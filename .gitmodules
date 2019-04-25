@@ -1,0 +1,4 @@
+[submodule "qmk_firmware"]
+	path = qmk_firmware
+	url = git@github.com:tzarc/qmk_firmware.git
+	branch = cyclone

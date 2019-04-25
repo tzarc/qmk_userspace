@@ -2,6 +2,10 @@ export PATH := $(HOME)/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$(PATH)
 
 all: bin
 
+update:
+	git submodule update --remote
+	make -C qmk_firmware git-submodule
+
 clean:
 	rm *.bin
 	make -C qmk_firmware clean
