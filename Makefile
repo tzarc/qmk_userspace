@@ -1,33 +1,46 @@
+export ROOTDIR := $(shell pwd)
 export PATH := $(HOME)/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$(PATH)
 
 all: bin
 
 update:
 	git submodule update --remote
-	make -C qmk_firmware git-submodule
+	make -C "$(ROOTDIR)/qmk_firmware" git-submodule
 
 clean:
 	rm *.bin || true
-	make -C qmk_firmware clean || true
+	make -C "$(ROOTDIR)/qmk_firmware" clean || true
 
 distclean:
 	rm *.bin || true
-	make -C qmk_firmware distclean || true
+	make -C "$(ROOTDIR)/qmk_firmware" distclean || true
 
-CYCLONE_DEPS = $(shell find qmk_firmware/keyboards/tzarc/cyclone -type f)
+bin: tzarc_cyclone_L082_default.bin
 
-bin: tzarc_cyclone_default.bin
+CYCLONE_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/tzarc/cyclone_L082" -type f)
+tzarc_cyclone_L082_default.bin: $(CYCLONE_DEPS)
+	#make -C "$(ROOTDIR)/qmk_firmware" tzarc/cyclone_L082:default
+	make -j$(shell nproc) -C "$(ROOTDIR)/qmk_firmware" tzarc/cyclone_L082:default
+	cp "$(ROOTDIR)/qmk_firmware/tzarc_cyclone_L082_default.bin" "$(ROOTDIR)"
 
-tzarc_cyclone_default.bin: $(CYCLONE_DEPS)
-	make -j$(shell nproc) -C "qmk_firmware" tzarc/cyclone:default
-	cp "qmk_firmware/tzarc_cyclone_default.bin" "."
-
-flash: bin
-	openocd -s /usr/share/openocd/scripts -f stlink.cfg -c "program tzarc_cyclone_default.bin 0x08000000 verify" -c "reset" -c "exit"
+flash: stlink bin
+	st-flash write "$(ROOTDIR)/tzarc_cyclone_L082_default.bin" 0x08000000
 
 debug: bin
-	arm-none-eabi-gdb --command=./gdbinit --exec=./qmk_firmware/.build/tzarc_cyclone_default.elf --symbols=./qmk_firmware/.build/tzarc_cyclone_default.elf
+	{ cd "$(ROOTDIR)/qmk_firmware" && arm-none-eabi-gdb --command="$(ROOTDIR)/gdbinit" --exec="$(ROOTDIR)/qmk_firmware/.build/tzarc_cyclone_L082_default.elf" --symbols="$(ROOTDIR)/qmk_firmware/.build/tzarc_cyclone_L082_default.elf" ; }
 
-CYCLONE_FORMATTABLE_FILES = $(shell find qmk_firmware/keyboards/tzarc/cyclone -maxdepth 1 -type f \( -name 'cyclone*.h' -or -name 'cyclone*.c' -or -name 'cyclone*.cpp' \))
+dump: bin
+	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/tzarc_cyclone_L082_default.elf"
+
+CYCLONE_FORMATTABLE_FILES = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/tzarc/cyclone_L082" -maxdepth 1 -type f \( -name 'config.h' -or -name 'cyclone*.h' -or -name 'cyclone*.c' -or -name 'cyclone*.cpp' \))
 format:
-	@for file in $(CYCLONE_FORMATTABLE_FILES); do clang-format -i $$file ; done
+	@for file in $(CYCLONE_FORMATTABLE_FILES); do clang-format -i "$$file" ; dos2unix "$$file" ; done
+
+stlink: /usr/local/bin/st-flash
+
+/usr/local/bin/st-flash:
+	sudo apt install -y build-essential cmake libusb-1.0 libusb-1.0-0-dev
+	[ -d "$(ROOTDIR)/stlink-repo/.git" ] || git clone https://github.com/texane/stlink.git "$(ROOTDIR)/stlink-repo"
+	[ -d "$(ROOTDIR)/stlink-build" ] || mkdir -p "$(ROOTDIR)/stlink-build"
+	{ umask 022; cd "$(ROOTDIR)/stlink-build" && cmake -DCMAKE_BUILD_TYPE=Release ../stlink-repo && make -j$(shell nproc) && sudo make install && sudo ldconfig ; }
+	rm -rf "$(ROOTDIR)/stlink-build" "$(ROOTDIR)/stlink-repo"
