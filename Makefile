@@ -24,6 +24,7 @@ tzarc_cyclone_L412_default.bin: $(CYCLONE_DEPS)
 	cp "$(ROOTDIR)/qmk_firmware/tzarc_cyclone_L412_default.bin" "$(ROOTDIR)"
 
 flash: stlink bin
+	st-flash erase
 	st-flash write "$(ROOTDIR)/tzarc_cyclone_L412_default.bin" 0x08000000
 
 debug: bin
