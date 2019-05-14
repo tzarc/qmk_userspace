@@ -20,7 +20,7 @@ bin: bin_L082 bin_L412
 CYCLONE_L082_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/tzarc/cyclone/L082" -type f)
 tzarc_cyclone_L082_default.bin: $(CYCLONE_L082_DEPS)
 	#make -C "$(ROOTDIR)/qmk_firmware" tzarc/cyclone/L082:default
-	make -j$(shell nproc) -C "$(ROOTDIR)/qmk_firmware" tzarc/cyclone/L082:default
+	make -j -C "$(ROOTDIR)/qmk_firmware" tzarc/cyclone/L082:default
 	cp "$(ROOTDIR)/qmk_firmware/tzarc_cyclone_L082_default.bin" "$(ROOTDIR)"
 
 bin_L082: tzarc_cyclone_L082_default.bin
@@ -28,7 +28,7 @@ bin_L082: tzarc_cyclone_L082_default.bin
 CYCLONE_L412_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/tzarc/cyclone/L412" -type f)
 tzarc_cyclone_L412_default.bin: $(CYCLONE_L412_DEPS)
 	#make -C "$(ROOTDIR)/qmk_firmware" tzarc/cyclone/L412:default
-	make -j$(shell nproc) -C "$(ROOTDIR)/qmk_firmware" tzarc/cyclone/L412:default
+	make -j -C "$(ROOTDIR)/qmk_firmware" tzarc/cyclone/L412:default
 	cp "$(ROOTDIR)/qmk_firmware/tzarc_cyclone_L412_default.bin" "$(ROOTDIR)"
 
 bin_L412: tzarc_cyclone_L412_default.bin
