@@ -17,18 +17,22 @@ distclean:
 
 bin: bin_L082 bin_L412
 
+remove_L082:
+	@rm -f "$(ROOTDIR)/tzarc_cyclone_L082_default.bin" || true
+
 CYCLONE_L082_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/tzarc/cyclone/L082" -type f)
-tzarc_cyclone_L082_default.bin: $(CYCLONE_L082_DEPS)
-	#make -C "$(ROOTDIR)/qmk_firmware" tzarc/cyclone/L082:default
-	make -j -C "$(ROOTDIR)/qmk_firmware" tzarc/cyclone/L082:default
+tzarc_cyclone_L082_default.bin: remove_L082 $(CYCLONE_L082_DEPS)
+	make -C "$(ROOTDIR)/qmk_firmware" tzarc/cyclone/L082:default
 	cp "$(ROOTDIR)/qmk_firmware/tzarc_cyclone_L082_default.bin" "$(ROOTDIR)"
 
 bin_L082: tzarc_cyclone_L082_default.bin
 
+remove_L412:
+	@rm -f "$(ROOTDIR)/tzarc_cyclone_L412_default.bin" || true
+
 CYCLONE_L412_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/tzarc/cyclone/L412" -type f)
-tzarc_cyclone_L412_default.bin: $(CYCLONE_L412_DEPS)
-	#make -C "$(ROOTDIR)/qmk_firmware" tzarc/cyclone/L412:default
-	make -j -C "$(ROOTDIR)/qmk_firmware" tzarc/cyclone/L412:default
+tzarc_cyclone_L412_default.bin: remove_L412 $(CYCLONE_L412_DEPS)
+	make -C "$(ROOTDIR)/qmk_firmware" tzarc/cyclone/L412:default
 	cp "$(ROOTDIR)/qmk_firmware/tzarc_cyclone_L412_default.bin" "$(ROOTDIR)"
 
 bin_L412: tzarc_cyclone_L412_default.bin
@@ -57,11 +61,11 @@ CYCLONE_COMMON_FORMATTABLE_FILES = $(shell find "$(ROOTDIR)/qmk_firmware/keyboar
 format_common:
 	@for file in $(CYCLONE_COMMON_FORMATTABLE_FILES); do echo "clang-format $${file}..." ; clang-format -i "$$file" ; dos2unix "$$file" ; done
 
-CYCLONE_L082_FORMATTABLE_FILES = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/tzarc/cyclone/L082" -maxdepth 1 -type f \( -name 'config.h' -or -name 'L082.h' \) | sort)
+CYCLONE_L082_FORMATTABLE_FILES = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/tzarc/cyclone/L082" -maxdepth 1 -type f \( -name 'config.h' -or -name 'L082.*' -or -name 'cyclone*' \) | sort)
 format_L082:
 	@for file in $(CYCLONE_L082_FORMATTABLE_FILES); do echo "clang-format $${file}..." ; clang-format -i "$$file" ; dos2unix "$$file" ; done
 
-CYCLONE_L412_FORMATTABLE_FILES = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/tzarc/cyclone/L412" -maxdepth 1 -type f \( -name 'config.h' -or -name 'L412.h' \) | sort)
+CYCLONE_L412_FORMATTABLE_FILES = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/tzarc/cyclone/L412" -maxdepth 1 -type f \( -name 'config.h' -or -name 'L412.*' -or -name 'cyclone*' \) | sort)
 format_L412:
 	@for file in $(CYCLONE_L412_FORMATTABLE_FILES); do echo "clang-format $${file}..." ; clang-format -i "$$file" ; dos2unix "$$file" ; done
 
