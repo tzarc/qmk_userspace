@@ -37,6 +37,12 @@ tzarc_cyclone_L412_default.bin: remove_L412 $(CYCLONE_L412_DEPS)
 
 bin_L412: tzarc_cyclone_L412_default.bin
 
+dfu_L082: dfu-util tzarc_cyclone_L082_default.bin
+	make -C "$(ROOTDIR)/qmk_firmware" tzarc/cyclone/L082:default:dfu-util
+
+dfu_L412: dfu-util tzarc_cyclone_L412_default.bin
+	make -C "$(ROOTDIR)/qmk_firmware" tzarc/cyclone/L412:default:dfu-util
+
 flash_L082: stlink tzarc_cyclone_L082_default.bin
 	st-flash erase
 	st-flash write "$(ROOTDIR)/tzarc_cyclone_L082_default.bin" 0x08000000
@@ -74,9 +80,9 @@ format: format_common format_L082 format_L412
 stlink: /usr/local/bin/st-flash
 
 /usr/local/bin/st-flash:
-	sudo apt install -y build-essential cmake libusb-1.0 libusb-1.0-0-dev
-	[ -d "$(ROOTDIR)/stlink-repo/.git" ] || git clone https://github.com/texane/stlink.git "$(ROOTDIR)/stlink-repo"
-	[ -d "$(ROOTDIR)/stlink-build" ] || mkdir -p "$(ROOTDIR)/stlink-build"
-	{ umask 022; cd "$(ROOTDIR)/stlink-repo" && patch -p1 < "$(ROOTDIR)/patches/stlink_L412.patch" ; }
-	{ umask 022; cd "$(ROOTDIR)/stlink-build" && cmake -DCMAKE_BUILD_TYPE=Release ../stlink-repo && make -j$(shell nproc) && sudo make install && sudo ldconfig ; }
-	rm -rf "$(ROOTDIR)/stlink-build" "$(ROOTDIR)/stlink-repo"
+	$(ROOTDIR)/build_st-flash.sh
+
+dfu-util: /usr/local/bin/dfu-util
+
+/usr/local/bin/dfu-util:
+	$(ROOTDIR)/build_dfu-util.sh
