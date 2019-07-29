@@ -18,7 +18,7 @@ distclean:
 	rm *.bin *.hex || true
 	make -C "$(ROOTDIR)/qmk_firmware" distclean || true
 
-bin: bin_cyclone bin_luddite
+bin: cyclone luddite chocopad
 
 format: format_cyclone
 
@@ -101,3 +101,26 @@ dfu_luddite: dfu-util 40percentclub_luddite_tzarc.hex
 
 dump_luddite: bin_luddite
 	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/40percentclub_luddite_tzarc.elf"
+
+########################################################################################################################
+# Chocopad
+
+chocopad: bin_chocopad
+
+remove_chocopad:
+	@rm -f "$(ROOTDIR)"/keebio_chocopad_default*.hex || true
+
+bin_chocopad: keebio_chocopad_default.hex
+
+CHOCOPAD_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/keebio/chocopad/keymaps/default" -type f)
+keebio_chocopad_default.hex: remove_chocopad $(CHOCOPAD_DEPS)
+	make -C "$(ROOTDIR)/qmk_firmware" keebio/chocopad:default:production
+	cp "$(ROOTDIR)/qmk_firmware"/keebio_chocopad_default*.hex "$(ROOTDIR)"
+
+bin_chocopad: keebio_chocopad_default.hex
+
+dfu_chocopad: dfu-util keebio_chocopad_default.hex
+	make -C "$(ROOTDIR)/qmk_firmware" keebio/chocopad:default:dfu
+
+dump_chocopad: bin_chocopad
+	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/keebio_chocopad_default.elf"
