@@ -1,3 +1,6 @@
+########################################################################################################################
+# Common
+
 export ROOTDIR := $(shell pwd)
 export PATH := $(HOME)/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$(PATH)
 
@@ -8,81 +11,93 @@ update:
 	make -C "$(ROOTDIR)/qmk_firmware" git-submodule
 
 clean:
-	rm *.bin || true
+	rm *.bin *.hex || true
 	make -C "$(ROOTDIR)/qmk_firmware" clean || true
 
 distclean:
-	rm *.bin || true
+	rm *.bin *.hex || true
 	make -C "$(ROOTDIR)/qmk_firmware" distclean || true
 
-bin: bin_L082 bin_L412
+bin: bin_cyclone bin_luddite
 
-remove_L082:
-	@rm -f "$(ROOTDIR)/handwired_tzarc_cyclone_L082_default.bin" || true
+format: format_cyclone
 
-CYCLONE_L082_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone/L082" -type f)
-handwired_tzarc_cyclone_L082_default.bin: remove_L082 $(CYCLONE_L082_DEPS)
-	make -C "$(ROOTDIR)/qmk_firmware" handwired/tzarc/cyclone/L082:default
-	cp "$(ROOTDIR)/qmk_firmware/handwired_tzarc_cyclone_L082_default.bin" "$(ROOTDIR)"
-
-bin_L082: handwired_tzarc_cyclone_L082_default.bin
-
-remove_L412:
-	@rm -f "$(ROOTDIR)/handwired_tzarc_cyclone_L412_default.bin" || true
-
-CYCLONE_L412_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone/L412" -type f)
-handwired_tzarc_cyclone_L412_default.bin: remove_L412 $(CYCLONE_L412_DEPS)
-	make -C "$(ROOTDIR)/qmk_firmware" handwired/tzarc/cyclone/L412:default
-	cp "$(ROOTDIR)/qmk_firmware/handwired_tzarc_cyclone_L412_default.bin" "$(ROOTDIR)"
-
-bin_L412: handwired_tzarc_cyclone_L412_default.bin
-
-dfu_L082: dfu-util handwired_tzarc_cyclone_L082_default.bin
-	make -C "$(ROOTDIR)/qmk_firmware" handwired/tzarc/cyclone/L082:default:dfu-util
-
-dfu_L412: dfu-util handwired_tzarc_cyclone_L412_default.bin
-	make -C "$(ROOTDIR)/qmk_firmware" handwired/tzarc/cyclone/L412:default:dfu-util
-
-flash_L082: stlink handwired_tzarc_cyclone_L082_default.bin
-	st-flash erase
-	st-flash write "$(ROOTDIR)/handwired_tzarc_cyclone_L082_default.bin" 0x08000000
-
-flash_L412: stlink handwired_tzarc_cyclone_L412_default.bin
-	st-flash erase
-	st-flash write "$(ROOTDIR)/handwired_tzarc_cyclone_L412_default.bin" 0x08000000
-
-debug_L082: bin
-	{ cd "$(ROOTDIR)/qmk_firmware" && arm-none-eabi-gdb --command="$(ROOTDIR)/gdbinit" --exec="$(ROOTDIR)/qmk_firmware/.build/handwired_tzarc_cyclone_L082_default.elf" --symbols="$(ROOTDIR)/qmk_firmware/.build/handwired_tzarc_cyclone_L082_default.elf" ; }
-
-debug_L412: bin
-	{ cd "$(ROOTDIR)/qmk_firmware" && arm-none-eabi-gdb --command="$(ROOTDIR)/gdbinit" --exec="$(ROOTDIR)/qmk_firmware/.build/handwired_tzarc_cyclone_L412_default.elf" --symbols="$(ROOTDIR)/qmk_firmware/.build/handwired_tzarc_cyclone_L412_default.elf" ; }
-
-dump_L082: bin
-	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/handwired_tzarc_cyclone_L082_default.elf"
-
-dump_L412: bin
-	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/handwired_tzarc_cyclone_L412_default.elf"
-
-CYCLONE_COMMON_FORMATTABLE_FILES = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone" -maxdepth 1 -type f \( -name '*.h' -or -name '*.c' -or -name '*.cpp' \) | sort)
-format_common:
-	@for file in $(CYCLONE_COMMON_FORMATTABLE_FILES); do echo "clang-format $${file}..." ; clang-format -i "$$file" ; dos2unix "$$file" ; done
-
-CYCLONE_L082_FORMATTABLE_FILES = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone/L082" -maxdepth 1 -type f \( -name 'config.h' -or -name 'L082.*' -or -name 'cyclone*' \) | sort)
-format_L082:
-	@for file in $(CYCLONE_L082_FORMATTABLE_FILES); do echo "clang-format $${file}..." ; clang-format -i "$$file" ; dos2unix "$$file" ; done
-
-CYCLONE_L412_FORMATTABLE_FILES = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone/L412" -maxdepth 1 -type f \( -name 'config.h' -or -name 'L412.*' -or -name 'cyclone*' \) | sort)
-format_L412:
-	@for file in $(CYCLONE_L412_FORMATTABLE_FILES); do echo "clang-format $${file}..." ; clang-format -i "$$file" ; dos2unix "$$file" ; done
-
-format: format_common format_L082 format_L412
+########################################################################################################################
+# ST-Flash
 
 stlink: /usr/local/bin/st-flash
 
 /usr/local/bin/st-flash:
 	$(ROOTDIR)/build_st-flash.sh
 
+########################################################################################################################
+# DFU Util
+
 dfu-util: /usr/local/bin/dfu-util
 
 /usr/local/bin/dfu-util:
 	$(ROOTDIR)/build_dfu-util.sh
+
+########################################################################################################################
+# Cyclone
+
+DEFAULT_CYCLONE = handwired_tzarc_cyclone_revA_default
+
+cyclone: bin_cyclone
+
+remove_cyclone:
+	@rm -f "$(ROOTDIR)/handwired_tzarc_cyclone_*.bin" || true
+
+bin_cyclone: handwired_tzarc_cyclone_revA_default.bin
+
+CYCLONE_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone" -type f)
+handwired_tzarc_cyclone_revA_default.bin: remove_cyclone $(CYCLONE_DEPS)
+	make -C "$(ROOTDIR)/qmk_firmware" handwired/tzarc/cyclone:default
+	cp "$(ROOTDIR)/qmk_firmware/handwired_tzarc_cyclone_revA_default.bin" "$(ROOTDIR)"
+
+bin_cyclone: $(DEFAULT_CYCLONE).bin
+
+dfu_cyclone: dfu-util $(DEFAULT_CYCLONE).bin
+	make -C "$(ROOTDIR)/qmk_firmware" handwired/tzarc/cyclone:default:dfu-util
+
+flash_cyclone: stlink $(DEFAULT_CYCLONE).bin
+	st-flash erase
+	st-flash write "$(ROOTDIR)/$(DEFAULT_CYCLONE).bin" 0x08000000
+
+debug_cyclone: bin_cyclone
+	{ cd "$(ROOTDIR)/qmk_firmware" && arm-none-eabi-gdb --command="$(ROOTDIR)/gdbinit" --exec="$(ROOTDIR)/qmk_firmware/.build/$(DEFAULT_CYCLONE).elf" --symbols="$(ROOTDIR)/qmk_firmware/.build/$(DEFAULT_CYCLONE).elf" ; }
+
+dump_cyclone: bin_cyclone
+	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/$(DEFAULT_CYCLONE).elf"
+
+CYCLONE_COMMON_FORMATTABLE_FILES = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone" -maxdepth 1 -type f \( -name '*.h' -or -name '*.c' \) | sort)
+CYCLONE_REVA_FORMATTABLE_FILES = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone/revA" -maxdepth 1 -type f \( -name 'config.h' -or -name '*revA*.h' -or -name '*revA*.c' \) | sort)
+format_cyclone:
+	@for file in $(CYCLONE_COMMON_FORMATTABLE_FILES) $(CYCLONE_REVA_FORMATTABLE_FILES); do \
+		echo "clang-format $${file}..." ; \
+		clang-format -i "$$file" ; \
+		dos2unix "$$file" ; \
+	done
+
+########################################################################################################################
+# Luddite
+
+luddite: bin_luddite
+
+remove_luddite:
+	@rm -f "$(ROOTDIR)"/40percentclub_luddite_tzarc*.hex || true
+
+bin_luddite: 40percentclub_luddite_tzarc.hex
+
+LUDDITE_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/40percentclub/luddite/keymaps/tzarc" -type f)
+40percentclub_luddite_tzarc.hex: remove_luddite $(LUDDITE_DEPS)
+	make -C "$(ROOTDIR)/qmk_firmware" 40percentclub/luddite:tzarc:production
+	cp "$(ROOTDIR)/qmk_firmware"/40percentclub_luddite_tzarc*.hex "$(ROOTDIR)"
+
+bin_luddite: 40percentclub_luddite_tzarc.hex
+
+dfu_luddite: dfu-util 40percentclub_luddite_tzarc.hex
+	make -C "$(ROOTDIR)/qmk_firmware" 40percentclub/luddite:tzarc:dfu
+
+dump_luddite: bin_luddite
+	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/40percentclub_luddite_tzarc.elf"
