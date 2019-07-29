@@ -50,13 +50,6 @@ remove_cyclone:
 
 bin_cyclone: handwired_tzarc_cyclone_revA_default.bin
 
-CYCLONE_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone" -type f)
-handwired_tzarc_cyclone_revA_default.bin: remove_cyclone $(CYCLONE_DEPS)
-	make -C "$(ROOTDIR)/qmk_firmware" handwired/tzarc/cyclone:default
-	cp "$(ROOTDIR)/qmk_firmware/handwired_tzarc_cyclone_revA_default.bin" "$(ROOTDIR)"
-
-bin_cyclone: $(DEFAULT_CYCLONE).bin
-
 dfu_cyclone: dfu-util $(DEFAULT_CYCLONE).bin
 	make -C "$(ROOTDIR)/qmk_firmware" handwired/tzarc/cyclone:default:dfu-util
 
@@ -69,6 +62,11 @@ debug_cyclone: bin_cyclone
 
 dump_cyclone: bin_cyclone
 	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/$(DEFAULT_CYCLONE).elf"
+
+CYCLONE_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone" -type f)
+handwired_tzarc_cyclone_revA_default.bin: remove_cyclone $(CYCLONE_DEPS)
+	make -C "$(ROOTDIR)/qmk_firmware" handwired/tzarc/cyclone:default
+	cp "$(ROOTDIR)/qmk_firmware/handwired_tzarc_cyclone_revA_default.bin" "$(ROOTDIR)"
 
 CYCLONE_COMMON_FORMATTABLE_FILES = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone" -maxdepth 1 -type f \( -name '*.h' -or -name '*.c' \) | sort)
 CYCLONE_REVA_FORMATTABLE_FILES = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone/revA" -maxdepth 1 -type f \( -name 'config.h' -or -name '*revA*.h' -or -name '*revA*.c' \) | sort)
@@ -89,18 +87,22 @@ remove_luddite:
 
 bin_luddite: 40percentclub_luddite_tzarc.hex
 
-LUDDITE_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/40percentclub/luddite/keymaps/tzarc" -type f)
-40percentclub_luddite_tzarc.hex: remove_luddite $(LUDDITE_DEPS)
-	make -C "$(ROOTDIR)/qmk_firmware" 40percentclub/luddite:tzarc:production
-	cp "$(ROOTDIR)/qmk_firmware"/40percentclub_luddite_tzarc*.hex "$(ROOTDIR)"
-
-bin_luddite: 40percentclub_luddite_tzarc.hex
+boot_luddite: 40percentclub_luddite_tzarc_production.hex
 
 dfu_luddite: dfu-util 40percentclub_luddite_tzarc.hex
 	make -C "$(ROOTDIR)/qmk_firmware" 40percentclub/luddite:tzarc:dfu
 
 dump_luddite: bin_luddite
 	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/40percentclub_luddite_tzarc.elf"
+
+LUDDITE_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/40percentclub/luddite/keymaps/tzarc" -type f)
+40percentclub_luddite_tzarc.hex: remove_luddite $(LUDDITE_DEPS)
+	make -C "$(ROOTDIR)/qmk_firmware" 40percentclub/luddite:tzarc
+	cp "$(ROOTDIR)/qmk_firmware"/40percentclub_luddite_tzarc*.hex "$(ROOTDIR)"
+
+40percentclub_luddite_tzarc_production.hex: remove_luddite $(LUDDITE_DEPS)
+	make -C "$(ROOTDIR)/qmk_firmware" 40percentclub/luddite:tzarc:production
+	cp "$(ROOTDIR)/qmk_firmware"/40percentclub_luddite_tzarc*.hex "$(ROOTDIR)"
 
 ########################################################################################################################
 # Chocopad
@@ -112,15 +114,19 @@ remove_chocopad:
 
 bin_chocopad: keebio_chocopad_default.hex
 
-CHOCOPAD_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/keebio/chocopad/keymaps/default" -type f)
-keebio_chocopad_default.hex: remove_chocopad $(CHOCOPAD_DEPS)
-	make -C "$(ROOTDIR)/qmk_firmware" keebio/chocopad:default:production
-	cp "$(ROOTDIR)/qmk_firmware"/keebio_chocopad_default*.hex "$(ROOTDIR)"
-
-bin_chocopad: keebio_chocopad_default.hex
+boot_chocopad: keebio_chocopad_default_production.hex
 
 dfu_chocopad: dfu-util keebio_chocopad_default.hex
 	make -C "$(ROOTDIR)/qmk_firmware" keebio/chocopad:default:dfu
 
 dump_chocopad: bin_chocopad
 	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/keebio_chocopad_default.elf"
+
+CHOCOPAD_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/keebio/chocopad/keymaps/default" -type f)
+keebio_chocopad_default.hex: remove_chocopad $(CHOCOPAD_DEPS)
+	make -C "$(ROOTDIR)/qmk_firmware" keebio/chocopad:default
+	cp "$(ROOTDIR)/qmk_firmware"/keebio_chocopad_default*.hex "$(ROOTDIR)"
+
+keebio_chocopad_default_production.hex: remove_chocopad $(CHOCOPAD_DEPS)
+	make -C "$(ROOTDIR)/qmk_firmware" keebio/chocopad:default:production
+	cp "$(ROOTDIR)/qmk_firmware"/keebio_chocopad_default*.hex "$(ROOTDIR)"
