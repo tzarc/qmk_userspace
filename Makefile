@@ -41,14 +41,14 @@ dfu-util: /usr/local/bin/dfu-util
 ########################################################################################################################
 # Cyclone
 
-DEFAULT_CYCLONE = handwired_tzarc_cyclone_revA_default
+DEFAULT_CYCLONE = handwired_tzarc_cyclone_default
 
 cyclone: bin_cyclone
 
 remove_cyclone:
 	@rm -f "$(ROOTDIR)/handwired_tzarc_cyclone_*.bin" || true
 
-bin_cyclone: handwired_tzarc_cyclone_revA_default.bin
+bin_cyclone: handwired_tzarc_cyclone_default.bin
 
 dfu_cyclone: dfu-util $(DEFAULT_CYCLONE).bin
 	make -C "$(ROOTDIR)/qmk_firmware" handwired/tzarc/cyclone:default:dfu-util
@@ -64,14 +64,13 @@ dump_cyclone: bin_cyclone
 	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/$(DEFAULT_CYCLONE).elf"
 
 CYCLONE_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone" -type f)
-handwired_tzarc_cyclone_revA_default.bin: remove_cyclone $(CYCLONE_DEPS)
+handwired_tzarc_cyclone_default.bin: remove_cyclone $(CYCLONE_DEPS)
 	make -C "$(ROOTDIR)/qmk_firmware" handwired/tzarc/cyclone:default
-	cp "$(ROOTDIR)/qmk_firmware/handwired_tzarc_cyclone_revA_default.bin" "$(ROOTDIR)"
+	cp "$(ROOTDIR)/qmk_firmware/handwired_tzarc_cyclone_default.bin" "$(ROOTDIR)"
 
-CYCLONE_COMMON_FORMATTABLE_FILES = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone" -maxdepth 1 -type f \( -name '*.h' -or -name '*.c' \) | sort)
-CYCLONE_REVA_FORMATTABLE_FILES = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone/revA" -maxdepth 1 -type f \( -name 'config.h' -or -name '*revA*.h' -or -name '*revA*.c' \) | sort)
+CYCLONE_COMMON_FORMATTABLE_FILES = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone" -maxdepth 1 -type f \( -name '*.h' -or -name '*.c' \) -and -not -name '*conf.h' | sort)
 format_cyclone:
-	@for file in $(CYCLONE_COMMON_FORMATTABLE_FILES) $(CYCLONE_REVA_FORMATTABLE_FILES); do \
+	@for file in $(CYCLONE_COMMON_FORMATTABLE_FILES) ; do \
 		echo "clang-format $${file}..." ; \
 		clang-format -i "$$file" ; \
 		dos2unix "$$file" ; \
