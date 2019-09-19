@@ -1,4 +1,4 @@
 *.hex
 *.bin
 .vscode/ipch
-tzarc
+.clang-format
