@@ -26,21 +26,20 @@ BOOTMAGIC_ENABLE = yes    # Virtual DIP switch configuration
 MOUSEKEY_ENABLE = yes     # Mouse keys
 EXTRAKEY_ENABLE = yes     # Audio control and System control
 CONSOLE_ENABLE = yes      # Console for debug
-# COMMAND_ENABLE = yes      # Commands for debug and configuration
+#COMMAND_ENABLE = yes      # Commands for debug and configuration
 NKRO_ENABLE = yes         # USB Nkey Rollover
 CUSTOM_MATRIX = yes       # Custom matrix file
 RAW_ENABLE = yes
 # SLEEP_LED_ENABLE = yes    # Breathing sleep LED during USB suspend
 
-# RGBLIGHT_ENABLE = yes
 RGB_MATRIX_ENABLE = WS2812
 WS2812_DRIVER = bitbang
 
 #EEPROM_DRIVER = i2c
 
-#OLED_DRIVER_ENABLE = yes
+OLED_DRIVER_ENABLE = yes
 # AUDIO_ENABLE = yes
-# LINK_TIME_OPTIMIZATION_ENABLE = yes
+#LINK_TIME_OPTIMIZATION_ENABLE = yes
 
 SRC += \
 	bootloader.c \

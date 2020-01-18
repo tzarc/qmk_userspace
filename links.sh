@@ -18,3 +18,7 @@ if [[ ! -L "$script_dir/qmk_firmware/keyboards/handwired/tzarc/cyclone" ]] ; the
         || mkdir -p "$script_dir/qmk_firmware/keyboards/handwired/tzarc"
     ln -sf "$script_dir/tzarc-cyclone" "$script_dir/qmk_firmware/keyboards/handwired/tzarc/cyclone"
 fi
+
+if [[ ! -L "$script_dir/.clang-format" ]] ; then
+    ln -sf "$script_dir/qmk_firmware/.clang-format" "$script_dir/.clang-format"
+fi

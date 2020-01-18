@@ -4,51 +4,51 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        {
-            "name": "Black Magic Probe",
-            "type": "cppdbg",
-            "request": "launch",
-            "cwd": "${workspaceRoot}",
-            "MIMode": "gdb",
-            "targetArchitecture": "arm",
-            "logging": {
-                "engineLogging": true
+      {
+        "name": "Black Magic Probe",
+        "type": "cppdbg",
+        "request": "launch",
+        "cwd": "${workspaceRoot}",
+        "MIMode": "gdb",
+        "targetArchitecture": "arm",
+        "logging": {
+            "engineLogging": true
+        },
+        "program": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_cyclone_default.elf",
+        "miDebuggerPath": "arm-none-eabi-gdb",
+        "customLaunchSetupCommands": [
+            {
+              "text": "cd ${workspaceRoot}\\qmk_firmware\\.build"
             },
-            "program": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_cyclone_default.elf",
-            "miDebuggerPath": "arm-none-eabi-gdb",
-            "customLaunchSetupCommands": [
-                {
-                  "text": "cd ${workspaceRoot}\\qmk_firmware\\.build"
-                },
-                {
-                  "text": "target extended-remote \\\\.\\COM16" /* replace with your COM or /dev/ttyX */
-                },
-                {
-                  "text": "monitor swdp_scan"
-                },
-                {
-                  "text": "attach 1"
-                },
-                {
-                  "text": "file handwired_tzarc_cyclone_default.elf"
-                },
-                {
-                  "text": "load"
-                },
-                {
-                    "text": "cd ${workspaceRoot}\\qmk_firmware" /* set bath back so VScode can find source files */
-                },
-                {
-                  "text": "set mem inaccessible-by-default off"
-                },
-                {
-                  "text": "break main"
-                }
-              ],
-            "serverLaunchTimeout": 10000,
-            "windows": {
-                "miDebuggerPath": "arm-none-eabi-gdb.exe"
+            {
+              "text": "target extended-remote \\\\.\\COM16" /* replace with your COM or /dev/ttyX */
+            },
+            {
+              "text": "monitor swdp_scan"
+            },
+            {
+              "text": "attach 1"
+            },
+            {
+              "text": "file handwired_tzarc_cyclone_default.elf"
+            },
+            {
+              "text": "load"
+            },
+            {
+              "text": "cd ${workspaceRoot}\\qmk_firmware" /* set bath back so VScode can find source files */
+            },
+            {
+              "text": "set mem inaccessible-by-default off"
+            },
+            {
+              "text": "break main"
             }
+          ],
+        "serverLaunchTimeout": 10000,
+        "windows": {
+            "miDebuggerPath": "arm-none-eabi-gdb.exe"
         }
-    ]
+    }
+  ]
 }

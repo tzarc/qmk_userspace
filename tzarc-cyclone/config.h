@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DESCRIPTION Cyclone Gamepad
 
 /* matrix debugging */
-#define DEBUG_MATRIX_SCAN_RATE
+// #define DEBUG_MATRIX_SCAN_RATE
 
 /* key matrix size */
 #define MATRIX_ROWS 8
@@ -91,6 +91,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    define RGB_MATRIX_KEYPRESSES
 #    define RGB_MATRIX_FRAMEBUFFER_EFFECTS
 #endif  // RGB_MATRIX_ENABLE
+
+#define IS_COMMAND() (matrix_is_on(5, 0) && matrix_is_on(6, 0))  // caps+shift
 
 /*
  * Feature disable options

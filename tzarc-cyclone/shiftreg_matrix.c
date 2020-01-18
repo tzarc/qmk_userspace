@@ -121,6 +121,7 @@ void matrix_init(void) {
         matrix[i] = 0x00;
     }
 
+#ifndef NO_MATRIX_OUTPUT
     pin_output_init(SHIFTREG_MATRIX_ROW_LATCH, 0);
     pin_output_init(SHIFTREG_MATRIX_ROW_CLK, 0);
     pin_output_init(SHIFTREG_MATRIX_ROW_DATA, 0);
@@ -134,11 +135,13 @@ void matrix_init(void) {
     pin_low(SHIFTREG_MATRIX_ROW_CLK);
     pin_high(SHIFTREG_MATRIX_COL_LATCH);
     pin_low(SHIFTREG_MATRIX_COL_CLK);
+#endif
 
     debounce_init(MATRIX_ROWS);
 
     matrix_init_quantum();
 
+#ifndef NO_MATRIX_OUTPUT
     // Write zeros to the output shift register
     pin_low(SHIFTREG_MATRIX_ROW_DATA);
     for (uint8_t i = 0; i < MATRIX_ROWS; ++i) {
@@ -146,6 +149,7 @@ void matrix_init(void) {
     }
 
     latch_output_register();
+#endif
 }
 
 uint8_t matrix_scan(void) {
