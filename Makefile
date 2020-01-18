@@ -167,7 +167,7 @@ dump_cyclone: bin_cyclone
 
 CYCLONE_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone" -type f)
 handwired_tzarc_cyclone_default.bin: remove_cyclone $(CYCLONE_DEPS)
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" handwired/tzarc/cyclone:default __CFLAGS+="-Wcast-align"
+	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" handwired/tzarc/cyclone:default
 	cp "$(ROOTDIR)/qmk_firmware/handwired_tzarc_cyclone_default.bin" "$(ROOTDIR)"
 
 ########################################################################################################################

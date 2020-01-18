@@ -22,14 +22,14 @@ MCU  = cortex-m0plus
 ARMV = 6
 
 # Build Options
-#BOOTMAGIC_ENABLE = yes    # Virtual DIP switch configuration
-#MOUSEKEY_ENABLE = yes     # Mouse keys
-#EXTRAKEY_ENABLE = yes     # Audio control and System control
+BOOTMAGIC_ENABLE = yes    # Virtual DIP switch configuration
+MOUSEKEY_ENABLE = yes     # Mouse keys
+EXTRAKEY_ENABLE = yes     # Audio control and System control
 CONSOLE_ENABLE = yes      # Console for debug
 # COMMAND_ENABLE = yes      # Commands for debug and configuration
-#NKRO_ENABLE = yes         # USB Nkey Rollover
+NKRO_ENABLE = yes         # USB Nkey Rollover
 CUSTOM_MATRIX = yes       # Custom matrix file
-#RAW_ENABLE = yes
+RAW_ENABLE = yes
 # SLEEP_LED_ENABLE = yes    # Breathing sleep LED during USB suspend
 
 # RGBLIGHT_ENABLE = yes
