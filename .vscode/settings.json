@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "quantum_keycodes.h": "c",
+        "keyboard.h": "c"
+    }
+}

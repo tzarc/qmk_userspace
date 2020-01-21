@@ -92,6 +92,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    define RGB_MATRIX_FRAMEBUFFER_EFFECTS
 #endif  // RGB_MATRIX_ENABLE
 
+#define JOYSTICK_BUTTON_COUNT 16
+#define JOYSTICK_AXES_COUNT 0
+
 #define IS_COMMAND() (matrix_is_on(5, 0) && matrix_is_on(6, 0))  // caps+shift
 
 /*
