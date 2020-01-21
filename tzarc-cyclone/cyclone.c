@@ -67,7 +67,21 @@ void            matrix_scan_user(void) {
         spiStop(&SPID1);
     }
 }
+#else
+uint32_t last_oled_timer_print = 0;
+extern uint32_t oled_timeout;
+
+void matrix_scan_user(void) {
+    /*
+    uint32_t now = timer_read32();
+    if (now - last_oled_timer_print > 1000) {
+        last_oled_timer_print = now;
+        uprintf("%6u/%6u/%6u\n", now, oled_timeout, oled_timeout - now);
+    }
+    */
+}
 #endif
+
 
 void matrix_init_kb(void) {
 #ifdef TEST_SPI_OUTPUT
@@ -77,6 +91,9 @@ void matrix_init_kb(void) {
     palSetPad(GPIOA, 1);
     palSetPadMode(GPIOA, 1, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST); /* New CS.      */
 #endif
+
+    palSetPadMode(GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL);
+    palClearPad(GPIOB, 0);
 
     // Set the level shifter GPIO directions and initial states, needs to be before shift registers get initialised
     setPinOutput(PIN_EN_5V_IO_INV);

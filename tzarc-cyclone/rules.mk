@@ -22,20 +22,20 @@ MCU  = cortex-m0plus
 ARMV = 6
 
 # Build Options
-BOOTMAGIC_ENABLE = yes    # Virtual DIP switch configuration
-MOUSEKEY_ENABLE = yes     # Mouse keys
-EXTRAKEY_ENABLE = yes     # Audio control and System control
-CONSOLE_ENABLE = yes      # Console for debug
-#COMMAND_ENABLE = yes      # Commands for debug and configuration
-NKRO_ENABLE = yes         # USB Nkey Rollover
-CUSTOM_MATRIX = yes       # Custom matrix file
-RAW_ENABLE = yes
-# SLEEP_LED_ENABLE = yes    # Breathing sleep LED during USB suspend
+BOOTMAGIC_ENABLE = full
+# MOUSEKEY_ENABLE = yes
+EXTRAKEY_ENABLE = yes
+CONSOLE_ENABLE = yes
+COMMAND_ENABLE = no
+# NKRO_ENABLE = yes
+CUSTOM_MATRIX = yes
+RAW_ENABLE = no
+# SLEEP_LED_ENABLE = yes
 
 RGB_MATRIX_ENABLE = WS2812
 WS2812_DRIVER = bitbang
-
-EEPROM_DRIVER = i2c
+# WS2812_DRIVER = pwm
+CIE1931_CURVE = yes
 
 OLED_DRIVER_ENABLE = yes
 # AUDIO_ENABLE = yes

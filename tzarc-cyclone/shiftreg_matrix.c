@@ -101,7 +101,8 @@ static inline int delayed_pin_read(int pin) {
 static matrix_row_t raw_matrix[MATRIX_ROWS];
 static matrix_row_t matrix[MATRIX_ROWS];
 
-static bool is_modified = false;
+static bool is_initialised = false;
+static bool is_modified    = false;
 
 __attribute__((weak)) void matrix_init_kb(void) { matrix_init_user(); }
 
@@ -115,7 +116,7 @@ inline uint8_t matrix_rows(void) { return MATRIX_ROWS; }
 
 inline uint8_t matrix_cols(void) { return MATRIX_COLS; }
 
-void matrix_init(void) {
+static inline void matrix_init_pins(void) {
     // Clear the stored matrix
     for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
         matrix[i] = 0x00;
@@ -135,13 +136,7 @@ void matrix_init(void) {
     pin_low(SHIFTREG_MATRIX_ROW_CLK);
     pin_high(SHIFTREG_MATRIX_COL_LATCH);
     pin_low(SHIFTREG_MATRIX_COL_CLK);
-#endif
 
-    debounce_init(MATRIX_ROWS);
-
-    matrix_init_quantum();
-
-#ifndef NO_MATRIX_OUTPUT
     // Write zeros to the output shift register
     pin_low(SHIFTREG_MATRIX_ROW_DATA);
     for (uint8_t i = 0; i < MATRIX_ROWS; ++i) {
@@ -150,9 +145,28 @@ void matrix_init(void) {
 
     latch_output_register();
 #endif
+
+    is_initialised = true;
+}
+
+void matrix_init(void) {
+    // Need to see if the pin configs been initialised -- via calls matrix_scan without any sort of init
+    if (!is_initialised) {
+        matrix_init_kb();
+        matrix_init_pins();
+    }
+
+    debounce_init(MATRIX_ROWS);
+    matrix_init_quantum();
 }
 
 uint8_t matrix_scan(void) {
+    // Need to see if the pin configs been initialised -- via calls matrix_scan without any sort of init
+    if (!is_initialised) {
+        matrix_init_kb();
+        matrix_init_pins();
+    }
+
     // Keep track of if something was modified
     is_modified = false;
 

@@ -26,7 +26,7 @@ distclean:
 	rm *.bin *.hex *.dump || true
 	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" distclean || true
 
-bin: cyclone iris luddite chocopad
+bin: cyclone iris luddite chocopad ctrl
 
 format: format_boards
 
@@ -64,7 +64,7 @@ dump_cyclone: bin_cyclone
 
 CYCLONE_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone" -type f)
 handwired_tzarc_cyclone_default.bin: remove_cyclone $(CYCLONE_DEPS)
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" handwired/tzarc/cyclone:default # CFLAGS+="-g" OPT=1 DEBUG=1
+	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" handwired/tzarc/cyclone:default # CFLAGS+="-g" OPT=0 DEBUG=1
 	cp "$(ROOTDIR)/qmk_firmware/handwired_tzarc_cyclone_default.bin" "$(ROOTDIR)"
 
 ########################################################################################################################
@@ -127,23 +127,41 @@ LUDDITE_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/40percentclub/lud
 chocopad: bin_chocopad
 
 remove_chocopad:
-	@rm -f "$(ROOTDIR)"/keebio_chocopad_default*.hex || true
+	@rm -f "$(ROOTDIR)"/keebio_chocopad_tzarc*.hex || true
 
-bin_chocopad: keebio_chocopad_default.hex
+bin_chocopad: keebio_chocopad_tzarc.hex
 
-boot_chocopad: keebio_chocopad_default_production.hex
+boot_chocopad: keebio_chocopad_tzarc_production.hex
 
-flash_chocopad: dfu-util keebio_chocopad_default.hex
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" keebio/chocopad:default:flash
+flash_chocopad: dfu-util keebio_chocopad_tzarc.hex
+	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" keebio/chocopad:tzarc:flash
 
 dump_chocopad: bin_chocopad
-	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/keebio_chocopad_default.elf"
+	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/keebio_chocopad_tzarc.elf"
 
 CHOCOPAD_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/keebio/chocopad/keymaps/default" -type f)
-keebio_chocopad_default.hex: remove_chocopad $(CHOCOPAD_DEPS)
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" keebio/chocopad:default
-	cp "$(ROOTDIR)/qmk_firmware"/keebio_chocopad_default*.hex "$(ROOTDIR)"
+keebio_chocopad_tzarc.hex: remove_chocopad $(CHOCOPAD_DEPS)
+	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" keebio/chocopad:tzarc
+	cp "$(ROOTDIR)/qmk_firmware"/keebio_chocopad_tzarc*.hex "$(ROOTDIR)"
 
-keebio_chocopad_default_production.hex: remove_chocopad $(CHOCOPAD_DEPS)
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" keebio/chocopad:default:production
-	cp "$(ROOTDIR)/qmk_firmware"/keebio_chocopad_default*.hex "$(ROOTDIR)"
+keebio_chocopad_tzarc_production.hex: remove_chocopad $(CHOCOPAD_DEPS)
+	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" keebio/chocopad:tzarc:production
+	cp "$(ROOTDIR)/qmk_firmware"/keebio_chocopad_tzarc*.hex "$(ROOTDIR)"
+
+########################################################################################################################
+# Massdrop CTRL
+
+ctrl: bin_ctrl
+
+remove_ctrl:
+	@rm -f "$(ROOTDIR)"/massdrop_ctrl_tzarc*.bin || true
+
+bin_ctrl: massdrop_ctrl_tzarc.bin
+
+dump_ctrl: bin_ctrl
+	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/massdrop_ctrl_tzarc.elf"
+
+CTRL_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/massdrop/ctrl/keymaps/default" -type f)
+massdrop_ctrl_tzarc.bin: remove_ctrl $(CTRL_DEPS)
+	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" massdrop/ctrl:tzarc
+	cp "$(ROOTDIR)/qmk_firmware"/massdrop_ctrl_tzarc*.bin "$(ROOTDIR)"

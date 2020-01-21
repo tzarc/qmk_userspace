@@ -19,6 +19,15 @@ void bootloader_jump(void) {
     NVIC_SystemReset();
 }
 
+#define bootdelay(loopcount)                  \
+    do {                                      \
+        for (int i = 0; i < loopcount; ++i) { \
+            __asm__ volatile("nop\n\t"        \
+                             "nop\n\t"        \
+                             "nop\n\t");      \
+        }                                     \
+    } while (0)
+
 void enter_bootloader_mode_if_requested(void) {
     unsigned long* check = MAGIC_ADDR;
     if (*check == BOOTLOADER_MAGIC) {
@@ -28,10 +37,9 @@ void enter_bootloader_mode_if_requested(void) {
         // Instead, we do it with hardware... toggle PB0 high, let it charge a capacitor across BOOT0, then issue a system reset.
         palSetPadMode(GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL);
         palSetPad(GPIOB, 0);
-        chThdSleepMilliseconds(100);
-        palSetPadMode(GPIOB, 0, PAL_MODE_INPUT_PULLDOWN);
+        bootdelay(10000);
         palClearPad(GPIOB, 0);
-        chThdSleepMilliseconds(1);
+        palSetPadMode(GPIOB, 0, PAL_MODE_INPUT_PULLDOWN);
         NVIC_SystemReset();
     }
 }

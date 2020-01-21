@@ -16,8 +16,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 /* USB Device descriptor parameter */
-#define VENDOR_ID 0xFEED
-#define PRODUCT_ID 0x6464
+#define VENDOR_ID 0xF055
+#define PRODUCT_ID 0x4919
 #define DEVICE_VER 0x0001
 #define MANUFACTURER QMK
 #define PRODUCT Cyclone
@@ -26,11 +26,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* matrix debugging */
 // #define DEBUG_MATRIX_SCAN_RATE
 
+// STM32L082's have 6kB EEPROM
+#define STM32_ONBOARD_EEPROM_SIZE (6 * 1024)
+#define DYNAMIC_KEYMAP_MACRO_EEPROM_SIZE (STM32_ONBOARD_EEPROM_SIZE - DYNAMIC_KEYMAP_MACRO_EEPROM_ADDR)
+
 /* key matrix size */
 #define MATRIX_ROWS 8
 #define MATRIX_COLS 8
-
 #define DIODE_DIRECTION CUSTOM_MATRIX
+
+/* Bootmagic lite definitions */
+#define BOOTMAGIC_LITE_ROW 2
+#define BOOTMAGIC_LITE_COLUMN 0
 
 /* Shift register matrix pin allocations */
 #define SHIFTREG_MATRIX_ROW_LATCH PIN_ROW_LATCH_3V3
@@ -73,10 +80,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* WS2812 configuration */
 #ifdef WS2812
+// Common
 #    define RGB_DI_PIN PIN_WS2812_3V3
 #    define RGBLED_NUM 15
+// Bitbang
 #    define NOP_FUDGE 0.5  // default of 0.4 gives flickering
-#endif                     // WS2812
+// PWM
+#    define WS2812_PWM_DRIVER PWMD2               // default: PWMD2
+#    define WS2812_PWM_CHANNEL 3                  // default: 2
+#    define WS2812_PWM_PAL_MODE 2                 // Pin "alternate function", see the respective datasheet for the appropriate values for your MCU. default: 2
+#    define WS2812_DMA_STREAM STM32_DMA1_STREAM2  // DMA Stream for TIMx_UP, see the respective reference manual for the appropriate values for your MCU.
+#    define WS2812_DMA_CHANNEL 8                  // DMA Channel for TIMx_UP, see the respective reference manual for the appropriate values for your MCU.
+#endif                                            // WS2812
 
 /* RGB backlighting configuration */
 #ifdef RGBLIGHT_ENABLE
@@ -95,7 +110,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define JOYSTICK_BUTTON_COUNT 16
 #define JOYSTICK_AXES_COUNT 0
 
-#define IS_COMMAND() (matrix_is_on(5, 0) && matrix_is_on(6, 0))  // caps+shift
+#define IS_COMMAND() (matrix_is_on(6, 0) && matrix_is_on(7, 0) && matrix_is_on(7, 1) && matrix_is_on(7, 2))  // shift+ctrl+win+alt
 
 /*
  * Feature disable options

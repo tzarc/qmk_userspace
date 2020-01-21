@@ -13,6 +13,10 @@ if [[ ! -L "$script_dir/qmk_firmware/keyboards/keebio/iris/keymaps/tzarc" ]] ; t
     ln -sf "$script_dir/tzarc-iris_rev4" "$script_dir/qmk_firmware/keyboards/keebio/iris/keymaps/tzarc"
 fi
 
+if [[ ! -L "$script_dir/qmk_firmware/keyboards/massdrop/ctrl/keymaps/tzarc" ]] ; then
+    ln -sf "$script_dir/tzarc-ctrl" "$script_dir/qmk_firmware/keyboards/massdrop/ctrl/keymaps/tzarc"
+fi
+
 if [[ ! -L "$script_dir/qmk_firmware/keyboards/handwired/tzarc/cyclone" ]] ; then
     [[ -d "$script_dir/qmk_firmware/keyboards/handwired/tzarc" ]] \
         || mkdir -p "$script_dir/qmk_firmware/keyboards/handwired/tzarc"
@@ -21,4 +25,16 @@ fi
 
 if [[ ! -L "$script_dir/.clang-format" ]] ; then
     ln -sf "$script_dir/qmk_firmware/.clang-format" "$script_dir/.clang-format"
+fi
+
+if [[ ! -L "$script_dir/qmk_firmware/keyboards/handwired/onekey/nucleo64_l152re" ]] ; then
+    ln -sf "$script_dir/alternates/nucleo64_l152re" "$script_dir/qmk_firmware/keyboards/handwired/onekey/nucleo64_l152re"
+fi
+
+if [[ ! -L "$script_dir/qmk_firmware/keyboards/handwired/onekey/nucleo64_g431rb" ]] ; then
+    ln -sf "$script_dir/alternates/nucleo64_g431rb" "$script_dir/qmk_firmware/keyboards/handwired/onekey/nucleo64_g431rb"
+fi
+
+if [[ ! -L "$script_dir/qmk_firmware/keyboards/handwired/onekey/nucleo64_g474re" ]] ; then
+    ln -sf "$script_dir/alternates/nucleo64_g474re" "$script_dir/qmk_firmware/keyboards/handwired/onekey/nucleo64_g474re"
 fi

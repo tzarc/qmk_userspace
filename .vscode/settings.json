@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "quantum_keycodes.h": "c",
-        "keyboard.h": "c"
+        "keyboard.h": "c",
+        "eeprom_driver.h": "c",
+        "eeprom_stm32_l0_l1.h": "c"
     }
 }

@@ -41,5 +41,3 @@ const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     )
 };
 // clang-format on
-
-const uint16_t fn_actions[] = {};
