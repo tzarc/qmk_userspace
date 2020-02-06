@@ -16,6 +16,11 @@
 #    include "oled_driver.h"
 #endif  // OLED_DRIVER_ENABLE
 
+#ifdef QWIIC_MICRO_OLED_ENABLE
+#    include "micro_oled.h"
+static void draw_ui(void);
+#endif  // QWIIC_MICRO_OLED_ENABLE
+
 #ifdef RGB_MATRIX_ENABLE
 led_config_t g_led_config = {{// Key Matrix to LED Index
                               {14, 12, 10, 8, 6, 4, 2, 0},
@@ -46,15 +51,12 @@ led_config_t g_led_config = {{// Key Matrix to LED Index
                               4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4}};
 #endif  // RGB_MATRIX_ENABLE
 
+void matrix_scan_user(void) {
 #ifdef TEST_SPI_OUTPUT
-/*
- * Half-speed SPI configuration (8MHz, CPHA=0, CPOL=0, MSb first).
- */
-static const SPIConfig hs_spicfg = {0, NULL, GPIOA, 1, SPI_CR1_BR_0, 0};
+    static const SPIConfig hs_spicfg = {0, NULL, GPIOA, 1, SPI_CR1_BR_0, 0};
 
-static uint32_t last = 0;
-void            matrix_scan_user(void) {
-    uint32_t now = timer_read32();
+    static uint32_t last = 0;
+    uint32_t        now  = timer_read32();
     if (now - last > 20) {
         const char txbuf[4] = {0x12, 0x34, 0x56, 0x78};
         char       rxbuf[4] = {0};
@@ -66,13 +68,16 @@ void            matrix_scan_user(void) {
         spiUnselect(&SPID1);                  /* Slave Select de-assertion.       */
         spiStop(&SPID1);
     }
-}
-#else
-uint32_t last_oled_timer_print = 0;
-extern uint32_t oled_timeout;
+#endif
 
-void matrix_scan_user(void) {
+#ifdef QWIIC_MICRO_OLED_ENABLE
+    (void)draw_ui;
+    draw_ui();
+#endif  // QWIIC_MICRO_OLED_ENABLE
+
     /*
+    uint32_t        last_oled_timer_print = 0;
+    extern uint32_t oled_timeout;
     uint32_t now = timer_read32();
     if (now - last_oled_timer_print > 1000) {
         last_oled_timer_print = now;
@@ -80,8 +85,6 @@ void matrix_scan_user(void) {
     }
     */
 }
-#endif
-
 
 void matrix_init_kb(void) {
 #ifdef TEST_SPI_OUTPUT
@@ -153,6 +156,20 @@ void    oled_task_user(void) {
     }
 }
 #endif  // OLED_DRIVER_ENABLE
+
+#ifdef QWIIC_MICRO_OLED_ENABLE
+uint8_t last_led_usb_state = 0xFF;
+void    draw_ui(void) {
+    uint8_t led_usb_state = host_keyboard_leds();
+    if (last_led_usb_state != led_usb_state) {
+        last_led_usb_state = led_usb_state;
+        draw_string(2, 2, led_usb_state & (1 << USB_LED_NUM_LOCK) ? PSTR("NUM  ") : PSTR("     "), PIXEL_ON, NORM, 0);
+        draw_string(2, 12, led_usb_state & (1 << USB_LED_CAPS_LOCK) ? PSTR("CAPS") : PSTR("     "), PIXEL_ON, NORM, 0);
+        draw_string(2, 22, led_usb_state & (1 << USB_LED_SCROLL_LOCK) ? PSTR("SCRL") : PSTR("     "), PIXEL_ON, NORM, 0);
+    }
+    send_buffer();
+}
+#endif  // QWIIC_MICRO_OLED_ENABLE
 
 void chibi_system_halt_hook(const char* reason) {
     // re-route to QMK toolbox...

@@ -107,6 +107,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    define RGB_MATRIX_FRAMEBUFFER_EFFECTS
 #endif  // RGB_MATRIX_ENABLE
 
+#ifdef QWIIC_MICRO_OLED_ENABLE
+#    define LCDWIDTH 128
+#    define LCDHEIGHT 32
+#    define I2C_ADDRESS_SA0_1 0x3C
+#endif  // QWIIC_MICRO_OLED_ENABLE
+
 #define JOYSTICK_BUTTON_COUNT 16
 #define JOYSTICK_AXES_COUNT 0
 

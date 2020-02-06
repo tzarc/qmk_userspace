@@ -1,167 +1,90 @@
-########################################################################################################################
-# Common
-
 export ROOTDIR := $(shell pwd)
+#export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-9-2019-q4-major/bin/:$(PATH)
 
-ifeq '$(findstring ;,$(PATH))' ';'
-    detected_OS := Windows
-else
-    detected_OS := $(shell uname 2>/dev/null || echo Unknown)
-    detected_OS := $(patsubst CYGWIN%,Cygwin,$(detected_OS))
-    detected_OS := $(patsubst MSYS%,MSYS,$(detected_OS))
-    detected_OS := $(patsubst MINGW%,MSYS,$(detected_OS))
-endif
+BOARD_DEFS := \
+	iris!tzarc-iris_rev4!keebio/iris/rev4/keymaps/tzarc!tzarc \
+	ctrl!tzarc-ctrl!massdrop/ctrl/keymaps/tzarc!tzarc \
+	luddite!tzarc-luddite!40percentclub/luddite/keymaps/tzarc!tzarc \
+	mysterium-nick!tzarc-mysterium!coseyfannitutti/mysterium/keymaps/tzarc!tzarc \
+	mysterium-dad!tzarc-mysterium-dad!coseyfannitutti/mysterium/keymaps/tzarc-dad!tzarc-dad \
+	chocopad!tzarc-chocopad!keebio/chocopad/keymaps/tzarc!tzarc \
+	cyclone!tzarc-cyclone!handwired/tzarc/cyclone!default \
+	onekey_l152!alternates/nucleo64_l152re!handwired/onekey/nucleo64_l152re!default \
+	onekey_g431!alternates/nucleo64_g431rb!handwired/onekey/nucleo64_g431rb!default \
+	onekey_g474!alternates/nucleo64_g474re!handwired/onekey/nucleo64_g474re!default \
 
 all: bin
 
-update:
-	git submodule update --remote
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" git-submodule
+remove_artifacts:
+	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format >/dev/null 2>&1 || true
 
-clean:
-	rm *.bin *.hex *.dump || true
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" clean || true
+clean: remove_artifacts
+	@$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" clean 2>&1 \
+		| egrep --line-buffered -iv '(Entering|Leaving) directory' \
+		| egrep --line-buffered -iv 'Bad file descriptor' || true
 
-distclean:
-	rm *.bin *.hex *.dump || true
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" distclean || true
+distclean: remove_artifacts
+	@$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" distclean 2>&1 \
+		| egrep --line-buffered -iv '(Entering|Leaving) directory' \
+		| egrep --line-buffered -iv 'Bad file descriptor' || true
 
-bin: cyclone iris luddite chocopad ctrl
+format_prereq:
+	@ln -sf $(ROOTDIR)/qmk_firmware/.clang-format $(ROOTDIR)/.clang-format
 
-format: format_boards
+format: format_prereq
 
-########################################################################################################################
-# Common
+define handle_board_entry
+board_name_$1 := $$(word 1,$$(subst !, ,$1))
+board_source_$1 := $$(word 2,$$(subst !, ,$1))
+board_target_$1 := $$(word 3,$$(subst !, ,$1))
+board_keymap_$1 := $$(word 4,$$(subst !, ,$1))
+board_qmk_$1 := $$(shell echo $$(board_target_$1) | sed -e 's@/keymaps/.*@@g')
+board_file_$1 := $$(shell echo $$(board_qmk_$1) | sed -e 's@/@_@g' -e 's@:@_@g')
+board_files_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f \( -name '*.h' -or -name '*.c' \) -and -not -name '*conf.h' -and -not -name 'board.c' -and -not -name 'board.h' | sort)
 
-BOARD_COMMON_FORMATTABLE_FILES = $(shell find "$(ROOTDIR)"/tzarc*/ -maxdepth 1 -type f \( -name '*.h' -or -name '*.c' \) -and -not -name '*conf.h' | sort)
-format_boards:
-	@for file in $(BOARD_COMMON_FORMATTABLE_FILES) ; do \
-		echo "formatting $${file}..." ; \
-		clang-format -i "$$file" ; \
-		dos2unix "$$file" ; \
+bin_$$(board_name_$1): board_link_$$(board_name_$1)
+	@echo "\e[38;5;14mBuilding: $$(board_qmk_$1)\e[0m"
+	@$(MAKE) -C "$(ROOTDIR)/qmk_firmware" $$(board_qmk_$1):$$(board_keymap_$1) 2>&1 \
+		| egrep --line-buffered -iv '(Entering|Leaving) directory' \
+		| egrep --line-buffered -iv 'Bad file descriptor'
+	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR)
+
+flash_$$(board_name_$1): bin_$$(board_name_$1)
+	@echo "\e[38;5;14mFlashing: $$(board_qmk_$1)\e[0m"
+	@$(MAKE) -C "$(ROOTDIR)/qmk_firmware" $$(board_qmk_$1):$$(board_keymap_$1):flash
+
+format_$$(board_name_$1): format_prereq
+	@for file in $$(board_files_$1) ; do \
+		echo "\e[38;5;14mFormatting: $$$$file\e[0m" ; \
+		clang-format-7 -i "$$$$file" >/dev/null 2>&1 ; \
+		dos2unix "$$$$file" >/dev/null 2>&1 ; \
 	done
 
-########################################################################################################################
-# Cyclone
+format: format_$$(board_name_$1)
 
-DEFAULT_CYCLONE = handwired_tzarc_cyclone_default
+$$(board_name_$1): bin_$$(board_name_$1)
+bin: bin_$$(board_name_$1)
 
-cyclone: bin_cyclone
+board_link_$$(board_name_$1):
+	@if [ ! -L "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ] ; then \
+		echo "\e[38;5;14mLinking: $$(board_source_$1) -> $$(board_target_$1)\e[0m" ; \
+		if [ ! -d "$$(shell dirname "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)")" ] ; then \
+			mkdir -p "$$(shell dirname "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)")" ; \
+		fi ; \
+		ln -sf "$$(ROOTDIR)/$$(board_source_$1)" "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ; \
+	fi ; \
+	touch $$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)
 
-remove_cyclone:
-	@rm -f "$(ROOTDIR)/handwired_tzarc_cyclone_*.bin" || true
+board_unlink_$$(board_name_$1):
+	@if [ -L "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ] ; then \
+		echo "\e[38;5;14mRemoving link: $$(board_target_$1)\e[0m" ; \
+		rm "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ; \
+	fi
 
-bin_cyclone: handwired_tzarc_cyclone_default.bin
+links: board_link_$$(board_name_$1)
+unlinks: board_unlink_$$(board_name_$1)
+clean: board_unlink_$$(board_name_$1)
+distclean: board_unlink_$$(board_name_$1)
+endef
 
-flash_cyclone: $(DEFAULT_CYCLONE).bin
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" handwired/tzarc/cyclone:default:flash
-
-debug_cyclone: bin_cyclone
-	{ cd "$(ROOTDIR)/qmk_firmware" && arm-none-eabi-gdb --command="$(ROOTDIR)/gdbinit" --exec="$(ROOTDIR)/qmk_firmware/.build/$(DEFAULT_CYCLONE).elf" --symbols="$(ROOTDIR)/qmk_firmware/.build/$(DEFAULT_CYCLONE).elf" ; }
-
-dump_cyclone: bin_cyclone
-	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/$(DEFAULT_CYCLONE).elf"
-
-CYCLONE_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/handwired/tzarc/cyclone" -type f)
-handwired_tzarc_cyclone_default.bin: remove_cyclone $(CYCLONE_DEPS)
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" handwired/tzarc/cyclone:default # CFLAGS+="-g" OPT=0 DEBUG=1
-	cp "$(ROOTDIR)/qmk_firmware/handwired_tzarc_cyclone_default.bin" "$(ROOTDIR)"
-
-########################################################################################################################
-# Iris rev4
-
-iris: bin_iris
-
-remove_iris:
-	@rm -f "$(ROOTDIR)"/keebio_iris_rev4*.hex || true
-
-bin_iris: keebio_iris_rev4_tzarc.hex
-
-boot_iris: keebio_iris_rev4_tzarc_production.hex
-
-flash_iris: keebio_iris_rev4_tzarc.hex
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" keebio/iris/rev4:tzarc:flash
-
-dump_iris: bin_iris
-	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/keebio_iris_rev4_tzarc.elf"
-
-IRIS_REV4_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/keebio/iris/keymaps/tzarc" -type f)
-keebio_iris_rev4_tzarc.hex: remove_iris $(IRIS_REV4_DEPS)
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" keebio/iris/rev4:tzarc
-	cp "$(ROOTDIR)/qmk_firmware"/keebio_iris_rev4_tzarc*.hex "$(ROOTDIR)"
-
-keebio_iris_rev4_tzarc_production.hex: remove_iris $(IRIS_REV4_DEPS)
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" keebio/iris/rev4:tzarc:production
-	cp "$(ROOTDIR)/qmk_firmware"/keebio_iris_rev4_tzarc*.hex "$(ROOTDIR)"
-
-########################################################################################################################
-# Luddite
-
-luddite: bin_luddite
-
-remove_luddite:
-	@rm -f "$(ROOTDIR)"/40percentclub_luddite_tzarc*.hex || true
-
-bin_luddite: 40percentclub_luddite_tzarc.hex
-
-boot_luddite: 40percentclub_luddite_tzarc_production.hex
-
-flash_luddite: 40percentclub_luddite_tzarc.hex
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" 40percentclub/luddite:tzarc:flash
-
-dump_luddite: bin_luddite
-	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/40percentclub_luddite_tzarc.elf"
-
-LUDDITE_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/40percentclub/luddite/keymaps/tzarc" -type f)
-40percentclub_luddite_tzarc.hex: remove_luddite $(LUDDITE_DEPS)
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" 40percentclub/luddite:tzarc
-	cp "$(ROOTDIR)/qmk_firmware"/40percentclub_luddite_tzarc*.hex "$(ROOTDIR)"
-
-40percentclub_luddite_tzarc_production.hex: remove_luddite $(LUDDITE_DEPS)
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" 40percentclub/luddite:tzarc:production
-	cp "$(ROOTDIR)/qmk_firmware"/40percentclub_luddite_tzarc*.hex "$(ROOTDIR)"
-
-########################################################################################################################
-# Chocopad
-
-chocopad: bin_chocopad
-
-remove_chocopad:
-	@rm -f "$(ROOTDIR)"/keebio_chocopad_tzarc*.hex || true
-
-bin_chocopad: keebio_chocopad_tzarc.hex
-
-boot_chocopad: keebio_chocopad_tzarc_production.hex
-
-flash_chocopad: dfu-util keebio_chocopad_tzarc.hex
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" keebio/chocopad:tzarc:flash
-
-dump_chocopad: bin_chocopad
-	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/keebio_chocopad_tzarc.elf"
-
-CHOCOPAD_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/keebio/chocopad/keymaps/default" -type f)
-keebio_chocopad_tzarc.hex: remove_chocopad $(CHOCOPAD_DEPS)
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" keebio/chocopad:tzarc
-	cp "$(ROOTDIR)/qmk_firmware"/keebio_chocopad_tzarc*.hex "$(ROOTDIR)"
-
-keebio_chocopad_tzarc_production.hex: remove_chocopad $(CHOCOPAD_DEPS)
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" keebio/chocopad:tzarc:production
-	cp "$(ROOTDIR)/qmk_firmware"/keebio_chocopad_tzarc*.hex "$(ROOTDIR)"
-
-########################################################################################################################
-# Massdrop CTRL
-
-ctrl: bin_ctrl
-
-remove_ctrl:
-	@rm -f "$(ROOTDIR)"/massdrop_ctrl_tzarc*.bin || true
-
-bin_ctrl: massdrop_ctrl_tzarc.bin
-
-dump_ctrl: bin_ctrl
-	arm-none-eabi-readelf -e "$(ROOTDIR)/qmk_firmware/.build/massdrop_ctrl_tzarc.elf"
-
-CTRL_DEPS = $(shell find "$(ROOTDIR)/qmk_firmware/keyboards/massdrop/ctrl/keymaps/default" -type f)
-massdrop_ctrl_tzarc.bin: remove_ctrl $(CTRL_DEPS)
-	$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" massdrop/ctrl:tzarc
-	cp "$(ROOTDIR)/qmk_firmware"/massdrop_ctrl_tzarc*.bin "$(ROOTDIR)"
+$(foreach board_entry,$(BOARD_DEFS),$(eval $(call handle_board_entry,$(board_entry))))

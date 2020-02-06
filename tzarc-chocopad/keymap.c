@@ -1,29 +1,61 @@
 #include QMK_KEYBOARD_H
 
-#define _BASE 0
-#define _FN1 1
-#define _FN2 2
+enum { _BASE = 0, _LAYER1, _LAYER2, _LAYER3, _LAYER4 };
+
+#define LAYER1 MO(_LAYER1)
+#define LAYER2 MO(_LAYER2)
+#define LAYER3 MO(_LAYER3)
+#define LAYER4 MO(_LAYER4)
+
+enum {
+    TBL_FLIP = SAFE_RANGE,
+};
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_BASE] = LAYOUT_ortho_4x4(
-    KC_PGUP,  KC_HOME,  KC_UP,    KC_END ,
-    KC_PGDN,  KC_LEFT,  KC_DOWN,  KC_RGHT,
-    MO(_FN2), KC_VOLU,  KC_MPLY,  KC_MPRV,
-    MO(_FN1), KC_VOLD,  KC_MUTE,  KC_MNXT
+    LAYER1,   KC_HOME,  KC_UP,    KC_END ,
+    LAYER2,   KC_LEFT,  KC_DOWN,  KC_RGHT,
+    LAYER3,   KC_VOLU,  KC_MPLY,  KC_MPRV,
+    LAYER4,   KC_VOLD,  KC_MUTE,  KC_MNXT
   ),
-  [_FN1] = LAYOUT_ortho_4x4(
-    KC_ESC,   KC_P7,    KC_P8,    KC_P9,
-    KC_TAB,   KC_P4,    KC_P5,    KC_P6,
-    KC_ENT,   KC_P1,    KC_P2,    KC_P3,
-    _______,  KC_P0,    KC_P0,    KC_DOT
+  [_LAYER1] = LAYOUT_ortho_4x4(
+    _______,  _______,  _______,  _______,
+    _______,  _______,  _______,  _______,
+    _______,  _______,  _______,  _______,
+    _______,  _______,  _______,  _______
   ),
-  [_FN2] = LAYOUT_ortho_4x4(
-    RGB_TOG,  RGB_HUI,  RGB_SAI,  RGB_VAI,
-    RGB_MOD,  RGB_HUD,  RGB_SAD,  RGB_VAD,
-    _______,  _______,  _______,  RESET,
-    BL_STEP,  _______,  _______,  _______
+  [_LAYER2] = LAYOUT_ortho_4x4(
+    _______,  _______,  _______,  _______,
+    _______,  _______,  _______,  _______,
+    _______,  _______,  _______,  _______,
+    _______,  _______,  _______,  _______
+  ),
+  [_LAYER3] = LAYOUT_ortho_4x4(
+    _______,  _______,  _______,  _______,
+    _______,  _______,  _______,  _______,
+    _______,  _______,  _______,  _______,
+    _______,  _______,  _______,  _______
+  ),
+  [_LAYER4] = LAYOUT_ortho_4x4(
+    _______,  _______,  _______,  _______,
+    _______,  _______,  _______,  _______,
+    _______,  _______,  _______,  _______,
+    _______,  _______,  _______,  TBL_FLIP
   )
 };
 // clang-format on
+
+void keyboard_post_init_user(void) { set_unicode_input_mode(UC_WINC); }
+
+bool process_record_user(uint16_t keycode, keyrecord_t* record) {
+    switch (keycode) {
+        case TBL_FLIP:
+            if (record->event.pressed) {
+                send_unicode_string("(ノಠ痊ಠ)ノ彡┻━┻");
+            }
+            return false;
+    }
+    return true;
+}

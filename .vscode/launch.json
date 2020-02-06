@@ -47,7 +47,7 @@
         ],
       "serverLaunchTimeout": 10000,
       "windows": {
-          "miDebuggerPath": "arm-none-eabi-gdb.exe"
+          "miDebuggerPath": "E:\\gcc-arm-none-eabi-8-2018-q4-major-win32\\bin\\arm-none-eabi-gdb.exe"
       }
   }
 

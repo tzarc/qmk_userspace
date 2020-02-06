@@ -33,12 +33,14 @@ RAW_ENABLE = no
 # SLEEP_LED_ENABLE = yes
 
 RGB_MATRIX_ENABLE = WS2812
-WS2812_DRIVER = bitbang
-# WS2812_DRIVER = pwm
+WS2812_DRIVER = pwm
 CIE1931_CURVE = yes
 
 OLED_DRIVER_ENABLE = yes
+#QWIIC_ENABLE += MICRO_OLED
+
 # AUDIO_ENABLE = yes
+
 LINK_TIME_OPTIMIZATION_ENABLE = yes
 
 SRC += \
@@ -46,3 +48,6 @@ SRC += \
 	shiftreg_matrix.c
 
 DFU_ARGS = -d 0483:df11 -a 0 -s 0x08000000:leave
+
+# Debugging
+#OPT_DEFS += -g -O0 -fno-lto

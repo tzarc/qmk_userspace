@@ -38,8 +38,8 @@ void enter_bootloader_mode_if_requested(void) {
         palSetPadMode(GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL);
         palSetPad(GPIOB, 0);
         bootdelay(10000);
+        palSetPadMode(GPIOB, 0, PAL_MODE_INPUT_ANALOG);
         palClearPad(GPIOB, 0);
-        palSetPadMode(GPIOB, 0, PAL_MODE_INPUT_PULLDOWN);
         NVIC_SystemReset();
     }
 }
