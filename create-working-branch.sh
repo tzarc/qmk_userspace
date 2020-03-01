@@ -5,61 +5,103 @@ set -eEuo pipefail
 this_script="$(readlink -f "${BASH_SOURCE[0]}")"
 script_dir="$(readlink -f "$(dirname "$this_script")")"
 
+unset upgrade_chibios
+unset upgrade_chibios_confs
+#upgrade_chibios=1
+#upgrade_chibios_confs=1
+
+target_branch="generated-workarea"
+if [ ! -z ${upgrade_chibios:-} ] ; then
+target_branch="generated-chibios-master-upgrade"
+fi
+
 declare -a prs_to_apply
-prs_to_apply+=(8002) # STM32L0/L1 EEPROM
-prs_to_apply+=(7928) # STM32 WS2812 PWM
+prs_to_apply+=(6165) # ARM audio DAC/PWM change
+prs_to_apply+=(8330) # Early init
+prs_to_apply+=(7987) # Half-duplex uart Arm split
+#prs_to_apply+=(7072) # Bitbang Arm split
 
 rm -f "$script_dir"/*.patch || true
 
-pushd "$script_dir/qmk_firmware"
-
-git clean -xfd
-git checkout -- .
-git reset --hard
-git fetch --all
-git branch -D master || true
-git checkout -f -b master upstream/master
-git reset --hard upstream/master
-git branch --force cyclone-merged-prs upstream/master
-git checkout cyclone-merged-prs
-
-for pr in ${prs_to_apply[@]} ; do
-    echo -e "\e[38;5;203mPR $pr\e[0m"
-    hub apply https://github.com/qmk/qmk_firmware/pull/${pr}
-done
-
-find . \( -name '*.rej' -or -name '*.orig' \) -delete
-
-make git-submodule
-
-git add -A
-git commit -am 'Rebuild branch "cyclone-merged-prs"' || true
-git push origin cyclone-merged-prs --set-upstream --force-with-lease
-
-popd
+hard_reset() {
+    local repo_upstream=$1
+    local repo_name=$2
+    git merge --abort || true
+    git clean -xfd
+    git checkout -- .
+    git reset --hard
+    git remote set-url origin git@github.com:tzarc/$repo_name.git
+    git remote set-url origin --push git@github.com:tzarc/$repo_name.git
+    git remote set-url upstream https://github.com/$repo_upstream/$repo_name.git
+    git remote set-url upstream --push git@github.com:tzarc/$repo_name.git
+    git fetch --all --tags --prune
+    git checkout -f master
+    git branch -D $target_branch || true
+    git checkout -b $target_branch
+    git reset --hard upstream/master
+}
 
 upgrade-chibios() {
     pushd "$script_dir/qmk_firmware/lib/chibios"
-    git remote set-url origin https://github.com/ChibiOS/ChibiOS.git
-    git fetch --all
-    git checkout master
-    git reset --hard origin/master || true
+    hard_reset ChibiOS ChibiOS
+    git push origin $target_branch --set-upstream --force-with-lease
     popd
 
     pushd "$script_dir/qmk_firmware/lib/chibios-contrib"
-    git remote set-url origin https://github.com/ChibiOS/ChibiOS-Contrib.git
-    git fetch --all
-    git checkout master
-    git reset --hard origin/master || true
+    hard_reset ChibiOS ChibiOS-Contrib
+    git push origin $target_branch --set-upstream --force-with-lease
     popd
 
-    "$script_dir/links.sh"
+    pushd "$script_dir/qmk_firmware"
+    git add lib/chibios lib/chibios-contrib
+    git commit -m 'Upgrade ChibiOS to master'
+    popd
+}
+
+upgrade-chibios-confs() {
+    pushd "$script_dir"
+    make links
+    popd
 
     pushd "$script_dir/qmk_firmware"
     ./util/chibios-upgrader.sh
+    clang-format-7 -i quantum/stm32/chconf.h
+    clang-format-7 -i quantum/stm32/halconf.h
+    clang-format-7 -i quantum/stm32/mcuconf.h
+    popd
 
+    pushd "$script_dir"
+    make clean
+    popd
+
+    pushd "$script_dir/qmk_firmware"
     git add -A
-    git commit -am 'Upgrate ChibiOS conf files' || true
-    git push origin cyclone-merged-prs --set-upstream --force-with-lease
+    git commit -am 'Upgrade ChibiOS conf files'
     popd
 }
+
+pushd "$script_dir/qmk_firmware"
+hard_reset qmk qmk_firmware
+make git-submodule
+sed -i 's#qmk/ChibiOS#tzarc/ChibiOS#g' .gitmodules
+git add -A
+git commit -am "Retarget '$target_branch' to point to personal ChibiOS repositories" || true
+popd
+
+pushd "$script_dir"
+if [ ! -z ${upgrade_chibios:-} ] ; then
+    upgrade-chibios
+fi
+if [ ! -z ${upgrade_chibios_confs:-} ] ; then
+    upgrade-chibios-confs
+fi
+popd
+
+pushd "$script_dir/qmk_firmware"
+for pr in ${prs_to_apply[@]} ; do
+    echo -e "\e[38;5;203mPR $pr\e[0m"
+    hub merge https://github.com/qmk/qmk_firmware/pull/${pr}
+    git commit --amend -m "Merge qmk_firmware upstream PR ${pr}"
+done
+git push origin $target_branch --set-upstream --force-with-lease
+popd

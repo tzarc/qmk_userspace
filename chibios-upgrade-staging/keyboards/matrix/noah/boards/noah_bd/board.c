@@ -155,8 +155,8 @@ static void stm32_gpio_init(void) {
 
   /* Enabling GPIO-related clocks, the mask comes from the
      registry header file.*/
-  rccResetAHB2(STM32_GPIO_EN_MASK);
-  rccEnableAHB2(STM32_GPIO_EN_MASK, true);
+  rccResetAHB1(STM32_GPIO_EN_MASK);
+  rccEnableAHB1(STM32_GPIO_EN_MASK, true);
 
   /* Initializing all the defined GPIO ports.*/
 #if STM32_HAS_GPIOA
@@ -208,12 +208,11 @@ static void stm32_gpio_init(void) {
  *          else.
  */
 void __early_init(void) {
+  extern void enter_bootloader_mode_if_requested(void);
+  enter_bootloader_mode_if_requested();
 
   stm32_gpio_init();
   stm32_clock_init();
-
-  extern void enter_bootloader_mode_if_requested(void);
-  enter_bootloader_mode_if_requested();
 }
 
 #if HAL_USE_SDC || defined(__DOXYGEN__)
@@ -223,7 +222,7 @@ void __early_init(void) {
 bool sdc_lld_is_card_inserted(SDCDriver *sdcp) {
 
   (void)sdcp;
-  /* CHTODO: Fill the implementation.*/
+  /* TODO: Fill the implementation.*/
   return true;
 }
 
@@ -233,7 +232,7 @@ bool sdc_lld_is_card_inserted(SDCDriver *sdcp) {
 bool sdc_lld_is_write_protected(SDCDriver *sdcp) {
 
   (void)sdcp;
-  /* CHTODO: Fill the implementation.*/
+  /* TODO: Fill the implementation.*/
   return false;
 }
 #endif /* HAL_USE_SDC */
@@ -245,7 +244,7 @@ bool sdc_lld_is_write_protected(SDCDriver *sdcp) {
 bool mmc_lld_is_card_inserted(MMCDriver *mmcp) {
 
   (void)mmcp;
-  /* CHTODO: Fill the implementation.*/
+  /* TODO: Fill the implementation.*/
   return true;
 }
 
@@ -255,14 +254,14 @@ bool mmc_lld_is_card_inserted(MMCDriver *mmcp) {
 bool mmc_lld_is_write_protected(MMCDriver *mmcp) {
 
   (void)mmcp;
-  /* CHTODO: Fill the implementation.*/
+  /* TODO: Fill the implementation.*/
   return false;
 }
 #endif
 
 /**
  * @brief   Board-specific initialization code.
- * @note    You can add your board-specific code here.
+ * @todo    Add your board-specific code, if any.
  */
 void boardInit(void) {
 

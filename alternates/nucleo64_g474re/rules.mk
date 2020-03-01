@@ -21,7 +21,7 @@ MCU_STARTUP = stm32g4xx
 
 # Board: it should exist either in <chibios>/os/hal/boards/,
 # <keyboard_dir>/boards/, or drivers/boards/
-BOARD = ST_NUCLEO64_G474RE_MOD
+BOARD = ST_NUCLEO64_G474RE
 
 USE_FPU = YES
 
@@ -30,4 +30,6 @@ DFU_ARGS = -d 0483:df11 -a 0 -s 0x08000000:leave
 DFU_SUFFIX_ARGS = -v 0483 -p df11
 
 # Address of the booloader in system memory
-STM32_BOOTLOADER_ADDRESS = 0x1FFF0000
+#STM32_BOOTLOADER_ADDRESS = 0x1FFF0000
+
+SRC += bootloader.c

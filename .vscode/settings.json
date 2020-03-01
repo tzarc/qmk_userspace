@@ -1,4 +1,9 @@
 {
+    "files.exclude": {
+        "**/.build": true,
+        "**/*.hex": true,
+        "**/*.bin": true
+    },
     "files.associations": {
         "quantum_keycodes.h": "c",
         "keyboard.h": "c",

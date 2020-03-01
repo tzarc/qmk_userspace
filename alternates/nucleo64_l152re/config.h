@@ -20,6 +20,8 @@
 
 #define STM32_HSECLK 12000000U
 
-#define MATRIX_COL_PINS { A8 }
-#define MATRIX_ROW_PINS { A9 }
+#define MATRIX_COL_PINS \
+    { A8 }
+#define MATRIX_ROW_PINS \
+    { A9 }
 #define UNUSED_PINS

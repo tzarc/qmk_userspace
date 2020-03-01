@@ -1,8 +1,8 @@
 # List of all the board related files.
-BOARDSRC = $(BOARD_PATH)/boards/ST_NUCLEO64_G474RE_MOD/board.c
+BOARDSRC = $(BOARD_PATH)/boards/GENERIC_STM32_F072XB/board.c
 
 # Required include directories
-BOARDINC = $(BOARD_PATH)/boards/ST_NUCLEO64_G474RE_MOD
+BOARDINC = $(BOARD_PATH)/boards/GENERIC_STM32_F072XB
 
 # Shared variables
 ALLCSRC += $(BOARDSRC)

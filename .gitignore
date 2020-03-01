@@ -2,4 +2,6 @@
 *.bin
 .vscode/ipch
 .clang-format
-PR-*.patch
+PR-*.patchbuild.log
+/build.log
+/.project
