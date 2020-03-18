@@ -37,7 +37,7 @@ const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_NO,     KC_NO,   KC_NO,   KC_NO,     KC_NO,   KC_NO,   KC_NO,
         KC_NO,     KC_NO,   KC_NO,   KC_NO,     KC_NO,   KC_NO,   KC_NO,      KC_NO,
         KC_NO,     KC_NO,   KC_NO,   KC_NO,     KC_NO,   KC_NO,            KC_NO, KC_NO,
-        KC_NO,     KC_NO,   KC_NO,        KC_NO,             KC_NO,           KC_NO
+        KC_NO,     KC_NO,   KC_NO,        KC_NO,             KC_TRNS,           KC_NO
     )
 };
 // clang-format on

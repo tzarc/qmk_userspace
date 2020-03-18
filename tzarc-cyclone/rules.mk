@@ -28,7 +28,7 @@ EXTRAKEY_ENABLE = yes
 CONSOLE_ENABLE = yes
 COMMAND_ENABLE = yes
 # NKRO_ENABLE = yes
-CUSTOM_MATRIX = yes
+CUSTOM_MATRIX = lite
 RAW_ENABLE = no
 # SLEEP_LED_ENABLE = yes
 
@@ -44,8 +44,8 @@ OLED_DRIVER_ENABLE = yes
 LINK_TIME_OPTIMIZATION_ENABLE = yes
 
 SRC += \
-	bootloader.c \
-	shiftreg_matrix.c
+	shiftreg_matrix.c \
+	bootloader.c
 
 DFU_ARGS = -d 0483:df11 -a 0 -s 0x08000000:leave
 

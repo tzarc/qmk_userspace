@@ -51,6 +51,8 @@ led_config_t g_led_config = {{// Key Matrix to LED Index
                               4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4}};
 #endif  // RGB_MATRIX_ENABLE
 
+void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
+
 void matrix_scan_user(void) {
 #ifdef TEST_SPI_OUTPUT
     static const SPIConfig hs_spicfg = {0, NULL, GPIOA, 1, SPI_CR1_BR_0, 0};
@@ -117,8 +119,8 @@ void keyboard_post_init_kb(void) {
     }
 #endif  // EEPROM_ENABLE
 
-    debug_enable   = false;
-    debug_matrix   = false;
+    debug_enable   = true;
+    debug_matrix   = true;
     debug_keyboard = false;
     debug_mouse    = false;
 
@@ -139,7 +141,7 @@ void keyboard_post_init_kb(void) {
 #ifdef OLED_DRIVER_ENABLE
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     // We're vertical...
-    return OLED_ROTATION_90;
+    return OLED_ROTATION_270;
 }
 
 uint8_t last_led_usb_state = 0xFF;

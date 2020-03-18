@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DESCRIPTION Cyclone Gamepad
 
 /* matrix debugging */
-// #define DEBUG_MATRIX_SCAN_RATE
+#define DEBUG_MATRIX_SCAN_RATE
 
 // STM32L082's have 6kB EEPROM
 #define STM32_ONBOARD_EEPROM_SIZE (6 * 1024)
@@ -107,9 +107,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    define RGB_MATRIX_FRAMEBUFFER_EFFECTS
 #endif  // RGB_MATRIX_ENABLE
 
+#define OLED_DISPLAY_128X64
+
 #ifdef QWIIC_MICRO_OLED_ENABLE
 #    define LCDWIDTH 128
-#    define LCDHEIGHT 32
+#    define LCDHEIGHT 64
 #    define I2C_ADDRESS_SA0_1 0x3C
 #endif  // QWIIC_MICRO_OLED_ENABLE
 
