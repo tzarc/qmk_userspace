@@ -18,11 +18,11 @@ fi
 declare -a prs_to_apply
 prs_to_apply+=(6165) # ARM audio DAC/PWM change
 prs_to_apply+=(8330) # Early init
-#prs_to_apply+=(7987) # Half-duplex uart Arm split
-prs_to_apply+=(7072) # Bitbang Arm split
+prs_to_apply+=(7987) # Half-duplex uart Arm split
+#prs_to_apply+=(7072) # Bitbang Arm split
 #prs_to_apply+=(8291) # GPT ARM backlight
 #prs_to_apply+=(7959) # PWM ARM backlight
-prs_to_apply+=(8559) # V-USB Console
+#prs_to_apply+=(8559) # V-USB Console
 
 rm -f "$script_dir"/*.patch || true
 

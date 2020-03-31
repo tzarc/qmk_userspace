@@ -33,13 +33,15 @@ void enter_bootloader_mode_if_requested(void) {
     if (*check == BOOTLOADER_MAGIC) {
         *check = 0;
 
-        // STM32L082 has dual-bank flash, and we're incapable of jumping to the bootloader.
-        // Instead, we do it with hardware... toggle PB0 high, let it charge a capacitor across BOOT0, then issue a system reset.
+        // STM32L072/082 has dual-bank flash, and we're incapable of jumping to the bootloader as a result. The first
+        // valid flash bank is executed unconditionally after a reset, so it doesn't enter DFU unless BOOT0 is high.
+        // Instead, we do it with hardware...in this case, we pull PB0 low, which is connected to a P-channel transistor
+        // which connects 3.3V to BOOT0's RC charging circuit, let it charge the capacitor, and issue a system reset.
         palSetPadMode(GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL);
-        palSetPad(GPIOB, 0);
+        palClearPad(GPIOB, 0);
         bootdelay(10000);
         palSetPadMode(GPIOB, 0, PAL_MODE_INPUT_ANALOG);
-        palClearPad(GPIOB, 0);
+        palSetPad(GPIOB, 0);
         NVIC_SystemReset();
     }
 }

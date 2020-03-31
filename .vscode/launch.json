@@ -21,7 +21,7 @@
             "text": "cd ${workspaceRoot}\\qmk_firmware\\.build"
           },
           {
-            "text": "target extended-remote \\\\.\\COM16" /* replace with your COM or /dev/ttyX */
+            "text": "target extended-remote \\\\.\\COM16"
           },
           {
             "text": "file handwired_tzarc_cyclone_default.elf"
@@ -36,7 +36,7 @@
             "text": "load"
           },
           {
-            "text": "cd ${workspaceRoot}\\qmk_firmware" /* set bath back so VScode can find source files */
+            "text": "cd ${workspaceRoot}\\qmk_firmware"
           },
           {
             "text": "set mem inaccessible-by-default off"

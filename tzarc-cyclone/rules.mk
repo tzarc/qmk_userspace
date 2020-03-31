@@ -5,7 +5,7 @@ MCU_FAMILY = STM32
 MCU_SERIES = STM32L0xx
 
 # linker script to use
-MCU_LDSCRIPT = STM32L082xZ
+MCU_LDSCRIPT = STM32L072xZ
 
 # startup code to use
 # is should exist in <chibios>/os/common/ports/ARMCMx/compilers/GCC/mk/
@@ -13,7 +13,7 @@ MCU_STARTUP = stm32l0xx
 
 # it should exist either in <chibios>/os/hal/boards/
 #  or <this_dir>/boards
-BOARD = ST_NUCLEO32_L082KZ
+BOARD = GENERIC_STM32_L072KZ
 
 # Cortex version
 MCU  = cortex-m0plus

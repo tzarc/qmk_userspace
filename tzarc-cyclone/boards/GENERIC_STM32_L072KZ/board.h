@@ -27,14 +27,10 @@
 /*===========================================================================*/
 
 /*
- * Setup for custom STMicroelectronics STM32 Nucleo32-L082KZ board.
- */
-
-/*
  * Board identifier.
  */
 #define BOARD_ST_NUCLEO32_L082KZ
-#define BOARD_NAME                  "STMicroelectronics STM32 Nucleo32-L082KZ (modified from F303K8)"
+#define BOARD_NAME                  "Generic STM32 L072KZ"
 
 /*
  * Board oscillators-related settings.
@@ -55,7 +51,7 @@
  * MCU type as defined in the ST header.
  */
 #define STM32L072xx
-//#define STM32L082xx
+#define STM32L082xx
 
 /*
  * IO pins assignments.
