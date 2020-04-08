@@ -16,6 +16,7 @@ target_branch="generated-chibios-master-upgrade"
 fi
 
 declare -a prs_to_apply
+prs_to_apply+=(8256) # dump_vars
 prs_to_apply+=(6165) # ARM audio DAC/PWM change
 prs_to_apply+=(8330) # Early init
 prs_to_apply+=(7987) # Half-duplex uart Arm split
@@ -29,6 +30,8 @@ rm -f "$script_dir"/*.patch || true
 hard_reset() {
     local repo_upstream=$1
     local repo_name=$2
+    local repo_branch=${3:-master}
+    git rebase --abort || true
     git merge --abort || true
     git clean -xfd
     git checkout -- .
@@ -38,10 +41,10 @@ hard_reset() {
     git remote set-url upstream https://github.com/$repo_upstream/$repo_name.git
     git remote set-url upstream --push git@github.com:tzarc/$repo_name.git
     git fetch --all --tags --prune
-    git checkout -f master
+    git checkout -f $repo_branch
     git branch -D $target_branch || true
     git checkout -b $target_branch
-    git reset --hard upstream/master
+    git reset --hard upstream/$repo_branch
 }
 
 upgrade-chibios() {
@@ -51,7 +54,7 @@ upgrade-chibios() {
     popd
 
     pushd "$script_dir/qmk_firmware/lib/chibios-contrib"
-    hard_reset ChibiOS ChibiOS-Contrib
+    hard_reset ChibiOS ChibiOS-Contrib chibios-20.3.x
     git push origin $target_branch --set-upstream --force-with-lease
     popd
 
