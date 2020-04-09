@@ -78,7 +78,7 @@ void matrix_scan_user(void) {
 #endif  // QWIIC_MICRO_OLED_ENABLE
 
     /*
-    uint32_t        last_oled_timer_print = 0;
+    static uint32_t        last_oled_timer_print = 0;
     extern uint32_t oled_timeout;
     uint32_t now = timer_read32();
     if (now - last_oled_timer_print > 1000) {
@@ -86,6 +86,14 @@ void matrix_scan_user(void) {
         uprintf("%6u/%6u/%6u\n", now, oled_timeout, oled_timeout - now);
     }
     */
+
+    static uint32_t        last_eeprom_access = 0;
+    uint32_t now = timer_read32();
+    if (now - last_eeprom_access > 5000) {
+        last_eeprom_access = now;
+        eeconfig_update_user(0x55);
+        eeconfig_read_user();
+    }
 }
 
 void matrix_init_kb(void) {

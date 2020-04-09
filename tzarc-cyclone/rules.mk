@@ -22,26 +22,28 @@ MCU  = cortex-m0plus
 ARMV = 6
 
 # Build Options
-BOOTMAGIC_ENABLE = full
+#BOOTMAGIC_ENABLE = full
 # MOUSEKEY_ENABLE = yes
-EXTRAKEY_ENABLE = yes
+#EXTRAKEY_ENABLE = yes
 CONSOLE_ENABLE = yes
-COMMAND_ENABLE = yes
+#COMMAND_ENABLE = yes
 # NKRO_ENABLE = yes
 CUSTOM_MATRIX = lite
 RAW_ENABLE = no
 # SLEEP_LED_ENABLE = yes
 
-RGB_MATRIX_ENABLE = WS2812
-WS2812_DRIVER = pwm
-CIE1931_CURVE = yes
+#RGB_MATRIX_ENABLE = WS2812
+#WS2812_DRIVER = pwm
+#CIE1931_CURVE = yes
 
-OLED_DRIVER_ENABLE = yes
+#OLED_DRIVER_ENABLE = yes
 #QWIIC_ENABLE += MICRO_OLED
 
 # AUDIO_ENABLE = yes
 
 LINK_TIME_OPTIMIZATION_ENABLE = yes
+
+EEPROM_DRIVER = spi
 
 SRC += \
 	shiftreg_matrix.c \
@@ -50,4 +52,4 @@ SRC += \
 DFU_ARGS = -d 0483:df11 -a 0 -s 0x08000000:leave
 
 # Debugging
-#OPT_DEFS += -g -O0 -fno-lto
+OPT_DEFS += -g -O0 -fno-lto

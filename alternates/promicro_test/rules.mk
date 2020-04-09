@@ -1,5 +1,5 @@
 # MCU name
-MCU = STM32F303
+MCU = atmega32u4
 CONSOLE_ENABLE = yes
 
 RGBLIGHT_ENABLE = no
@@ -13,4 +13,4 @@ AUDIO_ENABLE = no
 
 EEPROM_DRIVER = spi
 
-SRC += proton_c.c
+SRC += promicro.c

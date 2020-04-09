@@ -1,5 +1,5 @@
 export ROOTDIR := $(shell pwd)
-export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin/:$(PATH)
+#export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin/:$(PATH)
 
 BOARD_DEFS := \
 	iris!tzarc-iris_rev4!keebio/iris/rev4/keymaps/tzarc!tzarc \
@@ -9,7 +9,8 @@ BOARD_DEFS := \
 	mysterium-dad!tzarc-mysterium-dad!coseyfannitutti/mysterium/keymaps/tzarc-dad!tzarc-dad \
 	chocopad!tzarc-chocopad!keebio/chocopad/keymaps/tzarc!tzarc \
 	cyclone!tzarc-cyclone!handwired/tzarc/cyclone!default \
-	onekey_proton_c!alternates/proton_c_test!handwired/onekey/proton_c_test!default \
+	onekey_promicro!alternates/promicro_test!handwired/onekey/promicro_test!eep_rst \
+	onekey_proton_c!alternates/proton_c_test!handwired/onekey/proton_c_test!eep_rst \
 	onekey_l152!alternates/nucleo64_l152re!handwired/onekey/nucleo64_l152re!reset \
 	onekey_g431!alternates/nucleo64_g431rb!handwired/onekey/nucleo64_g431rb!reset \
 	onekey_g474!alternates/nucleo64_g474re!handwired/onekey/nucleo64_g474re!reset \
@@ -81,7 +82,7 @@ bin: bin_$$(board_name_$1)
 
 board_link_$$(board_name_$1):
 	@if [ ! -L "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ] ; then \
-		echo "\e[38;5;14mLinking: $$(board_source_$1) -> $$(board_target_$1)\e[0m" ; \
+		echo "\e[38;5;14mSymlinking: $$(board_source_$1) -> $$(board_target_$1)\e[0m" ; \
 		if [ ! -d "$$(shell dirname "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)")" ] ; then \
 			mkdir -p "$$(shell dirname "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)")" ; \
 		fi ; \

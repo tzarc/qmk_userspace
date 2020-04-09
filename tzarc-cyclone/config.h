@@ -51,6 +51,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Set 0 if debouncing isn't needed */
 #define DEBOUNCE 5
 
+/* SPI Parameters */
+#define SPI_DRIVER SPID1
+#define SPI_SCK_PIN A5
+#define SPI_MOSI_PIN A7
+#define SPI_MISO_PIN A6
+#define SPI_SCK_PAL_MODE 0
+#define SPI_MOSI_PAL_MODE 0
+#define SPI_MISO_PAL_MODE 0
+
+#define EXTERNAL_EEPROM_SPI_CHIP_SELECT_PIN A0
+#define EXTERNAL_EEPROM_SPI_CLOCK_DIVISOR 2
+
 /* I2C parameters -> 1MHz I2C @ 32MHz clock */
 #define I2C_DRIVER I2CD1
 #define I2C1_BANK GPIOA
