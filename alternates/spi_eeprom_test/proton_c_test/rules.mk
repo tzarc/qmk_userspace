@@ -8,7 +8,9 @@ RGBLIGHT_ENABLE = no
 BACKLIGHT_ENABLE = no
 #BACKLIGHT_DRIVER = pwm
 
-AUDIO_ENABLE = yes
-AUDIO_DRIVER = pwm_software
+AUDIO_ENABLE = no
+AUDIO_DRIVER = dac_basic
+
+EEPROM_DRIVER = spi
 
 SRC += proton_c.c

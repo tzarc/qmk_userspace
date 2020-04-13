@@ -1,17 +1,12 @@
 {
-    "files.exclude": {
-        "**/.build": true,
-        "**/*.hex": true,
-        "**/*.bin": true
-    },
-    "files.associations": {
-        "quantum_keycodes.h": "c",
-        "keyboard.h": "c",
-        "eeprom_driver.h": "c",
-        "eeprom_stm32_l0_l1.h": "c",
-        "limits": "c",
-        "type_traits": "c",
-        "xutility": "c"
-    },
-    "git.ignoreLimitWarning": true
+  "files.exclude": {
+    "**/.build": true,
+    "**/*.hex": true,
+    "**/*.bin": true
+  },
+  "git.ignoreLimitWarning": true,
+  "[markdown]": {
+    "editor.trimAutoWhitespace": false,
+    "files.trimTrailingWhitespace": false
+  }
 }

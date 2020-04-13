@@ -60,8 +60,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SPI_MOSI_PAL_MODE 0
 #define SPI_MISO_PAL_MODE 0
 
-#define EXTERNAL_EEPROM_SPI_CHIP_SELECT_PIN A0
-#define EXTERNAL_EEPROM_SPI_CLOCK_DIVISOR 2
+#define EXTERNAL_EEPROM_SPI_SLAVE_SELECT_PIN A0
+#define EXTERNAL_EEPROM_SPI_CLOCK_DIVISOR 4
+#define EXTERNAL_EEPROM_BYTE_COUNT 256
 
 /* I2C parameters -> 1MHz I2C @ 32MHz clock */
 #define I2C_DRIVER I2CD1

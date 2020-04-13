@@ -1,9 +1,9 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
     {
       "name": "Black Magic Probe (Upload)",
       "type": "cppdbg",
@@ -12,44 +12,43 @@
       "MIMode": "gdb",
       "targetArchitecture": "arm",
       "logging": {
-          "engineLogging": true
+        "engineLogging": true
       },
       "program": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_cyclone_default.elf",
       "miDebuggerPath": "arm-none-eabi-gdb",
       "customLaunchSetupCommands": [
-          {
-            "text": "cd ${workspaceRoot}\\qmk_firmware\\.build"
-          },
-          {
-            "text": "target extended-remote \\\\.\\COM16"
-          },
-          {
-            "text": "file handwired_tzarc_cyclone_default.elf"
-          },
-          {
-            "text": "monitor swdp_scan"
-          },
-          {
-            "text": "attach 1"
-          },
-          {
-            "text": "load"
-          },
-          {
-            "text": "cd ${workspaceRoot}\\qmk_firmware"
-          },
-          {
-            "text": "set mem inaccessible-by-default off"
-          },
-          {
-            "text": "break main"
-          }
-        ],
+        {
+          "text": "cd ${workspaceRoot}\\qmk_firmware\\.build"
+        },
+        {
+          "text": "target extended-remote \\\\.\\COM16"
+        },
+        {
+          "text": "file handwired_tzarc_cyclone_default.elf"
+        },
+        {
+          "text": "monitor swdp_scan"
+        },
+        {
+          "text": "attach 1"
+        },
+        {
+          "text": "load"
+        },
+        {
+          "text": "cd ${workspaceRoot}\\qmk_firmware"
+        },
+        {
+          "text": "set mem inaccessible-by-default off"
+        },
+        {
+          "text": "break main"
+        }
+      ],
       "serverLaunchTimeout": 10000,
       "windows": {
-          "miDebuggerPath": "E:\\gcc-arm-none-eabi-8-2018-q4-major-win32\\bin\\arm-none-eabi-gdb.exe"
+        "miDebuggerPath": "E:\\gcc-arm-none-eabi-8-2018-q4-major-win32\\bin\\arm-none-eabi-gdb.exe"
       }
-  }
-
+    }
   ]
 }

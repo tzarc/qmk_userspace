@@ -9,14 +9,17 @@ BOARD_DEFS := \
 	mysterium-dad!tzarc-mysterium-dad!coseyfannitutti/mysterium/keymaps/tzarc-dad!tzarc-dad \
 	chocopad!tzarc-chocopad!keebio/chocopad/keymaps/tzarc!tzarc \
 	cyclone!tzarc-cyclone!handwired/tzarc/cyclone!default \
-	onekey_promicro!alternates/promicro_test!handwired/onekey/promicro_test!eep_rst \
-	onekey_proton_c!alternates/proton_c_test!handwired/onekey/proton_c_test!eep_rst \
 	onekey_l152!alternates/nucleo64_l152re!handwired/onekey/nucleo64_l152re!reset \
 	onekey_g431!alternates/nucleo64_g431rb!handwired/onekey/nucleo64_g431rb!reset \
 	onekey_g474!alternates/nucleo64_g474re!handwired/onekey/nucleo64_g474re!reset \
 	onekey_l082!alternates/nucleo32_l082kz!handwired/onekey/nucleo32_l082!reset \
 	split_l082!alternates/nucleo32_l082kz_split!handwired/splittest/nucleo32_l082!default \
+	test_proton_c!alternates/proton_c_test!handwired/onekey/proton_c_test!reset \
 	split_proton_c!alternates/proton_c_split!handwired/splittest/proton_c_split!default \
+	spi_eeprom_promicro!alternates/spi_eeprom_test/promicro_test!handwired/onekey/spi_eeprom_test_promicro!eep_rst \
+	spi_eeprom_proton_c!alternates/spi_eeprom_test/proton_c_test!handwired/onekey/spi_eeprom_test_proton_c!eep_rst \
+	spi_eeprom_f103!alternates/spi_eeprom_test/f103_test!handwired/onekey/spi_eeprom_test_f103!eep_rst \
+	spi_eeprom_f401!alternates/spi_eeprom_test/f401_test!handwired/onekey/spi_eeprom_test_f401!eep_rst \
 
 all: bin
 
