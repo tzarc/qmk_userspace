@@ -21,6 +21,7 @@ prs_to_apply+=(6165) # ARM audio DAC/PWM change
 prs_to_apply+=(8330) # Early init
 prs_to_apply+=(7987) # Half-duplex uart Arm split
 prs_to_apply+=(8739) # SPI EEPROM
+prs_to_apply+=(8711) # mdloader flash
 #prs_to_apply+=(7072) # Bitbang Arm split
 #prs_to_apply+=(8291) # GPT ARM backlight
 #prs_to_apply+=(7959) # PWM ARM backlight
