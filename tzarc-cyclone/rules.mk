@@ -40,11 +40,8 @@ OLED_DRIVER_ENABLE = yes
 
 LINK_TIME_OPTIMIZATION_ENABLE = yes
 
-EEPROM_DRIVER = spi
-
 SRC += \
-	shiftreg_matrix.c \
-	bootloader.c
+	shiftreg_matrix.c
 
 DFU_ARGS = -d 0483:df11 -a 0 -s 0x08000000:leave
 

@@ -51,14 +51,6 @@ led_config_t g_led_config = {{// Key Matrix to LED Index
                               4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4}};
 #endif  // RGB_MATRIX_ENABLE
 
-uint8_t prng(void) {
-    static uint8_t s = 0xAA, a = 0;
-    s ^= s << 3;
-    s ^= s >> 5;
-    s ^= a++ >> 2;
-    return s;
-}
-
 void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
 
 void matrix_scan_user(void) {
@@ -94,25 +86,6 @@ void matrix_scan_user(void) {
         uprintf("%6u/%6u/%6u\n", now, oled_timeout, oled_timeout - now);
     }
     */
-
-    static uint32_t        last_eeprom_access = 0;
-    uint32_t now = timer_read32();
-    if (now - last_eeprom_access > 5000) {
-        dprint("reading eeprom\n");
-        last_eeprom_access = now;
-
-        union {
-            uint8_t bytes[4];
-            uint32_t raw;
-        } tmp;
-        tmp.bytes[0] = prng();
-        tmp.bytes[1] = prng();
-        tmp.bytes[2] = prng();
-        tmp.bytes[3] = prng();
-
-        eeconfig_update_user(tmp.raw);
-        eeconfig_read_user();
-    }
 }
 
 void matrix_init_kb(void) {

@@ -15,6 +15,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+/* Bootloader */
+#define EARLY_INIT_PERFORM_BOOTLOADER_JUMP TRUE
+#define STM32_BOOTLOADER_DUAL_BANK TRUE
+#define STM32_BOOTLOADER_DUAL_BANK_GPIO B0
+
 /* USB Device descriptor parameter */
 #define VENDOR_ID 0xF055
 #define PRODUCT_ID 0x4919
