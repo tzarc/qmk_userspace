@@ -8,5 +8,4 @@ void keyboard_post_init_user(void) {
     // debug_mouse=true;
 }
 
-void matrix_scan_user(void) {
-}
+void matrix_scan_user(void) {}

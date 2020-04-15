@@ -53,7 +53,7 @@ led_config_t g_led_config = {{// Key Matrix to LED Index
 
 void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
 
-void matrix_scan_user(void) {
+void matrix_scan_keymap(void) {
 #ifdef TEST_SPI_OUTPUT
     static const SPIConfig hs_spicfg = {0, NULL, GPIOA, 1, SPI_CR1_BR_0, 0};
 

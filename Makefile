@@ -8,7 +8,7 @@ BOARD_DEFS := \
 	mysterium-nick!tzarc-mysterium!coseyfannitutti/mysterium/keymaps/tzarc!tzarc \
 	mysterium-dad!tzarc-mysterium-dad!coseyfannitutti/mysterium/keymaps/tzarc-dad!tzarc-dad \
 	chocopad!tzarc-chocopad!keebio/chocopad/keymaps/tzarc!tzarc \
-	cyclone!tzarc-cyclone!handwired/tzarc/cyclone!default \
+	cyclone!tzarc-cyclone!handwired/tzarc/cyclone!tzarc \
 	onekey_l152!alternates/nucleo64_l152re!handwired/onekey/nucleo64_l152re!reset \
 	onekey_g431!alternates/nucleo64_g431rb!handwired/onekey/nucleo64_g431rb!reset \
 	onekey_g474!alternates/nucleo64_g474re!handwired/onekey/nucleo64_g474re!reset \
@@ -45,7 +45,31 @@ format_prereq:
 
 format: format_prereq
 
-links: format_prereq
+links: format_prereq link-user
+
+link-user:
+	@if [ ! -L "$(ROOTDIR)/qmk_firmware/users/tzarc" ] ; then \
+		echo "\e[38;5;14mSymlinking: users-tzarc -> users/tzarc\e[0m" ; \
+		ln -sf $(ROOTDIR)/users-tzarc $(ROOTDIR)/qmk_firmware/users/tzarc ; \
+	fi
+	@if [ ! -L "$(ROOTDIR)/qmk_firmware/layouts/community/tkl_ansi/tzarc" ] ; then \
+		echo "\e[38;5;14mSymlinking: layout-tkl_ansi-tzarc -> layouts/community/tkl_ansi/tzarc\e[0m" ; \
+		ln -sf $(ROOTDIR)/layout-tkl_ansi-tzarc $(ROOTDIR)/qmk_firmware/layouts/community/tkl_ansi/tzarc ; \
+	fi
+
+unlink-user:
+	@if [ -L "$(ROOTDIR)/qmk_firmware/users/tzarc" ] ; then \
+		echo "\e[38;5;14mRemoving link: users/tzarc/\e[0m" ; \
+		rm "$(ROOTDIR)/qmk_firmware/users/tzarc" ; \
+	fi
+	@if [ -L "$(ROOTDIR)/qmk_firmware/layouts/community/tkl_ansi/tzarc" ] ; then \
+		echo "\e[38;5;14mRemoving link: layouts/community/tkl_ansi/tzarc/\e[0m" ; \
+		rm "$(ROOTDIR)/qmk_firmware/layouts/community/tkl_ansi/tzarc" ; \
+	fi
+
+unlinks: unlink-user
+clean: unlink-user
+distclean: unlink-user
 
 define handle_board_entry
 board_name_$1 := $$(word 1,$$(subst !, ,$1))
@@ -57,16 +81,16 @@ board_file_$1 := $$(shell echo $$(board_qmk_$1) | sed -e 's@/@_@g' -e 's@:@_@g')
 board_files_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f \( -name '*.h' -or -name '*.c' \) -and -not -name '*conf.h' -and -not -name 'board.c' -and -not -name 'board.h' | sort)
 board_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f | sort)
 
-bin_$$(board_name_$1): board_link_$$(board_name_$1)
+bin_$$(board_name_$1): board_link_$$(board_name_$1) link-user
 	@echo "\e[38;5;14mBuilding: $$(board_qmk_$1)\e[0m"
-	$(MAKE) -O $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" $$(board_qmk_$1):$$(board_keymap_$1) 2>&1 \
+	$$(MAKE) -O $$(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" $$(board_qmk_$1):$$(board_keymap_$1) 2>&1 \
 		| egrep --line-buffered -iv '(Entering|Leaving) directory' \
 		| egrep --line-buffered -iv 'Bad file descriptor'
 	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR)
 
 flash_$$(board_name_$1): bin_$$(board_name_$1)
 	@echo "\e[38;5;14mFlashing: $$(board_qmk_$1)\e[0m"
-	@$(MAKE) -C "$(ROOTDIR)/qmk_firmware" $$(board_qmk_$1):$$(board_keymap_$1):flash
+	@$$(MAKE) -C "$(ROOTDIR)/qmk_firmware" $$(board_qmk_$1):$$(board_keymap_$1):flash
 
 format_$$(board_name_$1): format_prereq
 	@for file in $$(board_files_$1) ; do \
@@ -74,7 +98,6 @@ format_$$(board_name_$1): format_prereq
 		clang-format-7 -i "$$$$file" >/dev/null 2>&1 ; \
 	done ; \
 	for file in $$(board_files_all_$1) ; do \
-		echo "\e[38;5;14mdos2unix'ing: $$$$file\e[0m" ; \
 		dos2unix "$$$$file" >/dev/null 2>&1 ; \
 	done
 

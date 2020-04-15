@@ -1,4 +1,5 @@
 #include QMK_KEYBOARD_H
+#include "tzarc.h"
 
 enum {
     _QWERTY = 0,
@@ -10,7 +11,7 @@ enum {
     _FUNC3,
 };
 
-enum custom_keycodes { QWERTY = SAFE_RANGE, LOWER, RAISE, ADJUST, B_IRONY, SNAKE, POOP };
+enum custom_keycodes { QWERTY = KEYMAP_SAFE_RANGE, LOWER, RAISE, ADJUST, B_IRONY, SNAKE, POOP };
 
 #define TABFN1 LT(_FUNC1, KC_TAB)
 #define GRVFN2 LT(_FUNC2, KC_GRV)
@@ -120,7 +121,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-void eeconfig_init_user(void) {
+void eeconfig_init_keymap(void) {
     set_unicode_input_mode(UC_WINC);
     breathing_disable();
     rgblight_mode(RGBLIGHT_MODE_STATIC_LIGHT);
@@ -129,14 +130,14 @@ void eeconfig_init_user(void) {
     backlight_level(BACKLIGHT_LEVELS);
 }
 
-void matrix_scan_user(void) {
+void matrix_scan_keymap(void) {
     led_t led_state = host_keyboard_led_state();
     if (!led_state.num_lock) {
         tap_code(KC_NUMLOCK);
     }
 }
 
-bool process_record_user(uint16_t keycode, keyrecord_t* record) {
+bool process_record_keymap(uint16_t keycode, keyrecord_t* record) {
     switch (keycode) {
         case LOWER:
             if (record->event.pressed) {
