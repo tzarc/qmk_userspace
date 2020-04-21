@@ -22,3 +22,5 @@
     { B4 }
 #define MATRIX_ROW_PINS \
     { B5 }
+
+#define EARLY_INIT_PERFORM_BOOTLOADER_JUMP TRUE

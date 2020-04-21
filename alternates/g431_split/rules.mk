@@ -31,3 +31,16 @@ DFU_SUFFIX_ARGS = -v 0483 -p df11
 
 # Address of the booloader in system memory
 STM32_BOOTLOADER_ADDRESS = 0x1FFF0000
+
+CONSOLE_ENABLE = yes
+
+SERIAL_DRIVER = usart
+
+RGBLIGHT_ENABLE = no
+#WS2812_DRIVER = pwm
+
+BACKLIGHT_ENABLE = no
+#$BACKLIGHT_DRIVER = pwm
+
+AUDIO_ENABLE = no
+#AUDIO_DRIVER = pwm_hardware

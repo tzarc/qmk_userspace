@@ -10,5 +10,7 @@ BACKLIGHT_ENABLE = no
 
 AUDIO_ENABLE = yes
 AUDIO_DRIVER = pwm_software
+AUDIO_PIN = A5
+AUDIO_PIN_ALT = A4
 
 SRC += proton_c.c

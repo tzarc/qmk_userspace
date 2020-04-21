@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2018 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2020 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -42,11 +42,9 @@
  */
 #define STM32_NO_INIT                       FALSE
 #define STM32_VOS                           STM32_VOS_RANGE1
-/*
-#define STM32_PWR_CR2                       (STM32_PLS_LEV0 | STM32_PVDE_DISABLED)
+#define STM32_PWR_CR2                       (PWR_CR2_PLS_LEV0)
 #define STM32_PWR_CR3                       (PWR_CR3_EIWF)
 #define STM32_PWR_CR4                       (0U)
-*/
 #define STM32_HSI16_ENABLED                 TRUE
 #define STM32_HSI48_ENABLED                 TRUE
 #define STM32_HSE_ENABLED                   TRUE
@@ -109,6 +107,10 @@
 #define STM32_IRQ_EXTI30_32_PRIORITY        6
 #define STM32_IRQ_EXTI33_PRIORITY           6
 
+#define STM32_IRQ_FDCAN1_PRIORITY           10
+#define STM32_IRQ_FDCAN2_PRIORITY           10
+#define STM32_IRQ_FDCAN3_PRIORITY           10
+
 #define STM32_IRQ_TIM1_BRK_TIM15_PRIORITY   7
 #define STM32_IRQ_TIM1_UP_TIM16_PRIORITY    7
 #define STM32_IRQ_TIM1_TRGCO_TIM17_PRIORITY 7
@@ -163,6 +165,9 @@
 /*
  * CAN driver system settings.
  */
+#define STM32_CAN_USE_FDCAN1                TRUE
+#define STM32_CAN_USE_FDCAN2                FALSE
+#define STM32_CAN_USE_FDCAN3                FALSE
 
 /*
  * DAC driver system settings.
