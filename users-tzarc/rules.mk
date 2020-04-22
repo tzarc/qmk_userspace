@@ -4,6 +4,7 @@ SRC += \
 	tzarc_wow.c \
 	tzarc_diablo3.c
 
+UNICODE_COMMON = yes
 LTO_ENABLE = yes
 
 # board-specific configs

@@ -2,15 +2,7 @@
 
 #include <quantum.h>
 
-enum {
-  KC_CONFIG = SAFE_RANGE,
-  TIME_RESET,
-  TIME_EEPRST,
-  KC_NOMODE,
-  KC_WOWMODE,
-  KC_D3MODE,
-  KEYMAP_SAFE_RANGE
-};
+enum { KC_CONFIG = SAFE_RANGE, TIME_RESET, TIME_EEPRST, KC_NOMODE, KC_BLOCKMODE, KC_WOWMODE, KC_D3MODE, KEYMAP_SAFE_RANGE };
 
 uint8_t prng(void);
 
@@ -78,7 +70,7 @@ void matrix_scan_wow(void);
 // Diablo III
 
 struct diablo3_config_t {
-  bool dummy;
+    bool dummy;
 };
 
 extern struct diablo3_config_t diablo3_config;

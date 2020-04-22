@@ -8,5 +8,8 @@
   "[markdown]": {
     "editor.trimAutoWhitespace": false,
     "files.trimTrailingWhitespace": false
+  },
+  "files.associations": {
+    "array": "cpp"
   }
 }

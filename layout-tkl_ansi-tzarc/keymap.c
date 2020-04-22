@@ -16,13 +16,13 @@
 #include QMK_KEYBOARD_H
 #include "tzarc.h"
 
-enum { _BASE,  _FUNC1 };
+enum { _BASE, _FUNC1 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Base keymaps
-#define TABFN LT(_FUNC1,  KC_TAB)
-#define APPFN LT(_FUNC1,  KC_APP)
-#define CTLESC MT(MOD_LCTL,  KC_ESC)
+#define TABFN LT(_FUNC1, KC_TAB)
+#define APPFN LT(_FUNC1, KC_APP)
+#define CTLESC MT(MOD_LCTL, KC_ESC)
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -35,17 +35,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       KC_LCTL,  KC_LGUI,  KC_LALT,                                     KC_SPC,                    KC_RALT,  KC_RGUI,  APPFN,     KC_RCTL,              KC_LEFT,  KC_DOWN,  KC_RGHT),
 
   [_FUNC1] = LAYOUT_tkl_ansi(
-      KC_NOMODE,          KC_CONFIG, KC_WOWMODE,  KC_D3MODE,  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS,  KC_TRNS,   KC_TRNS,  KC_TRNS,   KC_TRNS,   KC_TRNS,  DEBUG,
-      KC_TRNS,  KC_TRNS,  KC_TRNS,   KC_TRNS,     KC_TRNS,    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS,  KC_TRNS,   KC_TRNS,  KC_TRNS,   KC_TRNS,   KC_TRNS,  KC_TRNS,
-      KC_TRNS,  KC_TRNS,  KC_TRNS,   TIME_EEPRST, TIME_RESET, KC_TRNS, KC_TRNS, KC_P7,   KC_P8,   KC_P9,    KC_TRNS,  KC_PSLS,   KC_PAST,  KC_TRNS,   KC_TRNS,   KC_TRNS,  KC_TRNS,
-      KC_CAPS,  KC_TRNS,  KC_TRNS,   KC_TRNS,     KC_TRNS,    KC_TRNS, KC_TRNS, KC_P4,   KC_P5,   KC_P6,    KC_TRNS,  KC_TRNS,   KC_TRNS,
-      KC_TRNS,            KC_TRNS,   KC_TRNS,     KC_TRNS,    KC_TRNS, KC_TRNS, KC_P0,   KC_P1,   KC_P2,    KC_P3,    KC_TRNS,   KC_PMNS,                        KC_VOLU,
-      KC_TRNS,  KC_TRNS,  KC_TRNS,                                     KC_TRNS,                   KC_TRNS,  KC_TRNS,  KC_TRNS,   KC_TRNS,              KC_TRNS,  KC_VOLD,  KC_TRNS),
+      KC_NOMODE,          KC_CONFIG, KC_WOWMODE,  KC_D3MODE,  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,  KC_BLOCKMODE,KC_TRNS,   KC_TRNS,  KC_TRNS,   KC_TRNS,   KC_TRNS,  DEBUG,
+      KC_TRNS,  KC_TRNS,  KC_TRNS,   KC_TRNS,     KC_TRNS,    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS,     KC_TRNS,   KC_TRNS,  KC_TRNS,   KC_TRNS,   KC_TRNS,  KC_TRNS,
+      KC_TRNS,  KC_TRNS,  KC_TRNS,   TIME_EEPRST, TIME_RESET, KC_TRNS, KC_TRNS, KC_P7,   KC_P8,   KC_P9,    KC_TRNS,     KC_PSLS,   KC_PAST,  KC_TRNS,   KC_TRNS,   KC_TRNS,  KC_TRNS,
+      KC_CAPS,  KC_TRNS,  KC_TRNS,   KC_TRNS,     KC_TRNS,    KC_TRNS, KC_TRNS, KC_P4,   KC_P5,   KC_P6,    KC_TRNS,     KC_TRNS,   KC_TRNS,
+      KC_TRNS,            KC_TRNS,   KC_TRNS,     KC_TRNS,    KC_TRNS, KC_TRNS, KC_P0,   KC_P1,   KC_P2,    KC_P3,       KC_TRNS,   KC_PMNS,                        KC_VOLU,
+      KC_TRNS,  KC_TRNS,  KC_TRNS,                                     KC_TRNS,                   KC_TRNS,  KC_TRNS,     KC_TRNS,   KC_TRNS,              KC_TRNS,  KC_VOLD,  KC_TRNS),
 };
 // clang-format on
 
-bool process_record_keymap(uint16_t keycode,  keyrecord_t* record) {
-    static uint32_t reset_key_timer = 0;
+bool process_record_keymap(uint16_t keycode, keyrecord_t* record) {
+    static uint32_t reset_key_timer  = 0;
     static uint32_t eeprst_key_timer = 0;
     switch (keycode) {
         case TIME_RESET:

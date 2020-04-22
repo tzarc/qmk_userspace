@@ -77,7 +77,7 @@
 #define STM32_LPTIM1SEL                     STM32_LPTIM1SEL_PCLK1
 #define STM32_SAI1SEL                       STM32_SAI1SEL_SYSCLK
 #define STM32_I2S23SEL                      STM32_I2S23SEL_SYSCLK
-#define STM32_FDCANSEL                      STM32_FDCANSEL_HSE
+#define STM32_FDCANSEL                      STM32_FDCANSEL_PCLK1
 #define STM32_CLK48SEL                      STM32_CLK48SEL_HSI48
 #define STM32_ADC12SEL                      STM32_ADC12SEL_PLLPCLK
 #define STM32_RTCSEL                        STM32_RTCSEL_NOCLOCK

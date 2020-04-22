@@ -45,6 +45,13 @@ format_prereq:
 	@ln -sf $(ROOTDIR)/qmk_firmware/.clang-format $(ROOTDIR)/.clang-format
 
 format: format_prereq
+	@for file in $$(find "$(ROOTDIR)/layout-tkl_ansi-tzarc" "$(ROOTDIR)/users-tzarc" -type f \( -name '*.h' -or -name '*.c' \) -and -not -name '*conf.h' -and -not -name 'board.c' -and -not -name 'board.h' | sort) ; do \
+		echo "\e[38;5;14mclang-format'ing: $$file\e[0m" ; \
+		clang-format-7 -i "$$file" >/dev/null 2>&1 ; \
+	done ; \
+	for file in $$(find "$(ROOTDIR)/layout-tkl_ansi-tzarc" "$(ROOTDIR)/users-tzarc" -type f | sort) ; do \
+		dos2unix "$$file" >/dev/null 2>&1 ; \
+	done
 
 links: format_prereq link-user
 

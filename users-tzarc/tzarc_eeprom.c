@@ -22,9 +22,7 @@ static inline void dump_config(const char *name, struct tzarc_eeprom_cfg_t *cfg)
 }
 #endif
 
-void tzarc_eeprom_init(void) {
-    memset(&tzarc_eeprom_cfg, 0, sizeof(tzarc_eeprom_cfg));
-}
+void tzarc_eeprom_init(void) { memset(&tzarc_eeprom_cfg, 0, sizeof(tzarc_eeprom_cfg)); }
 
 static uint8_t tzarc_eeprom_calculate_magic(struct tzarc_eeprom_cfg_t *cfg) {
     uint8_t magic = TZARC_EEPROM_MAGIC_SEED;
@@ -59,9 +57,9 @@ bool tzarc_eeprom_data_matches(struct tzarc_eeprom_cfg_t *cfg) {
     struct tzarc_eeprom_cfg_t temp;
     eeprom_read_block(&temp, TZARC_EEPROM_LOCATION, sizeof(temp));
 
-    const uint8_t *startCfg = (const uint8_t*)cfg + sizeof(temp.magic1);
-    const uint8_t *startTmp = ((const uint8_t*)&temp) + sizeof(temp.magic1);
-    size_t count = sizeof(temp) - sizeof(temp.magic1) - sizeof(temp.magic2);
+    const uint8_t *startCfg = (const uint8_t *)cfg + sizeof(temp.magic1);
+    const uint8_t *startTmp = ((const uint8_t *)&temp) + sizeof(temp.magic1);
+    size_t         count    = sizeof(temp) - sizeof(temp.magic1) - sizeof(temp.magic2);
     return (memcmp(startCfg, startTmp, count) == 0);
 }
 

@@ -26,9 +26,7 @@ void     wow_key_last_keydown_set(uint16_t keycode, uint32_t last_keydown) { wow
 uint32_t wow_key_next_trigger_get(uint16_t keycode) { return wow_config.next_trigger[keycode - KC_A]; }
 void     wow_key_next_trigger_set(uint16_t keycode, uint32_t next_trigger) { wow_config.next_trigger[keycode - KC_A] = next_trigger; }
 
-void tzarc_wow_init(void) {
-    memset(&wow_config, 0, sizeof(wow_config));
-}
+void tzarc_wow_init(void) { memset(&wow_config, 0, sizeof(wow_config)); }
 
 bool process_record_wow(uint16_t keycode, keyrecord_t *record) {
     if (config_enabled) {
