@@ -35,12 +35,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       KC_LCTL,  KC_LGUI,  KC_LALT,                                     KC_SPC,                    KC_RALT,  KC_RGUI,  APPFN,     KC_RCTL,              KC_LEFT,  KC_DOWN,  KC_RGHT),
 
   [_FUNC1] = LAYOUT_tkl_ansi(
-      KC_NOMODE,          KC_CONFIG, KC_WOWMODE,  KC_D3MODE,  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,  KC_BLOCKMODE,KC_TRNS,   KC_TRNS,  KC_TRNS,   KC_TRNS,   KC_TRNS,  DEBUG,
-      KC_TRNS,  KC_TRNS,  KC_TRNS,   KC_TRNS,     KC_TRNS,    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS,     KC_TRNS,   KC_TRNS,  KC_TRNS,   KC_TRNS,   KC_TRNS,  KC_TRNS,
-      KC_TRNS,  KC_TRNS,  KC_TRNS,   TIME_EEPRST, TIME_RESET, KC_TRNS, KC_TRNS, KC_P7,   KC_P8,   KC_P9,    KC_TRNS,     KC_PSLS,   KC_PAST,  KC_TRNS,   KC_TRNS,   KC_TRNS,  KC_TRNS,
-      KC_CAPS,  KC_TRNS,  KC_TRNS,   KC_TRNS,     KC_TRNS,    KC_TRNS, KC_TRNS, KC_P4,   KC_P5,   KC_P6,    KC_TRNS,     KC_TRNS,   KC_TRNS,
-      KC_TRNS,            KC_TRNS,   KC_TRNS,     KC_TRNS,    KC_TRNS, KC_TRNS, KC_P0,   KC_P1,   KC_P2,    KC_P3,       KC_TRNS,   KC_PMNS,                        KC_VOLU,
-      KC_TRNS,  KC_TRNS,  KC_TRNS,                                     KC_TRNS,                   KC_TRNS,  KC_TRNS,     KC_TRNS,   KC_TRNS,              KC_TRNS,  KC_VOLD,  KC_TRNS),
+      KC_NOMODE,          KC_CONFIG, KC_WOWMODE,  KC_D3MODE,  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,  KC_WIDE, KC_CIRCLES, KC_TRNS,  KC_TRNS,   KC_TRNS,   KC_TRNS,  DEBUG,
+      KC_TRNS,  KC_TRNS,  KC_TRNS,   KC_TRNS,     KC_TRNS,    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS, KC_TRNS,    KC_TRNS,  KC_TRNS,   KC_TRNS,   KC_TRNS,  KC_TRNS,
+      KC_TRNS,  KC_TRNS,  KC_TRNS,   TIME_EEPRST, TIME_RESET, KC_TRNS, KC_TRNS, KC_P7,   KC_P8,   KC_P9,    KC_TRNS, KC_PSLS,    KC_PAST,  KC_TRNS,   KC_TRNS,   KC_TRNS,  KC_TRNS,
+      KC_CAPS,  KC_TRNS,  KC_TRNS,   KC_TRNS,     KC_TRNS,    KC_TRNS, KC_TRNS, KC_P4,   KC_P5,   KC_P6,    KC_TRNS, KC_TRNS,    KC_TRNS,
+      KC_TRNS,            KC_TRNS,   KC_TRNS,     KC_TRNS,    KC_TRNS, KC_TRNS, KC_P0,   KC_P1,   KC_P2,    KC_P3,   KC_TRNS,    KC_PMNS,                        KC_VOLU,
+      KC_TRNS,  KC_TRNS,  KC_TRNS,                                     KC_TRNS,                   KC_TRNS,  KC_TRNS, KC_TRNS,    KC_TRNS,              KC_TRNS,  KC_VOLD,  KC_TRNS),
 };
 // clang-format on
 

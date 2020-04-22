@@ -42,6 +42,82 @@ void keyboard_post_init_user(void) {
     tzarc_eeprom_load();
 }
 
+bool process_record_wide(uint16_t keycode, keyrecord_t *record) {
+    if (KC_A <= keycode && keycode <= KC_Z) {
+        if (!record->event.pressed) {
+            uint8_t temp_mod = get_mods();
+            uint8_t temp_osm = get_oneshot_mods();
+            clear_mods();
+            clear_oneshot_mods();
+
+            unicode_input_start();
+            uint32_t base = ((temp_mod | temp_osm) & MOD_MASK_SHIFT) ? 0xFF21 : 0xFF41;
+            register_hex32(base + (keycode - KC_A));  // vertical form alphas
+            unicode_input_finish();
+
+            set_mods(temp_mod);
+        }
+        return false;
+    } else if (keycode == KC_0) {
+        if (!record->event.pressed) {
+            unicode_input_start();
+            register_hex32(0xFF10);  // vertical form zero
+            unicode_input_finish();
+        }
+        return false;
+    } else if (KC_1 <= keycode && keycode <= KC_9) {
+        if (!record->event.pressed) {
+            unicode_input_start();
+            register_hex32(0xFF11 + (keycode - KC_1));  // vertical form numbers
+            unicode_input_finish();
+        }
+        return false;
+    } else if (keycode == KC_SPACE) {
+        if (!record->event.pressed) {
+            unicode_input_start();
+            register_hex32(0x2003);  // em space
+            unicode_input_finish();
+        }
+        return false;
+    }
+
+    return process_record_keymap(keycode, record);
+}
+
+bool process_record_circles(uint16_t keycode, keyrecord_t *record) {
+    if (KC_A <= keycode && keycode <= KC_Z) {
+        if (!record->event.pressed) {
+            unicode_input_start();
+            register_hex32(0x24B6 + (keycode - KC_A));  // circle-enclosed alphas
+            unicode_input_finish();
+        }
+        return false;
+    } else if (keycode == KC_0) {
+        if (!record->event.pressed) {
+            unicode_input_start();
+            register_hex32(0x24EA);  // circle-enclosed zero
+            unicode_input_finish();
+        }
+        return false;
+    } else if (KC_1 <= keycode && keycode <= KC_9) {
+        if (!record->event.pressed) {
+            unicode_input_start();
+            register_hex32(0x2460 + (keycode - KC_1));  // circle-enclosed numbers
+            unicode_input_finish();
+        }
+        return false;
+    } else if (keycode == KC_SPACE) {
+        if (!record->event.pressed) {
+            unicode_input_start();
+            register_hex32(0x2002);  // e2 space
+            unicode_input_finish();
+        }
+        return false;
+    }
+
+    return process_record_keymap(keycode, record);
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case KC_CONFIG:
@@ -60,10 +136,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
 
-        case KC_BLOCKMODE:
+        case KC_WIDE:
             if (!record->event.pressed) {
-                if (repeat_mode != KC_BLOCKMODE) {
-                    dprint("Enabling block mode\n");
+                if (repeat_mode != KC_WIDE) {
+                    dprint("Enabling wide mode\n");
+                }
+                repeat_mode = keycode;
+            }
+            return false;
+
+        case KC_CIRCLES:
+            if (!record->event.pressed) {
+                if (repeat_mode != KC_CIRCLES) {
+                    dprint("Enabling circles mode\n");
                 }
                 repeat_mode = keycode;
             }
@@ -88,22 +173,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
     }
 
-    if (repeat_mode == KC_BLOCKMODE) {
-        if (KC_A <= keycode && keycode <= KC_Z) {
-            unicode_input_start();
-            register_hex32(0x24B6 + (keycode - KC_A));  // circle-enclosed alphas
-            unicode_input_finish();
-            return false;
-        } else if (keycode == KC_0) {
-            unicode_input_start();
-            register_hex32(0x24EA);  // circle-enclosed zero
-            unicode_input_finish();
-            return false;
-        } else if (KC_1 <= keycode && keycode <= KC_9) {
-            unicode_input_start();
-            register_hex32(0x2460 + (keycode - KC_1));  // circle-enclosed numbers
-            unicode_input_finish();
-            return false;
+    if (repeat_mode == KC_WIDE) {
+        if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
+            return process_record_wide(keycode, record);
+        }
+    } else if (repeat_mode == KC_CIRCLES) {
+        if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
+            return process_record_circles(keycode, record);
         }
     } else if (repeat_mode == KC_WOWMODE) {
         if ((KC_A <= keycode) && (keycode <= KC_0)) {
