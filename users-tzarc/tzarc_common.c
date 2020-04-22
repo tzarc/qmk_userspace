@@ -127,10 +127,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
 
-        case KC_CIRCLES:
+        case KC_BLOCKS:
             if (!record->event.pressed) {
-                if (repeat_mode != KC_CIRCLES) {
-                    dprint("Enabling circles mode\n");
+                if (repeat_mode != KC_BLOCKS) {
+                    dprint("Enabling blocks mode\n");
                 }
                 repeat_mode = keycode;
             }
@@ -163,9 +163,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
             return process_record_glyph_replacement(keycode, record, 0x1D4EA, 0x1D4D0, 0x1D7CE, 0x1D7C1, 0x2002);
         }
-    } else if (repeat_mode == KC_CIRCLES) {
+    } else if (repeat_mode == KC_BLOCKS) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
-            return process_record_glyph_replacement(keycode, record, 0x24B6, 0x24B6, 0x24EA, 0x2460, 0x2002);
+            return process_record_glyph_replacement(keycode, record, 0x1F170, 0x1F170, '0', '1', 0x2002);
         }
     } else if (repeat_mode == KC_WOWMODE) {
         if ((KC_A <= keycode) && (keycode <= KC_0)) {
