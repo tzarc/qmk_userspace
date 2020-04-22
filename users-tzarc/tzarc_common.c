@@ -53,23 +53,29 @@ bool process_record_glyph_replacement(uint16_t keycode, keyrecord_t *record, uin
 
                 unicode_input_start();
                 uint32_t base = ((temp_mod | temp_osm) & MOD_MASK_SHIFT) ? baseAlphaUpper : baseAlphaLower;
-                register_hex32(base + (keycode - KC_A));  // vertical form alphas
+                register_hex32(base + (keycode - KC_A));
                 unicode_input_finish();
 
                 set_mods(temp_mod);
             }
             return false;
         } else if (keycode == KC_0) {
+            if ((temp_mod | temp_osm) & MOD_MASK_SHIFT) {  // skip shifted numbers, so that we can still use symbols etc.
+                return process_record_keymap(keycode, record);
+            }
             if (!record->event.pressed) {
                 unicode_input_start();
-                register_hex32(zeroGlyph);  // vertical form zero
+                register_hex32(zeroGlyph);
                 unicode_input_finish();
             }
             return false;
         } else if (KC_1 <= keycode && keycode <= KC_9) {
+            if ((temp_mod | temp_osm) & MOD_MASK_SHIFT) {  // skip shifted numbers, so that we can still use symbols etc.
+                return process_record_keymap(keycode, record);
+            }
             if (!record->event.pressed) {
                 unicode_input_start();
-                register_hex32(baseNumberOne + (keycode - KC_1));  // vertical form numbers
+                register_hex32(baseNumberOne + (keycode - KC_1));
                 unicode_input_finish();
             }
             return false;
@@ -112,10 +118,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
 
-        case KC_GOTHIC:
+        case KC_SCRIPT:
             if (!record->event.pressed) {
-                if (repeat_mode != KC_GOTHIC) {
-                    dprint("Enabling gothic mode\n");
+                if (repeat_mode != KC_SCRIPT) {
+                    dprint("Enabling calligraphy mode\n");
                 }
                 repeat_mode = keycode;
             }
@@ -153,9 +159,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
             return process_record_glyph_replacement(keycode, record, 0xFF41, 0xFF21, 0xFF10, 0xFF11, 0x2003);
         }
-    } else if (repeat_mode == KC_GOTHIC) {
+    } else if (repeat_mode == KC_SCRIPT) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
-            return process_record_glyph_replacement(keycode, record, 0x1D586, 0x1D56C, 0x1D7CE, 0x1D7C1, 0x2002);
+            return process_record_glyph_replacement(keycode, record, 0x1D4EA, 0x1D4D0, 0x1D7CE, 0x1D7C1, 0x2002);
         }
     } else if (repeat_mode == KC_CIRCLES) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
@@ -183,4 +189,3 @@ void matrix_scan_user(void) {
 
     matrix_scan_keymap();
 }
-
