@@ -42,79 +42,46 @@ void keyboard_post_init_user(void) {
     tzarc_eeprom_load();
 }
 
-bool process_record_wide(uint16_t keycode, keyrecord_t *record) {
-    if (KC_A <= keycode && keycode <= KC_Z) {
-        if (!record->event.pressed) {
-            uint8_t temp_mod = get_mods();
-            uint8_t temp_osm = get_oneshot_mods();
-            clear_mods();
-            clear_oneshot_mods();
+bool process_record_glyph_replacement(uint16_t keycode, keyrecord_t *record, uint32_t baseAlphaLower, uint32_t baseAlphaUpper, uint32_t zeroGlyph, uint32_t baseNumberOne, uint32_t spaceGlyph) {
+    uint8_t temp_mod = get_mods();
+    uint8_t temp_osm = get_oneshot_mods();
+    if ((((temp_mod | temp_osm) & (MOD_MASK_CTRL | MOD_MASK_ALT | MOD_MASK_GUI))) == 0) {
+        if (KC_A <= keycode && keycode <= KC_Z) {
+            if (!record->event.pressed) {
+                clear_mods();
+                clear_oneshot_mods();
 
-            unicode_input_start();
-            uint32_t base = ((temp_mod | temp_osm) & MOD_MASK_SHIFT) ? 0xFF21 : 0xFF41;
-            register_hex32(base + (keycode - KC_A));  // vertical form alphas
-            unicode_input_finish();
+                unicode_input_start();
+                uint32_t base = ((temp_mod | temp_osm) & MOD_MASK_SHIFT) ? baseAlphaUpper : baseAlphaLower;
+                register_hex32(base + (keycode - KC_A));  // vertical form alphas
+                unicode_input_finish();
 
-            set_mods(temp_mod);
+                set_mods(temp_mod);
+            }
+            return false;
+        } else if (keycode == KC_0) {
+            if (!record->event.pressed) {
+                unicode_input_start();
+                register_hex32(zeroGlyph);  // vertical form zero
+                unicode_input_finish();
+            }
+            return false;
+        } else if (KC_1 <= keycode && keycode <= KC_9) {
+            if (!record->event.pressed) {
+                unicode_input_start();
+                register_hex32(baseNumberOne + (keycode - KC_1));  // vertical form numbers
+                unicode_input_finish();
+            }
+            return false;
+        } else if (keycode == KC_SPACE) {
+            if (!record->event.pressed) {
+                unicode_input_start();
+                register_hex32(spaceGlyph);  // em space
+                unicode_input_finish();
+            }
+            return false;
         }
-        return false;
-    } else if (keycode == KC_0) {
-        if (!record->event.pressed) {
-            unicode_input_start();
-            register_hex32(0xFF10);  // vertical form zero
-            unicode_input_finish();
-        }
-        return false;
-    } else if (KC_1 <= keycode && keycode <= KC_9) {
-        if (!record->event.pressed) {
-            unicode_input_start();
-            register_hex32(0xFF11 + (keycode - KC_1));  // vertical form numbers
-            unicode_input_finish();
-        }
-        return false;
-    } else if (keycode == KC_SPACE) {
-        if (!record->event.pressed) {
-            unicode_input_start();
-            register_hex32(0x2003);  // em space
-            unicode_input_finish();
-        }
-        return false;
     }
-
-    return process_record_keymap(keycode, record);
-}
-
-bool process_record_circles(uint16_t keycode, keyrecord_t *record) {
-    if (KC_A <= keycode && keycode <= KC_Z) {
-        if (!record->event.pressed) {
-            unicode_input_start();
-            register_hex32(0x24B6 + (keycode - KC_A));  // circle-enclosed alphas
-            unicode_input_finish();
-        }
-        return false;
-    } else if (keycode == KC_0) {
-        if (!record->event.pressed) {
-            unicode_input_start();
-            register_hex32(0x24EA);  // circle-enclosed zero
-            unicode_input_finish();
-        }
-        return false;
-    } else if (KC_1 <= keycode && keycode <= KC_9) {
-        if (!record->event.pressed) {
-            unicode_input_start();
-            register_hex32(0x2460 + (keycode - KC_1));  // circle-enclosed numbers
-            unicode_input_finish();
-        }
-        return false;
-    } else if (keycode == KC_SPACE) {
-        if (!record->event.pressed) {
-            unicode_input_start();
-            register_hex32(0x2002);  // e2 space
-            unicode_input_finish();
-        }
-        return false;
-    }
-
     return process_record_keymap(keycode, record);
 }
 
@@ -140,6 +107,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (!record->event.pressed) {
                 if (repeat_mode != KC_WIDE) {
                     dprint("Enabling wide mode\n");
+                }
+                repeat_mode = keycode;
+            }
+            return false;
+
+        case KC_GOTHIC:
+            if (!record->event.pressed) {
+                if (repeat_mode != KC_GOTHIC) {
+                    dprint("Enabling gothic mode\n");
                 }
                 repeat_mode = keycode;
             }
@@ -175,11 +151,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     if (repeat_mode == KC_WIDE) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
-            return process_record_wide(keycode, record);
+            return process_record_glyph_replacement(keycode, record, 0xFF41, 0xFF21, 0xFF10, 0xFF11, 0x2003);
+        }
+    } else if (repeat_mode == KC_GOTHIC) {
+        if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
+            return process_record_glyph_replacement(keycode, record, 0x1D586, 0x1D56C, 0x1D7CE, 0x1D7C1, 0x2002);
         }
     } else if (repeat_mode == KC_CIRCLES) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
-            return process_record_circles(keycode, record);
+            return process_record_glyph_replacement(keycode, record, 0x24B6, 0x24B6, 0x24EA, 0x2460, 0x2002);
         }
     } else if (repeat_mode == KC_WOWMODE) {
         if ((KC_A <= keycode) && (keycode <= KC_0)) {
@@ -203,3 +183,4 @@ void matrix_scan_user(void) {
 
     matrix_scan_keymap();
 }
+
