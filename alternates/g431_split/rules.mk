@@ -34,7 +34,7 @@ STM32_BOOTLOADER_ADDRESS = 0x1FFF0000
 
 CONSOLE_ENABLE = yes
 
-SERIAL_DRIVER = usart
+#SERIAL_DRIVER = usart
 
 RGBLIGHT_ENABLE = no
 #WS2812_DRIVER = pwm
@@ -44,3 +44,6 @@ BACKLIGHT_ENABLE = no
 
 AUDIO_ENABLE = no
 #AUDIO_DRIVER = pwm_hardware
+
+# Debugging
+OPT_DEFS += -g -O0 -fno-lto

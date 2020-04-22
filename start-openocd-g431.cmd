@@ -1,0 +1,1 @@
+E:\OpenOCD-20200114-0.10.0\bin\openocd.exe --search E:\OpenOCD-20200114-0.10.0\share\openocd\scripts -f interface/stlink.cfg -f board/st_nucleo_g4.cfg -c "debug_level 2;init"

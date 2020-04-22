@@ -26,16 +26,16 @@
 #undef MATRIX_ROWS
 #define MATRIX_ROWS 2
 #undef MATRIX_COLS
-#define MATRIX_COLS 8
+#define MATRIX_COLS 1
 
 #define MATRIX_ROW_PINS \
     { B5 }
 #define MATRIX_COL_PINS \
-    { B4, A1, A1, A1, A1, A1, A1, A1 }
+    { B4 }
 #define UNUSED_PINS
 
 #define SELECT_SOFT_SERIAL_SPEED 5
-#define SOFT_SERIAL_PIN A9
+#define SOFT_SERIAL_PIN A10
 #define SOFT_SERIAL_PIN_2 A10
 
 #define SERIAL_USART_SPEED 115200  // 9600 // 38400 // 115200 // 230400 // 460800 // 921600 // 1843200 // 2000000
