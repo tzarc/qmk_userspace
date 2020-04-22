@@ -22,6 +22,11 @@ BOARD_DEFS := \
 	spi_eeprom_f103!alternates/spi_eeprom_test/f103_test!handwired/onekey/spi_eeprom_test_f103!eep_rst \
 	spi_eeprom_f401!alternates/spi_eeprom_test/f401_test!handwired/onekey/spi_eeprom_test_f401!eep_rst \
 
+EXTRA_LINK_DEFS := \
+	layout-tkl_ansi-tzarc!layouts/community/tkl_ansi/tzarc \
+	layout-60_ansi-tzarc!layouts/community/60_ansi/tzarc \
+	users-tzarc!users/tzarc \
+
 all: bin
 
 arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
@@ -45,39 +50,44 @@ format_prereq:
 	@ln -sf $(ROOTDIR)/qmk_firmware/.clang-format $(ROOTDIR)/.clang-format
 
 format: format_prereq
-	@for file in $$(find "$(ROOTDIR)/layout-tkl_ansi-tzarc" "$(ROOTDIR)/users-tzarc" -type f \( -name '*.h' -or -name '*.c' \) -and -not -name '*conf.h' -and -not -name 'board.c' -and -not -name 'board.h' | sort) ; do \
-		echo "\e[38;5;14mclang-format'ing: $$file\e[0m" ; \
-		clang-format-7 -i "$$file" >/dev/null 2>&1 ; \
+
+links: format_prereq
+
+define handle_link_entry
+link_source_$1 := $$(word 1,$$(subst !, ,$1))
+link_target_$1 := $$(word 2,$$(subst !, ,$1))
+link_files_$1 := $$(shell find $$(ROOTDIR)/$$(link_source_$1) -type f \( -name '*.h' -or -name '*.c' \) -and -not -name '*conf.h' -and -not -name 'board.c' -and -not -name 'board.h' | sort)
+link_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(link_source_$1) -type f | sort)
+
+links: link_$$(link_source_$1)
+link_$$(link_source_$1):
+	@if [ ! -L "$(ROOTDIR)/qmk_firmware/$$(link_target_$1)" ] ; then \
+		echo "\e[38;5;14mSymlinking: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
+		ln -sf $(ROOTDIR)/$$(link_source_$1) $(ROOTDIR)/qmk_firmware/$$(link_target_$1) ; \
+	fi
+
+clean: unlink_$$(link_source_$1)
+distclean: unlink_$$(link_source_$1)
+unlinks: unlink_$$(link_source_$1)
+unlink_$$(link_source_$1):
+	@if [ -L "$(ROOTDIR)/qmk_firmware/$$(link_target_$1)" ] ; then \
+		echo "\e[38;5;14mRemoving symlink: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
+		rm $(ROOTDIR)/qmk_firmware/$$(link_target_$1) ; \
+	fi
+
+format: format_$$(link_source_$1)
+format_$$(link_source_$1): format_prereq
+	@for file in $$(link_files_$1) ; do \
+		echo "\e[38;5;14mclang-format'ing: $$$$file\e[0m" ; \
+		clang-format-7 -i "$$$$file" >/dev/null 2>&1 ; \
 	done ; \
-	for file in $$(find "$(ROOTDIR)/layout-tkl_ansi-tzarc" "$(ROOTDIR)/users-tzarc" -type f | sort) ; do \
-		dos2unix "$$file" >/dev/null 2>&1 ; \
+	for file in $$(link_files_all_$1) ; do \
+		dos2unix "$$$$file" >/dev/null 2>&1 ; \
 	done
 
-links: format_prereq link-user
+endef
 
-link-user:
-	@if [ ! -L "$(ROOTDIR)/qmk_firmware/users/tzarc" ] ; then \
-		echo "\e[38;5;14mSymlinking: users-tzarc -> users/tzarc\e[0m" ; \
-		ln -sf $(ROOTDIR)/users-tzarc $(ROOTDIR)/qmk_firmware/users/tzarc ; \
-	fi
-	@if [ ! -L "$(ROOTDIR)/qmk_firmware/layouts/community/tkl_ansi/tzarc" ] ; then \
-		echo "\e[38;5;14mSymlinking: layout-tkl_ansi-tzarc -> layouts/community/tkl_ansi/tzarc\e[0m" ; \
-		ln -sf $(ROOTDIR)/layout-tkl_ansi-tzarc $(ROOTDIR)/qmk_firmware/layouts/community/tkl_ansi/tzarc ; \
-	fi
-
-unlink-user:
-	@if [ -L "$(ROOTDIR)/qmk_firmware/users/tzarc" ] ; then \
-		echo "\e[38;5;14mRemoving link: users/tzarc/\e[0m" ; \
-		rm "$(ROOTDIR)/qmk_firmware/users/tzarc" ; \
-	fi
-	@if [ -L "$(ROOTDIR)/qmk_firmware/layouts/community/tkl_ansi/tzarc" ] ; then \
-		echo "\e[38;5;14mRemoving link: layouts/community/tkl_ansi/tzarc/\e[0m" ; \
-		rm "$(ROOTDIR)/qmk_firmware/layouts/community/tkl_ansi/tzarc" ; \
-	fi
-
-unlinks: unlink-user
-clean: unlink-user
-distclean: unlink-user
+$(foreach link_entry,$(EXTRA_LINK_DEFS),$(eval $(call handle_link_entry,$(link_entry))))
 
 define handle_board_entry
 board_name_$1 := $$(word 1,$$(subst !, ,$1))
@@ -89,7 +99,7 @@ board_file_$1 := $$(shell echo $$(board_qmk_$1) | sed -e 's@/@_@g' -e 's@:@_@g')
 board_files_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f \( -name '*.h' -or -name '*.c' \) -and -not -name '*conf.h' -and -not -name 'board.c' -and -not -name 'board.h' | sort)
 board_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f | sort)
 
-bin_$$(board_name_$1): board_link_$$(board_name_$1) link-user
+bin_$$(board_name_$1): board_link_$$(board_name_$1) links
 	@echo "\e[38;5;14mBuilding: $$(board_qmk_$1)\e[0m"
 	$$(MAKE) -O $$(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" $$(board_qmk_$1):$$(board_keymap_$1) 2>&1 \
 		| egrep --line-buffered -iv '(Entering|Leaving) directory' \
@@ -104,8 +114,8 @@ format_$$(board_name_$1): format_prereq
 	@for file in $$(board_files_$1) ; do \
 		echo "\e[38;5;14mclang-format'ing: $$$$file\e[0m" ; \
 		clang-format-7 -i "$$$$file" >/dev/null 2>&1 ; \
-	done ; \
-	for file in $$(board_files_all_$1) ; do \
+	done
+	@for file in $$(board_files_all_$1) ; do \
 		dos2unix "$$$$file" >/dev/null 2>&1 ; \
 	done
 
@@ -121,12 +131,12 @@ board_link_$$(board_name_$1):
 			mkdir -p "$$(shell dirname "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)")" ; \
 		fi ; \
 		ln -sf "$$(ROOTDIR)/$$(board_source_$1)" "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ; \
-	fi ; \
-	touch $$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)
+	fi
+	@touch $$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)
 
 board_unlink_$$(board_name_$1):
 	@if [ -L "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ] ; then \
-		echo "\e[38;5;14mRemoving link: $$(board_target_$1)\e[0m" ; \
+		echo "\e[38;5;14mRemoving symlink: $$(board_target_$1)\e[0m" ; \
 		rm "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ; \
 	fi
 

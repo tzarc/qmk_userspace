@@ -1,8 +1,23 @@
 #pragma once
-
 #include <quantum.h>
 
-enum { KC_CONFIG = SAFE_RANGE, TIME_RESET, TIME_EEPRST, KC_NOMODE, KC_WIDE, KC_SCRIPT, KC_BLOCKS, KC_WOWMODE, KC_D3MODE, KEYMAP_SAFE_RANGE };
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Common layers and keys
+
+enum { KC_CONFIG = SAFE_RANGE, TIME_RESET, TIME_EEPRST, KC_LOWER, KC_RAISE, KC_ADJUST, KC_NOMODE, KC_WIDE, KC_SCRIPT, KC_BLOCKS, KC_WOWMODE, KC_D3MODE, KEYMAP_SAFE_RANGE };
+enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
+
+#define KC_TAB_LOWER LT(LAYER_LOWER, KC_TAB)
+#define KC_APP_RAISE LT(LAYER_RAISE, KC_APP)
+#define KC_CTL_ESC MT(MOD_LCTL, KC_ESC)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Common functionality
+
+extern bool     config_enabled;
+extern uint16_t repeat_mode;
+
+void tzarc_common_init(void);
 
 uint8_t prng(void);
 
@@ -12,13 +27,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record);
 void matrix_scan_keymap(void);
 void matrix_scan_user(void);
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Common functionality
-
-extern bool     config_enabled;
-extern uint16_t repeat_mode;
-
-void tzarc_common_init(void);
+layer_state_t layer_state_set_keymap(layer_state_t state);
+layer_state_t layer_state_set_user(layer_state_t state);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // EEPROM
