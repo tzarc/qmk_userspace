@@ -47,9 +47,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-void keyboard_post_init_user(void) { set_unicode_input_mode(UC_WINC); }
+void keyboard_post_init_keymap(void) { set_unicode_input_mode(UC_WINC); }
 
-bool process_record_user(uint16_t keycode, keyrecord_t* record) {
+bool process_record_keymap(uint16_t keycode, keyrecord_t* record) {
     switch (keycode) {
         case TBL_FLIP:
             if (record->event.pressed) {
