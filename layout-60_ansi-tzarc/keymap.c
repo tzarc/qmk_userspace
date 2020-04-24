@@ -11,7 +11,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ____________TZARC_BASE_R6_ALPHA__________),
 
   [LAYER_LOWER] = LAYOUT_60_ansi_wrapper(
-      ____________TZARC_LOWER_R2_ALPHA_________,
+      ____________TZARC_LOWER_R2_ALPHA_FKEYS___,
       ____________TZARC_LOWER_R3_ALPHA_________,
       ____________TZARC_LOWER_R4_ALPHA_________,
       ____________TZARC_LOWER_R5_ALPHA_________,

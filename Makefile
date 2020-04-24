@@ -17,6 +17,7 @@ BOARD_DEFS := \
 	test_proton_c!alternates/proton_c_test!handwired/onekey/proton_c_test!reset \
 	split_proton_c!alternates/proton_c_split!handwired/splittest/proton_c_split!default \
 	split_g431!alternates/g431_split!handwired/splittest/g431_split!default \
+	split_f411!alternates/f411_split!handwired/splittest/f411_split!default \
 	spi_eeprom_promicro!alternates/spi_eeprom_test/promicro_test!handwired/onekey/spi_eeprom_test_promicro!eep_rst \
 	spi_eeprom_proton_c!alternates/spi_eeprom_test/proton_c_test!handwired/onekey/spi_eeprom_test_proton_c!eep_rst \
 	spi_eeprom_f103!alternates/spi_eeprom_test/f103_test!handwired/onekey/spi_eeprom_test_f103!eep_rst \

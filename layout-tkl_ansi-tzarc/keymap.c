@@ -13,7 +13,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [LAYER_LOWER] = LAYOUT_tkl_ansi_wrapper(
       ____________TZARC_LOWER_R1_ALPHA_________, ____________TZARC_LOWER_R1_NAV___________,
-      ____________TZARC_LOWER_R2_ALPHA_________, ____________TZARC_LOWER_R2_NAV___________,
+      ____________TZARC_LOWER_R2_ALPHA_NORM____, ____________TZARC_LOWER_R2_NAV___________,
       ____________TZARC_LOWER_R3_ALPHA_________, ____________TZARC_LOWER_R3_NAV___________,
       ____________TZARC_LOWER_R4_ALPHA_________,
       ____________TZARC_LOWER_R5_ALPHA_________, ____________TZARC_LOWER_R5_NAV___________,

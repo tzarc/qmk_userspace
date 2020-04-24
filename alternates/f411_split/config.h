@@ -24,18 +24,18 @@
 #define SERIAL_BUFFERS_SIZE 1024
 
 #define MATRIX_ROW_PINS \
-    { A13 }
+    { B5 }
 #define MATRIX_COL_PINS \
-    { A14 }
+    { B4 }
 #define UNUSED_PINS
 
 #define SOFT_SERIAL_PIN A9
-#define SOFT_SERIAL_PIN_2 A10
+//#define SOFT_SERIAL_PIN_2 A10
 
 #define SERIAL_USART_SPEED 2000000  // 9600 // 38400 // 115200 // 230400 // 460800 // 921600 // 1843200 // 2000000
 
 #define SPLIT_USB_DETECT
-#define SPLIT_HAND_PIN A0
+#define SPLIT_HAND_PIN A2
 
 #define DEBUG_MATRIX_SCAN_RATE
 

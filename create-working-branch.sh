@@ -7,7 +7,7 @@ script_dir="$(readlink -f "$(dirname "$this_script")")"
 
 unset upgrade_chibios
 unset upgrade_chibios_confs
-#upgrade_chibios=1
+upgrade_chibios=1
 #upgrade_chibios_confs=1
 
 target_branch="generated-workarea"
@@ -18,8 +18,8 @@ fi
 declare -a prs_to_apply
 prs_to_apply+=(8256) # dump_vars
 prs_to_apply+=(6165) # ARM audio DAC/PWM change
-prs_to_apply+=(7072) # Bitbang Arm split
-#prs_to_apply+=(7987) # Half-duplex uart Arm split
+#prs_to_apply+=(7072) # Bitbang Arm split
+prs_to_apply+=(7987) # Half-duplex uart Arm split
 prs_to_apply+=(8780) # SPI EEPROM
 prs_to_apply+=(8778) # Dual-bank bootloader
 #prs_to_apply+=(8291) # GPT ARM backlight
