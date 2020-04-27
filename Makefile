@@ -28,6 +28,11 @@ EXTRA_LINK_DEFS := \
 	layout-60_ansi-tzarc!layouts/community/60_ansi/tzarc \
 	users-tzarc!users/tzarc \
 
+git-submodule: clean
+	cd $(ROOTDIR)/qmk_firmware \
+		&& git fetch --all --tags \
+		&& git reset --hard origin/$(shell cd $(ROOTDIR)/qmk_firmware && git rev-parse --abbrev-ref HEAD)
+
 all: bin
 
 arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
