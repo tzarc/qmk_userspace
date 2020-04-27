@@ -43,6 +43,8 @@ hard_reset() {
     git remote set-url upstream --push git@github.com:tzarc/$repo_name.git
     git fetch --all --tags --prune
     git checkout -f $repo_branch
+    git reset --hard upstream/$repo_branch
+    git push origin $repo_branch
     git branch -D $target_branch || true
     git checkout -b $target_branch
     git reset --hard upstream/$repo_branch
