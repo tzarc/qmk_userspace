@@ -43,14 +43,10 @@ remove_artifacts:
 	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format >/dev/null 2>&1 || true
 
 clean: remove_artifacts
-	@$(MAKE) -O $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" clean 2>&1 \
-		| egrep --line-buffered -iv '(Entering|Leaving) directory' \
-		| egrep --line-buffered -iv 'Bad file descriptor' || true
+	@$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" clean || true
 
 distclean: remove_artifacts
-	@$(MAKE) -O $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" distclean 2>&1 \
-		| egrep --line-buffered -iv '(Entering|Leaving) directory' \
-		| egrep --line-buffered -iv 'Bad file descriptor' || true
+	@$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" distclean || true
 
 format_prereq:
 	@ln -sf $(ROOTDIR)/qmk_firmware/.clang-format $(ROOTDIR)/.clang-format
@@ -107,9 +103,7 @@ board_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f | so
 
 bin_$$(board_name_$1): board_link_$$(board_name_$1) links
 	@echo "\e[38;5;14mBuilding: $$(board_qmk_$1)\e[0m"
-	$$(MAKE) -O $$(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" $$(board_qmk_$1):$$(board_keymap_$1) 2>&1 \
-		| egrep --line-buffered -iv '(Entering|Leaving) directory' \
-		| egrep --line-buffered -iv 'Bad file descriptor'
+	$$(MAKE) $$(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" $$(board_qmk_$1):$$(board_keymap_$1)
 	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR)
 
 flash_$$(board_name_$1): bin_$$(board_name_$1)
