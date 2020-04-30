@@ -140,6 +140,7 @@ bool process_record_glyph_replacement(uint16_t keycode, keyrecord_t *record, tra
 DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_wide, 0xFF41, 0xFF21, 0xFF10, 0xFF11, 0x2003);
 DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_script, 0x1D4EA, 0x1D4D0, 0x1D7CE, 0x1D7C1, 0x2002);
 DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_boxes, 0x1F170, 0x1F170, '0', '1', 0x2002);
+DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_regional, 0x1F1E6, 0x1F1E6, '0', '1', 0x2003);
 
 DEFINE_UNICODE_LUT_TRANSLATOR(unicode_lut_translator_aussie,
                               0x0250,  // a
@@ -321,6 +322,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
 
+        case KC_REGIONAL:
+            if (record->event.pressed) {
+                if (repeat_mode != KC_REGIONAL) {
+                    dprint("Enabling regional mode\n");
+                }
+                repeat_mode = keycode;
+            }
+            return false;
+
         case KC_AUSSIE:
             if (record->event.pressed) {
                 if (repeat_mode != KC_AUSSIE) {
@@ -360,6 +370,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     } else if (repeat_mode == KC_BLOCKS) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
             return process_record_glyph_replacement(keycode, record, unicode_range_translator_boxes);
+        }
+    } else if (repeat_mode == KC_REGIONAL) {
+        if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
+            if(!process_record_glyph_replacement(keycode, record, unicode_range_translator_regional)) {
+                tap_unicode_glyph_nomods(0x200C);
+                return false;
+            }
         }
     } else if (repeat_mode == KC_AUSSIE) {
         return process_record_aussie(keycode, record);
