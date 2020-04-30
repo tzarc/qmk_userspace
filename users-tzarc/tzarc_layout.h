@@ -77,7 +77,7 @@
 #define ____________TZARC_LOWER_R3_ALPHA_________ _______, KC_NOMODE, KC_CONFIG, KC_WOWMODE, KC_D3MODE, _______, _______, _______, _______, _______, _______, KC_VOLD, KC_VOLU, KC_MUTE
 #define ____________TZARC_LOWER_R3_NAV___________ _______, _______, _______
 
-#define ____________TZARC_LOWER_R4_ALPHA_________ KC_CAPS, KC_WIDE, KC_SCRIPT, KC_BLOCKS, _______, _______, _______, _______, _______, _______, _______, _______, _______
+#define ____________TZARC_LOWER_R4_ALPHA_________ KC_CAPS, KC_WIDE, KC_SCRIPT, KC_BLOCKS, KC_AUSSIE, _______, _______, _______, _______, _______, _______, _______, _______
 
 #define ____________TZARC_LOWER_R5_ALPHA_________ _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
 #define ____________TZARC_LOWER_R5_NAV___________ _______

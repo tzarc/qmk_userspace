@@ -32,6 +32,28 @@ uint8_t prng(void) {
     return s;
 }
 
+void tap_code16_nomods(uint8_t kc) {
+    uint8_t temp_mod = get_mods();
+    clear_mods();
+    clear_oneshot_mods();
+    tap_code16(kc);
+    set_mods(temp_mod);
+}
+
+void tap_unicode_glyph(uint32_t glyph) {
+    unicode_input_start();
+    register_hex32(glyph);
+    unicode_input_finish();
+}
+
+void tap_unicode_glyph_nomods(uint32_t glyph) {
+    uint8_t temp_mod = get_mods();
+    clear_mods();
+    clear_oneshot_mods();
+    tap_unicode_glyph(glyph);
+    set_mods(temp_mod);
+}
+
 __attribute__((weak)) void eeconfig_init_keymap(void) {}
 
 __attribute__((weak)) void keyboard_post_init_keymap(void) {}
@@ -62,45 +84,6 @@ void keyboard_post_init_user(void) {
 
 typedef uint32_t (*translator_function_t)(bool is_shifted, uint32_t keycode);
 
-bool process_record_glyph_replacement(uint16_t keycode, keyrecord_t *record, translator_function_t translator) {
-    uint8_t temp_mod   = get_mods();
-    uint8_t temp_osm   = get_oneshot_mods();
-    bool    is_shifted = (temp_mod | temp_osm) & MOD_MASK_SHIFT;
-    if (((temp_mod | temp_osm) & (MOD_MASK_CTRL | MOD_MASK_ALT | MOD_MASK_GUI)) == 0) {
-        if (KC_A <= keycode && keycode <= KC_Z) {
-            if (record->event.pressed) {
-                clear_mods();
-                clear_oneshot_mods();
-
-                unicode_input_start();
-                register_hex32(translator(is_shifted, keycode));
-                unicode_input_finish();
-
-                set_mods(temp_mod);
-            }
-            return false;
-        } else if (KC_1 <= keycode && keycode <= KC_0) {
-            if (is_shifted) {  // skip shifted numbers, so that we can still use symbols etc.
-                return process_record_keymap(keycode, record);
-            }
-            if (record->event.pressed) {
-                unicode_input_start();
-                register_hex32(translator(is_shifted, keycode));
-                unicode_input_finish();
-            }
-            return false;
-        } else if (keycode == KC_SPACE) {
-            if (record->event.pressed) {
-                unicode_input_start();
-                register_hex32(translator(is_shifted, keycode));
-                unicode_input_finish();
-            }
-            return false;
-        }
-    }
-    return process_record_keymap(keycode, record);
-}
-
 #define DEFINE_UNICODE_RANGE_TRANSLATOR(translator_name, lower_alpha, upper_alpha, zero_glyph, number_one, space_glyph) \
     static inline uint32_t translator_name(bool is_shifted, uint32_t keycode) {                                         \
         switch (keycode) {                                                                                              \
@@ -116,9 +99,135 @@ bool process_record_glyph_replacement(uint16_t keycode, keyrecord_t *record, tra
         return keycode;                                                                                                 \
     }
 
+#define DEFINE_UNICODE_LUT_TRANSLATOR(translator_name, ...)                     \
+    static inline uint32_t translator_name(bool is_shifted, uint32_t keycode) { \
+        static const uint32_t translation[] = {__VA_ARGS__};                    \
+        uint32_t              ret           = keycode;                          \
+        if ((keycode - KC_A) < (sizeof(translation) / sizeof(uint32_t))) {      \
+            ret = translation[keycode - KC_A];                                  \
+        }                                                                       \
+        return ret;                                                             \
+    }
+
+bool process_record_glyph_replacement(uint16_t keycode, keyrecord_t *record, translator_function_t translator) {
+    uint8_t temp_mod   = get_mods();
+    uint8_t temp_osm   = get_oneshot_mods();
+    bool    is_shifted = (temp_mod | temp_osm) & MOD_MASK_SHIFT;
+    if (((temp_mod | temp_osm) & (MOD_MASK_CTRL | MOD_MASK_ALT | MOD_MASK_GUI)) == 0) {
+        if (KC_A <= keycode && keycode <= KC_Z) {
+            if (record->event.pressed) {
+                tap_unicode_glyph_nomods(translator(is_shifted, keycode));
+            }
+            return false;
+        } else if (KC_1 <= keycode && keycode <= KC_0) {
+            if (is_shifted) {  // skip shifted numbers, so that we can still use symbols etc.
+                return process_record_keymap(keycode, record);
+            }
+            if (record->event.pressed) {
+                tap_unicode_glyph(translator(is_shifted, keycode));
+            }
+            return false;
+        } else if (keycode == KC_SPACE) {
+            if (record->event.pressed) {
+                tap_unicode_glyph(translator(is_shifted, keycode));
+            }
+            return false;
+        }
+    }
+    return process_record_keymap(keycode, record);
+}
+
 DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_wide, 0xFF41, 0xFF21, 0xFF10, 0xFF11, 0x2003);
 DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_script, 0x1D4EA, 0x1D4D0, 0x1D7CE, 0x1D7C1, 0x2002);
 DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_boxes, 0x1F170, 0x1F170, '0', '1', 0x2002);
+
+DEFINE_UNICODE_LUT_TRANSLATOR(unicode_lut_translator_aussie,
+                              0x0250,  // a
+                              'q',     // b
+                              0x0254,  // c
+                              'p',     // d
+                              0x01DD,  // e
+                              0x025F,  // f
+                              0x0183,  // g
+                              0x0265,  // h
+                              0x1D09,  // i
+                              0x027E,  // j
+                              0x029E,  // k
+                              'l',     // l
+                              0x026F,  // m
+                              'u',     // n
+                              'o',     // o
+                              'd',     // p
+                              'b',     // q
+                              0x0279,  // r
+                              's',     // s
+                              0x0287,  // t
+                              'n',     // u
+                              0x028C,  // v
+                              0x028D,  // w
+                              0x2717,  // x
+                              0x028E,  // y
+                              'z',     // z
+                              0x0269,  // 1
+                              0x3139,  // 2
+                              0x0190,  // 3
+                              0x3123,  // 4
+                              0x03DB,  // 5
+                              '9',     // 6
+                              0x3125,  // 7
+                              '8',     // 8
+                              '6',     // 9
+                              '0'      // 0
+);
+
+bool process_record_aussie(uint16_t keycode, keyrecord_t *record) {
+    bool is_shifted = (get_mods() | get_oneshot_mods()) & MOD_MASK_SHIFT;
+    if ((KC_A <= keycode) && (keycode <= KC_0)) {
+        if (record->event.pressed) {
+            if (!process_record_glyph_replacement(keycode, record, unicode_lut_translator_aussie)) {
+                tap_code16_nomods(KC_LEFT);
+                return false;
+            }
+        }
+    } else if (record->event.pressed && keycode == KC_SPACE) {
+        tap_code16_nomods(KC_SPACE);
+        tap_code16_nomods(KC_LEFT);
+        return false;
+    } else if (record->event.pressed && keycode == KC_ENTER) {
+        tap_code16_nomods(KC_END);
+        tap_code16_nomods(KC_ENTER);
+        return false;
+    } else if (record->event.pressed && keycode == KC_HOME) {
+        tap_code16_nomods(KC_END);
+        return false;
+    } else if (record->event.pressed && keycode == KC_END) {
+        tap_code16_nomods(KC_HOME);
+        return false;
+    } else if (record->event.pressed && keycode == KC_BSPC) {
+        tap_code16_nomods(KC_DELT);
+        return false;
+    } else if (record->event.pressed && keycode == KC_DELT) {
+        tap_code16_nomods(KC_BSPC);
+        return false;
+    } else if (record->event.pressed && keycode == KC_QUOT) {
+        tap_unicode_glyph_nomods(is_shifted ? 0x201E : 0x201A);
+        tap_code16_nomods(KC_LEFT);
+        return false;
+    } else if (record->event.pressed && keycode == KC_COMMA) {
+        tap_unicode_glyph_nomods(is_shifted ? '<' : 0x2018);
+        tap_code16_nomods(KC_LEFT);
+        return false;
+    } else if (record->event.pressed && keycode == KC_DOT) {
+        tap_unicode_glyph_nomods(is_shifted ? '>' : 0x02D9);
+        tap_code16_nomods(KC_LEFT);
+        return false;
+    } else if (record->event.pressed && keycode == KC_SLASH) {
+        tap_unicode_glyph_nomods(is_shifted ? 0x00BF : '/');
+        tap_code16_nomods(KC_LEFT);
+        return false;
+    }
+    return process_record_keymap(keycode, record);
+}
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t reset_key_timer  = 0;
@@ -212,6 +321,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
 
+        case KC_AUSSIE:
+            if (record->event.pressed) {
+                if (repeat_mode != KC_AUSSIE) {
+                    dprint("Enabling aussie mode\n");
+                }
+                repeat_mode = keycode;
+            }
+            return false;
+
         case KC_WOWMODE:
             if (record->event.pressed) {
                 if (repeat_mode != KC_WOWMODE) {
@@ -243,6 +361,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
             return process_record_glyph_replacement(keycode, record, unicode_range_translator_boxes);
         }
+    } else if (repeat_mode == KC_AUSSIE) {
+        return process_record_aussie(keycode, record);
     } else if (repeat_mode == KC_WOWMODE) {
         if ((KC_A <= keycode) && (keycode <= KC_0)) {
             return process_record_wow(keycode, record);

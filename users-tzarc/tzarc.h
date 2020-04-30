@@ -21,7 +21,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Common layers and keys
 
-enum { KC_CONFIG = SAFE_RANGE, TIME_RESET, TIME_EEPRST, KC_LOWER, KC_RAISE, KC_ADJUST, KC_NOMODE, KC_WIDE, KC_SCRIPT, KC_BLOCKS, KC_WOWMODE, KC_D3MODE, KEYMAP_SAFE_RANGE };
+enum { KC_CONFIG = SAFE_RANGE, TIME_RESET, TIME_EEPRST, KC_LOWER, KC_RAISE, KC_ADJUST, KC_NOMODE, KC_WIDE, KC_SCRIPT, KC_BLOCKS, KC_AUSSIE, KC_WOWMODE, KC_D3MODE, KEYMAP_SAFE_RANGE };
 enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 
 #define KC_TAB_LOWER LT(LAYER_LOWER, KC_TAB)
