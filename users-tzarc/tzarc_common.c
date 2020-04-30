@@ -60,47 +60,39 @@ void keyboard_post_init_user(void) {
     tzarc_eeprom_load();
 }
 
-bool process_record_glyph_replacement(uint16_t keycode, keyrecord_t *record, uint32_t baseAlphaLower, uint32_t baseAlphaUpper, uint32_t zeroGlyph, uint32_t baseNumberOne, uint32_t spaceGlyph) {
-    uint8_t temp_mod = get_mods();
-    uint8_t temp_osm = get_oneshot_mods();
-    if ((((temp_mod | temp_osm) & (MOD_MASK_CTRL | MOD_MASK_ALT | MOD_MASK_GUI))) == 0) {
+typedef uint32_t (*translator_function_t)(bool is_shifted, uint32_t keycode);
+
+bool process_record_glyph_replacement(uint16_t keycode, keyrecord_t *record, translator_function_t translator) {
+    uint8_t temp_mod   = get_mods();
+    uint8_t temp_osm   = get_oneshot_mods();
+    bool    is_shifted = (temp_mod | temp_osm) & MOD_MASK_SHIFT;
+    if (((temp_mod | temp_osm) & (MOD_MASK_CTRL | MOD_MASK_ALT | MOD_MASK_GUI)) == 0) {
         if (KC_A <= keycode && keycode <= KC_Z) {
             if (record->event.pressed) {
                 clear_mods();
                 clear_oneshot_mods();
 
                 unicode_input_start();
-                uint32_t base = ((temp_mod | temp_osm) & MOD_MASK_SHIFT) ? baseAlphaUpper : baseAlphaLower;
-                register_hex32(base + (keycode - KC_A));
+                register_hex32(translator(is_shifted, keycode));
                 unicode_input_finish();
 
                 set_mods(temp_mod);
             }
             return false;
-        } else if (keycode == KC_0) {
-            if ((temp_mod | temp_osm) & MOD_MASK_SHIFT) {  // skip shifted numbers, so that we can still use symbols etc.
+        } else if (KC_1 <= keycode && keycode <= KC_0) {
+            if (is_shifted) {  // skip shifted numbers, so that we can still use symbols etc.
                 return process_record_keymap(keycode, record);
             }
             if (record->event.pressed) {
                 unicode_input_start();
-                register_hex32(zeroGlyph);
-                unicode_input_finish();
-            }
-            return false;
-        } else if (KC_1 <= keycode && keycode <= KC_9) {
-            if ((temp_mod | temp_osm) & MOD_MASK_SHIFT) {  // skip shifted numbers, so that we can still use symbols etc.
-                return process_record_keymap(keycode, record);
-            }
-            if (record->event.pressed) {
-                unicode_input_start();
-                register_hex32(baseNumberOne + (keycode - KC_1));
+                register_hex32(translator(is_shifted, keycode));
                 unicode_input_finish();
             }
             return false;
         } else if (keycode == KC_SPACE) {
             if (record->event.pressed) {
                 unicode_input_start();
-                register_hex32(spaceGlyph);  // em space
+                register_hex32(translator(is_shifted, keycode));
                 unicode_input_finish();
             }
             return false;
@@ -108,6 +100,25 @@ bool process_record_glyph_replacement(uint16_t keycode, keyrecord_t *record, uin
     }
     return process_record_keymap(keycode, record);
 }
+
+#define DEFINE_UNICODE_RANGE_TRANSLATOR(translator_name, lower_alpha, upper_alpha, zero_glyph, number_one, space_glyph) \
+    static inline uint32_t translator_name(bool is_shifted, uint32_t keycode) {                                         \
+        switch (keycode) {                                                                                              \
+            case KC_A ... KC_Z:                                                                                         \
+                return (is_shifted ? upper_alpha : lower_alpha) + keycode - KC_A;                                       \
+            case KC_0:                                                                                                  \
+                return zero_glyph;                                                                                      \
+            case KC_1 ... KC_9:                                                                                         \
+                return (number_one + keycode - KC_1);                                                                   \
+            case KC_SPACE:                                                                                              \
+                return space_glyph;                                                                                     \
+        }                                                                                                               \
+        return keycode;                                                                                                 \
+    }
+
+DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_wide, 0xFF41, 0xFF21, 0xFF10, 0xFF11, 0x2003);
+DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_script, 0x1D4EA, 0x1D4D0, 0x1D7CE, 0x1D7C1, 0x2002);
+DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_boxes, 0x1F170, 0x1F170, '0', '1', 0x2002);
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t reset_key_timer  = 0;
@@ -222,15 +233,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     if (repeat_mode == KC_WIDE) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
-            return process_record_glyph_replacement(keycode, record, 0xFF41, 0xFF21, 0xFF10, 0xFF11, 0x2003);
+            return process_record_glyph_replacement(keycode, record, unicode_range_translator_wide);
         }
     } else if (repeat_mode == KC_SCRIPT) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
-            return process_record_glyph_replacement(keycode, record, 0x1D4EA, 0x1D4D0, 0x1D7CE, 0x1D7C1, 0x2002);
+            return process_record_glyph_replacement(keycode, record, unicode_range_translator_script);
         }
     } else if (repeat_mode == KC_BLOCKS) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
-            return process_record_glyph_replacement(keycode, record, 0x1F170, 0x1F170, '0', '1', 0x2002);
+            return process_record_glyph_replacement(keycode, record, unicode_range_translator_boxes);
         }
     } else if (repeat_mode == KC_WOWMODE) {
         if ((KC_A <= keycode) && (keycode <= KC_0)) {
