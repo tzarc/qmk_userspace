@@ -87,7 +87,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 #define ____________TZARC_4x6_RAISE_R4_L_________ _______, _______, _______, _______, _______, KC_MINS
 
 #define ____________TZARC_4x6_RAISE_R1_R_________ KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11
-#define ____________TZARC_4x6_RAISE_R2_R_________ _______, _______, _______, _______, _______, _______
+#define ____________TZARC_4x6_RAISE_R2_R_________ KC_NOMODE, KC_WIDE, KC_SCRIPT, KC_BLOCKS, KC_REGIONAL, KC_AUSSIE
 #define ____________TZARC_4x6_RAISE_R3_R_________ KC_EQL, _______, _______, _______, _______, _______
 #define ____________TZARC_4x6_RAISE_R4_R_________ KC_PLUS, _______, _______, _______, _______, _______
 
@@ -95,12 +95,12 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 #define ____________TZARC_4x6_ADJUST_R1_L________ _______, _______, _______, _______, _______, _______
 #define ____________TZARC_4x6_ADJUST_R2_L________ KC_MUTE, KC_VOLU, KC_MSTP, KC_MPLY, KC_MPRV, KC_MNXT
 #define ____________TZARC_4x6_ADJUST_R3_L________ _______, KC_VOLD, _______, _______, _______, _______
-#define ____________TZARC_4x6_ADJUST_R4_L________ BL_DEC,  BL_INC, _______, _______, _______, _______
+#define ____________TZARC_4x6_ADJUST_R4_L________ BL_DEC, BL_INC, _______, _______, _______, _______
 
 #define ____________TZARC_4x6_ADJUST_R1_R________ _______, _______, _______, DEBUG, TIME_EEPRST, TIME_RESET
 #define ____________TZARC_4x6_ADJUST_R2_R________ _______, _______, _______, _______, _______, _______
 #define ____________TZARC_4x6_ADJUST_R3_R________ _______, RGB_MOD, RGB_HUI, RGB_SAI, RGB_VAI, RGB_SPI
-#define ____________TZARC_4x6_ADJUST_R4_R________ RGB_TOG, RGB_RMOD,RGB_HUD, RGB_SAD, RGB_VAD, RGB_SPD
+#define ____________TZARC_4x6_ADJUST_R4_R________ RGB_TOG, RGB_RMOD, RGB_HUD, RGB_SAD, RGB_VAD, RGB_SPD
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Layout Helpers: Standard layout
