@@ -16,4 +16,10 @@
 
 #pragma once
 
+// Pre-define the amount of space to use for userspace EEPROM
+#define TZARC_EEPROM_ALLOCATION 32
+
+// If we ever decide we're going to use VIA, then make sure we're not going to collide with any of the EEPROM settings for userspace.
+#define VIA_EEPROM_MAGIC_ADDR (EECONFIG_SIZE + TZARC_EEPROM_ALLOCATION + 1)
+
 // #define DEBUG_MATRIX_SCAN_RATE

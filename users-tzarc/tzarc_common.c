@@ -72,6 +72,7 @@ void tzarc_common_init(void) {
 void eeconfig_init_user(void) {
     set_unicode_input_mode(UC_WINC);
     tzarc_eeprom_reset();
+    eeconfig_init_keymap();
 }
 
 void keyboard_post_init_user(void) {

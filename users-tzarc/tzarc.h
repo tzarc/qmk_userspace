@@ -15,6 +15,7 @@
  */
 
 #pragma once
+#include <assert.h>
 #include <quantum.h>
 #include "tzarc_layout.h"
 
@@ -59,6 +60,9 @@ __attribute__((packed)) struct tzarc_eeprom_cfg_t {
 };
 
 extern struct tzarc_eeprom_cfg_t tzarc_eeprom_cfg;
+
+// Make sure if/when we ever use VIA we have a block of settings that still fits
+_Static_assert(sizeof(struct tzarc_eeprom_cfg_t) <= TZARC_EEPROM_ALLOCATION, "EEPROM settings greater than TZARC_EEPROM_ALLOCATION, need to change users/tzarc/config.h");
 
 void tzarc_eeprom_init(void);
 void tzarc_eeprom_reset(void);

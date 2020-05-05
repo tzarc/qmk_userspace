@@ -107,6 +107,4 @@ void matrix_scan_wow(void) {
             wow_key_next_trigger_set(keycode, now + 128 + (prng() % 128));
         }
     }
-
-    matrix_scan_keymap();
 }
