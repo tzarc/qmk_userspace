@@ -17,7 +17,7 @@ fi
 
 declare -a prs_to_apply
 prs_to_apply+=(8256) # dump_vars
-prs_to_apply+=(6165) # ARM audio DAC/PWM change
+#prs_to_apply+=(6165) # ARM audio DAC/PWM change
 #prs_to_apply+=(7072) # Bitbang Arm split
 prs_to_apply+=(7987) # Half-duplex uart Arm split
 prs_to_apply+=(8780) # SPI EEPROM
@@ -52,7 +52,7 @@ hard_reset() {
 
 upgrade-chibios() {
     pushd "$script_dir/qmk_firmware/lib/chibios"
-    hard_reset ChibiOS ChibiOS
+    hard_reset ChibiOS ChibiOS stable_20.3.x
     git push origin $target_branch --set-upstream --force-with-lease
     popd
 
