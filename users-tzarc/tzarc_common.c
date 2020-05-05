@@ -373,7 +373,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
     } else if (repeat_mode == KC_REGIONAL) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
-            if(!process_record_glyph_replacement(keycode, record, unicode_range_translator_regional)) {
+            if (!process_record_glyph_replacement(keycode, record, unicode_range_translator_regional)) {
                 tap_unicode_glyph_nomods(0x200C);
                 return false;
             }
