@@ -25,7 +25,7 @@ prs_to_apply+=(8778) # Dual-bank bootloader
 #prs_to_apply+=(8291) # GPT ARM backlight
 #prs_to_apply+=(7959) # PWM ARM backlight
 #prs_to_apply+=(8559) # V-USB Console
-prs_to_apply+=(9061) # make --no-print-directory
+prs_to_apply+=(8916) # qmk compiledb
 
 rm -f "$script_dir"/*.patch || true
 

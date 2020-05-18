@@ -101,14 +101,21 @@ board_file_$1 := $$(shell echo $$(board_qmk_$1) | sed -e 's@/@_@g' -e 's@:@_@g')
 board_files_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f \( -name '*.h' -or -name '*.c' \) -and -not -name '*conf.h' -and -not -name 'board.c' -and -not -name 'board.h' | sort)
 board_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f | sort)
 
-bin_$$(board_name_$1): board_link_$$(board_name_$1) links
-	@echo "\e[38;5;14mBuilding: $$(board_qmk_$1)\e[0m"
-	$$(MAKE) $$(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" $$(board_qmk_$1):$$(board_keymap_$1)
+compiledb_$$(board_name_$1): board_link_$$(board_name_$1) links
+	@echo "\e[38;5;14mGenerating compile_commands.json: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
+	@cd "$(ROOTDIR)/qmk_firmware" \
+		&& MAKEFLAGS="" qmk compiledb -kb $$(board_qmk_$1) -km $$(board_keymap_$1)
+
+bin_$$(board_name_$1): compiledb_$$(board_name_$1)
+	@echo "\e[38;5;14mBuilding: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
+	@cd "$(ROOTDIR)/qmk_firmware" \
+		&& MAKEFLAGS="-j -O --no-print-directory" qmk compile -kb $$(board_qmk_$1) -km $$(board_keymap_$1)
 	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR)
 
 flash_$$(board_name_$1): bin_$$(board_name_$1)
-	@echo "\e[38;5;14mFlashing: $$(board_qmk_$1)\e[0m"
-	@$$(MAKE) -C "$(ROOTDIR)/qmk_firmware" $$(board_qmk_$1):$$(board_keymap_$1):flash
+	@echo "\e[38;5;14mFlashing: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
+	cd "$(ROOTDIR)/qmk_firmware" \
+		&& qmk flash -kb $$(board_qmk_$1) -km $$(board_keymap_$1)
 
 format_$$(board_name_$1): format_prereq
 	@for file in $$(board_files_$1) ; do \
