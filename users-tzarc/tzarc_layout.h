@@ -25,6 +25,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 #define KC_TAB_LOWER LT(LAYER_LOWER, KC_TAB)
 #define KC_APP_RAISE LT(LAYER_RAISE, KC_APP)
 #define KC_CTL_ESC MT(MOD_LCTL, KC_ESC)
+#define KC_SFT_ENT MT(MOD_RSFT, KC_ENT)
 
 #define KC_1PASSWORD C(A(KC_BSLS))
 
@@ -60,7 +61,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 //                                               ├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤
 #define ____________TZARC_6x4_BASE_R3_R__________ KC_H,        KC_J,        KC_K,        KC_L,        KC_SCLN,     KC_QUOT
 //                                               ├────────────┼────────────┼────────────┼────────────┼────────────┼────────────┤
-#define ____________TZARC_6x4_BASE_R4_R__________ KC_N,        KC_M,        KC_COMM,     KC_DOT,      KC_SLSH,     KC_SFTENT
+#define ____________TZARC_6x4_BASE_R4_R__________ KC_N,        KC_M,        KC_COMM,     KC_DOT,      KC_SLSH,     KC_SFT_ENT
 //                                               └────────────┴────────────┴────────────┴────────────┴────────────┴────────────┘
 
 ////////////////////////////////////////////////////////////////////////////////

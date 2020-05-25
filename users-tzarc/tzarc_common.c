@@ -22,7 +22,26 @@
 void register_hex32(uint32_t hex);
 
 bool     config_enabled;
-uint16_t repeat_mode;
+uint16_t typing_mode;
+
+uint16_t get_tapping_term(uint16_t keycode) {
+    switch (keycode) {
+        case KC_SFT_ENT:
+            return TAPPING_TERM + 120;
+        default:
+            return TAPPING_TERM;
+    }
+}
+
+bool get_ignore_mod_tap_interrupt(uint16_t keycode) {
+    switch (keycode) {
+        case KC_SFT_ENT:
+        case KC_CTL_ESC:
+            return true;
+        default:
+            return false;
+    }
+}
 
 uint8_t prng(void) {
     static uint8_t s = 0xAA, a = 0;
@@ -66,7 +85,7 @@ __attribute__((weak)) layer_state_t layer_state_set_keymap(layer_state_t state) 
 
 void tzarc_common_init(void) {
     config_enabled = false;
-    repeat_mode    = KC_NOMODE;
+    typing_mode    = KC_NOMODE;
 }
 
 void eeconfig_init_user(void) {
@@ -289,103 +308,103 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
         case KC_NOMODE:
             if (record->event.pressed) {
-                if (repeat_mode != KC_NOMODE) {
+                if (typing_mode != KC_NOMODE) {
                     dprint("Disabling repeat mode\n");
                 }
-                repeat_mode = keycode;
+                typing_mode = keycode;
             }
             return false;
 
         case KC_WIDE:
             if (record->event.pressed) {
-                if (repeat_mode != KC_WIDE) {
+                if (typing_mode != KC_WIDE) {
                     dprint("Enabling wide mode\n");
                 }
-                repeat_mode = keycode;
+                typing_mode = keycode;
             }
             return false;
 
         case KC_SCRIPT:
             if (record->event.pressed) {
-                if (repeat_mode != KC_SCRIPT) {
+                if (typing_mode != KC_SCRIPT) {
                     dprint("Enabling calligraphy mode\n");
                 }
-                repeat_mode = keycode;
+                typing_mode = keycode;
             }
             return false;
 
         case KC_BLOCKS:
             if (record->event.pressed) {
-                if (repeat_mode != KC_BLOCKS) {
+                if (typing_mode != KC_BLOCKS) {
                     dprint("Enabling blocks mode\n");
                 }
-                repeat_mode = keycode;
+                typing_mode = keycode;
             }
             return false;
 
         case KC_REGIONAL:
             if (record->event.pressed) {
-                if (repeat_mode != KC_REGIONAL) {
+                if (typing_mode != KC_REGIONAL) {
                     dprint("Enabling regional mode\n");
                 }
-                repeat_mode = keycode;
+                typing_mode = keycode;
             }
             return false;
 
         case KC_AUSSIE:
             if (record->event.pressed) {
-                if (repeat_mode != KC_AUSSIE) {
+                if (typing_mode != KC_AUSSIE) {
                     dprint("Enabling aussie mode\n");
                 }
-                repeat_mode = keycode;
+                typing_mode = keycode;
             }
             return false;
 
         case KC_WOWMODE:
             if (record->event.pressed) {
-                if (repeat_mode != KC_WOWMODE) {
+                if (typing_mode != KC_WOWMODE) {
                     dprint("Enabling WoW repeat mode\n");
                 }
-                repeat_mode = keycode;
+                typing_mode = keycode;
             }
             return false;
 
         case KC_D3MODE:
             if (record->event.pressed) {
-                if (repeat_mode != KC_D3MODE) {
+                if (typing_mode != KC_D3MODE) {
                     dprint("Enabling Diablo III repeat mode\n");
                 }
-                repeat_mode = keycode;
+                typing_mode = keycode;
             }
             return false;
     }
 
-    if (repeat_mode == KC_WIDE) {
+    if (typing_mode == KC_WIDE) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
             return process_record_glyph_replacement(keycode, record, unicode_range_translator_wide);
         }
-    } else if (repeat_mode == KC_SCRIPT) {
+    } else if (typing_mode == KC_SCRIPT) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
             return process_record_glyph_replacement(keycode, record, unicode_range_translator_script);
         }
-    } else if (repeat_mode == KC_BLOCKS) {
+    } else if (typing_mode == KC_BLOCKS) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
             return process_record_glyph_replacement(keycode, record, unicode_range_translator_boxes);
         }
-    } else if (repeat_mode == KC_REGIONAL) {
+    } else if (typing_mode == KC_REGIONAL) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
             if (!process_record_glyph_replacement(keycode, record, unicode_range_translator_regional)) {
                 tap_unicode_glyph_nomods(0x200C);
                 return false;
             }
         }
-    } else if (repeat_mode == KC_AUSSIE) {
+    } else if (typing_mode == KC_AUSSIE) {
         return process_record_aussie(keycode, record);
-    } else if (repeat_mode == KC_WOWMODE) {
+    } else if (typing_mode == KC_WOWMODE) {
         if ((KC_A <= keycode) && (keycode <= KC_0)) {
             return process_record_wow(keycode, record);
         }
-    } else if (repeat_mode == KC_D3MODE) {
+    } else if (typing_mode == KC_D3MODE) {
         if ((KC_1 <= keycode) && (keycode <= KC_4)) {
             return process_record_diablo3(keycode, record);
         }
@@ -395,9 +414,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 
 void matrix_scan_user(void) {
-    if (repeat_mode == KC_WOWMODE) {
+    if (typing_mode == KC_WOWMODE) {
         matrix_scan_wow();
-    } else if (repeat_mode == KC_D3MODE) {
+    } else if (typing_mode == KC_D3MODE) {
         matrix_scan_diablo3();
     }
 
