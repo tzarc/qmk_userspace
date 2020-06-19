@@ -14,16 +14,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <quantum.h>
 
-/*
-void keyboard_post_init_user(void) {
-    // Customise these values to desired behaviour
-    debug_enable = true;
-    // debug_matrix = true;
-    // debug_keyboard=true;
-    // debug_mouse=true;
-}
-*/
-
-void matrix_scan_user(void) {}
+#define LAYOUT(k00, k01, k02, k10, k11, k12, k20, k21, k22) \
+    {                                                       \
+        {k00, k01, k02}, {k10, k11, k12}, { k20, k21, k22 } \
+    }

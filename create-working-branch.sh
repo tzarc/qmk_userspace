@@ -7,7 +7,7 @@ script_dir="$(readlink -f "$(dirname "$this_script")")"
 
 unset upgrade_chibios
 unset upgrade_chibios_confs
-#upgrade_chibios=1
+upgrade_chibios=1
 #upgrade_chibios_confs=1
 
 target_branch="generated-workarea"
@@ -16,15 +16,15 @@ target_branch="generated-chibios-master-upgrade"
 fi
 
 declare -a prs_to_apply
-prs_to_apply+=(8256) # dump_vars
+prs_to_apply+=(9471) # WS2812 DMAMUX
 #prs_to_apply+=(6165) # ARM audio DAC/PWM change
-prs_to_apply+=(8778) # Dual-bank bootloader
+#prs_to_apply+=(8778) # Dual-bank bootloader
 #prs_to_apply+=(8291) # GPT ARM backlight
 #prs_to_apply+=(7959) # PWM ARM backlight
 #prs_to_apply+=(8559) # V-USB Console
 #prs_to_apply+=(8916) # qmk compiledb
-prs_to_apply+=(8834) # raw usage id override
-prs_to_apply+=(9160) # arm split docs
+#prs_to_apply+=(8834) # raw usage id override
+#prs_to_apply+=(9258) # fix IGNORE_MOD_TAP_INTERRUPT_PER_KEY
 
 rm -f "$script_dir"/*.patch || true
 
@@ -90,7 +90,7 @@ upgrade-chibios-confs() {
 }
 
 pushd "$script_dir/qmk_firmware"
-hard_reset qmk qmk_firmware
+hard_reset qmk qmk_firmware develop
 make git-submodule
 sed -i 's#qmk/ChibiOS#tzarc/ChibiOS#g' .gitmodules
 git add -A

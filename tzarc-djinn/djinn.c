@@ -14,16 +14,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <quantum.h>
+#include "djinn.h"
 
-/*
-void keyboard_post_init_user(void) {
-    // Customise these values to desired behaviour
+void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
+
+void keyboard_post_init_kb(void) {
     debug_enable = true;
-    // debug_matrix = true;
-    // debug_keyboard=true;
-    // debug_mouse=true;
-}
-*/
+    debug_matrix = true;
 
-void matrix_scan_user(void) {}
+    // Turn on the LCD
+    setPinOutput(LCD_POWER_ENABLE_PIN);
+    writePinLow(LCD_POWER_ENABLE_PIN);
+
+    // Turn on the RGB
+    setPinOutput(RGB_POWER_ENABLE_PIN);
+    writePinLow(RGB_POWER_ENABLE_PIN);
+}

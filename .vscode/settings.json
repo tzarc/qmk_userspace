@@ -10,6 +10,7 @@
     "files.trimTrailingWhitespace": false
   },
   "files.associations": {
-    "array": "cpp"
+    "array": "cpp",
+    "system_error": "c"
   }
 }

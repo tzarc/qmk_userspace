@@ -25,7 +25,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 #define KC_TAB_LOWER LT(LAYER_LOWER, KC_TAB)
 #define KC_APP_RAISE LT(LAYER_RAISE, KC_APP)
 #define KC_CTL_ESC MT(MOD_LCTL, KC_ESC)
-#define KC_SFT_ENT MT(MOD_RSFT, KC_ENT)
+#define KC_SFT_ENT MT(MOD_RSFT, KC_ENT)  // KC_SFTENT doesn't seem to abide by tapping term timing?
 
 #define KC_1PASSWORD C(A(KC_BSLS))
 

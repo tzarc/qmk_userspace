@@ -47,3 +47,5 @@ DFU_ARGS = -d 0483:df11 -a 0 -s 0x08000000:leave
 
 # Debugging
 #OPT_DEFS += -g -O0 -fno-lto
+
+STM32_BOOTLOADER_ADDRESS = 0x1FF00000

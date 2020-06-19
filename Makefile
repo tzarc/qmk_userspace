@@ -1,5 +1,5 @@
 export ROOTDIR := $(shell pwd)
-#export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-9-2019-q4-major/bin/:$(PATH)
+export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-9-2020-q2-update/bin:$(PATH)
 
 BOARD_DEFS := \
 	iris!tzarc-iris_rev4!keebio/iris/rev4/keymaps/tzarc!tzarc \
@@ -9,12 +9,13 @@ BOARD_DEFS := \
 	mysterium-dad!tzarc-mysterium-dad!coseyfannitutti/mysterium/keymaps/tzarc-dad!tzarc-dad \
 	chocopad!tzarc-chocopad!keebio/chocopad/keymaps/tzarc!tzarc \
 	cyclone!tzarc-cyclone!handwired/tzarc/cyclone!tzarc \
+	djinn!tzarc-djinn!handwired/tzarc/djinn!default \
 	onekey_l152!alternates/nucleo64_l152re!handwired/onekey/nucleo64_l152re!reset \
 	onekey_g431!alternates/nucleo64_g431rb!handwired/onekey/nucleo64_g431rb!reset \
 	onekey_g474!alternates/nucleo64_g474re!handwired/onekey/nucleo64_g474re!reset \
 	onekey_l082!alternates/nucleo32_l082kz!handwired/onekey/nucleo32_l082!reset \
 	split_l082!alternates/nucleo32_l082kz_split!handwired/splittest/nucleo32_l082!default \
-	test_proton_c!alternates/proton_c_test!handwired/onekey/proton_c_test!reset \
+	test_proton_c!alternates/proton_c_test!handwired/onekey/proton_c_test!rgb \
 	split_proton_c!alternates/proton_c_split!handwired/splittest/proton_c_split!default \
 	split_g431!alternates/g431_split!handwired/splittest/g431_split!default \
 	split_f411!alternates/f411_split!handwired/splittest/f411_split!default \
