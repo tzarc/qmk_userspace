@@ -22,9 +22,9 @@
 #define MATRIX_ROWS 3
 #define MATRIX_COLS 3
 #define MATRIX_ROW_PINS \
-    { B8, B9, A5 }
+    { C5, C4, A10 }
 #define MATRIX_COL_PINS \
-    { A10, C4, C5 }
+    { B3, B5, B4 }
 
 #define DIODE_DIRECTION ROW2COL
 
@@ -45,7 +45,7 @@
 #define DESCRIPTION Oversized Split
 
 // Power control pins
-#define LCD_POWER_ENABLE_PIN A4
+#define LCD_POWER_ENABLE_PIN A1
 #define RGB_POWER_ENABLE_PIN A0
 
 // Backlight driver (to control LCD backlight)
@@ -58,13 +58,14 @@
 
 // RGB configuration
 #define STM32_DMA_REQUIRED  // ws2812 PWM driver doesn't trigger this apparently
-#define RGB_DI_PIN A6
+#define RGB_DI_PIN B7
 #define RGBLED_NUM 6
-#define WS2812_PWM_DRIVER PWMD3
-#define WS2812_PWM_CHANNEL 1
+#define WS2812_PWM_DRIVER PWMD4
+#define WS2812_PWM_CHANNEL 2
 #define WS2812_PWM_PAL_MODE 2
-#define WS2812_DMA_CHANNEL STM32_DMA_STREAM_ID_ANY
-#define WS2812_DMAMUX_ID STM32_DMAMUX1_TIM3_UP
+#define WS2812_DMA_STREAM STM32_DMA1_STREAM1
+#define WS2812_DMA_CHANNEL 1
+#define WS2812_DMAMUX_ID STM32_DMAMUX1_TIM4_UP
 #define DRIVER_LED_TOTAL RGBLED_NUM
 #define RGBLIGHT_ANIMATIONS
 #define RGBLIGHT_LIMIT_VAL 120
@@ -72,3 +73,10 @@
 #define RGB_MATRIX_KEYPRESSES
 #define RGB_MATRIX_FRAMEBUFFER_EFFECTS
 #define NOP_FUDGE 0.42
+
+// Audio configuration
+#define AUDIO_PIN A5
+#define AUDIO_PIN_ALT A4
+#define AUDIO_PIN_ALT_AS_NEGATIVE
+#define A5_AUDIO
+#define STARTUP_SONG SONG(CAMPANELLA)

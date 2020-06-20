@@ -16,6 +16,8 @@ target_branch="generated-chibios-master-upgrade"
 fi
 
 declare -a prs_to_apply
+prs_to_apply+=(9302) # WS2812 280us delay
+prs_to_apply+=(9414) # WS2812 Open drain
 prs_to_apply+=(9471) # WS2812 DMAMUX
 #prs_to_apply+=(6165) # ARM audio DAC/PWM change
 #prs_to_apply+=(8778) # Dual-bank bootloader
