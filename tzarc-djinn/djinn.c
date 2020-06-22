@@ -15,8 +15,12 @@
  */
 
 #include "djinn.h"
+#include "drawable_ili9341.h"
+#include "color.h"
 
 void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
+
+drawable_driver_t *lcd;
 
 void keyboard_post_init_kb(void) {
     debug_enable = true;
@@ -29,4 +33,25 @@ void keyboard_post_init_kb(void) {
     // Turn on the RGB
     setPinOutput(RGB_POWER_ENABLE_PIN);
     writePinLow(RGB_POWER_ENABLE_PIN);
+
+    // Turn on the backlight
+    backlight_enable();
+    backlight_level(BACKLIGHT_LEVELS);
+
+    // Initialise the LCD
+    lcd = make_ili9341_driver(LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN);
+    drawable_init(lcd, DRAWABLE_ROTATION_0);
+    drawable_power(lcd, true);
+
+    for (int r = 0; r < 320; ++r) {
+        HSV      hsv = {r * 255 / 320, 255, 255};
+        RGB      rgb = hsv_to_rgb(hsv);
+        uint16_t pix_data[240];
+        for (int c = 0; c < 240; ++c) {
+            pix_data[c] = (rgb.r >> 3) << 11 | (rgb.g >> 2) << 5 | (rgb.b >> 3);
+        }
+
+        drawable_viewport(lcd, 0, r, 319, r);
+        drawable_pixdata(lcd, pix_data, 240);
+    }
 }

@@ -39,3 +39,12 @@ RGBLIGHT_ENABLE = yes
 #RGB_MATRIX_ENABLE = WS2812
 
 AUDIO_ENABLE = no
+
+VPATH += \
+	$(KEYBOARD_PATH_1)/drivers/drawable \
+	$(KEYBOARD_PATH_1)/drivers/drawable/ili9341
+
+SRC += \
+	spi_master.c \
+	drawable.c \
+	drawable_ili9341.c
