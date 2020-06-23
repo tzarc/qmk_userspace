@@ -259,6 +259,25 @@ void ili9341_drawable_init_func(drawable_driver_t *driver, drawable_rotation_t r
 
     lcd_viewport(lcd, 0, 0, 239, 319);
 
+    switch (rotation) {
+        case DRAWABLE_ROTATION_0:
+            lcd_cmd(lcd, ILI9341_SET_MEM_ACS_CTL);
+            lcd_data(lcd, 0b00001000);
+            break;
+        case DRAWABLE_ROTATION_90:
+            lcd_cmd(lcd, ILI9341_SET_MEM_ACS_CTL);
+            lcd_data(lcd, 0b10101000);
+            break;
+        case DRAWABLE_ROTATION_180:
+            lcd_cmd(lcd, ILI9341_SET_MEM_ACS_CTL);
+            lcd_data(lcd, 0b11001000);
+            break;
+        case DRAWABLE_ROTATION_270:
+            lcd_cmd(lcd, ILI9341_SET_MEM_ACS_CTL);
+            lcd_data(lcd, 0b01101000);
+            break;
+    }
+
     lcd_cmd(lcd, ILI9341_CMD_SLEEP_OFF);
     wait_ms(20);
 
@@ -286,22 +305,10 @@ void ili9341_drawable_viewport_func(drawable_driver_t *driver, uint16_t left, ui
     lcd_stop();
 }
 
-void ili9341_drawable_pixdata_func(drawable_driver_t *driver, const uint16_t *pixel_data, uint32_t num_pixels) {
+void ili9341_drawable_pixdata_func(drawable_driver_t *driver, const uint8_t *pixel_data, uint32_t num_pixels) {
     ili9341_drawable_driver_t *lcd = (ili9341_drawable_driver_t *)driver;
     lcd_start(lcd);
-    uint8_t temp[ILI9341_PIXDATA_BUFSIZE * 2];
-    while (num_pixels > 0) {
-        uint32_t to_draw = (num_pixels < ILI9341_PIXDATA_BUFSIZE) ? num_pixels : ILI9341_PIXDATA_BUFSIZE;
-        for (uint32_t p = 0; p < to_draw; ++p) {
-            temp[p * 2 + 0] = pixel_data[p] >> 8;
-            temp[p * 2 + 1] = pixel_data[p] & 0xFF;
-        }
-
-        lcd_sendbuf(lcd, temp, to_draw * 2);
-        pixel_data += to_draw;
-        num_pixels -= to_draw;
-    }
-
+    lcd_sendbuf(lcd, pixel_data, num_pixels);
     lcd_stop();
 }
 

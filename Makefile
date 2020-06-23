@@ -34,14 +34,24 @@ git-submodule: clean
 		&& git fetch --all --tags \
 		&& git reset --hard origin/$(shell cd $(ROOTDIR)/qmk_firmware && git rev-parse --abbrev-ref HEAD)
 
+rgbtobgr565: rgbtobgr565.o
+
 all: bin
 
 arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
 
 nick: cyclone iris luddite mysterium-nick chocopad ctrl
 
+# QMK Logo generation
+djinn: $(ROOTDIR)/tzarc-djinn/qmk-logo.c
+
+$(ROOTDIR)/tzarc-djinn/qmk-logo.c: rgbtobgr565 Makefile
+	convert $(ROOTDIR)/badge-dark.svg -depth 8 -background none -geometry 200x  rgb:- | $(ROOTDIR)/rgbtobgr565 > $(ROOTDIR)/tzarc-djinn/qmk-logo-200.rgb565
+	cd $(ROOTDIR)/tzarc-djinn/ \
+		&& xxd -i -c 24 qmk-logo-200.rgb565 qmk-logo-200.h
+
 remove_artifacts:
-	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format >/dev/null 2>&1 || true
+	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format rgbtobgr565 rgbtobgr565.o >/dev/null 2>&1 || true
 
 clean: remove_artifacts
 	@$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" clean || true
