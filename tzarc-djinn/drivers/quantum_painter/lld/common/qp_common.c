@@ -18,41 +18,41 @@
 #include <color.h>
 #include "qp_common.h"
 
-bool qp_init(painter_device_t *device, painter_rotation_t rotation) {
+bool qp_init(painter_device_t device, painter_rotation_t rotation) {
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
     return DRIVER_SUCCESS == driver->init(device, rotation);
 }
 
-bool qp_clear(painter_device_t *device) {
+bool qp_clear(painter_device_t device) {
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
     return DRIVER_SUCCESS == driver->clear(device);
 }
 
-bool qp_power(painter_device_t *device, bool power_on) {
+bool qp_power(painter_device_t device, bool power_on) {
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
     return DRIVER_SUCCESS == driver->power(device, power_on);
 }
 
-bool qp_viewport(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom) {
+bool qp_viewport(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom) {
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
     return DRIVER_SUCCESS == driver->viewport(device, left, top, right, bottom);
 }
 
-bool qp_pixdata(painter_device_t *device, const void *pixel_data, uint32_t byte_count) {
+bool qp_pixdata(painter_device_t device, const void *pixel_data, uint32_t byte_count) {
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
     return DRIVER_SUCCESS == driver->pixdata(device, pixel_data, byte_count);
 }
 
-bool qp_setpixel(painter_device_t *device, uint16_t x, uint16_t y, HSV color) {
+bool qp_setpixel(painter_device_t device, uint16_t x, uint16_t y, uint8_t hue, uint8_t sat, uint8_t val) {
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
-    return DRIVER_SUCCESS == driver->setpixel(device, x, y, color);
+    return DRIVER_SUCCESS == driver->setpixel(device, x, y, hue, sat, val);
 }
 
-bool qp_line(painter_device_t *device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, HSV color) {
+bool qp_line(painter_device_t device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t hue, uint8_t sat, uint8_t val) {
     // If the driver has an optimised implementation of line drawing, offload to the driver
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
     if (driver->line) {
-        painter_lld_status status = driver->line(device, x0, y0, x1, y1, color);
+        painter_lld_status_t status = driver->line(device, x0, y0, x1, y1, hue, sat, val);
         switch (status) {
             case DRIVER_SUCCESS:
                 return true;
@@ -66,22 +66,22 @@ bool qp_line(painter_device_t *device, uint16_t x0, uint16_t y0, uint16_t x1, ui
     // Driver doesn't have an implementation -- fallback to setting pixels
     if (x0 == x1) {
         for (uint16_t y = y0; y <= y1; ++y) {
-            qp_setpixel(device, x0, y, color);
+            qp_setpixel(device, x0, y, hue, sat, val);
         }
     } else if (y0 == y1) {
         for (uint16_t x = x0; x <= x1; ++x) {
-            qp_setpixel(device, x, y0, color);
+            qp_setpixel(device, x, y0, hue, sat, val);
         }
     }
 
     return true;
 }
 
-bool qp_rect(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, HSV color, bool filled) {
+bool qp_rect(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t hue, uint8_t sat, uint8_t val, bool filled) {
     // If the driver has an optimised implementation of line drawing, offload to the driver
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
     if (driver->rect) {
-        painter_lld_status status = driver->rect(device, left, top, right, bottom, color, filled);
+        painter_lld_status_t status = driver->rect(device, left, top, right, bottom, hue, sat, val, filled);
         switch (status) {
             case DRIVER_SUCCESS:
                 return true;
@@ -95,13 +95,13 @@ bool qp_rect(painter_device_t *device, uint16_t left, uint16_t top, uint16_t rig
     // Driver doesn't have an implementation -- fallback to drawing lines
     if (filled) {
         for (uint16_t y = top; y <= bottom; ++y) {
-            qp_line(device, left, y, right, y, color);
+            qp_line(device, left, y, right, y, hue, sat, val);
         }
     } else {
-        qp_line(device, left, top, right, top, color);
-        qp_line(device, left, bottom, right, bottom, color);
-        qp_line(device, left, top + 1, left, bottom - 1, color);
-        qp_line(device, right, top + 1, right, bottom - 1, color);
+        qp_line(device, left, top, right, top, hue, sat, val);
+        qp_line(device, left, bottom, right, bottom, hue, sat, val);
+        qp_line(device, left, top + 1, left, bottom - 1, hue, sat, val);
+        qp_line(device, right, top + 1, right, bottom - 1, hue, sat, val);
     }
 
     return true;

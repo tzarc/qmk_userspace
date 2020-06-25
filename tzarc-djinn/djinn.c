@@ -21,7 +21,7 @@
 
 void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
 
-painter_device_t *lcd;
+painter_device_t lcd;
 
 void keyboard_post_init_kb(void) {
     debug_enable = true;
@@ -58,9 +58,9 @@ void keyboard_post_init_kb(void) {
     qp_viewport(lcd, 0, 160, 199, 239);
     qp_pixdata(lcd, qmk_logo_200_rgb565, qmk_logo_200_rgb565_len);
 
-    qp_line(lcd, 60, 130, 320 - 60, 130, (HSV){64, 255, 190});
-    qp_rect(lcd, 20, 20, 120, 100, (HSV){128, 255, 190}, true);
-    qp_rect(lcd, 20, 20, 120, 100, (HSV){0, 0, 255}, false);
+    qp_line(lcd, 60, 130, 320 - 60, 130, HSV_BLUE);
+    qp_rect(lcd, 20, 20, 120, 100, HSV_RED, true);
+    qp_rect(lcd, 20, 20, 120, 100, HSV_WHITE, false);
 
     qp_power(lcd, true);
 

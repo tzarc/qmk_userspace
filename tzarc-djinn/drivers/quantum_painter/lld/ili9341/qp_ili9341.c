@@ -115,26 +115,27 @@ typedef struct ili9341_painter_device_t {
 } ili9341_painter_device_t;
 
 typedef union {
-    uint8_t pix[2];
+    uint8_t  pix[2];
+    uint16_t rgb565;
 } ili9341_pixel_buf;
 
-static inline ili9341_pixel_buf hsv_to_ili9341(HSV color) {
+static inline ili9341_pixel_buf hsv_to_ili9341(uint8_t hue, uint8_t sat, uint8_t val) {
     ili9341_pixel_buf buf;
-    RGB               rgb   = hsv_to_rgb(color);
+    RGB               rgb   = hsv_to_rgb((HSV){hue, sat, val});
     uint16_t          pixel = (rgb.r >> 3) << 11 | (rgb.g >> 2) << 5 | (rgb.b >> 3);
     buf.pix[0]              = pixel >> 8;
     buf.pix[1]              = pixel & 0xFF;
     return buf;
 }
 
-painter_lld_status ili9341_qp_init(painter_device_t *device, painter_rotation_t rotation);
-painter_lld_status ili9341_qp_clear(painter_device_t *device);
-painter_lld_status ili9341_qp_power(painter_device_t *device, bool power_on);
-painter_lld_status ili9341_qp_viewport(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom);
-painter_lld_status ili9341_qp_pixdata(painter_device_t *device, const void *pixel_data, uint32_t byte_count);
-painter_lld_status ili9341_qp_setpixel(painter_device_t *device, uint16_t x, uint16_t y, HSV color);
-painter_lld_status ili9341_qp_line(painter_device_t *device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, HSV color);
-painter_lld_status ili9341_qp_rect(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, HSV color, bool filled);
+painter_lld_status_t ili9341_qp_init(painter_device_t *device, painter_rotation_t rotation);
+painter_lld_status_t ili9341_qp_clear(painter_device_t *device);
+painter_lld_status_t ili9341_qp_power(painter_device_t *device, bool power_on);
+painter_lld_status_t ili9341_qp_viewport(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom);
+painter_lld_status_t ili9341_qp_pixdata(painter_device_t *device, const void *pixel_data, uint32_t byte_count);
+painter_lld_status_t ili9341_qp_setpixel(painter_device_t *device, uint16_t x, uint16_t y, uint8_t hue, uint8_t sat, uint8_t val);
+painter_lld_status_t ili9341_qp_line(painter_device_t *device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t hue, uint8_t sat, uint8_t val);
+painter_lld_status_t ili9341_qp_rect(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t hue, uint8_t sat, uint8_t val, bool filled);
 
 static inline void lcd_start(ili9341_painter_device_t *lcd) { spi_start(lcd->chip_select_pin, false, 0, ILI9341_SPI_DIVISOR); }
 
@@ -172,7 +173,7 @@ static inline void lcd_viewport(ili9341_painter_device_t *lcd, uint16_t xbegin, 
     lcd_cmd(lcd, 0x2C);  // memory write
 }
 
-painter_lld_status ili9341_qp_init(painter_device_t *device, painter_rotation_t rotation) {
+painter_lld_status_t ili9341_qp_init(painter_device_t *device, painter_rotation_t rotation) {
     static const uint8_t pgamma[15] = {0x0F, 0x29, 0x24, 0x0C, 0x0E, 0x09, 0x4E, 0x78, 0x3C, 0x09, 0x13, 0x05, 0x17, 0x11, 0x00};
     static const uint8_t ngamma[15] = {0x00, 0x16, 0x1B, 0x04, 0x11, 0x07, 0x31, 0x33, 0x42, 0x05, 0x0C, 0x0A, 0x28, 0x2F, 0x0F};
 
@@ -299,7 +300,7 @@ painter_lld_status ili9341_qp_init(painter_device_t *device, painter_rotation_t 
     return DRIVER_SUCCESS;
 }
 
-painter_lld_status ili9341_qp_clear(painter_device_t *device) {
+painter_lld_status_t ili9341_qp_clear(painter_device_t *device) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
 
     // Re-init the LCD
@@ -308,13 +309,17 @@ painter_lld_status ili9341_qp_clear(painter_device_t *device) {
     return DRIVER_SUCCESS;
 }
 
-painter_lld_status ili9341_qp_power(painter_device_t *device, bool power_on) {
+painter_lld_status_t ili9341_qp_power(painter_device_t *device, bool power_on) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
+
+    // Turn on/off the display
     lcd_cmd(lcd, power_on ? ILI9341_CMD_DISPLAY_ON : ILI9341_CMD_DISPLAY_OFF);
+
     lcd_stop();
 
 #ifdef BACKLIGHT_PIN
+    // If we're using the backlight to control the display as well, toggle that too.
     if (lcd->uses_backlight) {
         if (power_on)
             backlight_enable();
@@ -323,36 +328,42 @@ painter_lld_status ili9341_qp_power(painter_device_t *device, bool power_on) {
     }
 #endif
 
-return DRIVER_SUCCESS;
+    return DRIVER_SUCCESS;
 }
 
-painter_lld_status ili9341_qp_viewport(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom) {
+painter_lld_status_t ili9341_qp_viewport(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
+
+    // Configure where we're going to be rendering to
     lcd_viewport(lcd, left, top, right, bottom);
+
     lcd_stop();
 
     return DRIVER_SUCCESS;
 }
 
-painter_lld_status ili9341_qp_pixdata(painter_device_t *device, const void *pixel_data, uint32_t byte_count) {
+painter_lld_status_t ili9341_qp_pixdata(painter_device_t *device, const void *pixel_data, uint32_t byte_count) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
+
+    // Stream data to the LCD
     lcd_sendbuf(lcd, pixel_data, byte_count);
+
     lcd_stop();
 
     return DRIVER_SUCCESS;
 }
 
-painter_lld_status ili9341_qp_setpixel(painter_device_t *device, uint16_t x, uint16_t y, HSV color) {
+painter_lld_status_t ili9341_qp_setpixel(painter_device_t *device, uint16_t x, uint16_t y, uint8_t hue, uint8_t sat, uint8_t val) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
 
-    // Set the area we're going to be writing to
+    // Configure where we're going to be rendering to
     lcd_viewport(lcd, x, y, x, y);
 
     // Convert the color to RGB565 and transmit to the device
-    ili9341_pixel_buf buf = hsv_to_ili9341(color);
+    ili9341_pixel_buf buf = hsv_to_ili9341(hue, sat, val);
     lcd_sendbuf(lcd, &buf, sizeof(buf));
 
     lcd_stop();
@@ -360,26 +371,27 @@ painter_lld_status ili9341_qp_setpixel(painter_device_t *device, uint16_t x, uin
     return DRIVER_SUCCESS;
 }
 
-painter_lld_status ili9341_qp_line(painter_device_t *device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, HSV color) {
+painter_lld_status_t ili9341_qp_line(painter_device_t *device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t hue, uint8_t sat, uint8_t val) {
     if (x0 != x1 && y0 != y1) return DRIVER_UNSUPPORTED;  // for now, let the upper layer handle the line drawing algorithm
 
     // If we're doing horizontal or vertical, just use the optimised rect draw so we don't need to deal with single pixels or buffers.
-    return ili9341_qp_rect(device, x0, y0, x1, y1, color, true);
+    return ili9341_qp_rect(device, x0, y0, x1, y1, hue, sat, val, true);
 }
 
-painter_lld_status ili9341_qp_rect(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, HSV color, bool filled) {
+painter_lld_status_t ili9341_qp_rect(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t hue, uint8_t sat, uint8_t val, bool filled) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
-    lcd_start(lcd);
-
-    // Convert the color to RGB565
-    ili9341_pixel_buf clr = hsv_to_ili9341(color);
-
-    // Build a larger buffer so we can stream to the LCD in larger chunks, for speed
-    ili9341_pixel_buf buf[ILI9341_PIXDATA_BUFSIZE];
-    for (int i = 0; i < ILI9341_PIXDATA_BUFSIZE; ++i) buf[i] = clr;
 
     if (filled) {
-        // Set the area we're going to be writing to
+        // Convert the color to RGB565
+        ili9341_pixel_buf clr = hsv_to_ili9341(hue, sat, val);
+
+        // Build a larger buffer so we can stream to the LCD in larger chunks, for speed
+        ili9341_pixel_buf buf[ILI9341_PIXDATA_BUFSIZE];
+        for (size_t i = 0; i < ILI9341_PIXDATA_BUFSIZE; ++i) buf[i] = clr;
+
+        lcd_start(lcd);
+
+        // Configure where we're going to be rendering to
         lcd_viewport(lcd, left, top, right, bottom);
 
         // Transmit the data to the LCD in chunks
@@ -387,17 +399,17 @@ painter_lld_status ili9341_qp_rect(painter_device_t *device, uint16_t left, uint
         while (remaining > 0) {
             size_t transmit = (remaining < ILI9341_PIXDATA_BUFSIZE ? remaining : ILI9341_PIXDATA_BUFSIZE);
             size_t bytes    = transmit * sizeof(ili9341_pixel_buf);
-            ili9341_qp_pixdata(device, buf, bytes);
+            lcd_sendbuf(lcd, buf, bytes);
             remaining -= transmit;
         }
-    } else {
-        qp_line(device, left, top, right, top, color);
-        qp_line(device, left, bottom, right, bottom, color);
-        qp_line(device, left, top + 1, left, bottom - 1, color);
-        qp_line(device, right, top + 1, right, bottom - 1, color);
-    }
 
-    lcd_stop();
+        lcd_stop();
+    } else {
+        ili9341_qp_rect(device, left, top, right, top, hue, sat, val, true);
+        ili9341_qp_rect(device, left, bottom, right, bottom, hue, sat, val, true);
+        ili9341_qp_rect(device, left, top + 1, left, bottom - 1, hue, sat, val, true);
+        ili9341_qp_rect(device, right, top + 1, right, bottom - 1, hue, sat, val, true);
+    }
 
     return DRIVER_SUCCESS;
 }
@@ -405,7 +417,7 @@ painter_lld_status ili9341_qp_rect(painter_device_t *device, uint16_t left, uint
 ili9341_painter_device_t drivers[ILI9341_NUM_DEVICES] = {0};
 
 painter_device_t *qp_make_ili9341_device(pin_t chip_select_pin, pin_t data_pin, pin_t reset_pin, bool uses_backlight) {
-    for (int i = 0; i < ILI9341_NUM_DEVICES; ++i) {
+    for (size_t i = 0; i < ILI9341_NUM_DEVICES; ++i) {
         ili9341_painter_device_t *driver = &drivers[i];
         memset(driver, 0, sizeof(ili9341_painter_device_t));
         if (!driver->allocated) {
@@ -422,7 +434,7 @@ painter_device_t *qp_make_ili9341_device(pin_t chip_select_pin, pin_t data_pin, 
             driver->data_pin           = data_pin;
             driver->reset_pin          = reset_pin;
             driver->uses_backlight     = uses_backlight;
-            return (painter_device_t *)driver;
+            return (painter_device_t)driver;
         }
     }
     return NULL;

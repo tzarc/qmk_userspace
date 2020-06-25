@@ -19,7 +19,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case KC_TOGGLE_LCD_POWER:
             if (record->event.pressed) {
                 lcd_power = !lcd_power;
-                extern painter_device_t *lcd;
+                extern painter_device_t lcd;
                 qp_power(lcd, lcd_power);
             }
             break;
