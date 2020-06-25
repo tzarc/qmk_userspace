@@ -55,8 +55,7 @@ void keyboard_post_init_kb(void) {
         qp_pixdata(lcd, (const uint8_t *)pix_data, 320 * 2);
     }
 
-    qp_viewport(lcd, 0, 160, 199, 239);
-    qp_pixdata(lcd, qmk_logo_200_rgb565, qmk_logo_200_rgb565_len);
+    qp_drawimage(lcd, 0, 160, 200, 60, qmk_logo_200_rgb565, qmk_logo_200_rgb565_len);
 
     qp_line(lcd, 60, 130, 320 - 60, 130, HSV_BLUE);
     qp_rect(lcd, 20, 20, 120, 100, HSV_RED, true);

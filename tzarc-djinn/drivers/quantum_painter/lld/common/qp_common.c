@@ -66,11 +66,11 @@ bool qp_line(painter_device_t device, uint16_t x0, uint16_t y0, uint16_t x1, uin
     // Driver doesn't have an implementation -- fallback to setting pixels
     if (x0 == x1) {
         for (uint16_t y = y0; y <= y1; ++y) {
-            qp_setpixel(device, x0, y, hue, sat, val);
+            if (DRIVER_SUCCESS != qp_setpixel(device, x0, y, hue, sat, val)) return false;
         }
     } else if (y0 == y1) {
         for (uint16_t x = x0; x <= x1; ++x) {
-            qp_setpixel(device, x, y0, hue, sat, val);
+            if (DRIVER_SUCCESS != qp_setpixel(device, x, y0, hue, sat, val)) return false;
         }
     }
 
@@ -95,14 +95,34 @@ bool qp_rect(painter_device_t device, uint16_t left, uint16_t top, uint16_t righ
     // Driver doesn't have an implementation -- fallback to drawing lines
     if (filled) {
         for (uint16_t y = top; y <= bottom; ++y) {
-            qp_line(device, left, y, right, y, hue, sat, val);
+            if (DRIVER_SUCCESS != qp_line(device, left, y, right, y, hue, sat, val)) return false;
         }
     } else {
-        qp_line(device, left, top, right, top, hue, sat, val);
-        qp_line(device, left, bottom, right, bottom, hue, sat, val);
-        qp_line(device, left, top + 1, left, bottom - 1, hue, sat, val);
-        qp_line(device, right, top + 1, right, bottom - 1, hue, sat, val);
+        if (DRIVER_SUCCESS != qp_line(device, left, top, right, top, hue, sat, val)) return false;
+        if (DRIVER_SUCCESS != qp_line(device, left, bottom, right, bottom, hue, sat, val)) return false;
+        if (DRIVER_SUCCESS != qp_line(device, left, top + 1, left, bottom - 1, hue, sat, val)) return false;
+        if (DRIVER_SUCCESS != qp_line(device, right, top + 1, right, bottom - 1, hue, sat, val)) return false;
     }
 
+    return true;
+}
+
+bool qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, uint16_t w, uint16_t h, const void *pixel_data, uint32_t byte_count) {
+    // If the driver has an optimised implementation of line drawing, offload to the driver
+    struct painter_driver_t *driver = (struct painter_driver_t *)device;
+    if (driver->drawimage) {
+        painter_lld_status_t status = driver->drawimage(device, x, y, w, h, pixel_data, byte_count);
+        switch (status) {
+            case DRIVER_SUCCESS:
+                return true;
+            case DRIVER_FAILED:
+                return false;
+            case DRIVER_UNSUPPORTED:
+                break;
+        }
+    }
+
+    if (DRIVER_SUCCESS != qp_viewport(device, x, y, x + w - 1, y + h - 1)) return false;
+    if (DRIVER_SUCCESS != qp_pixdata(device, pixel_data, byte_count)) return false;
     return true;
 }

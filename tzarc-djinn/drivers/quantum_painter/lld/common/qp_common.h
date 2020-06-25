@@ -22,22 +22,24 @@ typedef enum { DRIVER_FAILED, DRIVER_SUCCESS, DRIVER_UNSUPPORTED } painter_lld_s
 
 ///////////////////////////////////////////////////////////////
 // Quantum Painter definitions
-typedef painter_lld_status_t (*painter_driver_init_func)(painter_device_t *driver, painter_rotation_t rotation);
-typedef painter_lld_status_t (*painter_driver_clear_func)(painter_device_t *driver);
-typedef painter_lld_status_t (*painter_driver_power_func)(painter_device_t *driver, bool power_on);
-typedef painter_lld_status_t (*painter_driver_viewport_func)(painter_device_t *driver, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom);
-typedef painter_lld_status_t (*painter_driver_pixdata_func)(painter_device_t *driver, const void *pixel_data, uint32_t num_pixels);
-typedef painter_lld_status_t (*painter_driver_setpixel_func)(painter_device_t *driver, uint16_t x, uint16_t y, uint8_t hue, uint8_t sat, uint8_t val);
-typedef painter_lld_status_t (*painter_driver_line_func)(painter_device_t *driver, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t hue, uint8_t sat, uint8_t val);
-typedef painter_lld_status_t (*painter_driver_rect_func)(painter_device_t *driver, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t hue, uint8_t sat, uint8_t val, bool filled);
+typedef painter_lld_status_t (*painter_driver_init_func)(painter_device_t driver, painter_rotation_t rotation);
+typedef painter_lld_status_t (*painter_driver_clear_func)(painter_device_t driver);
+typedef painter_lld_status_t (*painter_driver_power_func)(painter_device_t driver, bool power_on);
+typedef painter_lld_status_t (*painter_driver_viewport_func)(painter_device_t driver, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom);
+typedef painter_lld_status_t (*painter_driver_pixdata_func)(painter_device_t driver, const void *pixel_data, uint32_t byte_count);
+typedef painter_lld_status_t (*painter_driver_setpixel_func)(painter_device_t driver, uint16_t x, uint16_t y, uint8_t hue, uint8_t sat, uint8_t val);
+typedef painter_lld_status_t (*painter_driver_line_func)(painter_device_t driver, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t hue, uint8_t sat, uint8_t val);
+typedef painter_lld_status_t (*painter_driver_rect_func)(painter_device_t driver, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t hue, uint8_t sat, uint8_t val, bool filled);
+typedef painter_lld_status_t (*painter_driver_drawimage_func)(painter_device_t device, uint16_t x, uint16_t y, uint16_t w, uint16_t h, const void *pixel_data, uint32_t byte_count);
 
 struct painter_driver_t {
-    painter_driver_init_func     init;
-    painter_driver_clear_func    clear;
-    painter_driver_power_func    power;
-    painter_driver_viewport_func viewport;
-    painter_driver_pixdata_func  pixdata;
-    painter_driver_setpixel_func setpixel;
-    painter_driver_line_func     line;
-    painter_driver_rect_func     rect;
+    painter_driver_init_func      init;
+    painter_driver_clear_func     clear;
+    painter_driver_power_func     power;
+    painter_driver_viewport_func  viewport;
+    painter_driver_pixdata_func   pixdata;
+    painter_driver_setpixel_func  setpixel;
+    painter_driver_line_func      line;
+    painter_driver_rect_func      rect;
+    painter_driver_drawimage_func drawimage;
 };
