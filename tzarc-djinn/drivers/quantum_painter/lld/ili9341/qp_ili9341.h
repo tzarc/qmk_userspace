@@ -30,4 +30,4 @@
 #    define ILI9341_PIXDATA_BUFSIZE 16
 #endif
 
-painter_device_t *qp_make_ili9341_driver(pin_t chip_select_pin, pin_t data_pin, pin_t reset_pin);
+painter_device_t *qp_make_ili9341_device(pin_t chip_select_pin, pin_t data_pin, pin_t reset_pin, bool uses_backlight);
