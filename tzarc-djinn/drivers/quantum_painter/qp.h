@@ -23,11 +23,11 @@ typedef void *painter_device_t;
 
 ///////////////////////////////////////////////////////////////
 // Quantum Painter API
-void qp_init(painter_device_t *device, painter_rotation_t rotation);
-void qp_clear(painter_device_t *device);
-void qp_power(painter_device_t *device, bool power_on);
-void qp_viewport(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom);
-void qp_pixdata(painter_device_t *device, const void *pixel_data, uint32_t num_pixels);
-void qp_setpixel(painter_device_t *device, uint16_t x, uint16_t y, HSV color);
-void qp_line(painter_device_t *device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, HSV color);
-void qp_rect(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, HSV color, bool filled);
+bool qp_init(painter_device_t *device, painter_rotation_t rotation);
+bool qp_clear(painter_device_t *device);
+bool qp_power(painter_device_t *device, bool power_on);
+bool qp_viewport(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom);
+bool qp_pixdata(painter_device_t *device, const void *pixel_data, uint32_t num_pixels);
+bool qp_setpixel(painter_device_t *device, uint16_t x, uint16_t y, HSV color);
+bool qp_line(painter_device_t *device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, HSV color);
+bool qp_rect(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, HSV color, bool filled);

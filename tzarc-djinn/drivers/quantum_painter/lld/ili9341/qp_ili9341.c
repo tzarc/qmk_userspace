@@ -118,11 +118,11 @@ typedef union {
 } ili9341_pixel_buf;
 
 static inline ili9341_pixel_buf hsv_to_ili9341(HSV color) {
-    ili9341_pixel_buf  buf;
-    RGB      rgb   = hsv_to_rgb(color);
-    uint16_t pixel = (rgb.r >> 3) << 11 | (rgb.g >> 2) << 5 | (rgb.b >> 3);
-    buf.pix[0]         = pixel >> 8;
-    buf.pix[1]         = pixel & 0xFF;
+    ili9341_pixel_buf buf;
+    RGB               rgb   = hsv_to_rgb(color);
+    uint16_t          pixel = (rgb.r >> 3) << 11 | (rgb.g >> 2) << 5 | (rgb.b >> 3);
+    buf.pix[0]              = pixel >> 8;
+    buf.pix[1]              = pixel & 0xFF;
     return buf;
 }
 
@@ -162,7 +162,7 @@ static inline void lcd_viewport(ili9341_painter_device_t *lcd, uint16_t xbegin, 
     lcd_cmd(lcd, 0x2C);  // memory write
 }
 
-void ili9341_qp_init(painter_device_t *device, painter_rotation_t rotation) {
+painter_lld_status ili9341_qp_init(painter_device_t *device, painter_rotation_t rotation) {
     static const uint8_t pgamma[15] = {0x0F, 0x29, 0x24, 0x0C, 0x0E, 0x09, 0x4E, 0x78, 0x3C, 0x09, 0x13, 0x05, 0x17, 0x11, 0x00};
     static const uint8_t ngamma[15] = {0x00, 0x16, 0x1B, 0x04, 0x11, 0x07, 0x31, 0x33, 0x42, 0x05, 0x0C, 0x0A, 0x28, 0x2F, 0x0F};
 
@@ -285,37 +285,47 @@ void ili9341_qp_init(painter_device_t *device, painter_rotation_t rotation) {
     wait_ms(20);
 
     lcd_stop();
+
+    return DRIVER_SUCCESS;
 }
 
-void ili9341_qp_clear(painter_device_t *device) {
+painter_lld_status ili9341_qp_clear(painter_device_t *device) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
 
     // Re-init the LCD
     ili9341_qp_init(device, lcd->rotation);
+
+    return DRIVER_SUCCESS;
 }
 
-void ili9341_qp_power(painter_device_t *device, bool power_on) {
+painter_lld_status ili9341_qp_power(painter_device_t *device, bool power_on) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
     lcd_cmd(lcd, power_on ? ILI9341_CMD_DISPLAY_ON : ILI9341_CMD_DISPLAY_OFF);
     lcd_stop();
+
+    return DRIVER_SUCCESS;
 }
 
-void ili9341_qp_viewport(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom) {
+painter_lld_status ili9341_qp_viewport(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
     lcd_viewport(lcd, left, top, right, bottom);
     lcd_stop();
+
+    return DRIVER_SUCCESS;
 }
 
-void ili9341_qp_pixdata(painter_device_t *device, const void *pixel_data, uint32_t byte_count) {
+painter_lld_status ili9341_qp_pixdata(painter_device_t *device, const void *pixel_data, uint32_t byte_count) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
     lcd_sendbuf(lcd, pixel_data, byte_count);
     lcd_stop();
+
+    return DRIVER_SUCCESS;
 }
 
-void ili9341_qp_setpixel(painter_device_t *device, uint16_t x, uint16_t y, HSV color) {
+painter_lld_status ili9341_qp_setpixel(painter_device_t *device, uint16_t x, uint16_t y, HSV color) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
 
@@ -327,33 +337,47 @@ void ili9341_qp_setpixel(painter_device_t *device, uint16_t x, uint16_t y, HSV c
     lcd_sendbuf(lcd, &buf, sizeof(buf));
 
     lcd_stop();
+
+    return DRIVER_SUCCESS;
 }
 
-void ili9341_qp_rect(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, HSV color, bool filled) {
+painter_lld_status ili9341_qp_line(painter_device_t *device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, HSV color) {
+    return DRIVER_UNSUPPORTED;  // for now, let the upper layer handle the line drawing algorithm
+}
+
+painter_lld_status ili9341_qp_rect(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, HSV color, bool filled) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
-
-    // Set the area we're going to be writing to
-    lcd_viewport(lcd, left, top, right, bottom);
 
     // Convert the color to RGB565
     ili9341_pixel_buf clr = hsv_to_ili9341(color);
 
     // Build a larger buffer so we can stream to the LCD in larger chunks, for speed
     ili9341_pixel_buf buf[ILI9341_PIXDATA_BUFSIZE];
-    for(int i = 0; i < ILI9341_PIXDATA_BUFSIZE; ++i)
-        buf[i] = clr;
+    for (int i = 0; i < ILI9341_PIXDATA_BUFSIZE; ++i) buf[i] = clr;
 
-    // Transmit the data to the LCD in chunks
-    size_t remaining = (right-left+1)*(bottom-top+1);
-    while(remaining > 0){
-        size_t transmit = (remaining < ILI9341_PIXDATA_BUFSIZE ? remaining : ILI9341_PIXDATA_BUFSIZE);
-        size_t bytes = transmit * sizeof(ili9341_pixel_buf);
-        ili9341_qp_pixdata(device, buf, bytes);
-        remaining -= transmit;
+    if (filled) {
+        // Set the area we're going to be writing to
+        lcd_viewport(lcd, left, top, right, bottom);
+
+        // Transmit the data to the LCD in chunks
+        size_t remaining = (right - left + 1) * (bottom - top + 1);
+        while (remaining > 0) {
+            size_t transmit = (remaining < ILI9341_PIXDATA_BUFSIZE ? remaining : ILI9341_PIXDATA_BUFSIZE);
+            size_t bytes    = transmit * sizeof(ili9341_pixel_buf);
+            ili9341_qp_pixdata(device, buf, bytes);
+            remaining -= transmit;
+        }
+    } else {
+        qp_line(device, left, top, right, top, color);
+        qp_line(device, left, bottom, right, bottom, color);
+        qp_line(device, left, top + 1, left, bottom - 1, color);
+        qp_line(device, right, top + 1, right, bottom - 1, color);
     }
 
     lcd_stop();
+
+    return DRIVER_SUCCESS;
 }
 
 ili9341_painter_device_t drivers[ILI9341_NUM_DEVICES] = {0};
@@ -370,7 +394,7 @@ painter_device_t *qp_make_ili9341_driver(pin_t chip_select_pin, pin_t data_pin, 
             driver->qp_driver.pixdata  = ili9341_qp_pixdata;
             driver->qp_driver.viewport = ili9341_qp_viewport;
             driver->qp_driver.setpixel = ili9341_qp_setpixel;
-            driver->qp_driver.line     = NULL; // let the upper layer handle the line drawing algorithm
+            driver->qp_driver.line     = ili9341_qp_line;
             driver->qp_driver.rect     = ili9341_qp_rect;
             driver->chip_select_pin    = chip_select_pin;
             driver->data_pin           = data_pin;

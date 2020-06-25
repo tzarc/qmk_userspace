@@ -18,42 +18,49 @@
 #include <color.h>
 #include "qp_common.h"
 
-void qp_init(painter_device_t *device, painter_rotation_t rotation) {
+bool qp_init(painter_device_t *device, painter_rotation_t rotation) {
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
-    driver->init(device, rotation);
+    return DRIVER_SUCCESS == driver->init(device, rotation);
 }
 
-void qp_clear(painter_device_t *device) {
+bool qp_clear(painter_device_t *device) {
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
-    driver->clear(device);
+    return DRIVER_SUCCESS == driver->clear(device);
 }
 
-void qp_power(painter_device_t *device, bool power_on) {
+bool qp_power(painter_device_t *device, bool power_on) {
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
-    driver->power(device, power_on);
+    return DRIVER_SUCCESS == driver->power(device, power_on);
 }
 
-void qp_viewport(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom) {
+bool qp_viewport(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom) {
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
-    driver->viewport(device, left, top, right, bottom);
+    return DRIVER_SUCCESS == driver->viewport(device, left, top, right, bottom);
 }
 
-void qp_pixdata(painter_device_t *device, const void *pixel_data, uint32_t byte_count) {
+bool qp_pixdata(painter_device_t *device, const void *pixel_data, uint32_t byte_count) {
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
-    driver->pixdata(device, pixel_data, byte_count);
+    return DRIVER_SUCCESS == driver->pixdata(device, pixel_data, byte_count);
 }
 
-void qp_setpixel(painter_device_t *device, uint16_t x, uint16_t y, HSV color) {
+bool qp_setpixel(painter_device_t *device, uint16_t x, uint16_t y, HSV color) {
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
-    driver->setpixel(device, x, y, color);
+    return DRIVER_SUCCESS == driver->setpixel(device, x, y, color);
 }
 
-void qp_line(painter_device_t *device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, HSV color) {
+bool qp_line(painter_device_t *device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, HSV color) {
     // If the driver has an optimised implementation of line drawing, offload to the driver
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
     if (driver->line) {
-        driver->line(device, x0, y0, x1, y1, color);
-        return;
+        painter_lld_status status = driver->line(device, x0, y0, x1, y1, color);
+        switch (status) {
+            case DRIVER_SUCCESS:
+                return true;
+            case DRIVER_FAILED:
+                return false;
+            case DRIVER_UNSUPPORTED:
+                break;
+        }
     }
 
     // Driver doesn't have an implementation -- fallback to setting pixels
@@ -66,14 +73,23 @@ void qp_line(painter_device_t *device, uint16_t x0, uint16_t y0, uint16_t x1, ui
             qp_setpixel(device, x, y0, color);
         }
     }
+
+    return true;
 }
 
-void qp_rect(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, HSV color, bool filled) {
+bool qp_rect(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, HSV color, bool filled) {
     // If the driver has an optimised implementation of line drawing, offload to the driver
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
     if (driver->rect) {
-        driver->rect(device, left, top, right, bottom, color, filled);
-        return;
+        painter_lld_status status = driver->rect(device, left, top, right, bottom, color, filled);
+        switch (status) {
+            case DRIVER_SUCCESS:
+                return true;
+            case DRIVER_FAILED:
+                return false;
+            case DRIVER_UNSUPPORTED:
+                break;
+        }
     }
 
     // Driver doesn't have an implementation -- fallback to drawing lines
@@ -84,7 +100,9 @@ void qp_rect(painter_device_t *device, uint16_t left, uint16_t top, uint16_t rig
     } else {
         qp_line(device, left, top, right, top, color);
         qp_line(device, left, bottom, right, bottom, color);
-        qp_line(device, left, top, left, bottom, color);
-        qp_line(device, right, top, right, bottom, color);
+        qp_line(device, left, top + 1, left, bottom - 1, color);
+        qp_line(device, right, top + 1, right, bottom - 1, color);
     }
+
+    return true;
 }

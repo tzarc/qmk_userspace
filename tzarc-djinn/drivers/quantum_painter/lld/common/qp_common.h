@@ -18,16 +18,18 @@
 
 #include "qp.h"
 
+typedef enum { DRIVER_FAILED, DRIVER_SUCCESS, DRIVER_UNSUPPORTED } painter_lld_status;
+
 ///////////////////////////////////////////////////////////////
 // Quantum Painter definitions
-typedef void (*painter_driver_init_func)(painter_device_t *driver, painter_rotation_t rotation);
-typedef void (*painter_driver_clear_func)(painter_device_t *driver);
-typedef void (*painter_driver_power_func)(painter_device_t *driver, bool power_on);
-typedef void (*painter_driver_viewport_func)(painter_device_t *driver, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom);
-typedef void (*painter_driver_pixdata_func)(painter_device_t *driver, const void *pixel_data, uint32_t num_pixels);
-typedef void (*painter_driver_setpixel_func)(painter_device_t *driver, uint16_t x, uint16_t y, HSV color);
-typedef void (*painter_driver_line_func)(painter_device_t *driver, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, HSV color);
-typedef void (*painter_driver_rect_func)(painter_device_t *driver, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, HSV color, bool filled);
+typedef painter_lld_status (*painter_driver_init_func)(painter_device_t *driver, painter_rotation_t rotation);
+typedef painter_lld_status (*painter_driver_clear_func)(painter_device_t *driver);
+typedef painter_lld_status (*painter_driver_power_func)(painter_device_t *driver, bool power_on);
+typedef painter_lld_status (*painter_driver_viewport_func)(painter_device_t *driver, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom);
+typedef painter_lld_status (*painter_driver_pixdata_func)(painter_device_t *driver, const void *pixel_data, uint32_t num_pixels);
+typedef painter_lld_status (*painter_driver_setpixel_func)(painter_device_t *driver, uint16_t x, uint16_t y, HSV color);
+typedef painter_lld_status (*painter_driver_line_func)(painter_device_t *driver, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, HSV color);
+typedef painter_lld_status (*painter_driver_rect_func)(painter_device_t *driver, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, HSV color, bool filled);
 
 struct painter_driver_t {
     painter_driver_init_func     init;

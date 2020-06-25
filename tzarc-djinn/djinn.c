@@ -43,7 +43,7 @@ void keyboard_post_init_kb(void) {
         uint8_t pix_data[2 * 320] = {0};
         if (r < 160) {
             for (int c = 0; c < 320; ++c) {
-                HSV      hsv        = {r * 255 / 160, c * 255 / 320, 255};
+                HSV      hsv        = {r * 255 / 160, 255, c * 255 / 320};
                 RGB      rgb        = hsv_to_rgb(hsv);
                 uint16_t pixel      = (rgb.r >> 3) << 11 | (rgb.g >> 2) << 5 | (rgb.b >> 3);
                 pix_data[c * 2 + 0] = pixel >> 8;
@@ -60,6 +60,7 @@ void keyboard_post_init_kb(void) {
 
     qp_line(lcd, 60, 130, 320 - 60, 130, (HSV){64, 255, 190});
     qp_rect(lcd, 20, 20, 120, 100, (HSV){128, 255, 190}, true);
+    qp_rect(lcd, 20, 20, 120, 100, (HSV){0, 0, 255}, false);
 
     qp_power(lcd, true);
 
