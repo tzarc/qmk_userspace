@@ -15,13 +15,13 @@
  */
 
 #include "djinn.h"
-#include "drawable_ili9341.h"
+#include "qp_ili9341.h"
 #include "color.h"
 #include "qmk-logo-200.h"
 
 void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
 
-drawable_driver_t *lcd;
+painter_device_t *lcd;
 
 void keyboard_post_init_kb(void) {
     debug_enable = true;
@@ -36,14 +36,14 @@ void keyboard_post_init_kb(void) {
     writePinLow(RGB_POWER_ENABLE_PIN);
 
     // Initialise the LCD
-    lcd = make_ili9341_driver(LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN);
-    drawable_init(lcd, DRAWABLE_ROTATION_270);
+    lcd = qp_make_ili9341_driver(LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN);
+    qp_init(lcd, QP_ROTATION_270);
 
     for (int r = 0; r < 240; ++r) {
         uint8_t pix_data[2 * 320] = {0};
         if (r < 160) {
             for (int c = 0; c < 320; ++c) {
-                HSV      hsv        = {r*255/160, c*255/320, 255};
+                HSV      hsv        = {r * 255 / 160, c * 255 / 320, 255};
                 RGB      rgb        = hsv_to_rgb(hsv);
                 uint16_t pixel      = (rgb.r >> 3) << 11 | (rgb.g >> 2) << 5 | (rgb.b >> 3);
                 pix_data[c * 2 + 0] = pixel >> 8;
@@ -51,13 +51,17 @@ void keyboard_post_init_kb(void) {
             }
         }
 
-        drawable_viewport(lcd, 0, r, 319, r);
-        drawable_pixdata(lcd, (const uint8_t *)pix_data, 320 * 2);
+        qp_viewport(lcd, 0, r, 319, r);
+        qp_pixdata(lcd, (const uint8_t *)pix_data, 320 * 2);
     }
 
-    drawable_viewport(lcd, 0, 160, 199, 239);
-    drawable_pixdata(lcd, qmk_logo_200_rgb565, qmk_logo_200_rgb565_len);
-    drawable_power(lcd, true);
+    qp_viewport(lcd, 0, 160, 199, 239);
+    qp_pixdata(lcd, qmk_logo_200_rgb565, qmk_logo_200_rgb565_len);
+
+    qp_line(lcd, 60, 130, 320 - 60, 130, (HSV){64, 255, 190});
+    qp_rect(lcd, 20, 20, 120, 100, (HSV){128, 255, 190}, true);
+
+    qp_power(lcd, true);
 
     // Turn on the backlight
     backlight_enable();

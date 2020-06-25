@@ -14,21 +14,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
 #include <quantum.h>
+#include <color.h>
 #include <spi_master.h>
-#include "drawable_ili9341.h"
-
-#ifndef ILI9341_NUM_DEVICES
-#    define ILI9341_NUM_DEVICES 1
-#endif
-
-#ifndef ILI9341_SPI_DIVISOR
-#    define ILI9341_SPI_DIVISOR 8
-#endif
-
-#ifndef ILI9341_PIXDATA_BUFSIZE
-#    define ILI9341_PIXDATA_BUFSIZE 16
-#endif
+#include "qp_ili9341.h"
 
 #define ILI9341_CMD_NOP 0x00                 // No operation
 #define ILI9341_CMD_RESET 0x01               // Software reset
@@ -114,37 +104,50 @@
 #define ILI9341_SET_IF_CTL 0xF6              // Set interface control
 #define ILI9341_SET_PUMP_RATIO_CTL 0xF7      // Set pump ratio control
 
-typedef struct ili9341_drawable_driver_t {
-    drawable_driver_t   drawable_driver;  // must be first, so it can be cast from the drawable_driver_t* type
-    bool                allocated;
-    pin_t               chip_select_pin;
-    pin_t               data_pin;
-    pin_t               reset_pin;
-    drawable_rotation_t rotation;
-} ili9341_drawable_driver_t;
+typedef struct ili9341_painter_device_t {
+    struct painter_driver_t qp_driver;  // must be first, so it can be cast from the painter_device_t* type
+    bool                    allocated;
+    pin_t                   chip_select_pin;
+    pin_t                   data_pin;
+    pin_t                   reset_pin;
+    painter_rotation_t      rotation;
+} ili9341_painter_device_t;
 
-static inline void lcd_start(ili9341_drawable_driver_t *lcd) { spi_start(lcd->chip_select_pin, false, 0, ILI9341_SPI_DIVISOR); }
+typedef union {
+    uint8_t pix[2];
+} ili9341_pixel_buf;
+
+static inline ili9341_pixel_buf hsv_to_ili9341(HSV color) {
+    ili9341_pixel_buf  buf;
+    RGB      rgb   = hsv_to_rgb(color);
+    uint16_t pixel = (rgb.r >> 3) << 11 | (rgb.g >> 2) << 5 | (rgb.b >> 3);
+    buf.pix[0]         = pixel >> 8;
+    buf.pix[1]         = pixel & 0xFF;
+    return buf;
+}
+
+static inline void lcd_start(ili9341_painter_device_t *lcd) { spi_start(lcd->chip_select_pin, false, 0, ILI9341_SPI_DIVISOR); }
 
 static inline void lcd_stop(void) { spi_stop(); }
 
-static inline void lcd_cmd(ili9341_drawable_driver_t *lcd, uint8_t b) {
+static inline void lcd_cmd(ili9341_painter_device_t *lcd, uint8_t b) {
     writePinLow(lcd->data_pin);
     spi_write(b);
 }
 
-static inline void lcd_sendbuf(ili9341_drawable_driver_t *lcd, const void *data, uint16_t len) {
+static inline void lcd_sendbuf(ili9341_painter_device_t *lcd, const void *data, uint16_t len) {
     writePinHigh(lcd->data_pin);
     spi_transmit(data, len);
 }
 
-static inline void lcd_data(ili9341_drawable_driver_t *lcd, uint8_t b) { lcd_sendbuf(lcd, &b, sizeof(b)); }
+static inline void lcd_data(ili9341_painter_device_t *lcd, uint8_t b) { lcd_sendbuf(lcd, &b, sizeof(b)); }
 
-static inline void lcd_reg(ili9341_drawable_driver_t *lcd, uint8_t reg, uint8_t val) {
+static inline void lcd_reg(ili9341_painter_device_t *lcd, uint8_t reg, uint8_t val) {
     lcd_cmd(lcd, reg);
     lcd_data(lcd, val);
 }
 
-static inline void lcd_viewport(ili9341_drawable_driver_t *lcd, uint16_t xbegin, uint16_t ybegin, uint16_t xend, uint16_t yend) {
+static inline void lcd_viewport(ili9341_painter_device_t *lcd, uint16_t xbegin, uint16_t ybegin, uint16_t xend, uint16_t yend) {
     // Set up the x-window
     uint8_t xbuf[4] = {xbegin >> 8, xbegin & 0xFF, xend >> 8, xend & 0xFF};
     lcd_cmd(lcd, 0x2A);  // column address set
@@ -159,12 +162,12 @@ static inline void lcd_viewport(ili9341_drawable_driver_t *lcd, uint16_t xbegin,
     lcd_cmd(lcd, 0x2C);  // memory write
 }
 
-void ili9341_drawable_init_func(drawable_driver_t *driver, drawable_rotation_t rotation) {
+void ili9341_qp_init(painter_device_t *device, painter_rotation_t rotation) {
     static const uint8_t pgamma[15] = {0x0F, 0x29, 0x24, 0x0C, 0x0E, 0x09, 0x4E, 0x78, 0x3C, 0x09, 0x13, 0x05, 0x17, 0x11, 0x00};
     static const uint8_t ngamma[15] = {0x00, 0x16, 0x1B, 0x04, 0x11, 0x07, 0x31, 0x33, 0x42, 0x05, 0x0C, 0x0A, 0x28, 0x2F, 0x0F};
 
-    ili9341_drawable_driver_t *lcd = (ili9341_drawable_driver_t *)driver;
-    lcd->rotation                  = rotation;
+    ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
+    lcd->rotation                 = rotation;
 
     spi_init();
 
@@ -260,19 +263,19 @@ void ili9341_drawable_init_func(drawable_driver_t *driver, drawable_rotation_t r
     lcd_viewport(lcd, 0, 0, 239, 319);
 
     switch (rotation) {
-        case DRAWABLE_ROTATION_0:
+        case QP_ROTATION_0:
             lcd_cmd(lcd, ILI9341_SET_MEM_ACS_CTL);
             lcd_data(lcd, 0b00001000);
             break;
-        case DRAWABLE_ROTATION_90:
+        case QP_ROTATION_90:
             lcd_cmd(lcd, ILI9341_SET_MEM_ACS_CTL);
             lcd_data(lcd, 0b10101000);
             break;
-        case DRAWABLE_ROTATION_180:
+        case QP_ROTATION_180:
             lcd_cmd(lcd, ILI9341_SET_MEM_ACS_CTL);
             lcd_data(lcd, 0b11001000);
             break;
-        case DRAWABLE_ROTATION_270:
+        case QP_ROTATION_270:
             lcd_cmd(lcd, ILI9341_SET_MEM_ACS_CTL);
             lcd_data(lcd, 0b01101000);
             break;
@@ -284,76 +287,95 @@ void ili9341_drawable_init_func(drawable_driver_t *driver, drawable_rotation_t r
     lcd_stop();
 }
 
-void ili9341_drawable_clear_func(drawable_driver_t *driver) {
-    ili9341_drawable_driver_t *lcd = (ili9341_drawable_driver_t *)driver;
+void ili9341_qp_clear(painter_device_t *device) {
+    ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
 
     // Re-init the LCD
-    ili9341_drawable_init_func(driver, lcd->rotation);
+    ili9341_qp_init(device, lcd->rotation);
 }
 
-void ili9341_drawable_power_func(drawable_driver_t *driver, bool power_on) {
-    ili9341_drawable_driver_t *lcd = (ili9341_drawable_driver_t *)driver;
+void ili9341_qp_power(painter_device_t *device, bool power_on) {
+    ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
     lcd_cmd(lcd, power_on ? ILI9341_CMD_DISPLAY_ON : ILI9341_CMD_DISPLAY_OFF);
     lcd_stop();
 }
 
-void ili9341_drawable_viewport_func(drawable_driver_t *driver, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom) {
-    ili9341_drawable_driver_t *lcd = (ili9341_drawable_driver_t *)driver;
+void ili9341_qp_viewport(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom) {
+    ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
     lcd_viewport(lcd, left, top, right, bottom);
     lcd_stop();
 }
 
-void ili9341_drawable_pixdata_func(drawable_driver_t *driver, const uint8_t *pixel_data, uint32_t num_pixels) {
-    ili9341_drawable_driver_t *lcd = (ili9341_drawable_driver_t *)driver;
+void ili9341_qp_pixdata(painter_device_t *device, const void *pixel_data, uint32_t byte_count) {
+    ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
-    lcd_sendbuf(lcd, pixel_data, num_pixels);
+    lcd_sendbuf(lcd, pixel_data, byte_count);
     lcd_stop();
 }
 
-void ili9341_drawable_setpixel_func(drawable_driver_t *driver, uint16_t x, uint16_t y, uint16_t color) {
-    ili9341_drawable_driver_t *lcd = (ili9341_drawable_driver_t *)driver;
+void ili9341_qp_setpixel(painter_device_t *device, uint16_t x, uint16_t y, HSV color) {
+    ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
+
+    // Set the area we're going to be writing to
     lcd_viewport(lcd, x, y, x, y);
-    uint8_t buf[2] = {color >> 8, color & 0xFF};
+
+    // Convert the color to RGB565 and transmit to the device
+    ili9341_pixel_buf buf = hsv_to_ili9341(color);
     lcd_sendbuf(lcd, &buf, sizeof(buf));
+
     lcd_stop();
 }
 
-void ili9341_drawable_line_func(drawable_driver_t *driver, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color) {
-    ili9341_drawable_driver_t *lcd = (ili9341_drawable_driver_t *)driver;
+void ili9341_qp_rect(painter_device_t *device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, HSV color, bool filled) {
+    ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
-    // do stuff
+
+    // Set the area we're going to be writing to
+    lcd_viewport(lcd, left, top, right, bottom);
+
+    // Convert the color to RGB565
+    ili9341_pixel_buf clr = hsv_to_ili9341(color);
+
+    // Build a larger buffer so we can stream to the LCD in larger chunks, for speed
+    ili9341_pixel_buf buf[ILI9341_PIXDATA_BUFSIZE];
+    for(int i = 0; i < ILI9341_PIXDATA_BUFSIZE; ++i)
+        buf[i] = clr;
+
+    // Transmit the data to the LCD in chunks
+    size_t remaining = (right-left+1)*(bottom-top+1);
+    while(remaining > 0){
+        size_t transmit = (remaining < ILI9341_PIXDATA_BUFSIZE ? remaining : ILI9341_PIXDATA_BUFSIZE);
+        size_t bytes = transmit * sizeof(ili9341_pixel_buf);
+        ili9341_qp_pixdata(device, buf, bytes);
+        remaining -= transmit;
+    }
+
     lcd_stop();
 }
 
-void ili9341_drawable_rect_func(drawable_driver_t *driver, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint16_t color, bool filled) {
-    ili9341_drawable_driver_t *lcd = (ili9341_drawable_driver_t *)driver;
-    lcd_start(lcd);
-    // do stuff
-    lcd_stop();
-}
+ili9341_painter_device_t drivers[ILI9341_NUM_DEVICES] = {0};
 
-ili9341_drawable_driver_t drivers[ILI9341_NUM_DEVICES] = {0};
-
-drawable_driver_t *make_ili9341_driver(pin_t chip_select_pin, pin_t data_pin, pin_t reset_pin) {
+painter_device_t *qp_make_ili9341_driver(pin_t chip_select_pin, pin_t data_pin, pin_t reset_pin) {
     for (int i = 0; i < ILI9341_NUM_DEVICES; ++i) {
-        ili9341_drawable_driver_t *driver = &drivers[i];
+        ili9341_painter_device_t *driver = &drivers[i];
+        memset(driver, 0, sizeof(ili9341_painter_device_t));
         if (!driver->allocated) {
-            driver->allocated                = true;
-            driver->drawable_driver.init     = ili9341_drawable_init_func;
-            driver->drawable_driver.clear    = ili9341_drawable_clear_func;
-            driver->drawable_driver.power    = ili9341_drawable_power_func;
-            driver->drawable_driver.pixdata  = ili9341_drawable_pixdata_func;
-            driver->drawable_driver.viewport = ili9341_drawable_viewport_func;
-            driver->drawable_driver.setpixel = ili9341_drawable_setpixel_func;
-            driver->drawable_driver.line     = ili9341_drawable_line_func;
-            driver->drawable_driver.rect     = ili9341_drawable_rect_func;
-            driver->chip_select_pin          = chip_select_pin;
-            driver->data_pin                 = data_pin;
-            driver->reset_pin                = reset_pin;
-            return (drawable_driver_t *)driver;
+            driver->allocated          = true;
+            driver->qp_driver.init     = ili9341_qp_init;
+            driver->qp_driver.clear    = ili9341_qp_clear;
+            driver->qp_driver.power    = ili9341_qp_power;
+            driver->qp_driver.pixdata  = ili9341_qp_pixdata;
+            driver->qp_driver.viewport = ili9341_qp_viewport;
+            driver->qp_driver.setpixel = ili9341_qp_setpixel;
+            driver->qp_driver.line     = NULL; // let the upper layer handle the line drawing algorithm
+            driver->qp_driver.rect     = ili9341_qp_rect;
+            driver->chip_select_pin    = chip_select_pin;
+            driver->data_pin           = data_pin;
+            driver->reset_pin          = reset_pin;
+            return (painter_device_t *)driver;
         }
     }
     return NULL;

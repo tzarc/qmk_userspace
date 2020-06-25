@@ -41,10 +41,11 @@ RGBLIGHT_ENABLE = yes
 AUDIO_ENABLE = no
 
 VPATH += \
-	$(KEYBOARD_PATH_1)/drivers/drawable \
-	$(KEYBOARD_PATH_1)/drivers/drawable/ili9341
+	$(KEYBOARD_PATH_1)/drivers/quantum_painter \
+	$(KEYBOARD_PATH_1)/drivers/quantum_painter/lld/common \
+	$(KEYBOARD_PATH_1)/drivers/quantum_painter/lld/ili9341
 
 SRC += \
 	spi_master.c \
-	drawable.c \
-	drawable_ili9341.c
+	qp_common.c \
+	qp_ili9341.c

@@ -7,13 +7,14 @@ SRC += \
 
 UNICODE_ENABLE = yes
 LTO_ENABLE = yes
-
-# platform-specific configs
-ifeq ($(PLATFORM),CHIBIOS)
-    RAW_ENABLE = yes
-endif
+RAW_ENABLE = yes
 
 # board-specific configs
 ifeq ($(strip $(KEYBOARD)), massdrop/ctrl)
     LTO_ENABLE = no
+endif
+
+# platform-specific configs
+ifeq ($(PLATFORM),VUSB)
+    RAW_ENABLE = no
 endif
