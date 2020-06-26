@@ -133,7 +133,7 @@ def image_to_rgb565(im):
     return rgb565array
 
 """
-Generate the lookup table for bytes consisting of packed 2bpp pixels
+Generate the lookup table for bytes consisting of packed monochrome 4bpp/2bpp pixels
 """
 def generate_lookup_tables(output_filename):
     print("Generating lookup tables for pixels as %s.c/.h" % (output_filename))

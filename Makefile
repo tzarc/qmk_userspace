@@ -28,6 +28,8 @@ EXTRA_LINK_DEFS := \
 	layout-tkl_ansi-tzarc!layouts/community/tkl_ansi/tzarc \
 	layout-60_ansi-tzarc!layouts/community/60_ansi/tzarc \
 	users-tzarc!users/tzarc \
+	inject-root/drivers/quantum_painter!drivers/quantum_painter \
+	inject-root/util/convert_gfx.py!util/convert_gfx.py
 
 git-submodule: clean
 	cd $(ROOTDIR)/qmk_firmware \
@@ -43,36 +45,16 @@ arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
 nick: cyclone iris luddite mysterium-nick chocopad ctrl
 
 # QMK Logo generation
-LOGO_FILES := dark light
-LOGO_WIDTHS := 120 160 240
-define handle_logo_width
-logo_type_$1_$2 := $1
-logo_width_$1_$2 := $2
-logo_file_$1_$2 := badge-$$(logo_type_$1_$2)$$(logo_width_$1_$2)
-logo_target_$1_$2 := $(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/lld/common/$$(logo_file_$1_$2).h
-$$(logo_target_$1_$2): Makefile $(ROOTDIR)/tzarc-djinn/inject-root/util/convert_gfx.py
-	[ -d "$(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/lld/common/img" ] \
-		|| mkdir -p "$(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/lld/common/img"
-	convert $(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/lld/common/badge-$$(logo_type_$1_$2).svg -depth 8 -background black -geometry $$(logo_width_$1_$2)x $(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/lld/common/img/$$(logo_file_$1_$2).png
-	cd $(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/lld/common/img \
-		&& $(ROOTDIR)/tzarc-djinn/inject-root/util/convert_gfx.py -4 -i $$(logo_file_$1_$2).png -o $$(logo_file_$1_$2)
-djinn: $$(logo_target_$1_$2)
-endef
-define handle_logo_file
-$(foreach logo_width,$(LOGO_WIDTHS),$(eval $(call handle_logo_width,$(1),$(logo_width))))
-endef
-$(foreach logo_file,$(LOGO_FILES),$(eval $(call handle_logo_file,$(logo_file))))
+$(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/img/decode_luts.h: $(ROOTDIR)/inject-root/util/convert_gfx.py $(ROOTDIR)/inject-root/drivers/quantum_painter/img/Makefile
+	cd $(ROOTDIR)/inject-root/drivers/quantum_painter/img \
+		&& make all
 
-$(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/lld/common/img/decode_luts.h: $(ROOTDIR)/tzarc-djinn/inject-root/util/convert_gfx.py
-	[ -d "$(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/lld/common/img" ] \
-		|| mkdir -p "$(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/lld/common/img"
-	cd $(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/lld/common/img \
-		&& $(ROOTDIR)/tzarc-djinn/inject-root/util/convert_gfx.py -r -l -o decode_luts
-
-djinn: $(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/lld/common/img/decode_luts.h
+djinn: $(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/img/decode_luts.h
 
 remove_artifacts:
 	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format rgbtobgr565 rgbtobgr565.o >/dev/null 2>&1 || true
+	cd $(ROOTDIR)/inject-root/drivers/quantum_painter/img \
+		&& make clean
 
 clean: remove_artifacts
 	@$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" clean || true

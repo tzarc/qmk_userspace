@@ -1,4 +1,4 @@
-CONVERT_GFX := ../../../../../util/convert_gfx.py
+CONVERT_GFX := ../../../util/convert_gfx.py
 
 all: files
 
@@ -23,10 +23,10 @@ endef
 
 $(foreach logo_file,$(LOGO_FILES),$(eval $(call handle_logo_file,$(logo_file))))
 
-decode_luts.h: Makefile $(CONVERT_GFX)
-	@$(CONVERT_GFX) -r -l -o decode_luts
+qp_luts.h: Makefile $(CONVERT_GFX)
+	@$(CONVERT_GFX) -r -l -o qp_luts
 
-files: decode_luts.h
+files: qp_luts.h
 
 clean: Makefile
-	rm gfx-* *.png decode_luts* || true
+	rm gfx-* *.png qp_luts* || true
