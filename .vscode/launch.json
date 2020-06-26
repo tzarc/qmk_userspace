@@ -5,6 +5,22 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Python: convert_gfx.py - dark160",
+      "type": "python",
+      "cwd": "${workspaceRoot}/tzarc-djinn/inject-root/drivers/quantum_painter/lld/common/img",
+      "request": "launch",
+      "program": "${workspaceRoot}/tzarc-djinn/inject-root/util/convert_gfx.py",
+      "args": ["-2", "-i", "badge-dark160.png", "-o", "badge-dark160"]
+    },
+    {
+      "name": "Python: convert_gfx.py - decode_luts",
+      "type": "python",
+      "cwd": "${workspaceRoot}/tzarc-djinn/inject-root/drivers/quantum_painter/lld/common/img",
+      "request": "launch",
+      "program": "${workspaceRoot}/tzarc-djinn/inject-root/util/convert_gfx.py",
+      "args": ["-2", "-l", "-o", "badge-dark160"]
+    },
+    {
       "name": "Black Magic Probe (Cyclone)",
       "type": "cppdbg",
       "request": "launch",

@@ -17,7 +17,8 @@
 #include "djinn.h"
 #include "qp_ili9341.h"
 #include "color.h"
-#include "qmk-logo-200.h"
+
+#include "gfx-badge-dark120.c"
 
 void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
 
@@ -37,13 +38,13 @@ void keyboard_post_init_kb(void) {
 
     // Initialise the LCD
     lcd = qp_make_ili9341_device(LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, true);
-    qp_init(lcd, QP_ROTATION_270);
+    qp_init(lcd, QP_ROTATION_180);
 
-    for (int r = 0; r < 240; ++r) {
-        uint8_t pix_data[2 * 320] = {0};
+    for (int r = 0; r < 320; ++r) {
+        uint8_t pix_data[2 * 240] = {0};
         if (r < 160) {
-            for (int c = 0; c < 320; ++c) {
-                HSV      hsv        = {r * 255 / 160, 255, c * 255 / 320};
+            for (int c = 0; c < 240; ++c) {
+                HSV      hsv        = {r * 255 / 160, 255, c * 255 / 240};
                 RGB      rgb        = hsv_to_rgb(hsv);
                 uint16_t pixel      = (rgb.r >> 3) << 11 | (rgb.g >> 2) << 5 | (rgb.b >> 3);
                 pix_data[c * 2 + 0] = pixel >> 8;
@@ -51,13 +52,13 @@ void keyboard_post_init_kb(void) {
             }
         }
 
-        qp_viewport(lcd, 0, r, 319, r);
-        qp_pixdata(lcd, (const uint8_t *)pix_data, 320 * 2);
+        qp_viewport(lcd, 0, r, 239, r);
+        qp_pixdata(lcd, pix_data, sizeof(pix_data));
     }
 
-    qp_drawimage(lcd, 0, 160, 200, 60, qmk_logo_200_rgb565, qmk_logo_200_rgb565_len);
+    qp_drawimage(lcd, (240 - GFX_BADGE_DARK120_WIDTH) / 2, 320 - GFX_BADGE_DARK120_HEIGHT, GFX_BADGE_DARK120_WIDTH, GFX_BADGE_DARK120_HEIGHT, gfx_badge_dark120, GFX_BADGE_DARK120_BYTES);
 
-    qp_line(lcd, 60, 130, 320 - 60, 130, HSV_BLUE);
+    qp_line(lcd, 60, 130, 240 - 60, 130, HSV_BLUE);
     qp_rect(lcd, 20, 20, 120, 100, HSV_RED, true);
     qp_rect(lcd, 20, 20, 120, 100, HSV_WHITE, false);
 
