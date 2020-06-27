@@ -18,7 +18,7 @@
 #include "qp_ili9341.h"
 #include "color.h"
 
-#include "gfx-badge-dark160.c"
+#include "gfx-badge-dark_160px_4bpp.c"
 
 void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
 
@@ -40,11 +40,13 @@ void keyboard_post_init_kb(void) {
     lcd = qp_make_ili9341_device(LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, true);
     qp_init(lcd, QP_ROTATION_180);
 
+#define NUM_ROWS (320 - GFX_BADGE_DARK_160PX_4BPP_HEIGHT)
+#define NUM_COLS (240)
     for (int r = 0; r < 320; ++r) {
-        uint8_t pix_data[2 * 240] = {0};
-        if (r < 160) {
-            for (int c = 0; c < 240; ++c) {
-                HSV      hsv        = {r * 255 / 160, 255, c * 255 / 240};
+        uint8_t pix_data[2 * NUM_COLS] = {0};
+        if (r < NUM_ROWS) {
+            for (int c = 0; c < NUM_COLS; ++c) {
+                HSV      hsv        = {r * 255 / NUM_ROWS, 255, c * 255 / NUM_COLS};
                 RGB      rgb        = hsv_to_rgb(hsv);
                 uint16_t pixel      = (rgb.r >> 3) << 11 | (rgb.g >> 2) << 5 | (rgb.b >> 3);
                 pix_data[c * 2 + 0] = pixel >> 8;
@@ -52,19 +54,20 @@ void keyboard_post_init_kb(void) {
             }
         }
 
-        qp_viewport(lcd, 0, r, 239, r);
+        qp_viewport(lcd, 0, r, NUM_COLS - 1, r);
         qp_pixdata(lcd, pix_data, sizeof(pix_data));
     }
-
-    qp_drawimage(lcd, (240 - GFX_BADGE_DARK160_WIDTH) / 2, 320 - GFX_BADGE_DARK160_HEIGHT, GFX_BADGE_DARK160_WIDTH, GFX_BADGE_DARK160_HEIGHT, GFX_BADGE_DARK160_FORMAT, gfx_badge_dark160, GFX_BADGE_DARK160_BYTES);
-
-    qp_line(lcd, 60, 130, 240 - 60, 130, HSV_BLUE);
-    qp_rect(lcd, 20, 20, 120, 100, HSV_RED, true);
-    qp_rect(lcd, 20, 20, 120, 100, HSV_WHITE, false);
-
-    qp_power(lcd, true);
 
     // Turn on the backlight
     backlight_enable();
     backlight_level(BACKLIGHT_LEVELS);
+
+    // Turn on the LCD
+    qp_power(lcd, true);
+
+    // Test drawing
+    qp_line(lcd, 60, 130, 240 - 60, 130, HSV_BLUE);
+    qp_rect(lcd, 20, 20, 120, 100, HSV_RED, true);
+    qp_rect(lcd, 20, 20, 120, 100, HSV_WHITE, false);
+    qp_drawimage(lcd, (240 - GFX_BADGE_DARK_160PX_4BPP_WIDTH) / 2, 320 - GFX_BADGE_DARK_160PX_4BPP_HEIGHT, GFX_BADGE_DARK_160PX_4BPP_WIDTH, GFX_BADGE_DARK_160PX_4BPP_HEIGHT, GFX_BADGE_DARK_160PX_4BPP_FORMAT, gfx_badge_dark_160px_4bpp, GFX_BADGE_DARK_160PX_4BPP_BYTES);
 }

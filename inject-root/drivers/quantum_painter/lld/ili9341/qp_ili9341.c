@@ -202,7 +202,7 @@ static inline void lcd_send_mono_pixdata(ili9341_painter_device_t *lcd, uint8_t 
         uint16_t  transmit_pixels = remaining_pixels < max_transmit_pixels ? remaining_pixels : max_transmit_pixels;
         uint16_t *target16        = (uint16_t *)buf;
         for (uint16_t p = 0; p < transmit_pixels; p += pixels_per_byte) {
-            uint8_t pixval = *pixdata;
+            uint8_t pixval      = *pixdata;
             uint8_t loop_pixels = remaining_pixels < pixels_per_byte ? remaining_pixels : pixels_per_byte;
             for (uint8_t q = 0; q < loop_pixels; ++q) {
                 *target16++ = lookup_table[pixval & pixel_bitmask];

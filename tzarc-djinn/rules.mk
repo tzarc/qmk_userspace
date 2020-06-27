@@ -49,5 +49,4 @@ VPATH += \
 SRC += \
 	spi_master.c \
 	qp_common.c \
-	qp_luts.c \
 	qp_ili9341.c

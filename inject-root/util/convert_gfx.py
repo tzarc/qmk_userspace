@@ -133,74 +133,6 @@ def image_to_rgb565(im):
     return rgb565array
 
 """
-Generate the lookup table for bytes consisting of packed monochrome 4bpp/2bpp pixels
-"""
-def generate_lookup_tables(output_filename):
-    print("Generating lookup tables for pixels as %s.c/.h" % (output_filename))
-    source_filename = "%s.c" % (output_filename)
-    header_filename = "%s.h" % (output_filename)
-
-    description4bpp = """
-  * This lookup table handles the conversion from a single 4bpp mono pixel, to a 16-bit rgb565 format pixels used natively by the TFT.
-  * Each 4-bit pixel expands to the equivalent value:
-  *   - The range of value in a 4-bit integer is [0,15]
-  *   - Equivalent on-screen brightness translates to a linear interpolation of 16 steps between 0% brightness to 100% brightness
-  *   - Each channel in the resulting rgb565 pixel needs corresponding brightness values as they're monochrome
-  * This table matches a single nibble of each byte specified in the pixel data
-"""
-
-    description2bpp = """
-  * This lookup table handles the conversion from a pair of 2bpp mono pixels, to a pair of 16-bit rgb565 format pixels used natively by the TFT.
-  * Each 2-bit pixel expands to the equivalent value:
-  *   - The range of value in a 2-bit integer is [0,3]
-  *   - Equivalent on-screen brightness translates to "off", "33% bright", "66% bright", "100% bright"
-  *   - Each channel in the resulting rgb565 pixel needs corresponding brightness values as they're monochrome
-  *   - For B and R, 5-bit, this corresponds to 0, 10, 20, 31
-  *   - For G, 6-bit, this corresponds to 0, 21, 42, 63
-  *   - Fully composed as bitmasks, this results in pixel values of 0x0000, 0x52AA, 0xA554, 0xFFFF
-  * This table matches a single nibble of each byte specified in the pixel data, i.e. a pair of pixels:
-  *   - Two 2-bit pixels at a time means the result is a pair of two 16-bit rgb565 pixels -- a single uint32_t is used to describe both in one value
-"""
-
-    # Generate the C source file
-    source_file = open(source_filename, "w")
-    source_file.write(fileHeader)
-    source_file.write("#include \"%s\"\n\n" % (header_filename))
-    source_file.write("// clang-format off\n\n")
-    source_file.write("/**%s  */\n\n" % (description4bpp))
-    source_file.write("const uint16_t mono4bpp_rgb565_lookup[16] = {")
-    for n in range(0,16):
-        if not(n % 4):
-            source_file.write("\n   ")
-        a = int(n * 255.0 / 15.0)
-        a565 = socket.htons(rgb888_to_rgb565(a, a, a))
-        source_file.write(" 0x%04X /* %3d */," % (a565, a))
-    source_file.write("\n};\n\n")
-
-    source_file.write("/**%s  */\n\n" % (description2bpp))
-    source_file.write("const uint32_t mono2bpp_rgb565_lookup[16] = {")
-    for n in range(0,16):
-        if not(n % 4):
-            source_file.write("\n   ")
-        a = int(((n >> 2) & 0x3) * 255.0 / 3.0)
-        b = int(((n >> 0) & 0x3) * 255.0 / 3.0)
-        a888 = rgb888_to_rgb565(a, a, a)
-        a565 = socket.htons(a888)
-        b888 = rgb888_to_rgb565(b, b, b)
-        b565 = socket.htons(b888)
-        source_file.write(" 0x%04X%04X /* %3d, %3d */," % (a565,b565,a,b))
-    source_file.write("\n};\n\n")
-    source_file.write("// clang-format on\n")
-
-    # Generate the C header file
-    header_file = open(header_filename, "w")
-    header_file.write(fileHeader)
-    header_file.write("#pragma once\n\n")
-    header_file.write("#include <stdint.h>\n\n")
-    header_file.write("extern const uint16_t mono4bpp_rgb565_lookup[16];\n")
-    header_file.write("extern const uint32_t mono2bpp_rgb565_lookup[16];\n")
-
-"""
 Measure the size of an image and return the coordinates of the (left, upper, right, lower) bounding box
 """
 def measure(im, border=(0,0,0,0)):
@@ -305,8 +237,6 @@ def main():
 
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-i',  '--image-file',   type=str, help="The image file to use")
-    group.add_argument('-l',  '--lookup-table',           help="Generate the lookup table", dest="lookup_table", action="store_true")
-    group.set_defaults(lookup_table=False)
 
     args, unknown = parser.parse_known_args()
 
@@ -318,10 +248,6 @@ def main():
             sys.exit(1)
 
         convert_graphic_to_c(args.image_file, args.output, args.fmt_rgb565, args.fmt_4bpp, args.fmt_2bpp, args.fmt_1bpp)
-
-    elif args.lookup_table:
-
-        generate_lookup_tables(args.output)
 
 if __name__ == "__main__":
     main()
