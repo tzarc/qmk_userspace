@@ -107,11 +107,11 @@ bool qp_rect(painter_device_t device, uint16_t left, uint16_t top, uint16_t righ
     return true;
 }
 
-bool qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, uint16_t w, uint16_t h, const void *pixel_data, uint32_t byte_count) {
+bool qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, uint16_t w, uint16_t h, painter_image_format_t format, const void *pixel_data, uint32_t byte_count) {
     // If the driver has an optimised implementation of line drawing, offload to the driver
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
     if (driver->drawimage) {
-        painter_lld_status_t status = driver->drawimage(device, x, y, w, h, pixel_data, byte_count);
+        painter_lld_status_t status = driver->drawimage(device, x, y, w, h, format, pixel_data, byte_count);
         switch (status) {
             case DRIVER_SUCCESS:
                 return true;
@@ -122,6 +122,7 @@ bool qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, uint16_t w, u
         }
     }
 
+    // If the driver doesn't want to handle it... we have no idea what format the display expects, so assume that the input data is native to the display.
     if (DRIVER_SUCCESS != qp_viewport(device, x, y, x + w - 1, y + h - 1)) return false;
     if (DRIVER_SUCCESS != qp_pixdata(device, pixel_data, byte_count)) return false;
     return true;

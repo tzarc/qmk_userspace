@@ -30,7 +30,7 @@ typedef painter_lld_status_t (*painter_driver_pixdata_func)(painter_device_t dri
 typedef painter_lld_status_t (*painter_driver_setpixel_func)(painter_device_t driver, uint16_t x, uint16_t y, uint8_t hue, uint8_t sat, uint8_t val);
 typedef painter_lld_status_t (*painter_driver_line_func)(painter_device_t driver, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t hue, uint8_t sat, uint8_t val);
 typedef painter_lld_status_t (*painter_driver_rect_func)(painter_device_t driver, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t hue, uint8_t sat, uint8_t val, bool filled);
-typedef painter_lld_status_t (*painter_driver_drawimage_func)(painter_device_t device, uint16_t x, uint16_t y, uint16_t w, uint16_t h, const void *pixel_data, uint32_t byte_count);
+typedef painter_lld_status_t (*painter_driver_drawimage_func)(painter_device_t device, uint16_t x, uint16_t y, uint16_t w, uint16_t h, painter_image_format_t format, const void *pixel_data, uint32_t byte_count);
 
 struct painter_driver_t {
     painter_driver_init_func      init;

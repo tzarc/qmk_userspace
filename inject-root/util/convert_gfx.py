@@ -101,14 +101,14 @@ def image_to_mono1bpp(im):
     mono1array = []
     for x in range(int(image_bytes_len / 8)):
         mono1array.append(
-            rescale(image_bytes[x*8+7], 255) << 7 |
-            rescale(image_bytes[x*8+6], 255) << 6 |
-            rescale(image_bytes[x*8+5], 255) << 5 |
-            rescale(image_bytes[x*8+4], 255) << 4 |
-            rescale(image_bytes[x*8+3], 255) << 3 |
-            rescale(image_bytes[x*8+2], 255) << 2 |
-            rescale(image_bytes[x*8+1], 255) << 1 |
-            rescale(image_bytes[x*8+0], 255))
+            rescale(image_bytes[x*8+7], 1) << 7 |
+            rescale(image_bytes[x*8+6], 1) << 6 |
+            rescale(image_bytes[x*8+5], 1) << 5 |
+            rescale(image_bytes[x*8+4], 1) << 4 |
+            rescale(image_bytes[x*8+3], 1) << 3 |
+            rescale(image_bytes[x*8+2], 1) << 2 |
+            rescale(image_bytes[x*8+1], 1) << 1 |
+            rescale(image_bytes[x*8+0], 1))
 
     return mono1array
 
@@ -223,12 +223,16 @@ def convert_graphic_to_c(graphic_fname, output_filename, fmt_rgb565, fmt_4bpp, f
     # Convert image to rgb565 byte list
     if fmt_rgb565:
         graphic_data = image_to_rgb565(graphic_image)
+        newline_counter = int(width * 2)
     elif fmt_4bpp:
         graphic_data = image_to_mono4bpp(graphic_image)
+        newline_counter = int(width / 2)
     elif fmt_2bpp:
         graphic_data = image_to_mono2bpp(graphic_image)
+        newline_counter = int(width / 4)
     elif fmt_1bpp:
         graphic_data = image_to_mono1bpp(graphic_image)
+        newline_counter = int(width / 8)
 
     # Generate the output filenames
     gfx_source_filename = "gfx-%s.c" % (output_filename)
@@ -247,11 +251,11 @@ def convert_graphic_to_c(graphic_fname, output_filename, fmt_rgb565, fmt_4bpp, f
     gfx_source_file.write("const uint8_t gfx_%s[%d] = {\n " % (sane_name, len(graphic_data)))
     count = 0
     for j in graphic_data:
-        gfx_source_file.write (" 0x{0:02X}".format(j))
+        gfx_source_file.write (" 0b{0:08b}".format(j))
         count += 1
         if count < len(graphic_data):
             gfx_source_file.write(",")
-            if not (count % 16): # Place a new line every 16 values
+            if (count % newline_counter) == 0: # Place a new line when we reach the same number of pixels as each row
                 gfx_source_file.write("\n ")
     gfx_source_file.write("\n};\n\n")
     gfx_source_file.write("// clang-format on\n")
@@ -272,13 +276,13 @@ def convert_graphic_to_c(graphic_fname, output_filename, fmt_rgb565, fmt_4bpp, f
     gfx_header_file.write("#define GFX_%s_WIDTH  %d\n" % (sane_name.upper(), width))
     gfx_header_file.write("#define GFX_%s_BYTES  %d\n" % (sane_name.upper(), len(graphic_data)))
     if fmt_rgb565:
-        gfx_header_file.write("#define GFX_%s_TYPE   IMAGE_RGB565\n\n" % (sane_name.upper()))
+        gfx_header_file.write("#define GFX_%s_FORMAT IMAGE_FORMAT_RGB565\n\n" % (sane_name.upper()))
     elif fmt_2bpp:
-        gfx_header_file.write("#define GFX_%s_TYPE   IMAGE_MONO2BPP\n\n" % (sane_name.upper()))
+        gfx_header_file.write("#define GFX_%s_FORMAT IMAGE_FORMAT_MONO2BPP\n\n" % (sane_name.upper()))
     elif fmt_4bpp:
-        gfx_header_file.write("#define GFX_%s_TYPE   IMAGE_MONO4BPP\n\n" % (sane_name.upper()))
+        gfx_header_file.write("#define GFX_%s_FORMAT IMAGE_FORMAT_MONO4BPP\n\n" % (sane_name.upper()))
     elif fmt_1bpp:
-        gfx_header_file.write("#define GFX_%s_TYPE   IMAGE_MONO1BPP\n\n" % (sane_name.upper()))
+        gfx_header_file.write("#define GFX_%s_FORMAT IMAGE_FORMAT_MONO1BPP\n\n" % (sane_name.upper()))
 
     gfx_header_file.write("extern const uint8_t gfx_%s[%d];\n\n" % (sane_name, len(graphic_data)))
     gfx_header_file.write("// clang-format on\n")

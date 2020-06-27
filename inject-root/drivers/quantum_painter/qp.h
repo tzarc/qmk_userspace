@@ -19,6 +19,7 @@
 ///////////////////////////////////////////////////////////////
 // Quantum Painter types
 typedef enum { QP_ROTATION_0, QP_ROTATION_90, QP_ROTATION_180, QP_ROTATION_270 } painter_rotation_t;
+typedef enum { IMAGE_FORMAT_RAW, IMAGE_FORMAT_RGB565, IMAGE_FORMAT_MONO4BPP, IMAGE_FORMAT_MONO2BPP, IMAGE_FORMAT_MONO1BPP } painter_image_format_t;
 typedef void *painter_device_t;
 
 ///////////////////////////////////////////////////////////////
@@ -31,4 +32,4 @@ bool qp_pixdata(painter_device_t device, const void *pixel_data, uint32_t byte_c
 bool qp_setpixel(painter_device_t device, uint16_t x, uint16_t y, uint8_t hue, uint8_t sat, uint8_t val);
 bool qp_line(painter_device_t device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t hue, uint8_t sat, uint8_t val);
 bool qp_rect(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t hue, uint8_t sat, uint8_t val, bool filled);
-bool qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, uint16_t w, uint16_t h, const void *pixel_data, uint32_t byte_count);
+bool qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, uint16_t w, uint16_t h, painter_image_format_t format, const void *pixel_data, uint32_t byte_count);

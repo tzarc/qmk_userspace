@@ -18,7 +18,7 @@
 #include "qp_ili9341.h"
 #include "color.h"
 
-#include "gfx-badge-dark120.c"
+#include "gfx-badge-dark160.c"
 
 void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
 
@@ -56,7 +56,7 @@ void keyboard_post_init_kb(void) {
         qp_pixdata(lcd, pix_data, sizeof(pix_data));
     }
 
-    qp_drawimage(lcd, (240 - GFX_BADGE_DARK120_WIDTH) / 2, 320 - GFX_BADGE_DARK120_HEIGHT, GFX_BADGE_DARK120_WIDTH, GFX_BADGE_DARK120_HEIGHT, gfx_badge_dark120, GFX_BADGE_DARK120_BYTES);
+    qp_drawimage(lcd, (240 - GFX_BADGE_DARK160_WIDTH) / 2, 320 - GFX_BADGE_DARK160_HEIGHT, GFX_BADGE_DARK160_WIDTH, GFX_BADGE_DARK160_HEIGHT, GFX_BADGE_DARK160_FORMAT, gfx_badge_dark160, GFX_BADGE_DARK160_BYTES);
 
     qp_line(lcd, 60, 130, 240 - 60, 130, HSV_BLUE);
     qp_rect(lcd, 20, 20, 120, 100, HSV_RED, true);
