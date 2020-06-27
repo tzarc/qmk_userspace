@@ -182,8 +182,10 @@ static inline void populate_lookup_table(uint16_t *lookup_table, uint8_t bits_pe
     // Construct the interpolated lookup table for the supplied HSV fg/bg
     uint8_t items = 1 << bits_per_pixel;
     for (uint8_t i = 0; i < items; ++i) {
-        uint8_t  comp5  = (32 * i / items);
-        uint8_t  comp6  = (64 * i / items);
+        uint8_t comp5   = ((1 << 5) * i / (items - 1));
+        comp5           = comp5 < ((1 << 5) - 1) ? comp5 : ((1 << 5) - 1);
+        uint8_t comp6   = ((1 << 6) * i / (items - 1));
+        comp6           = comp6 < ((1 << 6) - 1) ? comp6 : ((1 << 6) - 1);
         uint16_t rgb565 = comp5 << 11 | comp6 << 5 | comp5;
         lookup_table[i] = ((rgb565 >> 8) & 0x00FF) | ((rgb565 << 8) & 0xFF00);
     }
@@ -363,8 +365,12 @@ painter_lld_status_t ili9341_qp_power(painter_device_t device, bool power_on) {
 #ifdef BACKLIGHT_PIN
     // If we're using the backlight to control the display as well, toggle that too.
     if (lcd->uses_backlight) {
-        if (power_on)
+        if (power_on) {
+            // There's a small amount of time for the LCD to get the display back on the screen -- it's all white beforehand.
+            // Delay for a small amount of time and let the LCD catch up before turning the backlight on.
+            wait_ms(20);
             backlight_enable();
+        }
         else
             backlight_disable();
     }
