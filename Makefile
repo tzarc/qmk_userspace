@@ -36,8 +36,6 @@ git-submodule: clean
 		&& git fetch --all --tags \
 		&& git reset --hard origin/$(shell cd $(ROOTDIR)/qmk_firmware && git rev-parse --abbrev-ref HEAD)
 
-rgbtobgr565: rgbtobgr565.o
-
 all: bin
 
 arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
@@ -49,7 +47,9 @@ $(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/img/decode_luts.h: $(
 	cd $(ROOTDIR)/inject-root/drivers/quantum_painter/img \
 		&& make all
 
-djinn: $(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/img/decode_luts.h
+gfx: $(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/img/decode_luts.h
+
+djinn: gfx
 
 remove_artifacts:
 	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format rgbtobgr565 rgbtobgr565.o >/dev/null 2>&1 || true

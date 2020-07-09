@@ -18,6 +18,7 @@
 #include <quantum.h>
 #include <color.h>
 #include <spi_master.h>
+#include <qp_decoder.h>
 #include "qp_ili9341.h"
 
 #if ILI9341_PIXDATA_BUFSIZE < 16
@@ -132,7 +133,7 @@ painter_lld_status_t ili9341_qp_pixdata(painter_device_t device, const void *pix
 painter_lld_status_t ili9341_qp_setpixel(painter_device_t device, uint16_t x, uint16_t y, uint8_t hue, uint8_t sat, uint8_t val);
 painter_lld_status_t ili9341_qp_line(painter_device_t device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t hue, uint8_t sat, uint8_t val);
 painter_lld_status_t ili9341_qp_rect(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t hue, uint8_t sat, uint8_t val, bool filled);
-painter_lld_status_t ili9341_qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, uint16_t w, uint16_t h, painter_image_format_t format, const void *pixel_data, uint32_t byte_count);
+painter_lld_status_t ili9341_qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, const painter_image_descriptor_t *image);
 
 static inline void lcd_start(ili9341_painter_device_t *lcd) { spi_start(lcd->chip_select_pin, false, 0, ILI9341_SPI_DIVISOR); }
 
@@ -179,7 +180,7 @@ static inline void populate_lookup_table(uint16_t *lookup_table, uint8_t bits_pe
     (void)sat_bg;
     (void)val_bg;
 
-    // Construct the interpolated lookup table for the supplied HSV fg/bg
+    // Construct the interpolated lookup table for the supplied HSV fg/bg -- for now, just greyscale
     uint8_t items = 1 << bits_per_pixel;
     for (uint8_t i = 0; i < items; ++i) {
         uint8_t comp5   = ((1 << 5) * i / (items - 1));
@@ -191,13 +192,13 @@ static inline void populate_lookup_table(uint16_t *lookup_table, uint8_t bits_pe
     }
 }
 
-static inline void lcd_send_mono_pixdata(ili9341_painter_device_t *lcd, uint8_t bits_per_pixel, uint16_t w, uint16_t h, const void *pixel_data, uint32_t byte_count) {
+static inline void lcd_send_mono_pixdata(ili9341_painter_device_t *lcd, uint8_t bits_per_pixel, uint32_t pixel_count, const void *pixel_data, uint32_t byte_count) {
     uint16_t       buf[ILI9341_PIXDATA_BUFSIZE];
     const uint8_t  pixel_bitmask       = (1 << bits_per_pixel) - 1;
     const uint8_t  pixels_per_byte     = 8 / bits_per_pixel;
-    const uint16_t max_transmit_pixels = ((ILI9341_PIXDATA_BUFSIZE / pixels_per_byte) * pixels_per_byte);
+    const uint16_t max_transmit_pixels = ((ILI9341_PIXDATA_BUFSIZE / pixels_per_byte) * pixels_per_byte);  // the number of rgb565 pixels that we can complete fit in the buffer
     const uint8_t *pixdata             = (const uint8_t *)pixel_data;
-    uint32_t       remaining_pixels    = (w * h);
+    uint32_t       remaining_pixels    = pixel_count;  // don't try to derive from byte_count, we may not use an entire byte
     uint16_t       lookup_table[16];
     populate_lookup_table(lookup_table, bits_per_pixel, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00);
     while (remaining_pixels > 0) {
@@ -370,8 +371,7 @@ painter_lld_status_t ili9341_qp_power(painter_device_t device, bool power_on) {
             // Delay for a small amount of time and let the LCD catch up before turning the backlight on.
             wait_ms(20);
             backlight_enable();
-        }
-        else
+        } else
             backlight_disable();
     }
 #endif
@@ -462,26 +462,64 @@ painter_lld_status_t ili9341_qp_rect(painter_device_t device, uint16_t left, uin
     return DRIVER_SUCCESS;
 }
 
-painter_lld_status_t ili9341_qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, uint16_t w, uint16_t h, painter_image_format_t format, const void *pixel_data, uint32_t byte_count) {
+painter_lld_status_t ili9341_qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, const painter_image_descriptor_t *image) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
 
     // Configure where we're going to be rendering to
-    lcd_viewport(lcd, x, y, x + w - 1, y + h - 1);
+    lcd_viewport(lcd, x, y, x + image->width - 1, y + image->height - 1);
 
-    // Stream data to the LCD
-    if (format == IMAGE_FORMAT_RAW || format == IMAGE_FORMAT_RGB565) {
-        // The pixel data is in the correct format already -- send it directly to the device
-        lcd_sendbuf(lcd, pixel_data, byte_count);
-    } else if (format == IMAGE_FORMAT_MONO4BPP) {
-        // Supplied pixel data is in 4bpp monochrome -- decode it to the equivalent pixel data
-        lcd_send_mono_pixdata(lcd, 4, w, h, pixel_data, byte_count);
-    } else if (format == IMAGE_FORMAT_MONO2BPP) {
-        // Supplied pixel data is in 2bpp monochrome -- decode it to the equivalent pixel data
-        lcd_send_mono_pixdata(lcd, 2, w, h, pixel_data, byte_count);
-    } else if (format == IMAGE_FORMAT_MONO1BPP) {
-        // Supplied pixel data is in 1bpp monochrome -- decode it to the equivalent pixel data
-        lcd_send_mono_pixdata(lcd, 1, w, h, pixel_data, byte_count);
+    uint32_t pixel_count = (((uint32_t)image->width) * image->height);
+    if (image->compressed) {
+        const painter_compressed_image_descriptor_t *comp_image_desc = (const painter_compressed_image_descriptor_t *)image;
+        uint8_t                                      buf[QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE];
+        for (uint16_t i = 0; i < comp_image_desc->chunk_count; ++i) {
+            // Check if we're the last chunk
+            bool last_chunk = (i == (comp_image_desc->chunk_count - 1));
+            // Work out the current chunk size
+            uint32_t compressed_size = last_chunk ? (comp_image_desc->compressed_size - comp_image_desc->chunk_offsets[i])        // last chunk
+                                                  : (comp_image_desc->chunk_offsets[i + 1] - comp_image_desc->chunk_offsets[i]);  // any other chunk
+            // Decode the image data
+            uint32_t decompressed_size = qp_decode(&comp_image_desc->compressed_data[comp_image_desc->chunk_offsets[i]], compressed_size, buf, sizeof(buf));
+
+            // Stream data to the LCD
+            if (image->image_format == IMAGE_FORMAT_RAW || image->image_format == IMAGE_FORMAT_RGB565) {
+                // The pixel data is in the correct format already -- send it directly to the device
+                lcd_sendbuf(lcd, buf, decompressed_size);
+                pixel_count -= decompressed_size / 2;
+            } else if (image->image_format == IMAGE_FORMAT_MONO4BPP) {
+                // Supplied pixel data is in 4bpp monochrome -- decode it to the equivalent pixel data
+                uint32_t pixels_this_loop = last_chunk ? pixel_count : (comp_image_desc->chunk_size * 8 / 4);
+                lcd_send_mono_pixdata(lcd, 4, pixels_this_loop, buf, decompressed_size);
+                pixel_count -= pixels_this_loop;
+            } else if (image->image_format == IMAGE_FORMAT_MONO2BPP) {
+                // Supplied pixel data is in 2bpp monochrome -- decode it to the equivalent pixel data
+                uint32_t pixels_this_loop = last_chunk ? pixel_count : (comp_image_desc->chunk_size * 8 / 2);
+                lcd_send_mono_pixdata(lcd, 2, pixels_this_loop, buf, decompressed_size);
+                pixel_count -= pixels_this_loop;
+            } else if (image->image_format == IMAGE_FORMAT_MONO1BPP) {
+                // Supplied pixel data is in 1bpp monochrome -- decode it to the equivalent pixel data
+                uint32_t pixels_this_loop = last_chunk ? pixel_count : (comp_image_desc->chunk_size * 8 / 1);
+                lcd_send_mono_pixdata(lcd, 1, pixels_this_loop, buf, decompressed_size);
+                pixel_count -= pixels_this_loop;
+            }
+        }
+    } else {
+        const painter_raw_image_descriptor_t *raw_image_desc = (const painter_raw_image_descriptor_t *)image;
+        // Stream data to the LCD
+        if (image->image_format == IMAGE_FORMAT_RAW || image->image_format == IMAGE_FORMAT_RGB565) {
+            // The pixel data is in the correct format already -- send it directly to the device
+            lcd_sendbuf(lcd, raw_image_desc->image_data, raw_image_desc->byte_count);
+        } else if (image->image_format == IMAGE_FORMAT_MONO4BPP) {
+            // Supplied pixel data is in 4bpp monochrome -- decode it to the equivalent pixel data
+            lcd_send_mono_pixdata(lcd, 4, pixel_count, raw_image_desc->image_data, raw_image_desc->byte_count);
+        } else if (image->image_format == IMAGE_FORMAT_MONO2BPP) {
+            // Supplied pixel data is in 2bpp monochrome -- decode it to the equivalent pixel data
+            lcd_send_mono_pixdata(lcd, 2, pixel_count, raw_image_desc->image_data, raw_image_desc->byte_count);
+        } else if (image->image_format == IMAGE_FORMAT_MONO1BPP) {
+            // Supplied pixel data is in 1bpp monochrome -- decode it to the equivalent pixel data
+            lcd_send_mono_pixdata(lcd, 1, pixel_count, raw_image_desc->image_data, raw_image_desc->byte_count);
+        }
     }
 
     lcd_stop();
@@ -491,7 +529,7 @@ painter_lld_status_t ili9341_qp_drawimage(painter_device_t device, uint16_t x, u
 
 ili9341_painter_device_t drivers[ILI9341_NUM_DEVICES] = {0};
 
-painter_device_t *qp_make_ili9341_device(pin_t chip_select_pin, pin_t data_pin, pin_t reset_pin, bool uses_backlight) {
+painter_device_t qp_make_ili9341_device(pin_t chip_select_pin, pin_t data_pin, pin_t reset_pin, bool uses_backlight) {
     for (uint32_t i = 0; i < ILI9341_NUM_DEVICES; ++i) {
         ili9341_painter_device_t *driver = &drivers[i];
         memset(driver, 0, sizeof(ili9341_painter_device_t));

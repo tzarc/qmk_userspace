@@ -42,11 +42,14 @@ AUDIO_ENABLE = no
 
 VPATH += \
 	drivers/quantum_painter \
+	drivers/quantum_painter/3rdparty \
 	drivers/quantum_painter/img \
 	drivers/quantum_painter/lld/common \
 	drivers/quantum_painter/lld/ili9341
 
 SRC += \
 	spi_master.c \
+	lzf_d.c \
 	qp_common.c \
+	qp_decoder.c \
 	qp_ili9341.c

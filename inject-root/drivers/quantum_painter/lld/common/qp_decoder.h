@@ -16,18 +16,10 @@
 
 #pragma once
 
-#include "qp_common.h"
+#include <qp.h>
 
-#ifndef ILI9341_NUM_DEVICES
-#    define ILI9341_NUM_DEVICES 1
+#ifndef QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE
+#    define QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE 128
 #endif
 
-#ifndef ILI9341_SPI_DIVISOR
-#    define ILI9341_SPI_DIVISOR 8
-#endif
-
-#ifndef ILI9341_PIXDATA_BUFSIZE
-#    define ILI9341_PIXDATA_BUFSIZE 32
-#endif
-
-painter_device_t qp_make_ili9341_device(pin_t chip_select_pin, pin_t data_pin, pin_t reset_pin, bool uses_backlight);
+uint32_t qp_decode(const void* const input_buffer, const uint32_t input_size, void* output_buffer, const uint32_t output_size);

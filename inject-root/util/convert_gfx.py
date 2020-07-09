@@ -6,6 +6,7 @@ import sys
 import os
 import socket
 import re
+import lzf
 try:
     from PIL import Image
     from PIL import ImageDraw
@@ -144,10 +145,16 @@ def measure(im, border=(0,0,0,0)):
 """
 Convert the specified font to a pair of .c/.h C language lookup tables in BGR565 format
 """
-def convert_graphic_to_c(graphic_fname, output_filename, fmt_rgb565, fmt_4bpp, fmt_2bpp, fmt_1bpp):
+def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fmt_rgb565, fmt_4bpp, fmt_2bpp, fmt_1bpp):
     print("Converting %s to gfx-%s.c/h" % (graphic_fname, output_filename))
     sane_name = re.sub(r"[^a-zA-Z0-9]", "_", output_filename)
     graphic_image = Image.open(graphic_fname)
+
+    if compress == True:
+        if chunksize < 64:
+            raise Exception("Chunk size must be >= 64")
+        if chunksize > 512:
+            raise Exception("Chunk size must be <= 512")
 
     # Get image dimensions
     (width, height) = graphic_image.size
@@ -156,15 +163,23 @@ def convert_graphic_to_c(graphic_fname, output_filename, fmt_rgb565, fmt_4bpp, f
     if fmt_rgb565:
         graphic_data = image_to_rgb565(graphic_image)
         newline_counter = int(width * 2)
+        image_format = "IMAGE_FORMAT_RGB565"
+        format_name = "rgb565"
     elif fmt_4bpp:
         graphic_data = image_to_mono4bpp(graphic_image)
         newline_counter = int(width / 2)
+        image_format = "IMAGE_FORMAT_MONO4BPP"
+        format_name = "4bpp"
     elif fmt_2bpp:
         graphic_data = image_to_mono2bpp(graphic_image)
         newline_counter = int(width / 4)
+        image_format = "IMAGE_FORMAT_MONO2BPP"
+        format_name = "2bpp"
     elif fmt_1bpp:
         graphic_data = image_to_mono1bpp(graphic_image)
         newline_counter = int(width / 8)
+        image_format = "IMAGE_FORMAT_MONO1BPP"
+        format_name = "1bpp"
 
     # Generate the output filenames
     gfx_source_filename = "gfx-%s.c" % (output_filename)
@@ -176,60 +191,109 @@ def convert_graphic_to_c(graphic_fname, output_filename, fmt_rgb565, fmt_4bpp, f
 
     gfx_source_file.write("/* generated from %s */\n\n" % (graphic_fname))
 
-    gfx_source_file.write("#include \"%s\"\n\n" % (gfx_header_filename))
+    gfx_source_file.write("#include <stdint.h>\n")
+    gfx_source_file.write("#include <qp.h>\n")
+    gfx_source_file.write("#include <qp_common.h>\n\n")
     gfx_source_file.write("// clang-format off\n\n")
 
-    # Generate image data lookup table
-    gfx_source_file.write("const uint8_t gfx_%s[%d] = {\n " % (sane_name, len(graphic_data)))
-    count = 0
-    for j in graphic_data:
-        gfx_source_file.write (" 0b{0:08b}".format(j))
-        count += 1
-        if count < len(graphic_data):
-            gfx_source_file.write(",")
-            if (count % newline_counter) == 0: # Place a new line when we reach the same number of pixels as each row
-                gfx_source_file.write("\n ")
-    gfx_source_file.write("\n};\n\n")
+    if compress == True:
+        compressed_data = []
+        compressed_chunk_offsets = []
+        uncompressed_graphic_data = graphic_data.copy()
+        while len(uncompressed_graphic_data) > 0:
+            chunk_size = min(chunksize,len(uncompressed_graphic_data))
+            uncompressed_chunk = uncompressed_graphic_data[0:chunk_size]
+            uncompressed_graphic_data = uncompressed_graphic_data[chunk_size:]
+            compressed = lzf.compress(bytes(uncompressed_chunk), int(len(uncompressed_chunk)*2))
+            compressed_chunk_offsets.append((len(compressed_data),len(compressed))) # keep track of where this chunk starts
+            compressed_data.extend(compressed)
+
+        # Write out the compressed chunk offsets
+        gfx_source_file.write("const uint32_t gfx_%s_chunk_offsets[%d] = {\n" % (sane_name, len(compressed_chunk_offsets)))
+        for n in range(0,len(compressed_chunk_offsets)):
+            gfx_source_file.write("  %4d,  // chunk %-4d // compressed size: %4d / %6.2f%%\n" % (compressed_chunk_offsets[n][0], n, compressed_chunk_offsets[n][1], (100*compressed_chunk_offsets[n][1]/chunksize)))
+        gfx_source_file.write("};\n\n")
+
+        # Write out the compressed chunk data
+        gfx_source_file.write("static const uint8_t gfx_%s_chunk_data[%d] = {\n " % (sane_name, len(compressed_data)))
+        count = 0
+        for j in compressed_data:
+            gfx_source_file.write(" 0x{0:02X}".format(j))
+            count += 1
+            if count < len(compressed_data):
+                gfx_source_file.write(",")
+                if (count % 32) == 0: # Place a new line when we reach the same number of pixels as each row
+                    gfx_source_file.write("\n ")
+        gfx_source_file.write("\n};\n\n")
+
+        # Write out the image descriptor
+        gfx_source_file.write("const painter_compressed_image_descriptor_t gfx_%s_compressed = {" % (sane_name))
+        gfx_source_file.write("\n  .base = {")
+        gfx_source_file.write("\n    .image_format = %s," % (image_format))
+        gfx_source_file.write("\n    .compressed   = true,")
+        gfx_source_file.write("\n    .width        = %d," % (width))
+        gfx_source_file.write("\n    .height       = %d" % (height))
+        gfx_source_file.write("\n  },")
+        gfx_source_file.write("\n  .chunk_count     = %d," % (len(compressed_chunk_offsets)))
+        gfx_source_file.write("\n  .chunk_size      = %d," % (chunksize))
+        gfx_source_file.write("\n  .chunk_offsets   = gfx_%s_chunk_offsets," % (sane_name))
+        gfx_source_file.write("\n  .compressed_data = gfx_%s_chunk_data," % (sane_name))
+        gfx_source_file.write("\n  .compressed_size = %d  // original = %d bytes (%s) / %6.2f%% of original // rgb24 = %d bytes / %6.2f%% of rgb24" % (len(compressed_data), len(graphic_data), format_name, (100*len(compressed_data)/len(graphic_data)), (3*width*height), (100*len(compressed_data)/(3*width*height))))
+        gfx_source_file.write("\n};\n\n")
+        gfx_source_file.write("painter_image_t gfx_%s = (painter_image_t)&gfx_%s_compressed;\n\n" % (sane_name, sane_name))
+
+    else:
+        # Generate image data lookup table
+        gfx_source_file.write("static const uint8_t gfx_%s_data[%d] = {\n " % (sane_name, len(graphic_data)))
+        count = 0
+        for j in graphic_data:
+            gfx_source_file.write(" 0b{0:08b}".format(j))
+            count += 1
+            if count < len(graphic_data):
+                gfx_source_file.write(",")
+                if (count % newline_counter) == 0: # Place a new line when we reach the same number of pixels as each row
+                    gfx_source_file.write("\n ")
+        gfx_source_file.write("\n};\n\n")
+
+        # Write out the image descriptor
+        gfx_source_file.write("const painter_raw_image_descriptor_t gfx_%s_raw = {" % (sane_name))
+        gfx_source_file.write("\n  .base = {")
+        gfx_source_file.write("\n    .image_format = %s," % (image_format))
+        gfx_source_file.write("\n    .compressed   = false,")
+        gfx_source_file.write("\n    .width        = %d," % (width))
+        gfx_source_file.write("\n    .height       = %d" % (height))
+        gfx_source_file.write("\n  },")
+        gfx_source_file.write("\n  .byte_count   = %d," % (len(graphic_data)))
+        gfx_source_file.write("\n  .image_data   = gfx_%s_data," % (sane_name))
+        gfx_source_file.write("\n};\n\n")
+        gfx_source_file.write("painter_image_t gfx_%s = (painter_image_t)&gfx_%s_raw;\n\n" % (sane_name, sane_name))
+
     gfx_source_file.write("// clang-format on\n")
     gfx_source_file.close()
 
     # Generate the C header file
     gfx_header_file = open(gfx_header_filename, "w")
     gfx_header_file.write(fileHeader)
-
     gfx_header_file.write("/* generated from %s */\n\n" % (graphic_fname))
-
     gfx_header_file.write("#pragma once\n\n")
-    gfx_header_file.write("// clang-format off\n\n")
-
-    gfx_header_file.write("#include <stdint.h>\n\n")
-
-    gfx_header_file.write("#define GFX_%s_HEIGHT %d\n" % (sane_name.upper(), height))
-    gfx_header_file.write("#define GFX_%s_WIDTH  %d\n" % (sane_name.upper(), width))
-    gfx_header_file.write("#define GFX_%s_BYTES  %d\n" % (sane_name.upper(), len(graphic_data)))
-    if fmt_rgb565:
-        gfx_header_file.write("#define GFX_%s_FORMAT IMAGE_FORMAT_RGB565\n\n" % (sane_name.upper()))
-    elif fmt_2bpp:
-        gfx_header_file.write("#define GFX_%s_FORMAT IMAGE_FORMAT_MONO2BPP\n\n" % (sane_name.upper()))
-    elif fmt_4bpp:
-        gfx_header_file.write("#define GFX_%s_FORMAT IMAGE_FORMAT_MONO4BPP\n\n" % (sane_name.upper()))
-    elif fmt_1bpp:
-        gfx_header_file.write("#define GFX_%s_FORMAT IMAGE_FORMAT_MONO1BPP\n\n" % (sane_name.upper()))
-
-    gfx_header_file.write("extern const uint8_t gfx_%s[%d];\n\n" % (sane_name, len(graphic_data)))
-    gfx_header_file.write("// clang-format on\n")
+    gfx_header_file.write("#include <qp.h>\n\n")
+    gfx_header_file.write("extern painter_image_t gfx_%s;\n" % (sane_name))
     gfx_header_file.close()
 
 def main():
     global args
-    parser = argparse.ArgumentParser(description="Convert images to 1bpp or 2bpp for QMK Firmware's quantum_painter")
-    parser.add_argument('-o',  '--output',       type=str, required=True, help="The output file name")
+    parser = argparse.ArgumentParser(description="Convert images to RGB565, 1bpp, 2bpp, or 4bpp for QMK Firmware's quantum_painter")
+    parser.add_argument('-o',  '--output',       help="The output file name",             type=str,  required=True)
+    parser.add_argument('-c',  '--compress',     help="Compresses the output using LZF",             dest="compress",   action="store_true")
+    parser.add_argument('-k',  '--chunk-size',   help="The compression chunk size",       type=int,  dest="chunksize")
+    parser.set_defaults(compress=False)
+    parser.set_defaults(chunksize=128)
 
     group_fmt = parser.add_mutually_exclusive_group(required=True)
-    group_fmt.add_argument('-r',  '--rgb565', help="Output format of RGB565", dest="fmt_rgb565", action="store_true")
-    group_fmt.add_argument('-4',  '--4bpp', help="Output format of monochrome 4bpp", dest="fmt_4bpp", action="store_true")
-    group_fmt.add_argument('-2',  '--2bpp', help="Output format of monochrome 2bpp", dest="fmt_2bpp", action="store_true")
-    group_fmt.add_argument('-1',  '--1bpp', help="Output format of monochrome 1bpp", dest="fmt_1bpp", action="store_true")
+    group_fmt.add_argument('-r',  '--rgb565',    help="Output format of RGB565",          dest="fmt_rgb565", action="store_true")
+    group_fmt.add_argument('-4',  '--4bpp',      help="Output format of monochrome 4bpp", dest="fmt_4bpp",   action="store_true")
+    group_fmt.add_argument('-2',  '--2bpp',      help="Output format of monochrome 2bpp", dest="fmt_2bpp",   action="store_true")
+    group_fmt.add_argument('-1',  '--1bpp',      help="Output format of monochrome 1bpp", dest="fmt_1bpp",   action="store_true")
     group_fmt.set_defaults(fmt_rgb565=False)
     group_fmt.set_defaults(fmt_4bpp=False)
     group_fmt.set_defaults(fmt_2bpp=False)
@@ -247,7 +311,7 @@ def main():
             print("Can't find file %s" % (args.image_file))
             sys.exit(1)
 
-        convert_graphic_to_c(args.image_file, args.output, args.fmt_rgb565, args.fmt_4bpp, args.fmt_2bpp, args.fmt_1bpp)
+        convert_graphic_to_c(args.image_file, args.output, args.compress, args.chunksize, args.fmt_rgb565, args.fmt_4bpp, args.fmt_2bpp, args.fmt_1bpp)
 
 if __name__ == "__main__":
     main()

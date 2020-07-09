@@ -17,6 +17,7 @@
 #include <quantum.h>
 #include <color.h>
 #include "qp_common.h"
+#include "qp_decoder.h"
 
 bool qp_init(painter_device_t device, painter_rotation_t rotation) {
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
@@ -107,11 +108,11 @@ bool qp_rect(painter_device_t device, uint16_t left, uint16_t top, uint16_t righ
     return true;
 }
 
-bool qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, uint16_t w, uint16_t h, painter_image_format_t format, const void *pixel_data, uint32_t byte_count) {
+bool qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, painter_image_t image) {
     // If the driver has an optimised implementation of line drawing, offload to the driver
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
     if (driver->drawimage) {
-        painter_lld_status_t status = driver->drawimage(device, x, y, w, h, format, pixel_data, byte_count);
+        painter_lld_status_t status = driver->drawimage(device, x, y, image);
         switch (status) {
             case DRIVER_SUCCESS:
                 return true;
@@ -123,7 +124,28 @@ bool qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, uint16_t w, u
     }
 
     // If the driver doesn't want to handle it... we have no idea what format the display expects, so assume that the input data is native to the display.
-    if (DRIVER_SUCCESS != qp_viewport(device, x, y, x + w - 1, y + h - 1)) return false;
-    if (DRIVER_SUCCESS != qp_pixdata(device, pixel_data, byte_count)) return false;
+    const painter_image_descriptor_t *image_desc = (const painter_image_descriptor_t *)image;
+    if (image_desc->compressed) {
+        const painter_compressed_image_descriptor_t *comp_image_desc = (const painter_compressed_image_descriptor_t *)image;
+        uint8_t                                      buf[QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE];
+        if (DRIVER_SUCCESS != qp_viewport(device, x, y, x + image_desc->width - 1, y + image_desc->height - 1)) return false;
+        for (uint16_t i = 0; i < comp_image_desc->chunk_count; ++i) {
+            // Check if we're the last chunk
+            bool last_chunk = (i == (comp_image_desc->chunk_count - 1));
+            // Work out the current chunk size
+            uint32_t compressed_size = last_chunk ? (comp_image_desc->compressed_size - comp_image_desc->chunk_offsets[i])        // last chunk
+                                                  : (comp_image_desc->chunk_offsets[i + 1] - comp_image_desc->chunk_offsets[i]);  // any other chunk
+            // Decode the image data
+            uint32_t decompressed_size = qp_decode(&comp_image_desc->compressed_data[comp_image_desc->chunk_offsets[i]], compressed_size, buf, sizeof(buf));
+            // Send it out as native data...
+            if (DRIVER_SUCCESS != qp_pixdata(device, buf, decompressed_size)) return false;
+        }
+    } else {
+        const painter_raw_image_descriptor_t *raw_image_desc = (const painter_raw_image_descriptor_t *)image;
+        // Send it out as native data...
+        if (DRIVER_SUCCESS != qp_viewport(device, x, y, x + image_desc->width - 1, y + image_desc->height - 1)) return false;
+        if (DRIVER_SUCCESS != qp_pixdata(device, raw_image_desc->image_data, raw_image_desc->byte_count)) return false;
+    }
+
     return true;
 }

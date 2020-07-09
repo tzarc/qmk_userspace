@@ -29,7 +29,7 @@
 #define DIODE_DIRECTION ROW2COL
 
 // Matrix debugging
-#define DEBUG_MATRIX_SCAN_RATE
+// #define DEBUG_MATRIX_SCAN_RATE
 
 // Bootloader
 //#define EARLY_INIT_PERFORM_BOOTLOADER_JUMP TRUE
@@ -96,3 +96,6 @@
 #define AUDIO_PIN_ALT_AS_NEGATIVE
 #define A5_AUDIO
 #define STARTUP_SONG SONG(CAMPANELLA)
+
+// Display configuration
+#define QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE 128

@@ -14,20 +14,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <lzf.h>
+#include <qp_decoder.h>
 
-#include "qp_common.h"
-
-#ifndef ILI9341_NUM_DEVICES
-#    define ILI9341_NUM_DEVICES 1
-#endif
-
-#ifndef ILI9341_SPI_DIVISOR
-#    define ILI9341_SPI_DIVISOR 8
-#endif
-
-#ifndef ILI9341_PIXDATA_BUFSIZE
-#    define ILI9341_PIXDATA_BUFSIZE 32
-#endif
-
-painter_device_t qp_make_ili9341_device(pin_t chip_select_pin, pin_t data_pin, pin_t reset_pin, bool uses_backlight);
+uint32_t qp_decode(const void* const input_buffer, const uint32_t input_size, void* output_buffer, const uint32_t output_size) {
+    // Use LZF decompressor to decode the chunk data
+    return (uint32_t)lzf_decompress(input_buffer, input_size, output_buffer, output_size);
+}
