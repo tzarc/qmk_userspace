@@ -218,11 +218,11 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
         gfx_source_file.write("static const uint8_t gfx_%s_chunk_data[%d] = {\n " % (sane_name, len(compressed_data)))
         count = 0
         for j in compressed_data:
-            gfx_source_file.write(" 0x{0:02X}".format(j))
+            gfx_source_file.write(" 0b{0:08b}".format(j))
             count += 1
             if count < len(compressed_data):
                 gfx_source_file.write(",")
-                if (count % 32) == 0: # Place a new line when we reach the same number of pixels as each row
+                if (count % 16) == 0: # Place a new line when we reach the same number of pixels as each row
                     gfx_source_file.write("\n ")
         gfx_source_file.write("\n};\n\n")
 
@@ -230,7 +230,7 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
         gfx_source_file.write("const painter_compressed_image_descriptor_t gfx_%s_compressed = {" % (sane_name))
         gfx_source_file.write("\n  .base = {")
         gfx_source_file.write("\n    .image_format = %s," % (image_format))
-        gfx_source_file.write("\n    .compressed   = true,")
+        gfx_source_file.write("\n    .compression  = IMAGE_COMPRESSED_LZF,")
         gfx_source_file.write("\n    .width        = %d," % (width))
         gfx_source_file.write("\n    .height       = %d" % (height))
         gfx_source_file.write("\n  },")
@@ -259,7 +259,7 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
         gfx_source_file.write("const painter_raw_image_descriptor_t gfx_%s_raw = {" % (sane_name))
         gfx_source_file.write("\n  .base = {")
         gfx_source_file.write("\n    .image_format = %s," % (image_format))
-        gfx_source_file.write("\n    .compressed   = false,")
+        gfx_source_file.write("\n    .compression  = IMAGE_UNCOMPRESSED,")
         gfx_source_file.write("\n    .width        = %d," % (width))
         gfx_source_file.write("\n    .height       = %d" % (height))
         gfx_source_file.write("\n  },")

@@ -17,7 +17,7 @@
 #include <quantum.h>
 #include <color.h>
 #include "qp_common.h"
-#include "qp_decoder.h"
+#include "qp_utils.h"
 
 bool qp_init(painter_device_t device, painter_rotation_t rotation) {
     struct painter_driver_t *driver = (struct painter_driver_t *)device;
@@ -125,7 +125,7 @@ bool qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, painter_image
 
     // If the driver doesn't want to handle it... we have no idea what format the display expects, so assume that the input data is native to the display.
     const painter_image_descriptor_t *image_desc = (const painter_image_descriptor_t *)image;
-    if (image_desc->compressed) {
+    if (image_desc->compression == IMAGE_COMPRESSED_LZF) {
         const painter_compressed_image_descriptor_t *comp_image_desc = (const painter_compressed_image_descriptor_t *)image;
         uint8_t                                      buf[QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE];
         if (DRIVER_SUCCESS != qp_viewport(device, x, y, x + image_desc->width - 1, y + image_desc->height - 1)) return false;
@@ -140,7 +140,7 @@ bool qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, painter_image
             // Send it out as native data...
             if (DRIVER_SUCCESS != qp_pixdata(device, buf, decompressed_size)) return false;
         }
-    } else {
+    } else if (image_desc->compression == IMAGE_UNCOMPRESSED) {
         const painter_raw_image_descriptor_t *raw_image_desc = (const painter_raw_image_descriptor_t *)image;
         // Send it out as native data...
         if (DRIVER_SUCCESS != qp_viewport(device, x, y, x + image_desc->width - 1, y + image_desc->height - 1)) return false;

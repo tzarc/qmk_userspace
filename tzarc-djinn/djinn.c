@@ -16,6 +16,7 @@
 
 #include "djinn.h"
 #include "qp_ili9341.h"
+#include "rgblight_list.h"
 #include "color.h"
 
 #include "gfx-badge-dark_160px_4bpp.c"

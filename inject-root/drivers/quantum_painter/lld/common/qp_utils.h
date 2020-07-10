@@ -14,10 +14,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <lzf.h>
-#include <qp_decoder.h>
+#pragma once
 
-uint32_t qp_decode(const void* const input_buffer, const uint32_t input_size, void* output_buffer, const uint32_t output_size) {
-    // Use LZF decompressor to decode the chunk data
-    return (uint32_t)lzf_decompress(input_buffer, input_size, output_buffer, output_size);
-}
+#include <color.h>
+#include <qp.h>
+
+#ifndef QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE
+#    define QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE 128
+#endif
+
+uint32_t qp_decode(const void* const input_buffer, const uint32_t input_size, void* output_buffer, const uint32_t output_size);
+
+void qp_generate_colour_lookup_table(HSV* lookup_table, int16_t items, int16_t hue_fg, int16_t sat_fg, int16_t val_fg, int16_t hue_bg, int16_t sat_bg, int16_t val_bg);
+
+RGB qp_hsv_to_rgb(HSV hsv);

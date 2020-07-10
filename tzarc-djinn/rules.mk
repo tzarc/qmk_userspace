@@ -51,5 +51,5 @@ SRC += \
 	spi_master.c \
 	lzf_d.c \
 	qp_common.c \
-	qp_decoder.c \
+	qp_utils.c \
 	qp_ili9341.c

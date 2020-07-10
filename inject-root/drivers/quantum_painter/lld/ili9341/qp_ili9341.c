@@ -15,15 +15,16 @@
  */
 
 #include <string.h>
-#include <quantum.h>
 #include <color.h>
 #include <spi_master.h>
-#include <qp_decoder.h>
+#include <qp_utils.h>
 #include "qp_ili9341.h"
 
 #if ILI9341_PIXDATA_BUFSIZE < 16
 #    error ILI9341 pixel buffer size too small -- ILI9341_PIXDATA_BUFSIZE must be >= 16
 #endif
+
+#define BYTE_SWAP(x) (((x >> 8) & 0x00FF) | ((x << 8) & 0xFF00))
 
 #define ILI9341_CMD_NOP 0x00                 // No operation
 #define ILI9341_CMD_RESET 0x01               // Software reset
@@ -120,9 +121,9 @@ typedef struct ili9341_painter_device_t {
 } ili9341_painter_device_t;
 
 static inline uint16_t hsv_to_ili9341(uint8_t hue, uint8_t sat, uint8_t val) {
-    RGB      rgb    = hsv_to_rgb((HSV){hue, sat, val});
-    uint16_t rgb565 = (rgb.r >> 3) << 11 | (rgb.g >> 2) << 5 | (rgb.b >> 3);
-    return ((rgb565 >> 8) & 0x00FF) | ((rgb565 << 8) & 0xFF00);
+    RGB      rgb    = qp_hsv_to_rgb((HSV){hue, sat, val});
+    uint16_t rgb565 = (((uint16_t)rgb.r) >> 3) << 11 | (((uint16_t)rgb.g) >> 2) << 5 | (((uint16_t)rgb.b) >> 3);
+    return BYTE_SWAP(rgb565);
 }
 
 painter_lld_status_t ili9341_qp_init(painter_device_t device, painter_rotation_t rotation);
@@ -171,27 +172,6 @@ static inline void lcd_viewport(ili9341_painter_device_t *lcd, uint16_t xbegin, 
     lcd_cmd(lcd, 0x2C);  // memory write
 }
 
-static inline void populate_lookup_table(uint16_t *lookup_table, uint8_t bits_per_pixel, uint8_t hue_fg, uint8_t sat_fg, uint8_t val_fg, uint8_t hue_bg, uint8_t sat_bg, uint8_t val_bg) {
-    // TODO: Handle colour interpolation.
-    (void)hue_fg;
-    (void)sat_fg;
-    (void)val_fg;
-    (void)hue_bg;
-    (void)sat_bg;
-    (void)val_bg;
-
-    // Construct the interpolated lookup table for the supplied HSV fg/bg -- for now, just greyscale
-    uint8_t items = 1 << bits_per_pixel;
-    for (uint8_t i = 0; i < items; ++i) {
-        uint8_t comp5   = ((1 << 5) * i / (items - 1));
-        comp5           = comp5 < ((1 << 5) - 1) ? comp5 : ((1 << 5) - 1);
-        uint8_t comp6   = ((1 << 6) * i / (items - 1));
-        comp6           = comp6 < ((1 << 6) - 1) ? comp6 : ((1 << 6) - 1);
-        uint16_t rgb565 = comp5 << 11 | comp6 << 5 | comp5;
-        lookup_table[i] = ((rgb565 >> 8) & 0x00FF) | ((rgb565 << 8) & 0xFF00);
-    }
-}
-
 static inline void lcd_send_mono_pixdata(ili9341_painter_device_t *lcd, uint8_t bits_per_pixel, uint32_t pixel_count, const void *pixel_data, uint32_t byte_count) {
     uint16_t       buf[ILI9341_PIXDATA_BUFSIZE];
     const uint8_t  pixel_bitmask       = (1 << bits_per_pixel) - 1;
@@ -199,8 +179,17 @@ static inline void lcd_send_mono_pixdata(ili9341_painter_device_t *lcd, uint8_t 
     const uint16_t max_transmit_pixels = ((ILI9341_PIXDATA_BUFSIZE / pixels_per_byte) * pixels_per_byte);  // the number of rgb565 pixels that we can complete fit in the buffer
     const uint8_t *pixdata             = (const uint8_t *)pixel_data;
     uint32_t       remaining_pixels    = pixel_count;  // don't try to derive from byte_count, we may not use an entire byte
-    uint16_t       lookup_table[16];
-    populate_lookup_table(lookup_table, bits_per_pixel, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00);
+
+    // Generate the colour lookup table -- currently black->white
+    HSV      hsv_lookup_table[16];
+    uint16_t rgb565_lookup_table[16];
+    uint8_t  items = 1 << bits_per_pixel;  // number of items we need to intepolate
+    qp_generate_colour_lookup_table(hsv_lookup_table, items, 0, 0, 255, 0, 0, 0);
+    for (uint8_t i = 0; i < items; ++i) {
+        rgb565_lookup_table[i] = hsv_to_ili9341(hsv_lookup_table[i].h, hsv_lookup_table[i].s, hsv_lookup_table[i].v);
+    }
+
+    // Transmit each block of pixels
     while (remaining_pixels > 0) {
         uint16_t  transmit_pixels = remaining_pixels < max_transmit_pixels ? remaining_pixels : max_transmit_pixels;
         uint16_t *target16        = (uint16_t *)buf;
@@ -208,7 +197,7 @@ static inline void lcd_send_mono_pixdata(ili9341_painter_device_t *lcd, uint8_t 
             uint8_t pixval      = *pixdata;
             uint8_t loop_pixels = remaining_pixels < pixels_per_byte ? remaining_pixels : pixels_per_byte;
             for (uint8_t q = 0; q < loop_pixels; ++q) {
-                *target16++ = lookup_table[pixval & pixel_bitmask];
+                *target16++ = rgb565_lookup_table[pixval & pixel_bitmask];
                 pixval >>= bits_per_pixel;
             }
             ++pixdata;
@@ -470,7 +459,7 @@ painter_lld_status_t ili9341_qp_drawimage(painter_device_t device, uint16_t x, u
     lcd_viewport(lcd, x, y, x + image->width - 1, y + image->height - 1);
 
     uint32_t pixel_count = (((uint32_t)image->width) * image->height);
-    if (image->compressed) {
+    if (image->compression == IMAGE_COMPRESSED_LZF) {
         const painter_compressed_image_descriptor_t *comp_image_desc = (const painter_compressed_image_descriptor_t *)image;
         uint8_t                                      buf[QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE];
         for (uint16_t i = 0; i < comp_image_desc->chunk_count; ++i) {
@@ -504,7 +493,7 @@ painter_lld_status_t ili9341_qp_drawimage(painter_device_t device, uint16_t x, u
                 pixel_count -= pixels_this_loop;
             }
         }
-    } else {
+    } else if (image->compression == IMAGE_UNCOMPRESSED) {
         const painter_raw_image_descriptor_t *raw_image_desc = (const painter_raw_image_descriptor_t *)image;
         // Stream data to the LCD
         if (image->image_format == IMAGE_FORMAT_RAW || image->image_format == IMAGE_FORMAT_RGB565) {
