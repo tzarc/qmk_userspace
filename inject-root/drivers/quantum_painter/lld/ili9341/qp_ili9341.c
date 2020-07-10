@@ -172,7 +172,7 @@ static inline void lcd_viewport(ili9341_painter_device_t *lcd, uint16_t xbegin, 
     lcd_cmd(lcd, 0x2C);  // memory write
 }
 
-static inline void lcd_send_mono_pixdata(ili9341_painter_device_t *lcd, uint8_t bits_per_pixel, uint32_t pixel_count, const void *pixel_data, uint32_t byte_count) {
+static inline void lcd_send_mono_pixdata_recolour(ili9341_painter_device_t *lcd, uint8_t bits_per_pixel, uint32_t pixel_count, const void *pixel_data, uint32_t byte_count, int16_t hue_fg, int16_t sat_fg, int16_t val_fg, int16_t hue_bg, int16_t sat_bg, int16_t val_bg) {
     uint16_t       buf[ILI9341_PIXDATA_BUFSIZE];
     const uint8_t  pixel_bitmask       = (1 << bits_per_pixel) - 1;
     const uint8_t  pixels_per_byte     = 8 / bits_per_pixel;
@@ -180,11 +180,11 @@ static inline void lcd_send_mono_pixdata(ili9341_painter_device_t *lcd, uint8_t 
     const uint8_t *pixdata             = (const uint8_t *)pixel_data;
     uint32_t       remaining_pixels    = pixel_count;  // don't try to derive from byte_count, we may not use an entire byte
 
-    // Generate the colour lookup table -- currently black->white
+    // Generate the colour lookup table
     HSV      hsv_lookup_table[16];
     uint16_t rgb565_lookup_table[16];
     uint8_t  items = 1 << bits_per_pixel;  // number of items we need to intepolate
-    qp_generate_colour_lookup_table(hsv_lookup_table, items, 0, 0, 255, 0, 0, 0);
+    qp_generate_colour_lookup_table(hsv_lookup_table, items, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
     for (uint8_t i = 0; i < items; ++i) {
         rgb565_lookup_table[i] = hsv_to_ili9341(hsv_lookup_table[i].h, hsv_lookup_table[i].s, hsv_lookup_table[i].v);
     }
@@ -205,6 +205,11 @@ static inline void lcd_send_mono_pixdata(ili9341_painter_device_t *lcd, uint8_t 
         lcd_sendbuf(lcd, buf, transmit_pixels * sizeof(uint16_t));
         remaining_pixels -= transmit_pixels;
     }
+}
+
+static inline void lcd_send_mono_pixdata(ili9341_painter_device_t *lcd, uint8_t bits_per_pixel, uint32_t pixel_count, const void *pixel_data, uint32_t byte_count) {
+    // Default implementation is greyscale
+    lcd_send_mono_pixdata_recolour(lcd, bits_per_pixel, pixel_count, pixel_data, byte_count, 0, 0, 255, 0, 0, 0);
 }
 
 painter_lld_status_t ili9341_qp_init(painter_device_t device, painter_rotation_t rotation) {

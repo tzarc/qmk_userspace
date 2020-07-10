@@ -24,6 +24,14 @@ uint32_t qp_decode(const void* const input_buffer, const uint32_t input_size, vo
 }
 
 void qp_generate_colour_lookup_table(HSV* lookup_table, int16_t items, int16_t hue_fg, int16_t sat_fg, int16_t val_fg, int16_t hue_bg, int16_t sat_bg, int16_t val_bg) {
+    // Make sure we take the "shortest" route from one hue to the other
+    if ((hue_fg - hue_bg) >= 128) {
+        hue_bg += 256;
+    } else if ((hue_fg - hue_bg) <= -128) {
+        hue_bg -= 256;
+    }
+
+    // Interpolate each of the lookup table entries
     for (int16_t i = 0; i < items; ++i) {
         lookup_table[i].h = (uint8_t)((hue_fg - hue_bg) * i / (items - 1) + hue_bg);
         lookup_table[i].s = (uint8_t)((sat_fg - sat_bg) * i / (items - 1) + sat_bg);
