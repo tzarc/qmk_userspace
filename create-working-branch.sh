@@ -28,73 +28,78 @@ prs_to_apply+=(9471) # WS2812 DMAMUX
 
 rm -f "$script_dir"/*.patch || true
 
+pcmd() {
+    echo -e "\e[38;5;203mExecuting:\e[38;5;131m $@\e[0m"
+    "$@"
+}
+
 hard_reset() {
     local repo_upstream=$1
     local repo_name=$2
     local repo_branch=${3:-master}
-    git rebase --abort || true
-    git merge --abort || true
-    git clean -xfd
-    git checkout -- .
-    git reset --hard
-    git remote set-url origin git@github.com:tzarc/$repo_name.git
-    git remote set-url origin --push git@github.com:tzarc/$repo_name.git
-    git remote set-url upstream https://github.com/$repo_upstream/$repo_name.git
-    git remote set-url upstream --push git@github.com:tzarc/$repo_name.git
-    git fetch --all --tags --prune
-    git checkout -f $repo_branch
-    git reset --hard upstream/$repo_branch
-    git push origin $repo_branch
-    git branch -D $target_branch || true
-    git checkout -b $target_branch
-    git reset --hard upstream/$repo_branch
+    pcmd git rebase --abort || true
+    pcmd git merge --abort || true
+    pcmd git clean -xfd
+    pcmd git checkout -- .
+    pcmd git reset --hard
+    pcmd git remote set-url origin git@github.com:tzarc/$repo_name.git
+    pcmd git remote set-url origin --push git@github.com:tzarc/$repo_name.git
+    pcmd git remote set-url upstream https://github.com/$repo_upstream/$repo_name.git
+    pcmd git remote set-url upstream --push git@github.com:tzarc/$repo_name.git
+    pcmd git fetch --all --tags --prune
+    pcmd git checkout -f $repo_branch
+    pcmd git reset --hard upstream/$repo_branch
+    pcmd git push origin $repo_branch --force-with-lease
+    pcmd git branch -D $target_branch || true
+    pcmd git checkout -b $target_branch
+    pcmd git reset --hard upstream/$repo_branch
 }
 
 upgrade-chibios() {
     pushd "$script_dir/qmk_firmware/lib/chibios"
     hard_reset ChibiOS ChibiOS stable_20.3.x
-    git push origin $target_branch --set-upstream --force-with-lease
+    pcmd git push origin $target_branch --set-upstream --force-with-lease
     popd
 
     pushd "$script_dir/qmk_firmware/lib/chibios-contrib"
     hard_reset ChibiOS ChibiOS-Contrib chibios-20.3.x
-    git push origin $target_branch --set-upstream --force-with-lease
+    pcmd git push origin $target_branch --set-upstream --force-with-lease
     popd
 
     pushd "$script_dir/qmk_firmware"
-    git add lib/chibios lib/chibios-contrib
-    git commit -m 'Upgrade ChibiOS to master'
+    pcmd git add lib/chibios lib/chibios-contrib
+    pcmd git commit -m 'Upgrade ChibiOS to master'
     popd
 }
 
 upgrade-chibios-confs() {
     pushd "$script_dir"
-    make links
+    pcmd make links
     popd
 
     pushd "$script_dir/qmk_firmware"
-    ./util/chibios-upgrader.sh
-    clang-format-7 -i quantum/stm32/chconf.h
-    clang-format-7 -i quantum/stm32/halconf.h
-    clang-format-7 -i quantum/stm32/mcuconf.h
+    pcmd ./util/chibios-upgrader.sh
+    pcmd clang-format-7 -i quantum/stm32/chconf.h
+    pcmd clang-format-7 -i quantum/stm32/halconf.h
+    pcmd clang-format-7 -i quantum/stm32/mcuconf.h
     popd
 
     pushd "$script_dir"
-    make clean
+    pcmd make clean
     popd
 
     pushd "$script_dir/qmk_firmware"
-    git add -A
-    git commit -am 'Upgrade ChibiOS conf files'
+    pcmd git add -A
+    pcmd git commit -am 'Upgrade ChibiOS conf files'
     popd
 }
 
 pushd "$script_dir/qmk_firmware"
 hard_reset qmk qmk_firmware develop
-make git-submodule
-sed -i 's#qmk/ChibiOS#tzarc/ChibiOS#g' .gitmodules
-git add -A
-git commit -am "Retarget '$target_branch' to point to personal ChibiOS repositories" || true
+pcmd make git-submodule
+pcmd sed -i 's#qmk/ChibiOS#tzarc/ChibiOS#g' .gitmodules
+pcmd git add -A
+pcmd git commit -am "Retarget '$target_branch' to point to personal ChibiOS repositories" || true
 popd
 
 pushd "$script_dir"
@@ -109,8 +114,8 @@ popd
 pushd "$script_dir/qmk_firmware"
 for pr in ${prs_to_apply[@]} ; do
     echo -e "\e[38;5;203mPR $pr\e[0m"
-    hub merge https://github.com/qmk/qmk_firmware/pull/${pr}
-    git commit --amend -m "Merge qmk_firmware upstream PR ${pr}"
+    pcmd hub merge https://github.com/qmk/qmk_firmware/pull/${pr}
+    pcmd git commit --amend -m "Merge qmk_firmware upstream PR ${pr}"
 done
-git push origin $target_branch --set-upstream --force-with-lease
+pcmd git push origin $target_branch --set-upstream --force-with-lease
 popd
