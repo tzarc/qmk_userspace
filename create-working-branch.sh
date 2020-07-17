@@ -16,7 +16,7 @@ target_branch="generated-chibios-master-upgrade"
 fi
 
 declare -a prs_to_apply
-prs_to_apply+=(9471) # WS2812 DMAMUX
+prs_to_apply+=(9603) # Matrix delay
 #prs_to_apply+=(6165) # ARM audio DAC/PWM change
 #prs_to_apply+=(8778) # Dual-bank bootloader
 #prs_to_apply+=(8291) # GPT ARM backlight
@@ -47,6 +47,7 @@ hard_reset() {
     pcmd git remote set-url upstream https://github.com/$repo_upstream/$repo_name.git
     pcmd git remote set-url upstream --push git@github.com:tzarc/$repo_name.git
     pcmd git fetch --all --tags --prune
+    pcmd git fetch --unshallow upstream || true
     pcmd git checkout -f $repo_branch
     pcmd git reset --hard upstream/$repo_branch
     pcmd git push origin $repo_branch --force-with-lease

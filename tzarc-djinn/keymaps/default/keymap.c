@@ -8,7 +8,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT(
         BL_STEP, RGB_TOG, KC_TOGGLE_LCD_POWER,
         RGB_MOD, RGB_HUI, RGB_MODE_RAINBOW,
-        KC_A,    KC_B,    KC_C
+        KC_A,    KC_B,    RESET
     )
 };
 // clang-format on
