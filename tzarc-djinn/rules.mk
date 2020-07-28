@@ -40,12 +40,14 @@ VPATH += \
 	drivers/quantum_painter \
 	drivers/quantum_painter/3rdparty \
 	drivers/quantum_painter/img \
-	drivers/quantum_painter/lld/common \
+	drivers/quantum_painter/common \
+	drivers/quantum_painter/lld/fallback \
 	drivers/quantum_painter/lld/ili9341
 
 SRC += \
 	spi_master.c \
 	lzf_d.c \
-	qp_common.c \
+	qp.c \
 	qp_utils.c \
+	qp_fallback.c \
 	qp_ili9341.c

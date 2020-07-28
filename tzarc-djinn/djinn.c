@@ -39,7 +39,7 @@ void keyboard_post_init_kb(void) {
     writePinLow(RGB_POWER_ENABLE_PIN);
 
     // Initialise the LCD
-    lcd = qp_make_ili9341_device(LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, true);
+    lcd = qp_ili9341_make_device(LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, true);
     qp_init(lcd, QP_ROTATION_180);
 
 #define NUM_ROWS (320 - IMAGE->height)

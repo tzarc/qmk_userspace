@@ -19,12 +19,21 @@
 #include <color.h>
 #include <qp.h>
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Quantum Painter configurables
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #ifndef QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE
+// This value must match the chunk size used when converting images
 #    define QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE 128
 #endif
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Quantum Painter utility functions
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Decodes a compressed chunk of data
 uint32_t qp_decode(const void* const input_buffer, const uint32_t input_size, void* output_buffer, const uint32_t output_size);
 
+// Generates a colour-interpolated lookup table based off the number of items, foreground->background, for use with monochrome image rendering
 void qp_generate_colour_lookup_table(HSV* lookup_table, int16_t items, int16_t hue_fg, int16_t sat_fg, int16_t val_fg, int16_t hue_bg, int16_t sat_bg, int16_t val_bg);
-
-RGB qp_hsv_to_rgb(HSV hsv);

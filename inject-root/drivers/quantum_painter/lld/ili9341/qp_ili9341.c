@@ -17,99 +17,20 @@
 #include <string.h>
 #include <color.h>
 #include <spi_master.h>
-#include <qp_utils.h>
-#include "qp_ili9341.h"
 
-#if ILI9341_PIXDATA_BUFSIZE < 16
-#    error ILI9341 pixel buffer size too small -- ILI9341_PIXDATA_BUFSIZE must be >= 16
-#endif
+#include "qp_internal.h"
+#include "qp_utils.h"
+#include "qp_fallback.h"
+#include "qp_ili9341.h"
+#include "qp_ili9341_opcodes.h"
 
 #define BYTE_SWAP(x) (((x >> 8) & 0x00FF) | ((x << 8) & 0xFF00))
 
-#define ILI9341_CMD_NOP 0x00                 // No operation
-#define ILI9341_CMD_RESET 0x01               // Software reset
-#define ILI9341_GET_ID_INFO 0x04             // Get ID information
-#define ILI9341_GET_STATUS 0x09              // Get status
-#define ILI9341_GET_PWR_MODE 0x0A            // Get power mode
-#define ILI9341_GET_MADCTL 0x0B              // Get MADCTL
-#define ILI9341_GET_PIX_FMT 0x0C             // Get pixel format
-#define ILI9341_GET_IMG_FMT 0x0D             // Get image format
-#define ILI9341_GET_SIG_MODE 0x0E            // Get signal mode
-#define ILI9341_GET_SELF_DIAG 0x0F           // Get self-diagnostics
-#define ILI9341_CMD_SLEEP_ON 0x10            // Enter sleep mode
-#define ILI9341_CMD_SLEEP_OFF 0x11           // Exist sleep mode
-#define ILI9341_CMD_PARTIAL_ON 0x12          // Enter partial mode
-#define ILI9341_CMD_PARTIAL_OFF 0x13         // Exit partial mode
-#define ILI9341_CMD_INVERT_ON 0x20           // Enter inverted mode
-#define ILI9341_CMD_INVERT_OFF 0x21          // Exit inverted mode
-#define ILI9341_SET_GAMMA 0x26               // Set gamma params
-#define ILI9341_CMD_DISPLAY_OFF 0x28         // Disable display
-#define ILI9341_CMD_DISPLAY_ON 0x29          // Enable display
-#define ILI9341_SET_COL_ADDR 0x2A            // Set column address
-#define ILI9341_SET_PAGE_ADDR 0x2B           // Set page address
-#define ILI9341_SET_MEM 0x2C                 // Set memory
-#define ILI9341_SET_COLOR 0x2D               // Set color
-#define ILI9341_GET_MEM 0x2E                 // Get memory
-#define ILI9341_SET_PARTIAL_AREA 0x30        // Set partial area
-#define ILI9341_SET_VSCROLL 0x33             // Set vertical scroll def
-#define ILI9341_CMD_TEARING_ON 0x34          // Tearing line enabled
-#define ILI9341_CMD_TEARING_OFF 0x35         // Tearing line disabled
-#define ILI9341_SET_MEM_ACS_CTL 0x36         // Set mem access ctl
-#define ILI9341_SET_VSCROLL_ADDR 0x37        // Set vscroll start addr
-#define ILI9341_CMD_IDLE_OFF 0x38            // Exit idle mode
-#define ILI9341_CMD_IDLE_ON 0x39             // Enter idle mode
-#define ILI9341_SET_PIX_FMT 0x3A             // Set pixel format
-#define ILI9341_SET_MEM_CONT 0x3C            // Set memory continue
-#define ILI9341_GET_MEM_CONT 0x3E            // Get memory continue
-#define ILI9341_SET_TEAR_SCANLINE 0x44       // Set tearing scanline
-#define ILI9341_GET_TEAR_SCANLINE 0x45       // Get tearing scanline
-#define ILI9341_SET_BRIGHTNESS 0x51          // Set brightness
-#define ILI9341_GET_BRIGHTNESS 0x52          // Get brightness
-#define ILI9341_SET_DISPLAY_CTL 0x53         // Set display ctl
-#define ILI9341_GET_DISPLAY_CTL 0x54         // Get display ctl
-#define ILI9341_SET_CABC 0x55                // Set CABC
-#define ILI9341_GET_CABC 0x56                // Get CABC
-#define ILI9341_SET_CABC_MIN 0x5E            // Set CABC min
-#define ILI9341_GET_CABC_MIN 0x5F            // Set CABC max
-#define ILI9341_GET_ID1 0xDA                 // Get ID1
-#define ILI9341_GET_ID2 0xDB                 // Get ID2
-#define ILI9341_GET_ID3 0xDC                 // Get ID3
-#define ILI9341_SET_RGB_IF_SIG_CTL 0xB0      // RGB IF signal ctl
-#define ILI9341_SET_FRAME_CTL_NORMAL 0xB1    // Set frame ctl (normal)
-#define ILI9341_SET_FRAME_CTL_IDLE 0xB2      // Set frame ctl (idle)
-#define ILI9341_SET_FRAME_CTL_PARTIAL 0xB3   // Set frame ctl (partial)
-#define ILI9341_SET_INVERSION_CTL 0xB4       // Set inversion ctl
-#define ILI9341_SET_BLANKING_PORCH_CTL 0xB5  // Set blanking porch ctl
-#define ILI9341_SET_FUNCTION_CTL 0xB6        // Set function ctl
-#define ILI9341_SET_ENTRY_MODE 0xB7          // Set entry mode
-#define ILI9341_SET_LIGHT_CTL_1 0xB8         // Set backlight ctl 1
-#define ILI9341_SET_LIGHT_CTL_2 0xB9         // Set backlight ctl 2
-#define ILI9341_SET_LIGHT_CTL_3 0xBA         // Set backlight ctl 3
-#define ILI9341_SET_LIGHT_CTL_4 0xBB         // Set backlight ctl 4
-#define ILI9341_SET_LIGHT_CTL_5 0xBC         // Set backlight ctl 5
-#define ILI9341_SET_LIGHT_CTL_7 0xBE         // Set backlight ctl 7
-#define ILI9341_SET_LIGHT_CTL_8 0xBF         // Set backlight ctl 8
-#define ILI9341_SET_POWER_CTL_1 0xC0         // Set power ctl 1
-#define ILI9341_SET_POWER_CTL_2 0xC1         // Set power ctl 2
-#define ILI9341_SET_VCOM_CTL_1 0xC5          // Set VCOM ctl 1
-#define ILI9341_SET_VCOM_CTL_2 0xC7          // Set VCOM ctl 2
-#define ILI9341_POWER_CTL_A 0xCB             // Set power control A
-#define ILI9341_POWER_CTL_B 0xCF             // Set power control B
-#define ILI9341_DRV_TIMING_CTL_A 0xE8        // Set driver timing control A
-#define ILI9341_DRV_TIMING_CTL_B 0xEA        // Set driver timing control B
-#define ILI9341_POWER_ON_SEQ_CTL 0xED        // Set Power on sequence control
-#define ILI9341_SET_NVMEM 0xD0               // Set NVMEM data
-#define ILI9341_GET_NVMEM_KEY 0xD1           // Get NVMEM protect key
-#define ILI9341_GET_NVMEM_STATUS 0xD2        // Get NVMEM status
-#define ILI9341_GET_ID4 0xD3                 // Get ID4
-#define ILI9341_SET_PGAMMA 0xE0              // Set positive gamma
-#define ILI9341_SET_NGAMMA 0xE1              // Set negative gamma
-#define ILI9341_SET_DGAMMA_CTL_1 0xE2        // Set digital gamma ctl 1
-#define ILI9341_SET_DGAMMA_CTL_2 0xE3        // Set digital gamma ctl 2
-#define ILI9341_ENABLE_3_GAMMA 0xF2          // Enable 3 gamma
-#define ILI9341_SET_IF_CTL 0xF6              // Set interface control
-#define ILI9341_SET_PUMP_RATIO_CTL 0xF7      // Set pump ratio control
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Types
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Device definition
 typedef struct ili9341_painter_device_t {
     struct painter_driver_t qp_driver;  // must be first, so it can be cast from the painter_device_t* type
     bool                    allocated;
@@ -120,43 +41,52 @@ typedef struct ili9341_painter_device_t {
     bool                    uses_backlight;
 } ili9341_painter_device_t;
 
-static inline uint16_t hsv_to_ili9341(uint8_t hue, uint8_t sat, uint8_t val) {
-    RGB      rgb    = qp_hsv_to_rgb((HSV){hue, sat, val});
-    uint16_t rgb565 = (((uint16_t)rgb.r) >> 3) << 11 | (((uint16_t)rgb.g) >> 2) << 5 | (((uint16_t)rgb.b) >> 3);
-    return BYTE_SWAP(rgb565);
-}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Forward declarations
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-painter_lld_status_t ili9341_qp_init(painter_device_t device, painter_rotation_t rotation);
-painter_lld_status_t ili9341_qp_clear(painter_device_t device);
-painter_lld_status_t ili9341_qp_power(painter_device_t device, bool power_on);
-painter_lld_status_t ili9341_qp_viewport(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom);
-painter_lld_status_t ili9341_qp_pixdata(painter_device_t device, const void *pixel_data, uint32_t byte_count);
-painter_lld_status_t ili9341_qp_setpixel(painter_device_t device, uint16_t x, uint16_t y, uint8_t hue, uint8_t sat, uint8_t val);
-painter_lld_status_t ili9341_qp_line(painter_device_t device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t hue, uint8_t sat, uint8_t val);
-painter_lld_status_t ili9341_qp_rect(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t hue, uint8_t sat, uint8_t val, bool filled);
-painter_lld_status_t ili9341_qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, const painter_image_descriptor_t *image);
+bool qp_ili9341_init(painter_device_t device, painter_rotation_t rotation);
+bool qp_ili9341_clear(painter_device_t device);
+bool qp_ili9341_power(painter_device_t device, bool power_on);
+bool qp_ili9341_viewport(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom);
+bool qp_ili9341_pixdata(painter_device_t device, const void *pixel_data, uint32_t byte_count);
+bool qp_ili9341_setpixel(painter_device_t device, uint16_t x, uint16_t y, uint8_t hue, uint8_t sat, uint8_t val);
+bool qp_ili9341_line(painter_device_t device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t hue, uint8_t sat, uint8_t val);
+bool qp_ili9341_rect(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t hue, uint8_t sat, uint8_t val, bool filled);
+bool qp_ili9341_drawimage(painter_device_t device, uint16_t x, uint16_t y, const painter_image_descriptor_t *image);
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Low-level LCD control functions
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Enable SPI comms
 static inline void lcd_start(ili9341_painter_device_t *lcd) { spi_start(lcd->chip_select_pin, false, 0, ILI9341_SPI_DIVISOR); }
 
+// Disable SPI comms
 static inline void lcd_stop(void) { spi_stop(); }
 
+// Send a command
 static inline void lcd_cmd(ili9341_painter_device_t *lcd, uint8_t b) {
     writePinLow(lcd->data_pin);
     spi_write(b);
 }
 
+// Send data
 static inline void lcd_sendbuf(ili9341_painter_device_t *lcd, const void *data, uint16_t len) {
     writePinHigh(lcd->data_pin);
     spi_transmit(data, len);
 }
 
+// Send data (single byte)
 static inline void lcd_data(ili9341_painter_device_t *lcd, uint8_t b) { lcd_sendbuf(lcd, &b, sizeof(b)); }
 
+// Set a register value
 static inline void lcd_reg(ili9341_painter_device_t *lcd, uint8_t reg, uint8_t val) {
     lcd_cmd(lcd, reg);
     lcd_data(lcd, val);
 }
 
+// Set the drawing viewport position
 static inline void lcd_viewport(ili9341_painter_device_t *lcd, uint16_t xbegin, uint16_t ybegin, uint16_t xend, uint16_t yend) {
     // Set up the x-window
     uint8_t xbuf[4] = {xbegin >> 8, xbegin & 0xFF, xend >> 8, xend & 0xFF};
@@ -172,6 +102,22 @@ static inline void lcd_viewport(ili9341_painter_device_t *lcd, uint16_t xbegin, 
     lcd_cmd(lcd, 0x2C);  // memory write
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Helpers
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Colour conversion to LCD-native
+static inline uint16_t hsv_to_ili9341(uint8_t hue, uint8_t sat, uint8_t val) {
+    RGB      rgb    = hsv_to_rgb_nocie((HSV){hue, sat, val});
+    uint16_t rgb565 = (((uint16_t)rgb.r) >> 3) << 11 | (((uint16_t)rgb.g) >> 2) << 5 | (((uint16_t)rgb.b) >> 3);
+    return BYTE_SWAP(rgb565);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Monochrome-format image rendering
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Recoloured renderer
 static inline void lcd_send_mono_pixdata_recolour(ili9341_painter_device_t *lcd, uint8_t bits_per_pixel, uint32_t pixel_count, const void *pixel_data, uint32_t byte_count, int16_t hue_fg, int16_t sat_fg, int16_t val_fg, int16_t hue_bg, int16_t sat_bg, int16_t val_bg) {
     uint16_t       buf[ILI9341_PIXDATA_BUFSIZE];
     const uint8_t  pixel_bitmask       = (1 << bits_per_pixel) - 1;
@@ -207,18 +153,22 @@ static inline void lcd_send_mono_pixdata_recolour(ili9341_painter_device_t *lcd,
     }
 }
 
-static inline void lcd_send_mono_pixdata(ili9341_painter_device_t *lcd, uint8_t bits_per_pixel, uint32_t pixel_count, const void *pixel_data, uint32_t byte_count) {
-    // Default implementation is greyscale
-    lcd_send_mono_pixdata_recolour(lcd, bits_per_pixel, pixel_count, pixel_data, byte_count, 0, 0, 255, 0, 0, 0);
-}
+// Default implementation is greyscale
+static inline void lcd_send_mono_pixdata(ili9341_painter_device_t *lcd, uint8_t bits_per_pixel, uint32_t pixel_count, const void *pixel_data, uint32_t byte_count) { lcd_send_mono_pixdata_recolour(lcd, bits_per_pixel, pixel_count, pixel_data, byte_count, 0, 0, 255, 0, 0, 0); }
 
-painter_lld_status_t ili9341_qp_init(painter_device_t device, painter_rotation_t rotation) {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Quantum Painter API implementations
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Initialisation
+bool qp_ili9341_init(painter_device_t device, painter_rotation_t rotation) {
     static const uint8_t pgamma[15] = {0x0F, 0x29, 0x24, 0x0C, 0x0E, 0x09, 0x4E, 0x78, 0x3C, 0x09, 0x13, 0x05, 0x17, 0x11, 0x00};
     static const uint8_t ngamma[15] = {0x00, 0x16, 0x1B, 0x04, 0x11, 0x07, 0x31, 0x33, 0x42, 0x05, 0x0C, 0x0A, 0x28, 0x2F, 0x0F};
 
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd->rotation                 = rotation;
 
+    // Initialise the SPI peripheral
     spi_init();
 
     // Set up pin directions and initial values
@@ -236,8 +186,10 @@ painter_lld_status_t ili9341_qp_init(painter_device_t device, painter_rotation_t
     writePinHigh(lcd->reset_pin);
     wait_ms(20);
 
+    // Ebable the SPI comms to the LCS
     lcd_start(lcd);
 
+    // Configure power control
     lcd_cmd(lcd, ILI9341_POWER_CTL_A);
     lcd_data(lcd, 0x39);
     lcd_data(lcd, 0x2C);
@@ -256,20 +208,8 @@ painter_lld_status_t ili9341_qp_init(painter_device_t device, painter_rotation_t
     lcd_data(lcd, 0X12);
     lcd_data(lcd, 0X81);
 
-    lcd_cmd(lcd, ILI9341_DRV_TIMING_CTL_A);
-    lcd_data(lcd, 0x85);
-    lcd_data(lcd, 0x10);
-    lcd_data(lcd, 0x7A);
-
-    lcd_cmd(lcd, ILI9341_DRV_TIMING_CTL_B);
-    lcd_data(lcd, 0x00);
-    lcd_data(lcd, 0x00);
-
     lcd_cmd(lcd, ILI9341_SET_PUMP_RATIO_CTL);
     lcd_data(lcd, 0x20);
-
-    lcd_cmd(lcd, ILI9341_SET_BRIGHTNESS);
-    lcd_data(lcd, 0xFF);
 
     lcd_cmd(lcd, ILI9341_SET_POWER_CTL_1);
     lcd_data(lcd, 0x26);
@@ -284,19 +224,19 @@ painter_lld_status_t ili9341_qp_init(painter_device_t device, painter_rotation_t
     lcd_cmd(lcd, ILI9341_SET_VCOM_CTL_2);
     lcd_data(lcd, 0xBE);
 
-    lcd_cmd(lcd, ILI9341_SET_MEM_ACS_CTL);
-    lcd_data(lcd, 0x48);
+    // Configure timing control
+    lcd_cmd(lcd, ILI9341_DRV_TIMING_CTL_A);
+    lcd_data(lcd, 0x85);
+    lcd_data(lcd, 0x10);
+    lcd_data(lcd, 0x7A);
 
-    lcd_cmd(lcd, ILI9341_SET_PIX_FMT);
-    lcd_data(lcd, 0x55);
-
-    lcd_cmd(lcd, ILI9341_SET_FRAME_CTL_NORMAL);
+    lcd_cmd(lcd, ILI9341_DRV_TIMING_CTL_B);
     lcd_data(lcd, 0x00);
-    lcd_data(lcd, 0x1B);
+    lcd_data(lcd, 0x00);
 
-    lcd_cmd(lcd, ILI9341_SET_FUNCTION_CTL);
-    lcd_data(lcd, 0x0A);
-    lcd_data(lcd, 0xA2);
+    // Configure brightness / gamma
+    lcd_cmd(lcd, ILI9341_SET_BRIGHTNESS);
+    lcd_data(lcd, 0xFF);
 
     lcd_cmd(lcd, ILI9341_ENABLE_3_GAMMA);
     lcd_data(lcd, 0x00);
@@ -310,8 +250,22 @@ painter_lld_status_t ili9341_qp_init(painter_device_t device, painter_rotation_t
     lcd_cmd(lcd, ILI9341_SET_NGAMMA);
     lcd_sendbuf(lcd, ngamma, sizeof(ngamma));
 
+    // Set the pixel format
+    lcd_cmd(lcd, ILI9341_SET_PIX_FMT);
+    lcd_data(lcd, 0x55);
+
+    lcd_cmd(lcd, ILI9341_SET_FRAME_CTL_NORMAL);
+    lcd_data(lcd, 0x00);
+    lcd_data(lcd, 0x1B);
+
+    lcd_cmd(lcd, ILI9341_SET_FUNCTION_CTL);
+    lcd_data(lcd, 0x0A);
+    lcd_data(lcd, 0xA2);
+
+    // Set the default viewport to be fullscreen
     lcd_viewport(lcd, 0, 0, 239, 319);
 
+    // Configure the rotation (i.e. the ordering and direction of memory writes in GRAM)
     switch (rotation) {
         case QP_ROTATION_0:
             lcd_cmd(lcd, ILI9341_SET_MEM_ACS_CTL);
@@ -331,24 +285,28 @@ painter_lld_status_t ili9341_qp_init(painter_device_t device, painter_rotation_t
             break;
     }
 
+    // Disable sleep mode
     lcd_cmd(lcd, ILI9341_CMD_SLEEP_OFF);
     wait_ms(20);
 
+    // Disable the SPI comms to the LCS
     lcd_stop();
 
-    return DRIVER_SUCCESS;
+    return true;
 }
 
-painter_lld_status_t ili9341_qp_clear(painter_device_t device) {
+// Screen clear
+bool qp_ili9341_clear(painter_device_t device) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
 
     // Re-init the LCD
-    ili9341_qp_init(device, lcd->rotation);
+    qp_ili9341_init(device, lcd->rotation);
 
-    return DRIVER_SUCCESS;
+    return true;
 }
 
-painter_lld_status_t ili9341_qp_power(painter_device_t device, bool power_on) {
+// Power control -- on/off (will handle backlight if using normal QMK backlight driver)
+bool qp_ili9341_power(painter_device_t device, bool power_on) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
 
@@ -370,10 +328,11 @@ painter_lld_status_t ili9341_qp_power(painter_device_t device, bool power_on) {
     }
 #endif
 
-    return DRIVER_SUCCESS;
+    return true;
 }
 
-painter_lld_status_t ili9341_qp_viewport(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom) {
+// Viewport to draw to
+bool qp_ili9341_viewport(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
 
@@ -382,10 +341,11 @@ painter_lld_status_t ili9341_qp_viewport(painter_device_t device, uint16_t left,
 
     lcd_stop();
 
-    return DRIVER_SUCCESS;
+    return true;
 }
 
-painter_lld_status_t ili9341_qp_pixdata(painter_device_t device, const void *pixel_data, uint32_t byte_count) {
+// Stream pixel data to the current write position in GRAM
+bool qp_ili9341_pixdata(painter_device_t device, const void *pixel_data, uint32_t byte_count) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
 
@@ -394,10 +354,11 @@ painter_lld_status_t ili9341_qp_pixdata(painter_device_t device, const void *pix
 
     lcd_stop();
 
-    return DRIVER_SUCCESS;
+    return true;
 }
 
-painter_lld_status_t ili9341_qp_setpixel(painter_device_t device, uint16_t x, uint16_t y, uint8_t hue, uint8_t sat, uint8_t val) {
+// Manually set a single pixel's colour
+bool qp_ili9341_setpixel(painter_device_t device, uint16_t x, uint16_t y, uint8_t hue, uint8_t sat, uint8_t val) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
 
@@ -410,17 +371,22 @@ painter_lld_status_t ili9341_qp_setpixel(painter_device_t device, uint16_t x, ui
 
     lcd_stop();
 
-    return DRIVER_SUCCESS;
+    return true;
 }
 
-painter_lld_status_t ili9341_qp_line(painter_device_t device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t hue, uint8_t sat, uint8_t val) {
-    if (x0 != x1 && y0 != y1) return DRIVER_UNSUPPORTED;  // for now, let the upper layer handle the line drawing algorithm
+// Draw a line
+bool qp_ili9341_line(painter_device_t device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t hue, uint8_t sat, uint8_t val) {
+    // If we're not doing horizontal or vertical, fallback to the base implementation
+    if (x0 != x1 && y0 != y1) {
+        return qp_fallback_line(device, x0, y0, x1, y1, hue, sat, val);
+    }
 
     // If we're doing horizontal or vertical, just use the optimised rect draw so we don't need to deal with single pixels or buffers.
-    return ili9341_qp_rect(device, x0, y0, x1, y1, hue, sat, val, true);
+    return qp_ili9341_rect(device, x0, y0, x1, y1, hue, sat, val, true);
 }
 
-painter_lld_status_t ili9341_qp_rect(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t hue, uint8_t sat, uint8_t val, bool filled) {
+// Draw a rectangle
+bool qp_ili9341_rect(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t hue, uint8_t sat, uint8_t val, bool filled) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
 
     if (filled) {
@@ -447,16 +413,25 @@ painter_lld_status_t ili9341_qp_rect(painter_device_t device, uint16_t left, uin
 
         lcd_stop();
     } else {
-        ili9341_qp_rect(device, left, top, right, top, hue, sat, val, true);
-        ili9341_qp_rect(device, left, bottom, right, bottom, hue, sat, val, true);
-        ili9341_qp_rect(device, left, top + 1, left, bottom - 1, hue, sat, val, true);
-        ili9341_qp_rect(device, right, top + 1, right, bottom - 1, hue, sat, val, true);
+        if (!qp_ili9341_rect(device, left, top, right, top, hue, sat, val, true)) {
+            return false;
+        }
+        if (!qp_ili9341_rect(device, left, bottom, right, bottom, hue, sat, val, true)) {
+            return false;
+        }
+        if (!qp_ili9341_rect(device, left, top + 1, left, bottom - 1, hue, sat, val, true)) {
+            return false;
+        }
+        if (!qp_ili9341_rect(device, right, top + 1, right, bottom - 1, hue, sat, val, true)) {
+            return false;
+        }
     }
 
-    return DRIVER_SUCCESS;
+    return true;
 }
 
-painter_lld_status_t ili9341_qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, const painter_image_descriptor_t *image) {
+// Draw an image
+bool qp_ili9341_drawimage(painter_device_t device, uint16_t x, uint16_t y, const painter_image_descriptor_t *image) {
     ili9341_painter_device_t *lcd = (ili9341_painter_device_t *)device;
     lcd_start(lcd);
 
@@ -518,26 +493,32 @@ painter_lld_status_t ili9341_qp_drawimage(painter_device_t device, uint16_t x, u
 
     lcd_stop();
 
-    return DRIVER_SUCCESS;
+    return true;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Device creation
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Driver storage
 ili9341_painter_device_t drivers[ILI9341_NUM_DEVICES] = {0};
 
-painter_device_t qp_make_ili9341_device(pin_t chip_select_pin, pin_t data_pin, pin_t reset_pin, bool uses_backlight) {
+// Factory function for creating a handle to the ILI9341 device
+painter_device_t qp_ili9341_make_device(pin_t chip_select_pin, pin_t data_pin, pin_t reset_pin, bool uses_backlight) {
     for (uint32_t i = 0; i < ILI9341_NUM_DEVICES; ++i) {
         ili9341_painter_device_t *driver = &drivers[i];
         memset(driver, 0, sizeof(ili9341_painter_device_t));
         if (!driver->allocated) {
             driver->allocated           = true;
-            driver->qp_driver.init      = ili9341_qp_init;
-            driver->qp_driver.clear     = ili9341_qp_clear;
-            driver->qp_driver.power     = ili9341_qp_power;
-            driver->qp_driver.pixdata   = ili9341_qp_pixdata;
-            driver->qp_driver.viewport  = ili9341_qp_viewport;
-            driver->qp_driver.setpixel  = ili9341_qp_setpixel;
-            driver->qp_driver.line      = ili9341_qp_line;
-            driver->qp_driver.rect      = ili9341_qp_rect;
-            driver->qp_driver.drawimage = ili9341_qp_drawimage;
+            driver->qp_driver.init      = qp_ili9341_init;
+            driver->qp_driver.clear     = qp_ili9341_clear;
+            driver->qp_driver.power     = qp_ili9341_power;
+            driver->qp_driver.pixdata   = qp_ili9341_pixdata;
+            driver->qp_driver.viewport  = qp_ili9341_viewport;
+            driver->qp_driver.setpixel  = qp_ili9341_setpixel;
+            driver->qp_driver.line      = qp_ili9341_line;
+            driver->qp_driver.rect      = qp_ili9341_rect;
+            driver->qp_driver.drawimage = qp_ili9341_drawimage;
             driver->chip_select_pin     = chip_select_pin;
             driver->data_pin            = data_pin;
             driver->reset_pin           = reset_pin;

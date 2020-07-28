@@ -16,18 +16,33 @@
 
 #pragma once
 
-#include "qp_common.h"
+#include "qp.h"
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Quantum Painter ILI9341 configurables
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// The number of ILI9341 devices we're going to be talking to
 #ifndef ILI9341_NUM_DEVICES
 #    define ILI9341_NUM_DEVICES 1
 #endif
 
+// The SPI clock divisor to use when talking to the LCD -- will need to take into account your MCUs speed and the maximum allowed speed of the LCD
 #ifndef ILI9341_SPI_DIVISOR
 #    define ILI9341_SPI_DIVISOR 8
 #endif
 
+// The buffer size to use when rendering chunks of data, allows limiting of RAM allocation when rendering images
 #ifndef ILI9341_PIXDATA_BUFSIZE
 #    define ILI9341_PIXDATA_BUFSIZE 32
 #endif
 
-painter_device_t qp_make_ili9341_device(pin_t chip_select_pin, pin_t data_pin, pin_t reset_pin, bool uses_backlight);
+#if ILI9341_PIXDATA_BUFSIZE < 16
+#    error ILI9341 pixel buffer size too small -- ILI9341_PIXDATA_BUFSIZE must be >= 16
+#endif
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Quantum Painter ILI9341 device factory
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+painter_device_t qp_ili9341_make_device(pin_t chip_select_pin, pin_t data_pin, pin_t reset_pin, bool uses_backlight);

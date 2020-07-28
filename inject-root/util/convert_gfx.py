@@ -193,7 +193,7 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
 
     gfx_source_file.write("#include <stdint.h>\n")
     gfx_source_file.write("#include <qp.h>\n")
-    gfx_source_file.write("#include <qp_common.h>\n\n")
+    gfx_source_file.write("#include <qp_internal.h>\n\n")
     gfx_source_file.write("// clang-format off\n\n")
 
     if compress == True:
