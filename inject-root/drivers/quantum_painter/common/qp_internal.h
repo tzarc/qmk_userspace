@@ -22,12 +22,14 @@
 // Quantum painter image types
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Uncompressed raw image descriptor
 typedef struct painter_raw_image_descriptor_t {
     const painter_image_descriptor_t base;
     const uint32_t                   byte_count;  // number of bytes in the image
     const uint8_t *const             image_data;  // pointer to the image data
 } painter_raw_image_descriptor_t;
 
+// Compressed image descriptor
 typedef struct painter_compressed_image_descriptor_t {
     const painter_image_descriptor_t base;
     const uint16_t                   chunk_count;      // number of chunks
@@ -41,6 +43,7 @@ typedef struct painter_compressed_image_descriptor_t {
 // Quantum Painter definitions
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Callback function types
 typedef bool (*painter_driver_init_func)(painter_device_t driver, painter_rotation_t rotation);
 typedef bool (*painter_driver_clear_func)(painter_device_t driver);
 typedef bool (*painter_driver_power_func)(painter_device_t driver, bool power_on);
@@ -51,6 +54,7 @@ typedef bool (*painter_driver_line_func)(painter_device_t driver, uint16_t x0, u
 typedef bool (*painter_driver_rect_func)(painter_device_t driver, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t hue, uint8_t sat, uint8_t val, bool filled);
 typedef bool (*painter_driver_drawimage_func)(painter_device_t device, uint16_t x, uint16_t y, const painter_image_descriptor_t *image);
 
+// Driver base definition
 struct painter_driver_t {
     painter_driver_init_func      init;
     painter_driver_clear_func     clear;

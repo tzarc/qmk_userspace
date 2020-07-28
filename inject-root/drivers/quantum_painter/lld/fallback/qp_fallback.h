@@ -22,6 +22,8 @@
 // Quantum Painter fallback drawing implementations
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Fallback method of drawing lines via setpixel
 bool qp_fallback_line(painter_device_t device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t hue, uint8_t sat, uint8_t val);
-bool qp_fallback_rect(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t hue, uint8_t sat, uint8_t val, bool filled);
 
+// Fallback method of drawing rects via drawing lines
+bool qp_fallback_rect(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t hue, uint8_t sat, uint8_t val, bool filled);

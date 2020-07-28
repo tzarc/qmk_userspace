@@ -45,4 +45,5 @@
 // Quantum Painter ILI9341 device factory
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Factory method for an ILI9341 device
 painter_device_t qp_ili9341_make_device(pin_t chip_select_pin, pin_t data_pin, pin_t reset_pin, bool uses_backlight);

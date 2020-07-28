@@ -29,7 +29,7 @@ typedef const void *painter_device_t;
 // Rotation type
 typedef enum { QP_ROTATION_0, QP_ROTATION_90, QP_ROTATION_180, QP_ROTATION_270 } painter_rotation_t;
 
-// Image types
+// Image types -- handled by qmk convert-image
 typedef enum { IMAGE_FORMAT_RAW, IMAGE_FORMAT_RGB565, IMAGE_FORMAT_MONO4BPP, IMAGE_FORMAT_MONO2BPP, IMAGE_FORMAT_MONO1BPP } painter_image_format_t;
 typedef enum { IMAGE_UNCOMPRESSED, IMAGE_COMPRESSED_LZF } painter_compression_t;
 typedef struct painter_image_descriptor_t {
@@ -44,12 +44,29 @@ typedef const painter_image_descriptor_t *painter_image_t;
 // Quantum Painter API
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Initialise a device and set its rotation -- need to create the device using its corresponding factory method first
 bool qp_init(painter_device_t device, painter_rotation_t rotation);
+
+// Clear's a device's screen
 bool qp_clear(painter_device_t device);
+
+// Handle turning a display on or off
 bool qp_power(painter_device_t device, bool power_on);
+
+// Set the viewport that pixdata is to get streamed into
 bool qp_viewport(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom);
+
+// Stream pixel data in the device's native format into the previously-set viewport
 bool qp_pixdata(painter_device_t device, const void *pixel_data, uint32_t byte_count);
+
+// Set a specific pixel
 bool qp_setpixel(painter_device_t device, uint16_t x, uint16_t y, uint8_t hue, uint8_t sat, uint8_t val);
+
+// Draw a line
 bool qp_line(painter_device_t device, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t hue, uint8_t sat, uint8_t val);
+
+// Draw a rectangle
 bool qp_rect(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom, uint8_t hue, uint8_t sat, uint8_t val, bool filled);
+
+// Draw an image on the device
 bool qp_drawimage(painter_device_t device, uint16_t x, uint16_t y, painter_image_t image);

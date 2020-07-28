@@ -23,8 +23,8 @@
 // Quantum Painter configurables
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// This value must match the chunk size used when converting images via qmk convert-image
 #ifndef QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE
-// This value must match the chunk size used when converting images
 #    define QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE 128
 #endif
 

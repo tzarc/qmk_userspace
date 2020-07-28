@@ -19,16 +19,8 @@
 #include "qp_utils.h"
 
 uint32_t qp_decode(const void* const input_buffer, const uint32_t input_size, void* output_buffer, const uint32_t output_size) {
-#ifdef __AVR__
-    // Need to do progmem reads...
-    uint8_t tempbuf[input_size];
-    memcpy_P(tempbuf, input_buffer, input_size);
-    // Use LZF decompressor to decode the chunk data
-    return (uint32_t)lzf_decompress(tempbuf, input_size, output_buffer, output_size);
-#else
     // Use LZF decompressor to decode the chunk data
     return (uint32_t)lzf_decompress(input_buffer, input_size, output_buffer, output_size);
-#endif
 }
 
 void qp_generate_colour_lookup_table(HSV* lookup_table, int16_t items, int16_t hue_fg, int16_t sat_fg, int16_t val_fg, int16_t hue_bg, int16_t sat_bg, int16_t val_bg) {
