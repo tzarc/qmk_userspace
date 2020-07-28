@@ -11,12 +11,16 @@ upgrade_chibios=1
 #upgrade_chibios_confs=1
 
 target_branch="generated-workarea"
+target_qmk="master"
 if [ ! -z ${upgrade_chibios:-} ] ; then
 target_branch="generated-chibios-master-upgrade"
+target_qmk="develop"
 fi
 
 declare -a prs_to_apply
 prs_to_apply+=(9603) # Matrix delay
+#prs_to_apply+=(8893) # F4 inout endpoint refactor
+prs_to_apply+=(9856) # hsv_to_rgb_nocie
 #prs_to_apply+=(6165) # ARM audio DAC/PWM change
 #prs_to_apply+=(8778) # Dual-bank bootloader
 #prs_to_apply+=(8291) # GPT ARM backlight
@@ -96,7 +100,7 @@ upgrade-chibios-confs() {
 }
 
 pushd "$script_dir/qmk_firmware"
-hard_reset qmk qmk_firmware develop
+hard_reset qmk qmk_firmware $target_qmk
 pcmd make git-submodule
 pcmd sed -i 's#qmk/ChibiOS#tzarc/ChibiOS#g' .gitmodules
 pcmd git add -A
