@@ -248,8 +248,8 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
     if compress == True:
         if chunksize < 64:
             raise Exception("Chunk size must be >= 64")
-        if chunksize > 512:
-            raise Exception("Chunk size must be <= 512")
+        if chunksize > 4096:
+            raise Exception("Chunk size must be <= 4096")
 
     # Get image dimensions
     (width, height) = graphic_image.size
@@ -353,7 +353,7 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
         # Write out the compressed chunk offsets
         gfx_source_file.write("const uint32_t gfx_%s_chunk_offsets[%d] = {\n" % (sane_name, len(compressed_chunk_offsets)))
         for n in range(0,len(compressed_chunk_offsets)):
-            gfx_source_file.write("  %4d,  // chunk %-4d // compressed size: %4d / %6.2f%%\n" % (compressed_chunk_offsets[n][0], n, compressed_chunk_offsets[n][1], (100*compressed_chunk_offsets[n][1]/chunksize)))
+            gfx_source_file.write("  %6d,  // chunk %-6d // compressed size: %4d / %6.2f%%\n" % (compressed_chunk_offsets[n][0], n, compressed_chunk_offsets[n][1], (100*compressed_chunk_offsets[n][1]/chunksize)))
         gfx_source_file.write("};\n\n")
 
         # Write out the compressed chunk data

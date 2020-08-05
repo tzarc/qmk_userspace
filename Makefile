@@ -49,14 +49,14 @@ $(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/img/decode_luts.h: $(
 
 $(ROOTDIR)/tzarc-djinn/gfx-djinn.c: $(ROOTDIR)/inject-root/util/convert_gfx.py $(ROOTDIR)/tzarc-djinn/djinn.png Makefile
 	cd $(ROOTDIR)/tzarc-djinn \
-		&& $(ROOTDIR)/inject-root/util/convert_gfx.py --compress --pal4bpp --image-file djinn.png --output djinn
+		&& $(ROOTDIR)/inject-root/util/convert_gfx.py --compress --pal2bpp --chunk-size 4096 --image-file djinn.png --output djinn
 
 gfx: $(ROOTDIR)/tzarc-djinn/gfx-djinn.c
 
 djinn: gfx
 
 remove_artifacts:
-	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format rgbtobgr565 rgbtobgr565.o >/dev/null 2>&1 || true
+	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format >/dev/null 2>&1 || true
 	cd $(ROOTDIR)/inject-root/drivers/quantum_painter/img \
 		&& make clean
 

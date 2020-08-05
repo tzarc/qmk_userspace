@@ -74,7 +74,16 @@ static inline void lcd_cmd(ili9341_painter_device_t *lcd, uint8_t b) {
 // Send data
 static inline void lcd_sendbuf(ili9341_painter_device_t *lcd, const void *data, uint16_t len) {
     writePinHigh(lcd->data_pin);
-    spi_transmit(data, len);
+
+    uint32_t       bytes_remaining = len;
+    const uint8_t *p               = (const uint8_t *)data;
+    while (bytes_remaining > 0) {
+        uint32_t bytes_this_loop = bytes_remaining < 1024 ? bytes_remaining : 1024;
+        // The pixel data is in the correct format already -- send it directly to the device
+        spi_transmit(p, bytes_this_loop);
+        p += bytes_this_loop;
+        bytes_remaining -= bytes_this_loop;
+    }
 }
 
 // Send data (single byte)
@@ -105,6 +114,9 @@ static inline void lcd_viewport(ili9341_painter_device_t *lcd, uint16_t xbegin, 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Helpers
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Static buffer used for decompression
+static uint8_t decompressed_buf[QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE] = {0};
 
 // Colour conversion to LCD-native
 static inline uint16_t rgb_to_ili9341(uint8_t r, uint8_t g, uint8_t b) {
@@ -465,7 +477,6 @@ bool qp_ili9341_drawimage(painter_device_t device, uint16_t x, uint16_t y, const
     uint32_t pixel_count = (((uint32_t)image->width) * image->height);
     if (image->compression == IMAGE_COMPRESSED_LZF) {
         const painter_compressed_image_descriptor_t *comp_image_desc = (const painter_compressed_image_descriptor_t *)image;
-        uint8_t                                      buf[QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE];
         for (uint16_t i = 0; i < comp_image_desc->chunk_count; ++i) {
             // Check if we're the last chunk
             bool last_chunk = (i == (comp_image_desc->chunk_count - 1));
@@ -473,20 +484,20 @@ bool qp_ili9341_drawimage(painter_device_t device, uint16_t x, uint16_t y, const
             uint32_t compressed_size = last_chunk ? (comp_image_desc->compressed_size - comp_image_desc->chunk_offsets[i])        // last chunk
                                                   : (comp_image_desc->chunk_offsets[i + 1] - comp_image_desc->chunk_offsets[i]);  // any other chunk
             // Decode the image data
-            uint32_t decompressed_size = qp_decode(&comp_image_desc->compressed_data[comp_image_desc->chunk_offsets[i]], compressed_size, buf, sizeof(buf));
+            uint32_t decompressed_size = qp_decode(&comp_image_desc->compressed_data[comp_image_desc->chunk_offsets[i]], compressed_size, decompressed_buf, sizeof(decompressed_buf));
 
             // Stream data to the LCD
             if (image->image_format == IMAGE_FORMAT_RAW || image->image_format == IMAGE_FORMAT_RGB565) {
                 // The pixel data is in the correct format already -- send it directly to the device
-                lcd_sendbuf(lcd, buf, decompressed_size);
+                lcd_sendbuf(lcd, decompressed_buf, decompressed_size);
                 pixel_count -= decompressed_size / 2;
             } else if (image->image_format == IMAGE_FORMAT_GREYSCALE) {
                 uint32_t pixels_this_loop = last_chunk ? pixel_count : (comp_image_desc->chunk_size * 8 / comp_image_desc->image_bpp);
-                lcd_send_mono_pixdata(lcd, comp_image_desc->image_bpp, pixels_this_loop, buf, decompressed_size);
+                lcd_send_mono_pixdata(lcd, comp_image_desc->image_bpp, pixels_this_loop, decompressed_buf, decompressed_size);
                 pixel_count -= pixels_this_loop;
             } else if (image->image_format == IMAGE_FORMAT_PALETTE) {
                 uint32_t pixels_this_loop = last_chunk ? pixel_count : (comp_image_desc->chunk_size * 8 / comp_image_desc->image_bpp);
-                lcd_send_palette_pixdata(lcd, comp_image_desc->image_palette, comp_image_desc->image_bpp, pixels_this_loop, buf, decompressed_size);
+                lcd_send_palette_pixdata(lcd, comp_image_desc->image_palette, comp_image_desc->image_bpp, pixels_this_loop, decompressed_buf, decompressed_size);
                 pixel_count -= pixels_this_loop;
             }
         }
@@ -494,15 +505,8 @@ bool qp_ili9341_drawimage(painter_device_t device, uint16_t x, uint16_t y, const
         const painter_raw_image_descriptor_t *raw_image_desc = (const painter_raw_image_descriptor_t *)image;
         // Stream data to the LCD
         if (image->image_format == IMAGE_FORMAT_RAW || image->image_format == IMAGE_FORMAT_RGB565) {
-            uint32_t bytes_remaining = raw_image_desc->byte_count;
-            const uint8_t* data = raw_image_desc->image_data;
-            while(bytes_remaining > 0) {
-                uint32_t bytes_this_loop = bytes_remaining < 1024 ? bytes_remaining : 1024;
-                // The pixel data is in the correct format already -- send it directly to the device
-                lcd_sendbuf(lcd, data, bytes_this_loop);
-                data += bytes_this_loop;
-                bytes_remaining -= bytes_this_loop;
-            }
+            // The pixel data is in the correct format already -- send it directly to the device
+            lcd_sendbuf(lcd, raw_image_desc->image_data, raw_image_desc->byte_count);
         } else if (image->image_format == IMAGE_FORMAT_GREYSCALE) {
             // Supplied pixel data is in 4bpp monochrome -- decode it to the equivalent pixel data
             lcd_send_mono_pixdata(lcd, raw_image_desc->image_bpp, pixel_count, raw_image_desc->image_data, raw_image_desc->byte_count);
