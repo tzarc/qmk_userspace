@@ -7,10 +7,10 @@
     {
       "name": "Python: convert_gfx.py - pal256",
       "type": "python",
-      "cwd": "${workspaceRoot}/inject-root/drivers/quantum_painter/img",
+      "cwd": "${workspaceRoot}/tzarc-djinn",
       "request": "launch",
       "program": "${workspaceRoot}/inject-root/util/convert_gfx.py",
-      "args": ["--pal4bpp", "-c", "-i", "badge-dark_240px_1bpp.png", "-o", "badge-dark240-pal16"]
+      "args": ["--pal4bpp", "--compress", "--image-file", "djinn.png", "--output", "djinn"]
     },
     {
       "name": "Black Magic Probe (Cyclone)",

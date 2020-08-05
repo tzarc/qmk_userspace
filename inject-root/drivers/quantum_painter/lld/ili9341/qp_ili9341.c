@@ -152,7 +152,7 @@ static inline void lcd_send_palette_pixdata_impl(ili9341_painter_device_t *lcd, 
 // Recoloured renderer
 static inline void lcd_send_palette_pixdata(ili9341_painter_device_t *lcd, const uint8_t *const rgb_palette, uint8_t bits_per_pixel, uint32_t pixel_count, const void *const pixel_data, uint32_t byte_count) {
     // Generate the colour lookup table
-    uint16_t rgb565_palette[16];
+    uint16_t rgb565_palette[256];
     uint16_t items = 1 << bits_per_pixel;  // number of items we need to intepolate
     for (uint16_t i = 0; i < items; ++i) {
         rgb565_palette[i] = rgb_to_ili9341(rgb_palette[i * 3 + 0], rgb_palette[i * 3 + 1], rgb_palette[i * 3 + 2]);
@@ -494,8 +494,15 @@ bool qp_ili9341_drawimage(painter_device_t device, uint16_t x, uint16_t y, const
         const painter_raw_image_descriptor_t *raw_image_desc = (const painter_raw_image_descriptor_t *)image;
         // Stream data to the LCD
         if (image->image_format == IMAGE_FORMAT_RAW || image->image_format == IMAGE_FORMAT_RGB565) {
-            // The pixel data is in the correct format already -- send it directly to the device
-            lcd_sendbuf(lcd, raw_image_desc->image_data, raw_image_desc->byte_count);
+            uint32_t bytes_remaining = raw_image_desc->byte_count;
+            const uint8_t* data = raw_image_desc->image_data;
+            while(bytes_remaining > 0) {
+                uint32_t bytes_this_loop = bytes_remaining < 1024 ? bytes_remaining : 1024;
+                // The pixel data is in the correct format already -- send it directly to the device
+                lcd_sendbuf(lcd, data, bytes_this_loop);
+                data += bytes_this_loop;
+                bytes_remaining -= bytes_this_loop;
+            }
         } else if (image->image_format == IMAGE_FORMAT_GREYSCALE) {
             // Supplied pixel data is in 4bpp monochrome -- decode it to the equivalent pixel data
             lcd_send_mono_pixdata(lcd, raw_image_desc->image_bpp, pixel_count, raw_image_desc->image_data, raw_image_desc->byte_count);

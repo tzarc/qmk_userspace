@@ -51,6 +51,27 @@ fileHeader = """\
 
 """
 
+"""Convert an image to a 8bpp (256-colour) palette image
+"""
+def image_to_palette8bpp(im):
+    im = im.convert("RGB")
+    im = im.convert("P", palette = Image.ADAPTIVE, colors=256)
+    pal = im.getpalette()
+    image_bytes = im.tobytes("raw","P")
+    image_bytes_len = len(image_bytes)
+
+    # Convert the palette to rgb565 array
+    palarray = []
+    for n in range(0, 256*3, 3):
+        palarray.append([pal[n+0],pal[n+1],pal[n+2]])
+
+    # Convert to packed 4bpp palette image
+    pal8array = []
+    for x in range(int(image_bytes_len)):
+        pal8array.append(
+            (image_bytes[x]&255))
+    return (palarray, pal8array)
+
 """Convert an image to a 4bpp (16-colour) palette image
 """
 def image_to_palette4bpp(im):
@@ -218,7 +239,7 @@ def measure(im, border=(0,0,0,0)):
 """
 Convert the specified font to a pair of .c/.h C language lookup tables in BGR565 format
 """
-def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fmt_rgb565, fmt_pal4bpp, fmt_pal2bpp, fmt_pal1bpp, fmt_mono4bpp, fmt_mono2bpp, fmt_mono1bpp):
+def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fmt_rgb565, fmt_pal8bpp, fmt_pal4bpp, fmt_pal2bpp, fmt_pal1bpp, fmt_mono4bpp, fmt_mono2bpp, fmt_mono1bpp):
     print("Converting %s to gfx-%s.c/h" % (graphic_fname, output_filename))
     sane_name = re.sub(r"[^a-zA-Z0-9]", "_", output_filename)
     graphic_image = Image.open(graphic_fname)
@@ -240,6 +261,14 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
         image_format = "IMAGE_FORMAT_RGB565"
         format_name = "rgb565"
         image_bpp = 16,
+    elif fmt_pal8bpp:
+        graphic_data = image_to_palette8bpp(graphic_image)
+        newline_counter = 32
+        image_format = "IMAGE_FORMAT_PALETTE"
+        format_name = "pal8bpp"
+        has_palette = True
+        palette_size = 256
+        image_bpp = 8
     elif fmt_pal4bpp:
         graphic_data = image_to_palette4bpp(graphic_image)
         newline_counter = 32
@@ -331,11 +360,11 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
         gfx_source_file.write("static const uint8_t gfx_%s_chunk_data[%d] = {\n " % (sane_name, len(compressed_data)))
         count = 0
         for j in compressed_data:
-            gfx_source_file.write(" 0b{0:08b}".format(j))
+            gfx_source_file.write(" 0x{0:02X}".format(j))
             count += 1
             if count < len(compressed_data):
                 gfx_source_file.write(",")
-                if (count % 16) == 0: # Place a new line when we reach the same number of pixels as each row
+                if (count % 32) == 0: # Place a new line when we reach the same number of pixels as each row
                     gfx_source_file.write("\n ")
         gfx_source_file.write("\n};\n\n")
 
@@ -412,6 +441,7 @@ def main():
     group_fmt.add_argument('-4',  '--4bpp',      help="Output format of monochrome 4bpp",           dest="fmt_mono4bpp", action="store_true")
     group_fmt.add_argument('-2',  '--2bpp',      help="Output format of monochrome 2bpp",           dest="fmt_mono2bpp", action="store_true")
     group_fmt.add_argument('-1',  '--1bpp',      help="Output format of monochrome 1bpp",           dest="fmt_mono1bpp", action="store_true")
+    group_fmt.add_argument(       '--pal8bpp',   help="Output format of 8bpp (256-colour) palette", dest="fmt_pal8bpp",  action="store_true")
     group_fmt.add_argument(       '--pal4bpp',   help="Output format of 4bpp (16-colour) palette",  dest="fmt_pal4bpp",  action="store_true")
     group_fmt.add_argument(       '--pal2bpp',   help="Output format of 2bpp (4-colour) palette",   dest="fmt_pal2bpp",  action="store_true")
     group_fmt.add_argument(       '--pal1bpp',   help="Output format of 1bpp (2-colour) palette",   dest="fmt_pal1bpp",  action="store_true")
@@ -419,6 +449,7 @@ def main():
     group_fmt.set_defaults(fmt_mono4bpp=False)
     group_fmt.set_defaults(fmt_mono2bpp=False)
     group_fmt.set_defaults(fmt_mono1bpp=False)
+    group_fmt.set_defaults(fmt_pal8bpp=False)
     group_fmt.set_defaults(fmt_pal4bpp=False)
     group_fmt.set_defaults(fmt_pal2bpp=False)
     group_fmt.set_defaults(fmt_pal1bpp=False)
@@ -437,7 +468,7 @@ def main():
 
         convert_graphic_to_c(args.image_file, args.output, args.compress, args.chunksize,
         args.fmt_rgb565,
-        args.fmt_pal4bpp, args.fmt_pal2bpp, args.fmt_pal1bpp,
+        args.fmt_pal8bpp, args.fmt_pal4bpp, args.fmt_pal2bpp, args.fmt_pal1bpp,
         args.fmt_mono4bpp, args.fmt_mono2bpp, args.fmt_mono1bpp)
 
 if __name__ == "__main__":

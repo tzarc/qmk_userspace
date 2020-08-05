@@ -19,8 +19,8 @@
 #include "rgblight_list.h"
 #include "color.h"
 
-#include "gfx-badge-dark_160px_4bpp.c"
-#define IMAGE gfx_badge_dark_160px_4bpp
+#include "gfx-djinn.c"
+#define IMAGE gfx_djinn
 
 void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
 

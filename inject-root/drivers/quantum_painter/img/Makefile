@@ -16,7 +16,7 @@ logo_file_$1_$2_$3 := badge-$$(logo_type_$1_$2_$3)_$$(logo_width_$1_$2_$3)px_$$(
 logo_target_$1_$2_$3 := $$(logo_file_$1_$2_$3).h
 $$(logo_target_$1_$2_$3): Makefile $(CONVERT_GFX)
 	@convert badge-$$(logo_type_$1_$2_$3).svg -depth 8 -background black -geometry $$(logo_width_$1_$2_$3)x $$(logo_file_$1_$2_$3).png
-	$(CONVERT_GFX) -c -k $(CHUNK_SIZE) --pal$$(logo_bpp_$1_$2_$3)bpp -i $$(logo_file_$1_$2_$3).png -o $$(logo_file_$1_$2_$3)
+	@$(CONVERT_GFX) -c -k $(CHUNK_SIZE) --pal$$(logo_bpp_$1_$2_$3)bpp -i $$(logo_file_$1_$2_$3).png -o $$(logo_file_$1_$2_$3)
 files: $$(logo_target_$1_$2_$3)
 endef
 
