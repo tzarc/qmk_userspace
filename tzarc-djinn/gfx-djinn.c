@@ -24,6 +24,10 @@
 #include <qp.h>
 #include <qp_internal.h>
 
+#if (QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE < 4096)
+#    error Need to "#define QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE 4096" or greater in your config.h
+#endif
+
 // clang-format off
 
 static const uint8_t gfx_djinn_palette[12] = {

@@ -116,7 +116,13 @@ static inline void lcd_viewport(ili9341_painter_device_t *lcd, uint16_t xbegin, 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Static buffer used for decompression
-static uint8_t decompressed_buf[QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE] = {0};
+#if QUANTUM_PAINTER_SUPPORTS_256_PALETTE
+static uint16_t rgb565_palette[256];
+#else
+static uint16_t rgb565_palette[16];
+#endif
+static uint8_t  decompressed_buf[QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE];
+static uint16_t pixdata_transmit_buf[ILI9341_PIXDATA_BUFSIZE];
 
 // Colour conversion to LCD-native
 static inline uint16_t rgb_to_ili9341(uint8_t r, uint8_t g, uint8_t b) {
@@ -136,7 +142,6 @@ static inline uint16_t hsv_to_ili9341(uint8_t hue, uint8_t sat, uint8_t val) {
 
 // Palette renderer
 static inline void lcd_send_palette_pixdata_impl(ili9341_painter_device_t *lcd, const uint16_t *const rgb565_palette, uint8_t bits_per_pixel, uint32_t pixel_count, const void *const pixel_data, uint32_t byte_count) {
-    uint16_t       buf[ILI9341_PIXDATA_BUFSIZE];
     const uint8_t  pixel_bitmask       = (1 << bits_per_pixel) - 1;
     const uint8_t  pixels_per_byte     = 8 / bits_per_pixel;
     const uint16_t max_transmit_pixels = ((ILI9341_PIXDATA_BUFSIZE / pixels_per_byte) * pixels_per_byte);  // the number of rgb565 pixels that we can complete fit in the buffer
@@ -146,7 +151,7 @@ static inline void lcd_send_palette_pixdata_impl(ili9341_painter_device_t *lcd, 
     // Transmit each block of pixels
     while (remaining_pixels > 0) {
         uint16_t  transmit_pixels = remaining_pixels < max_transmit_pixels ? remaining_pixels : max_transmit_pixels;
-        uint16_t *target16        = (uint16_t *)buf;
+        uint16_t *target16        = (uint16_t *)pixdata_transmit_buf;
         for (uint16_t p = 0; p < transmit_pixels; p += pixels_per_byte) {
             uint8_t pixval      = *pixdata;
             uint8_t loop_pixels = remaining_pixels < pixels_per_byte ? remaining_pixels : pixels_per_byte;
@@ -156,7 +161,7 @@ static inline void lcd_send_palette_pixdata_impl(ili9341_painter_device_t *lcd, 
             }
             ++pixdata;
         }
-        lcd_sendbuf(lcd, buf, transmit_pixels * sizeof(uint16_t));
+        lcd_sendbuf(lcd, pixdata_transmit_buf, transmit_pixels * sizeof(uint16_t));
         remaining_pixels -= transmit_pixels;
     }
 }
@@ -164,7 +169,6 @@ static inline void lcd_send_palette_pixdata_impl(ili9341_painter_device_t *lcd, 
 // Recoloured renderer
 static inline void lcd_send_palette_pixdata(ili9341_painter_device_t *lcd, const uint8_t *const rgb_palette, uint8_t bits_per_pixel, uint32_t pixel_count, const void *const pixel_data, uint32_t byte_count) {
     // Generate the colour lookup table
-    uint16_t rgb565_palette[256];
     uint16_t items = 1 << bits_per_pixel;  // number of items we need to intepolate
     for (uint16_t i = 0; i < items; ++i) {
         rgb565_palette[i] = rgb_to_ili9341(rgb_palette[i * 3 + 0], rgb_palette[i * 3 + 1], rgb_palette[i * 3 + 2]);

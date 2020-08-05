@@ -325,6 +325,19 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
     gfx_source_file.write("#include <stdint.h>\n")
     gfx_source_file.write("#include <qp.h>\n")
     gfx_source_file.write("#include <qp_internal.h>\n\n")
+
+    # Compile-time safety check: if compressed, ensure the buffer size is large enough
+    if compress == True:
+        gfx_source_file.write("#if (QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE < %d)\n" % (int(chunksize)))
+        gfx_source_file.write("#    error Need to \"#define QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE %d\" or greater in your config.h\n" % (int(chunksize)))
+        gfx_source_file.write("#endif\n\n")
+
+    # Compile-time safety check: if using 256-colour palette, make sure we support 256 colours in the driver
+    if has_palette and image_bpp == 8:
+        gfx_source_file.write("#if (!(QUANTUM_PAINTER_SUPPORTS_256_PALETTE))\n")
+        gfx_source_file.write("#    error Need to \"#define QUANTUM_PAINTER_SUPPORTS_256_PALETTE TRUE\" in your config.h (requires extra RAM)\n")
+        gfx_source_file.write("#endif\n\n")
+
     gfx_source_file.write("// clang-format off\n\n")
 
     # Generate image palette lookup table
