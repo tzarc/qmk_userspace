@@ -30,7 +30,7 @@ typedef const void *painter_device_t;
 typedef enum { QP_ROTATION_0, QP_ROTATION_90, QP_ROTATION_180, QP_ROTATION_270 } painter_rotation_t;
 
 // Image types -- handled by qmk convert-image
-typedef enum { IMAGE_FORMAT_RAW, IMAGE_FORMAT_RGB565, IMAGE_FORMAT_MONO4BPP, IMAGE_FORMAT_MONO2BPP, IMAGE_FORMAT_MONO1BPP } painter_image_format_t;
+typedef enum { IMAGE_FORMAT_RAW, IMAGE_FORMAT_RGB565, IMAGE_FORMAT_GREYSCALE, IMAGE_FORMAT_PALETTE } painter_image_format_t;
 typedef enum { IMAGE_UNCOMPRESSED, IMAGE_COMPRESSED_LZF } painter_compression_t;
 typedef struct painter_image_descriptor_t {
     const painter_image_format_t image_format;

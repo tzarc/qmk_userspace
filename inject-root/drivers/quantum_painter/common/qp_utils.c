@@ -23,7 +23,7 @@ uint32_t qp_decode(const void* const input_buffer, const uint32_t input_size, vo
     return (uint32_t)lzf_decompress(input_buffer, input_size, output_buffer, output_size);
 }
 
-void qp_generate_colour_lookup_table(HSV* lookup_table, int16_t items, int16_t hue_fg, int16_t sat_fg, int16_t val_fg, int16_t hue_bg, int16_t sat_bg, int16_t val_bg) {
+void qp_generate_palette(HSV* lookup_table, int16_t items, int16_t hue_fg, int16_t sat_fg, int16_t val_fg, int16_t hue_bg, int16_t sat_bg, int16_t val_bg) {
     // Make sure we take the "shortest" route from one hue to the other
     if ((hue_fg - hue_bg) >= 128) {
         hue_bg += 256;

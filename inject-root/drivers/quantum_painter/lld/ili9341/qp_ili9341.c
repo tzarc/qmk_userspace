@@ -107,33 +107,29 @@ static inline void lcd_viewport(ili9341_painter_device_t *lcd, uint16_t xbegin, 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Colour conversion to LCD-native
-static inline uint16_t hsv_to_ili9341(uint8_t hue, uint8_t sat, uint8_t val) {
-    RGB      rgb    = hsv_to_rgb_nocie((HSV){hue, sat, val});
-    uint16_t rgb565 = (((uint16_t)rgb.r) >> 3) << 11 | (((uint16_t)rgb.g) >> 2) << 5 | (((uint16_t)rgb.b) >> 3);
+static inline uint16_t rgb_to_ili9341(uint8_t r, uint8_t g, uint8_t b) {
+    uint16_t rgb565 = (((uint16_t)r) >> 3) << 11 | (((uint16_t)g) >> 2) << 5 | (((uint16_t)b) >> 3);
     return BYTE_SWAP(rgb565);
 }
 
+// Colour conversion to LCD-native
+static inline uint16_t hsv_to_ili9341(uint8_t hue, uint8_t sat, uint8_t val) {
+    RGB rgb = hsv_to_rgb_nocie((HSV){hue, sat, val});
+    return rgb_to_ili9341(rgb.r, rgb.g, rgb.b);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Monochrome-format image rendering
+// Palette / Monochrome-format image rendering
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Recoloured renderer
-static inline void lcd_send_mono_pixdata_recolour(ili9341_painter_device_t *lcd, uint8_t bits_per_pixel, uint32_t pixel_count, const void *pixel_data, uint32_t byte_count, int16_t hue_fg, int16_t sat_fg, int16_t val_fg, int16_t hue_bg, int16_t sat_bg, int16_t val_bg) {
+// Palette renderer
+static inline void lcd_send_palette_pixdata_impl(ili9341_painter_device_t *lcd, const uint16_t *const rgb565_palette, uint8_t bits_per_pixel, uint32_t pixel_count, const void *const pixel_data, uint32_t byte_count) {
     uint16_t       buf[ILI9341_PIXDATA_BUFSIZE];
     const uint8_t  pixel_bitmask       = (1 << bits_per_pixel) - 1;
     const uint8_t  pixels_per_byte     = 8 / bits_per_pixel;
     const uint16_t max_transmit_pixels = ((ILI9341_PIXDATA_BUFSIZE / pixels_per_byte) * pixels_per_byte);  // the number of rgb565 pixels that we can complete fit in the buffer
     const uint8_t *pixdata             = (const uint8_t *)pixel_data;
     uint32_t       remaining_pixels    = pixel_count;  // don't try to derive from byte_count, we may not use an entire byte
-
-    // Generate the colour lookup table
-    HSV      hsv_lookup_table[16];
-    uint16_t rgb565_lookup_table[16];
-    uint8_t  items = 1 << bits_per_pixel;  // number of items we need to intepolate
-    qp_generate_colour_lookup_table(hsv_lookup_table, items, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
-    for (uint8_t i = 0; i < items; ++i) {
-        rgb565_lookup_table[i] = hsv_to_ili9341(hsv_lookup_table[i].h, hsv_lookup_table[i].s, hsv_lookup_table[i].v);
-    }
 
     // Transmit each block of pixels
     while (remaining_pixels > 0) {
@@ -143,7 +139,7 @@ static inline void lcd_send_mono_pixdata_recolour(ili9341_painter_device_t *lcd,
             uint8_t pixval      = *pixdata;
             uint8_t loop_pixels = remaining_pixels < pixels_per_byte ? remaining_pixels : pixels_per_byte;
             for (uint8_t q = 0; q < loop_pixels; ++q) {
-                *target16++ = rgb565_lookup_table[pixval & pixel_bitmask];
+                *target16++ = rgb565_palette[pixval & pixel_bitmask];
                 pixval >>= bits_per_pixel;
             }
             ++pixdata;
@@ -153,8 +149,36 @@ static inline void lcd_send_mono_pixdata_recolour(ili9341_painter_device_t *lcd,
     }
 }
 
+// Recoloured renderer
+static inline void lcd_send_palette_pixdata(ili9341_painter_device_t *lcd, const uint8_t *const rgb_palette, uint8_t bits_per_pixel, uint32_t pixel_count, const void *const pixel_data, uint32_t byte_count) {
+    // Generate the colour lookup table
+    uint16_t rgb565_palette[16];
+    uint16_t items = 1 << bits_per_pixel;  // number of items we need to intepolate
+    for (uint16_t i = 0; i < items; ++i) {
+        rgb565_palette[i] = rgb_to_ili9341(rgb_palette[i * 3 + 0], rgb_palette[i * 3 + 1], rgb_palette[i * 3 + 2]);
+    }
+
+    // Transmit each block of pixels
+    lcd_send_palette_pixdata_impl(lcd, rgb565_palette, bits_per_pixel, pixel_count, pixel_data, byte_count);
+}
+
+// Recoloured renderer
+static inline void lcd_send_mono_pixdata_recolour(ili9341_painter_device_t *lcd, uint8_t bits_per_pixel, uint32_t pixel_count, const void *const pixel_data, uint32_t byte_count, int16_t hue_fg, int16_t sat_fg, int16_t val_fg, int16_t hue_bg, int16_t sat_bg, int16_t val_bg) {
+    // Generate the colour lookup table
+    HSV      hsv_lookup_table[16];
+    uint16_t rgb565_palette[16];
+    uint8_t  items = 1 << bits_per_pixel;  // number of items we need to intepolate
+    qp_generate_palette(hsv_lookup_table, items, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
+    for (uint8_t i = 0; i < items; ++i) {
+        rgb565_palette[i] = hsv_to_ili9341(hsv_lookup_table[i].h, hsv_lookup_table[i].s, hsv_lookup_table[i].v);
+    }
+
+    // Transmit each block of pixels
+    lcd_send_palette_pixdata_impl(lcd, rgb565_palette, bits_per_pixel, pixel_count, pixel_data, byte_count);
+}
+
 // Default implementation is greyscale
-static inline void lcd_send_mono_pixdata(ili9341_painter_device_t *lcd, uint8_t bits_per_pixel, uint32_t pixel_count, const void *pixel_data, uint32_t byte_count) { lcd_send_mono_pixdata_recolour(lcd, bits_per_pixel, pixel_count, pixel_data, byte_count, 0, 0, 255, 0, 0, 0); }
+static inline void lcd_send_mono_pixdata(ili9341_painter_device_t *lcd, uint8_t bits_per_pixel, uint32_t pixel_count, const void *const pixel_data, uint32_t byte_count) { lcd_send_mono_pixdata_recolour(lcd, bits_per_pixel, pixel_count, pixel_data, byte_count, 0, 0, 255, 0, 0, 0); }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Quantum Painter API implementations
@@ -456,20 +480,13 @@ bool qp_ili9341_drawimage(painter_device_t device, uint16_t x, uint16_t y, const
                 // The pixel data is in the correct format already -- send it directly to the device
                 lcd_sendbuf(lcd, buf, decompressed_size);
                 pixel_count -= decompressed_size / 2;
-            } else if (image->image_format == IMAGE_FORMAT_MONO4BPP) {
-                // Supplied pixel data is in 4bpp monochrome -- decode it to the equivalent pixel data
-                uint32_t pixels_this_loop = last_chunk ? pixel_count : (comp_image_desc->chunk_size * 8 / 4);
-                lcd_send_mono_pixdata(lcd, 4, pixels_this_loop, buf, decompressed_size);
+            } else if (image->image_format == IMAGE_FORMAT_GREYSCALE) {
+                uint32_t pixels_this_loop = last_chunk ? pixel_count : (comp_image_desc->chunk_size * 8 / comp_image_desc->image_bpp);
+                lcd_send_mono_pixdata(lcd, comp_image_desc->image_bpp, pixels_this_loop, buf, decompressed_size);
                 pixel_count -= pixels_this_loop;
-            } else if (image->image_format == IMAGE_FORMAT_MONO2BPP) {
-                // Supplied pixel data is in 2bpp monochrome -- decode it to the equivalent pixel data
-                uint32_t pixels_this_loop = last_chunk ? pixel_count : (comp_image_desc->chunk_size * 8 / 2);
-                lcd_send_mono_pixdata(lcd, 2, pixels_this_loop, buf, decompressed_size);
-                pixel_count -= pixels_this_loop;
-            } else if (image->image_format == IMAGE_FORMAT_MONO1BPP) {
-                // Supplied pixel data is in 1bpp monochrome -- decode it to the equivalent pixel data
-                uint32_t pixels_this_loop = last_chunk ? pixel_count : (comp_image_desc->chunk_size * 8 / 1);
-                lcd_send_mono_pixdata(lcd, 1, pixels_this_loop, buf, decompressed_size);
+            } else if (image->image_format == IMAGE_FORMAT_PALETTE) {
+                uint32_t pixels_this_loop = last_chunk ? pixel_count : (comp_image_desc->chunk_size * 8 / comp_image_desc->image_bpp);
+                lcd_send_palette_pixdata(lcd, comp_image_desc->image_palette, comp_image_desc->image_bpp, pixels_this_loop, buf, decompressed_size);
                 pixel_count -= pixels_this_loop;
             }
         }
@@ -479,15 +496,12 @@ bool qp_ili9341_drawimage(painter_device_t device, uint16_t x, uint16_t y, const
         if (image->image_format == IMAGE_FORMAT_RAW || image->image_format == IMAGE_FORMAT_RGB565) {
             // The pixel data is in the correct format already -- send it directly to the device
             lcd_sendbuf(lcd, raw_image_desc->image_data, raw_image_desc->byte_count);
-        } else if (image->image_format == IMAGE_FORMAT_MONO4BPP) {
+        } else if (image->image_format == IMAGE_FORMAT_GREYSCALE) {
             // Supplied pixel data is in 4bpp monochrome -- decode it to the equivalent pixel data
-            lcd_send_mono_pixdata(lcd, 4, pixel_count, raw_image_desc->image_data, raw_image_desc->byte_count);
-        } else if (image->image_format == IMAGE_FORMAT_MONO2BPP) {
-            // Supplied pixel data is in 2bpp monochrome -- decode it to the equivalent pixel data
-            lcd_send_mono_pixdata(lcd, 2, pixel_count, raw_image_desc->image_data, raw_image_desc->byte_count);
-        } else if (image->image_format == IMAGE_FORMAT_MONO1BPP) {
+            lcd_send_mono_pixdata(lcd, raw_image_desc->image_bpp, pixel_count, raw_image_desc->image_data, raw_image_desc->byte_count);
+        } else if (image->image_format == IMAGE_FORMAT_PALETTE) {
             // Supplied pixel data is in 1bpp monochrome -- decode it to the equivalent pixel data
-            lcd_send_mono_pixdata(lcd, 1, pixel_count, raw_image_desc->image_data, raw_image_desc->byte_count);
+            lcd_send_palette_pixdata(lcd, raw_image_desc->image_palette, raw_image_desc->image_bpp, pixel_count, raw_image_desc->image_data, raw_image_desc->byte_count);
         }
     }
 

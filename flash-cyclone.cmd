@@ -1,1 +1,1 @@
-st-link_cli -q -c SWD -p qmk_firmware\.build\handwired_tzarc_cyclone_default.hex -HardRst
+dfu-util.exe -a 0 -d 0483:df11 -s 0x08000000:leave -D handwired_tzarc_cyclone_tzarc.bin

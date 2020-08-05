@@ -25,13 +25,17 @@
 // Uncompressed raw image descriptor
 typedef struct painter_raw_image_descriptor_t {
     const painter_image_descriptor_t base;
-    const uint32_t                   byte_count;  // number of bytes in the image
-    const uint8_t *const             image_data;  // pointer to the image data
+    const uint32_t                   byte_count;     // number of bytes in the image
+    const uint8_t                    image_bpp;      // image depth
+    const uint8_t *const             image_palette;  // pointer to the image data
+    const uint8_t *const             image_data;     // pointer to the image data
 } painter_raw_image_descriptor_t;
 
 // Compressed image descriptor
 typedef struct painter_compressed_image_descriptor_t {
     const painter_image_descriptor_t base;
+    const uint8_t                    image_bpp;        // image depth
+    const uint8_t *const             image_palette;    // pointer to the image data
     const uint16_t                   chunk_count;      // number of chunks
     const uint16_t                   chunk_size;       // size of the base chunk -- the last one will usually be smaller and needs to be determined from compressed_size
     const uint32_t *const            chunk_offsets;    // offsets within the compressed_data where each chunk starts

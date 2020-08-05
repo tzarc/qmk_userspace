@@ -51,8 +51,84 @@ fileHeader = """\
 
 """
 
+"""Convert an image to a 4bpp (16-colour) palette image
 """
-Convert an image to a packed mono 4bpp byte array
+def image_to_palette4bpp(im):
+    im = im.convert("RGB")
+    im = im.convert("P", palette = Image.ADAPTIVE, colors=16)
+    pal = im.getpalette()
+    image_bytes = im.tobytes("raw","P")
+    image_bytes += b'\0' # Dummy value at the end for alignment
+    image_bytes_len = len(image_bytes)
+
+    # Convert the palette to rgb565 array
+    palarray = []
+    for n in range(0, 16*3, 3):
+        palarray.append([pal[n+0],pal[n+1],pal[n+2]])
+
+    # Convert to packed 4bpp palette image
+    pal4array = []
+    for x in range(int(image_bytes_len / 2)):
+        pal4array.append(
+            (image_bytes[x*2+1]&15) << 4 |
+            (image_bytes[x*2+0]&15))
+    return (palarray, pal4array)
+
+"""Convert an image to a 2bpp (4-colour) palette image
+"""
+def image_to_palette2bpp(im):
+    im = im.convert("RGB")
+    im = im.convert("P", palette = Image.ADAPTIVE, colors=4)
+    pal = im.getpalette()
+    image_bytes = im.tobytes("raw","P")
+    image_bytes += b'\0\0\0' # Dummy value at the end for alignment
+    image_bytes_len = len(image_bytes)
+
+    # Convert the palette to rgb565 array
+    palarray = []
+    for n in range(0, 4*3, 3):
+        palarray.append([pal[n+0],pal[n+1],pal[n+2]])
+
+    # Convert to packed 2bpp palette image
+    pal2array = []
+    for x in range(int(image_bytes_len / 4)):
+        pal2array.append(
+            (image_bytes[x*4+3]&3) << 6 |
+            (image_bytes[x*4+2]&3) << 4 |
+            (image_bytes[x*4+1]&3) << 2 |
+            (image_bytes[x*4+0]&3))
+    return (palarray, pal2array)
+
+"""Convert an image to a 1bpp (2-colour) palette image
+"""
+def image_to_palette1bpp(im):
+    im = im.convert("RGB")
+    im = im.convert("P", palette = Image.ADAPTIVE, colors=2)
+    pal = im.getpalette()
+    image_bytes = im.tobytes("raw","P")
+    image_bytes += b'\0\0\0\0\0\0\0' # Dummy value at the end for alignment
+    image_bytes_len = len(image_bytes)
+
+    # Convert the palette to rgb565 array
+    palarray = []
+    for n in range(0, 2*3, 3):
+        palarray.append([pal[n+0],pal[n+1],pal[n+2]])
+
+    # Convert to packed 1bpp palette image
+    pal1array = []
+    for x in range(int(image_bytes_len / 8)):
+        pal1array.append(
+            (image_bytes[x*8+7]&1) << 7 |
+            (image_bytes[x*8+6]&1) << 6 |
+            (image_bytes[x*8+5]&1) << 5 |
+            (image_bytes[x*8+4]&1) << 4 |
+            (image_bytes[x*8+3]&1) << 3 |
+            (image_bytes[x*8+2]&1) << 2 |
+            (image_bytes[x*8+1]&1) << 1 |
+            (image_bytes[x*8+0]&1))
+    return (palarray, pal1array)
+
+"""Convert an image to a packed mono 4bpp byte array
 """
 def image_to_mono4bpp(im):
     im = im.convert("RGB")
@@ -61,16 +137,15 @@ def image_to_mono4bpp(im):
     image_bytes_len = len(image_bytes)
 
     # Convert 8bpp to packed 4bpp
-    mono2array = []
+    mono4array = []
     for x in range(int(image_bytes_len / 2)):
-        mono2array.append(
+        mono4array.append(
             rescale(image_bytes[x*2+1], 15) << 4 |
             rescale(image_bytes[x*2+0], 15))
 
-    return mono2array
+    return mono4array
 
-"""
-Convert an image to a packed mono 2bpp byte array
+"""Convert an image to a packed mono 2bpp byte array
 """
 def image_to_mono2bpp(im):
     im = im.convert("RGB")
@@ -89,8 +164,7 @@ def image_to_mono2bpp(im):
 
     return mono2array
 
-"""
-Convert an image to a packed mono 1bpp byte array
+"""Convert an image to a packed mono 1bpp byte array
 """
 def image_to_mono1bpp(im):
     im = im.convert("RGB")
@@ -113,8 +187,7 @@ def image_to_mono1bpp(im):
 
     return mono1array
 
-"""
-Convert an image to a rgb565 byte array
+"""Convert an image to a rgb565 byte array
 """
 def image_to_rgb565(im):
     im = im.convert("RGB")
@@ -145,10 +218,11 @@ def measure(im, border=(0,0,0,0)):
 """
 Convert the specified font to a pair of .c/.h C language lookup tables in BGR565 format
 """
-def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fmt_rgb565, fmt_4bpp, fmt_2bpp, fmt_1bpp):
+def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fmt_rgb565, fmt_pal4bpp, fmt_pal2bpp, fmt_pal1bpp, fmt_mono4bpp, fmt_mono2bpp, fmt_mono1bpp):
     print("Converting %s to gfx-%s.c/h" % (graphic_fname, output_filename))
     sane_name = re.sub(r"[^a-zA-Z0-9]", "_", output_filename)
     graphic_image = Image.open(graphic_fname)
+    has_palette = False
 
     if compress == True:
         if chunksize < 64:
@@ -165,21 +239,49 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
         newline_counter = int(width * 2)
         image_format = "IMAGE_FORMAT_RGB565"
         format_name = "rgb565"
-    elif fmt_4bpp:
+        image_bpp = 16,
+    elif fmt_pal4bpp:
+        graphic_data = image_to_palette4bpp(graphic_image)
+        newline_counter = 32
+        image_format = "IMAGE_FORMAT_PALETTE"
+        format_name = "pal4bpp"
+        has_palette = True
+        palette_size = 16
+        image_bpp = 4
+    elif fmt_pal2bpp:
+        graphic_data = image_to_palette2bpp(graphic_image)
+        newline_counter = 32
+        image_format = "IMAGE_FORMAT_PALETTE"
+        format_name = "pal2bpp"
+        has_palette = True
+        palette_size = 4
+        image_bpp = 2
+    elif fmt_pal1bpp:
+        graphic_data = image_to_palette1bpp(graphic_image)
+        newline_counter = 32
+        image_format = "IMAGE_FORMAT_PALETTE"
+        format_name = "pal1bpp"
+        has_palette = True
+        palette_size = 2
+        image_bpp = 1
+    elif fmt_mono4bpp:
         graphic_data = image_to_mono4bpp(graphic_image)
         newline_counter = int(width / 2)
-        image_format = "IMAGE_FORMAT_MONO4BPP"
+        image_format = "IMAGE_FORMAT_GREYSCALE"
         format_name = "4bpp"
-    elif fmt_2bpp:
+        image_bpp = 4
+    elif fmt_mono2bpp:
         graphic_data = image_to_mono2bpp(graphic_image)
         newline_counter = int(width / 4)
-        image_format = "IMAGE_FORMAT_MONO2BPP"
+        image_format = "IMAGE_FORMAT_GREYSCALE"
         format_name = "2bpp"
-    elif fmt_1bpp:
+        image_bpp = 2
+    elif fmt_mono1bpp:
         graphic_data = image_to_mono1bpp(graphic_image)
         newline_counter = int(width / 8)
-        image_format = "IMAGE_FORMAT_MONO1BPP"
+        image_format = "IMAGE_FORMAT_GREYSCALE"
         format_name = "1bpp"
+        image_bpp = 1
 
     # Generate the output filenames
     gfx_source_filename = "gfx-%s.c" % (output_filename)
@@ -196,10 +298,21 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
     gfx_source_file.write("#include <qp_internal.h>\n\n")
     gfx_source_file.write("// clang-format off\n\n")
 
+    # Generate image palette lookup table
+    if has_palette:
+        image_palette = graphic_data[0]
+        gfx_source_file.write("static const uint8_t gfx_%s_palette[%d] = {\n" % (sane_name, len(image_palette)*3))
+        count = 0
+        for j in image_palette:
+            gfx_source_file.write("  0x{0:02X}, 0x{1:02X}, 0x{2:02X},  // {3:3d} / 0x{3:02X}\n".format(j[0], j[1], j[2], count))
+            count += 1
+        gfx_source_file.write("};\n\n")
+
     if compress == True:
+        image_data = graphic_data[1] if has_palette else graphic_data
         compressed_data = []
         compressed_chunk_offsets = []
-        uncompressed_graphic_data = graphic_data.copy()
+        uncompressed_graphic_data = image_data.copy()
         while len(uncompressed_graphic_data) > 0:
             chunk_size = min(chunksize,len(uncompressed_graphic_data))
             uncompressed_chunk = uncompressed_graphic_data[0:chunk_size]
@@ -234,22 +347,25 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
         gfx_source_file.write("\n    .width        = %d," % (width))
         gfx_source_file.write("\n    .height       = %d" % (height))
         gfx_source_file.write("\n  },")
+        gfx_source_file.write("\n  .image_bpp       = %d," % (image_bpp))
+        gfx_source_file.write("\n  .image_palette   = %s," % ("gfx_%s_palette" % (sane_name) if has_palette else "NULL"))
         gfx_source_file.write("\n  .chunk_count     = %d," % (len(compressed_chunk_offsets)))
         gfx_source_file.write("\n  .chunk_size      = %d," % (chunksize))
         gfx_source_file.write("\n  .chunk_offsets   = gfx_%s_chunk_offsets," % (sane_name))
         gfx_source_file.write("\n  .compressed_data = gfx_%s_chunk_data," % (sane_name))
-        gfx_source_file.write("\n  .compressed_size = %d  // original = %d bytes (%s) / %6.2f%% of original // rgb24 = %d bytes / %6.2f%% of rgb24" % (len(compressed_data), len(graphic_data), format_name, (100*len(compressed_data)/len(graphic_data)), (3*width*height), (100*len(compressed_data)/(3*width*height))))
+        gfx_source_file.write("\n  .compressed_size = %d  // original = %d bytes (%s) / %6.2f%% of original // rgb24 = %d bytes / %6.2f%% of rgb24" % (len(compressed_data), len(image_data), format_name, (100*len(compressed_data)/len(image_data)), (3*width*height), (100*len(compressed_data)/(3*width*height))))
         gfx_source_file.write("\n};\n\n")
         gfx_source_file.write("painter_image_t gfx_%s = (painter_image_t)&gfx_%s_compressed;\n\n" % (sane_name, sane_name))
 
     else:
         # Generate image data lookup table
-        gfx_source_file.write("static const uint8_t gfx_%s_data[%d] = {\n " % (sane_name, len(graphic_data)))
+        image_data = graphic_data[1] if has_palette else graphic_data
+        gfx_source_file.write("static const uint8_t gfx_%s_data[%d] = {\n " % (sane_name, len(image_data)))
         count = 0
-        for j in graphic_data:
+        for j in image_data:
             gfx_source_file.write(" 0b{0:08b}".format(j))
             count += 1
-            if count < len(graphic_data):
+            if count < len(image_data):
                 gfx_source_file.write(",")
                 if (count % newline_counter) == 0: # Place a new line when we reach the same number of pixels as each row
                     gfx_source_file.write("\n ")
@@ -263,8 +379,10 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
         gfx_source_file.write("\n    .width        = %d," % (width))
         gfx_source_file.write("\n    .height       = %d" % (height))
         gfx_source_file.write("\n  },")
-        gfx_source_file.write("\n  .byte_count   = %d," % (len(graphic_data)))
-        gfx_source_file.write("\n  .image_data   = gfx_%s_data," % (sane_name))
+        gfx_source_file.write("\n  .image_bpp     = %d," % (image_bpp))
+        gfx_source_file.write("\n  .image_palette = %s," % ("gfx_%s_palette" % (sane_name) if has_palette else "NULL"))
+        gfx_source_file.write("\n  .byte_count    = %d," % (len(image_data)))
+        gfx_source_file.write("\n  .image_data    = gfx_%s_data," % (sane_name))
         gfx_source_file.write("\n};\n\n")
         gfx_source_file.write("painter_image_t gfx_%s = (painter_image_t)&gfx_%s_raw;\n\n" % (sane_name, sane_name))
 
@@ -290,14 +408,20 @@ def main():
     parser.set_defaults(chunksize=128)
 
     group_fmt = parser.add_mutually_exclusive_group(required=True)
-    group_fmt.add_argument('-r',  '--rgb565',    help="Output format of RGB565",          dest="fmt_rgb565", action="store_true")
-    group_fmt.add_argument('-4',  '--4bpp',      help="Output format of monochrome 4bpp", dest="fmt_4bpp",   action="store_true")
-    group_fmt.add_argument('-2',  '--2bpp',      help="Output format of monochrome 2bpp", dest="fmt_2bpp",   action="store_true")
-    group_fmt.add_argument('-1',  '--1bpp',      help="Output format of monochrome 1bpp", dest="fmt_1bpp",   action="store_true")
+    group_fmt.add_argument('-r',  '--rgb565',    help="Output format of RGB565",                    dest="fmt_rgb565",   action="store_true")
+    group_fmt.add_argument('-4',  '--4bpp',      help="Output format of monochrome 4bpp",           dest="fmt_mono4bpp", action="store_true")
+    group_fmt.add_argument('-2',  '--2bpp',      help="Output format of monochrome 2bpp",           dest="fmt_mono2bpp", action="store_true")
+    group_fmt.add_argument('-1',  '--1bpp',      help="Output format of monochrome 1bpp",           dest="fmt_mono1bpp", action="store_true")
+    group_fmt.add_argument(       '--pal4bpp',   help="Output format of 4bpp (16-colour) palette",  dest="fmt_pal4bpp",  action="store_true")
+    group_fmt.add_argument(       '--pal2bpp',   help="Output format of 2bpp (4-colour) palette",   dest="fmt_pal2bpp",  action="store_true")
+    group_fmt.add_argument(       '--pal1bpp',   help="Output format of 1bpp (2-colour) palette",   dest="fmt_pal1bpp",  action="store_true")
     group_fmt.set_defaults(fmt_rgb565=False)
-    group_fmt.set_defaults(fmt_4bpp=False)
-    group_fmt.set_defaults(fmt_2bpp=False)
-    group_fmt.set_defaults(fmt_1bpp=False)
+    group_fmt.set_defaults(fmt_mono4bpp=False)
+    group_fmt.set_defaults(fmt_mono2bpp=False)
+    group_fmt.set_defaults(fmt_mono1bpp=False)
+    group_fmt.set_defaults(fmt_pal4bpp=False)
+    group_fmt.set_defaults(fmt_pal2bpp=False)
+    group_fmt.set_defaults(fmt_pal1bpp=False)
 
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-i',  '--image-file',   type=str, help="The image file to use")
@@ -311,7 +435,10 @@ def main():
             print("Can't find file %s" % (args.image_file))
             sys.exit(1)
 
-        convert_graphic_to_c(args.image_file, args.output, args.compress, args.chunksize, args.fmt_rgb565, args.fmt_4bpp, args.fmt_2bpp, args.fmt_1bpp)
+        convert_graphic_to_c(args.image_file, args.output, args.compress, args.chunksize,
+        args.fmt_rgb565,
+        args.fmt_pal4bpp, args.fmt_pal2bpp, args.fmt_pal1bpp,
+        args.fmt_mono4bpp, args.fmt_mono2bpp, args.fmt_mono1bpp)
 
 if __name__ == "__main__":
     main()
