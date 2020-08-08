@@ -15,6 +15,6 @@ ifeq ($(strip $(KEYBOARD)), massdrop/ctrl)
 endif
 
 # platform-specific configs
-ifeq ($(PLATFORM),VUSB)
+ifeq ($(PROTOCOL),VUSB)
     RAW_ENABLE = no
 endif

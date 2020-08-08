@@ -19,8 +19,8 @@ fi
 
 declare -a prs_to_apply
 prs_to_apply+=(9603) # Matrix delay
+prs_to_apply+=(8256) # dump_vars
 #prs_to_apply+=(8893) # F4 inout endpoint refactor
-prs_to_apply+=(9856) # hsv_to_rgb_nocie
 #prs_to_apply+=(6165) # ARM audio DAC/PWM change
 #prs_to_apply+=(8778) # Dual-bank bootloader
 #prs_to_apply+=(8291) # GPT ARM backlight

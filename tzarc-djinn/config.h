@@ -24,7 +24,7 @@
 #define MATRIX_ROW_PINS \
     { C5, C4, A10 }
 #define MATRIX_COL_PINS \
-    { B3, B5, B10 }
+    { A9, B5, B10 }
 
 #define DIODE_DIRECTION ROW2COL
 
@@ -59,8 +59,8 @@
 // LCD Configuration
 #define ILI9341_SPI_DIVISOR 16
 #define ILI9341_PIXDATA_BUFSIZE 240
-#define LCD_RST_PIN A13
-#define LCD_CS_PIN A14
+#define LCD_RST_PIN B3
+#define LCD_CS_PIN D2
 #define LCD_DC_PIN A15
 
 // Backlight driver (to control LCD backlight)
@@ -98,3 +98,12 @@
 
 // Display configuration
 #define QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE 4096
+
+/* disable action features */
+#define NO_ACTION_LAYER
+#define NO_ACTION_TAPPING
+#define NO_ACTION_ONESHOT
+
+/* disable these deprecated features by default */
+#define NO_ACTION_MACRO
+#define NO_ACTION_FUNCTION

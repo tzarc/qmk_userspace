@@ -17,7 +17,11 @@
 #pragma once
 
 // Handle per-key tapping timing
+#ifdef TAPPING_TERM
+#undef TAPPING_TERM
+#endif // TAPPING_TERM
 #define TAPPING_TERM 120
+
 #define TAPPING_TERM_PER_KEY
 #define IGNORE_MOD_TAP_INTERRUPT_PER_KEY
 
