@@ -99,6 +99,11 @@
 // Display configuration
 #define QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE 4096
 
+// EEPROM configuration
+#define EXTERNAL_EEPROM_SPI_SLAVE_SELECT_PIN B5
+#define EXTERNAL_EEPROM_SPI_CLOCK_DIVISOR 8
+#define EXTERNAL_EEPROM_PAGE_SIZE 256
+
 /* disable action features */
 #define NO_ACTION_LAYER
 #define NO_ACTION_TAPPING
