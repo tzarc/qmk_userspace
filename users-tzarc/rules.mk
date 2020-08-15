@@ -11,10 +11,12 @@ RAW_ENABLE = yes
 
 # board-specific configs
 ifeq ($(strip $(KEYBOARD)), massdrop/ctrl)
-    LTO_ENABLE = no
+	LTO_ENABLE = no
 endif
 
 # platform-specific configs
 ifeq ($(PROTOCOL),VUSB)
-    RAW_ENABLE = no
+	MOUSEKEY_ENABLE = yes
+	EXTRAKEY_ENABLE = yes
+	VIA_ENABLE = yes
 endif

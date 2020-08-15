@@ -36,7 +36,7 @@ CIE1931_CURVE = yes
 RGBLIGHT_ENABLE = yes
 #RGB_MATRIX_ENABLE = WS2812
 
-EEPROM_DRIVER = spi
+#EEPROM_DRIVER = spi
 
 VPATH += \
 	drivers/quantum_painter \
