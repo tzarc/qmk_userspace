@@ -7,7 +7,7 @@ SRC += \
 
 UNICODE_ENABLE = yes
 LTO_ENABLE = yes
-RAW_ENABLE = yes
+RAW_ENABLE = no
 
 # board-specific configs
 ifeq ($(strip $(KEYBOARD)), massdrop/ctrl)
@@ -15,8 +15,6 @@ ifeq ($(strip $(KEYBOARD)), massdrop/ctrl)
 endif
 
 # platform-specific configs
-ifeq ($(PROTOCOL),VUSB)
-	MOUSEKEY_ENABLE = yes
-	EXTRAKEY_ENABLE = yes
-	VIA_ENABLE = yes
+ifeq ($(OPT_OS),chibios)
+	RAW_ENABLE = yes
 endif

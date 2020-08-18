@@ -28,9 +28,11 @@
 // Pre-define the amount of space to use for userspace EEPROM
 #define TZARC_EEPROM_ALLOCATION 32
 
+#if !defined(VIA_ENABLE)
 // Modify the RAW usage page and id
-#define RAW_USAGE_PAGE 0xFF9C
-#define RAW_USAGE_ID 0x01
+#    define RAW_USAGE_PAGE 0xFF9C
+#    define RAW_USAGE_ID 0x01
+#endif
 
 // If we ever decide we're going to use VIA, then make sure we're not going to collide with any of the EEPROM settings for userspace.
 // Completely incompatible with the change in RAW usage page and ID.

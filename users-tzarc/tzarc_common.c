@@ -26,6 +26,7 @@ uint16_t typing_mode;
 
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
+        case KC_APP_RAISE:
         case KC_SFT_ENT:
             return TAPPING_TERM + 120;
         default:
