@@ -166,6 +166,57 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 //                                               └─────────────┴─────────────┴─────────────┴─────────────┴─────────────┴─────────────┘
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Layout Helpers: Split 7x4 layouts
+
+////////////////////////////////////////////////////////////////////////////////
+// Base layer
+#define ____________TZARC_7x4_BASE_R1_L__________ ____________TZARC_6x4_BASE_R1_L__________, KC_GRV
+#define ____________TZARC_7x4_BASE_R2_L__________ ____________TZARC_6x4_BASE_R2_L__________, KC_LBRC
+#define ____________TZARC_7x4_BASE_R3_L__________ ____________TZARC_6x4_BASE_R3_L__________, KC_HOME
+#define ____________TZARC_7x4_BASE_R4_L__________ ____________TZARC_6x4_BASE_R4_L__________, KC_END
+
+#define ____________TZARC_7x4_BASE_R1_R__________ KC_DEL,  ____________TZARC_6x4_BASE_R1_R__________
+#define ____________TZARC_7x4_BASE_R2_R__________ KC_RBRC, ____________TZARC_6x4_BASE_R2_R__________
+#define ____________TZARC_7x4_BASE_R3_R__________ KC_PGUP, ____________TZARC_6x4_BASE_R3_R__________
+#define ____________TZARC_7x4_BASE_R4_R__________ KC_PGDN, ____________TZARC_6x4_BASE_R4_R__________
+
+////////////////////////////////////////////////////////////////////////////////
+// Lower layer
+#define ____________TZARC_7x4_LOWER_R1_L_________ ____________TZARC_6x4_LOWER_R1_L_________, KC_TRNS
+#define ____________TZARC_7x4_LOWER_R2_L_________ ____________TZARC_6x4_LOWER_R2_L_________, KC_TRNS
+#define ____________TZARC_7x4_LOWER_R3_L_________ ____________TZARC_6x4_LOWER_R3_L_________, KC_TRNS
+#define ____________TZARC_7x4_LOWER_R4_L_________ ____________TZARC_6x4_LOWER_R4_L_________, KC_TRNS
+
+#define ____________TZARC_7x4_LOWER_R1_R_________ KC_TRNS, ____________TZARC_6x4_LOWER_R1_R_________
+#define ____________TZARC_7x4_LOWER_R2_R_________ KC_TRNS, ____________TZARC_6x4_LOWER_R2_R_________
+#define ____________TZARC_7x4_LOWER_R3_R_________ KC_TRNS, ____________TZARC_6x4_LOWER_R3_R_________
+#define ____________TZARC_7x4_LOWER_R4_R_________ KC_TRNS, ____________TZARC_6x4_LOWER_R4_R_________
+
+////////////////////////////////////////////////////////////////////////////////
+// Raise layer
+#define ____________TZARC_7x4_RAISE_R1_L_________ ____________TZARC_6x4_RAISE_R1_L_________, KC_TRNS
+#define ____________TZARC_7x4_RAISE_R2_L_________ ____________TZARC_6x4_RAISE_R2_L_________, KC_TRNS
+#define ____________TZARC_7x4_RAISE_R3_L_________ ____________TZARC_6x4_RAISE_R3_L_________, KC_TRNS
+#define ____________TZARC_7x4_RAISE_R4_L_________ ____________TZARC_6x4_RAISE_R4_L_________, KC_TRNS
+
+#define ____________TZARC_7x4_RAISE_R1_R_________ KC_TRNS, ____________TZARC_6x4_RAISE_R1_R_________
+#define ____________TZARC_7x4_RAISE_R2_R_________ KC_TRNS, ____________TZARC_6x4_RAISE_R2_R_________
+#define ____________TZARC_7x4_RAISE_R3_R_________ KC_TRNS, ____________TZARC_6x4_RAISE_R3_R_________
+#define ____________TZARC_7x4_RAISE_R4_R_________ KC_TRNS, ____________TZARC_6x4_RAISE_R4_R_________
+
+////////////////////////////////////////////////////////////////////////////////
+// Adjust layer
+#define ____________TZARC_7x4_ADJUST_R1_L________ ____________TZARC_6x4_ADJUST_R1_L________, KC_TRNS
+#define ____________TZARC_7x4_ADJUST_R2_L________ ____________TZARC_6x4_ADJUST_R2_L________, KC_TRNS
+#define ____________TZARC_7x4_ADJUST_R3_L________ ____________TZARC_6x4_ADJUST_R3_L________, KC_TRNS
+#define ____________TZARC_7x4_ADJUST_R4_L________ ____________TZARC_6x4_ADJUST_R4_L________, KC_TRNS
+
+#define ____________TZARC_7x4_ADJUST_R1_R________ KC_TRNS, ____________TZARC_6x4_ADJUST_R1_R________
+#define ____________TZARC_7x4_ADJUST_R2_R________ KC_TRNS, ____________TZARC_6x4_ADJUST_R2_R________
+#define ____________TZARC_7x4_ADJUST_R3_R________ KC_TRNS, ____________TZARC_6x4_ADJUST_R3_R________
+#define ____________TZARC_7x4_ADJUST_R4_R________ KC_TRNS, ____________TZARC_6x4_ADJUST_R4_R________
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Layout Helpers: Standard layout
 
 ////////////////////////////////////////////////////////////////////////////////

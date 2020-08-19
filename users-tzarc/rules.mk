@@ -5,6 +5,7 @@ SRC += \
 	tzarc_wow.c \
 	tzarc_diablo3.c
 
+BOOTMAGIC_ENABLE = lite
 UNICODE_ENABLE = yes
 LTO_ENABLE = yes
 RAW_ENABLE = no
