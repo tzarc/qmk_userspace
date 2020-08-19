@@ -7,11 +7,11 @@ script_dir="$(readlink -f "$(dirname "$this_script")")"
 
 unset upgrade_chibios
 unset upgrade_chibios_confs
-upgrade_chibios=1
+#upgrade_chibios=1
 #upgrade_chibios_confs=1
 
 target_branch="generated-workarea"
-target_qmk="master"
+target_qmk="develop"
 if [ ! -z ${upgrade_chibios:-} ] ; then
 target_branch="generated-chibios-master-upgrade"
 target_qmk="develop"
