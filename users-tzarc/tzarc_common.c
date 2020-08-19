@@ -251,6 +251,23 @@ bool process_record_aussie(uint16_t keycode, keyrecord_t *record) {
     return process_record_keymap(keycode, record);
 }
 
+bool process_record_zalgo(uint16_t keycode, keyrecord_t *record) {
+    if ((KC_A <= keycode) && (keycode <= KC_0)) {
+        if (record->event.pressed) {
+            tap_code16_nomods(keycode);
+
+            int number = (rand() % (8 + 1 - 2)) + 2;
+            for (int index = 0; index < number; index++) {
+                uint16_t hex = (rand() % (0x036F + 1 - 0x0300)) + 0x0300;
+                tap_unicode_glyph(hex);
+            }
+
+            return false;
+        }
+    }
+    return process_record_keymap(keycode, record);
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t reset_key_timer  = 0;
     static uint32_t eeprst_key_timer = 0;
@@ -361,6 +378,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
 
+        case KC_ZALGO:
+            if (record->event.pressed) {
+                if (typing_mode != KC_ZALGO) {
+                    dprint("Enabling zalgo mode\n");
+                }
+                typing_mode = keycode;
+            }
+            return false;
+
         case KC_WOWMODE:
             if (record->event.pressed) {
                 if (typing_mode != KC_WOWMODE) {
@@ -401,6 +427,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
     } else if (typing_mode == KC_AUSSIE) {
         return process_record_aussie(keycode, record);
+    } else if (typing_mode == KC_ZALGO) {
+        return process_record_zalgo(keycode, record);
     } else if (typing_mode == KC_WOWMODE) {
         if ((KC_A <= keycode) && (keycode <= KC_0)) {
             return process_record_wow(keycode, record);

@@ -19,7 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Common layers and keys
 
-enum { KC_CONFIG = SAFE_RANGE, TIME_RESET, TIME_EEPRST, KC_LOWER, KC_RAISE, KC_ADJUST, KC_NOMODE, KC_WIDE, KC_SCRIPT, KC_BLOCKS, KC_REGIONAL, KC_AUSSIE, KC_WOWMODE, KC_D3MODE, KEYMAP_SAFE_RANGE };
+enum { KC_CONFIG = SAFE_RANGE, TIME_RESET, TIME_EEPRST, KC_LOWER, KC_RAISE, KC_ADJUST, KC_NOMODE, KC_WIDE, KC_SCRIPT, KC_BLOCKS, KC_REGIONAL, KC_AUSSIE, KC_ZALGO, KC_WOWMODE, KC_D3MODE, KEYMAP_SAFE_RANGE };
 enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 
 #define KC_LOWER MO(LAYER_LOWER)
@@ -237,7 +237,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 //                                               └──────────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴──────────────────┘
 //                                               ┌─────────────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬─────────────┬─────────────┬──────────────────────────┐
 //                                               | Caps Lock           | A          | S          | D          | F          | G          | H          | J          | K          | L          | ;           | "           | Enter                    |
-#define ____________TZARC_LOWER_R4_ALPHA_________ KC_CAPS,              KC_WIDE,     KC_SCRIPT,   KC_BLOCKS,   KC_REGIONAL, KC_AUSSIE,   _______,     _______,     _______,     _______,     _______,      _______,      _______
+#define ____________TZARC_LOWER_R4_ALPHA_________ KC_CAPS,              KC_WIDE,     KC_SCRIPT,   KC_BLOCKS,   KC_REGIONAL, KC_AUSSIE,   KC_ZALGO,    _______,     _______,     _______,     _______,      _______,      _______
 //                                               └─────────────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴─────────────┴─────────────┴──────────────────────────┘
 //                                               ┌────────────────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬──────────────────────────────────────┐
 //                                               | LShift                 | Z          | X          | C          | V          | B          | N          | M          | ,          | .          | /          | RShift                               |
