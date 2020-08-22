@@ -362,9 +362,10 @@ bool qp_ili9341_power(painter_device_t device, bool power_on) {
             // There's a small amount of time for the LCD to get the display back on the screen -- it's all white beforehand.
             // Delay for a small amount of time and let the LCD catch up before turning the backlight on.
             wait_ms(20);
-            backlight_enable();
-        } else
-            backlight_disable();
+            backlight_set(get_backlight_level());
+        } else {
+            backlight_set(0);
+        }
     }
 #endif
 
