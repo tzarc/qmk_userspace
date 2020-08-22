@@ -7,7 +7,7 @@ script_dir="$(readlink -f "$(dirname "$this_script")")"
 
 unset upgrade_chibios
 unset upgrade_chibios_confs
-upgrade_chibios=1
+#upgrade_chibios=1
 #upgrade_chibios_confs=1
 
 target_branch="generated-workarea"

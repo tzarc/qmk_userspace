@@ -35,7 +35,7 @@ CONSOLE_ENABLE = yes
 
 SERIAL_DRIVER = usart
 
-RGBLIGHT_ENABLE = no
+RGBLIGHT_ENABLE = yes
 #WS2812_DRIVER = pwm
 
 BACKLIGHT_ENABLE = no
@@ -43,6 +43,9 @@ BACKLIGHT_ENABLE = no
 
 AUDIO_ENABLE = no
 #AUDIO_DRIVER = pwm_hardware
+
+WS2812_DRIVER = pwm
+CIE1931_CURVE = yes
 
 # Debugging
 #OPT_DEFS += -g -O0 -fno-lto
