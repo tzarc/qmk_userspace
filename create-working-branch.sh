@@ -20,6 +20,7 @@ fi
 declare -a prs_to_apply
 prs_to_apply+=(9603) # Matrix delay
 prs_to_apply+=(10088) # ChibiOS USB Wakeup
+prs_to_apply+=(10174) # Quantum Painter
 #prs_to_apply+=(8893) # F4 inout endpoint refactor
 #prs_to_apply+=(6165) # ARM audio DAC/PWM change
 #prs_to_apply+=(8778) # Dual-bank bootloader

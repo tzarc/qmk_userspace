@@ -28,9 +28,7 @@ BOARD_DEFS := \
 EXTRA_LINK_DEFS := \
 	layout-tkl_ansi-tzarc!layouts/community/tkl_ansi/tzarc \
 	layout-60_ansi-tzarc!layouts/community/60_ansi/tzarc \
-	users-tzarc!users/tzarc \
-	inject-root/drivers/quantum_painter!drivers/quantum_painter \
-	inject-root/util/convert_gfx.py!util/convert_gfx.py
+	users-tzarc!users/tzarc
 
 git-submodule: clean
 	cd $(ROOTDIR)/qmk_firmware \
@@ -44,10 +42,6 @@ arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
 nick: cyclone iris luddite mysterium-nick chocopad ctrl
 
 # QMK Logo generation
-$(ROOTDIR)/tzarc-djinn/inject-root/drivers/quantum_painter/img/decode_luts.h: $(ROOTDIR)/inject-root/util/convert_gfx.py $(ROOTDIR)/inject-root/drivers/quantum_painter/img/Makefile
-	cd $(ROOTDIR)/inject-root/drivers/quantum_painter/img \
-		&& make all
-
 $(ROOTDIR)/tzarc-djinn/gfx-djinn.c: $(ROOTDIR)/inject-root/util/convert_gfx.py $(ROOTDIR)/tzarc-djinn/djinn.png Makefile
 	cd $(ROOTDIR)/tzarc-djinn \
 		&& $(ROOTDIR)/inject-root/util/convert_gfx.py --compress --pal2bpp --chunk-size 4096 --image-file djinn.png --output djinn
@@ -58,8 +52,6 @@ djinn: gfx
 
 remove_artifacts:
 	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format >/dev/null 2>&1 || true
-	cd $(ROOTDIR)/inject-root/drivers/quantum_painter/img \
-		&& make clean
 
 clean: remove_artifacts
 	@$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" clean || true

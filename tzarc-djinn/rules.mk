@@ -41,18 +41,4 @@ AUDIO_DRIVER = pwm_software
 AUDIO_PIN = A5
 AUDIO_PIN_ALT = A4
 
-VPATH += \
-	drivers/quantum_painter \
-	drivers/quantum_painter/3rdparty \
-	drivers/quantum_painter/img \
-	drivers/quantum_painter/common \
-	drivers/quantum_painter/lld/fallback \
-	drivers/quantum_painter/lld/ili9341
-
-SRC += \
-	spi_master.c \
-	lzf_d.c \
-	qp.c \
-	qp_utils.c \
-	qp_fallback.c \
-	qp_ili9341.c
+QUANTUM_PAINTER_DRIVERS = ili9341
