@@ -41,7 +41,6 @@
 
 // #define MATRIX_IO_DELAY 10
 
-#define STM32_DMA_REQUIRED  // ws2812 PWM driver doesn't trigger this apparently
 #define WS2812_EXTERNAL_PULLUP
 #define RGB_DI_PIN B9
 #define WS2812_PWM_DRIVER PWMD4

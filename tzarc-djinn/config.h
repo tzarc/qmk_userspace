@@ -72,7 +72,7 @@
 #define BACKLIGHT_BREATHING
 
 // RGB configuration
-#define STM32_DMA_REQUIRED  // ws2812 PWM driver doesn't trigger this apparently
+#define WS2812_EXTERNAL_PULLUP
 #define RGB_DI_PIN B2
 #define RGBLED_NUM 6
 #define WS2812_PWM_DRIVER PWMD20
