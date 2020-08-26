@@ -31,6 +31,9 @@ prs_to_apply+=(10174) # Quantum Painter
 #prs_to_apply+=(8834) # raw usage id override
 #prs_to_apply+=(9258) # fix IGNORE_MOD_TAP_INTERRUPT_PER_KEY
 
+declare -a cherry_picks
+cherry_picks+=(ba542a0164a10a1958aa5054d2a0cc333bb3ce64)
+
 rm -f "$script_dir"/*.patch || true
 
 pcmd() {
@@ -122,6 +125,10 @@ for pr in ${prs_to_apply[@]} ; do
     echo -e "\e[38;5;203mPR $pr\e[0m"
     pcmd hub merge https://github.com/qmk/qmk_firmware/pull/${pr}
     pcmd git commit --amend -m "Merge qmk_firmware upstream PR ${pr}"
+done
+for hash in ${cherry_picks[@]} ; do
+    echo -e "\e[38;5;203mCherry-picking $hash\e[0m"
+    pcmd git cherry-pick $hash
 done
 pcmd git push origin $target_branch --set-upstream --force-with-lease
 popd
