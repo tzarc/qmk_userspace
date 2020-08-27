@@ -1,2 +1,1 @@
 BOOTLOADER = qmk-dfu
-CONSOLE_ENABLE = yes

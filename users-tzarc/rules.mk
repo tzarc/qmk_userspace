@@ -5,17 +5,28 @@ SRC += \
 	tzarc_wow.c \
 	tzarc_diablo3.c
 
+NKRO_ENABLE = yes
+EXTRAKEY_ENABLE = yes
+KEYBOARD_SHARED_EP = yes
+MOUSEKEY_ENABLE = no
+CONSOLE_ENABLE = yes
 BOOTMAGIC_ENABLE = lite
 UNICODE_ENABLE = yes
 LTO_ENABLE = yes
-RAW_ENABLE = no
+RAW_ENABLE = yes
 
-# board-specific configs
-ifeq ($(strip $(KEYBOARD)), massdrop/ctrl)
+ifeq ($(strip $(PLATFORM)),CHIBIOS)
+	# Uses defaults above
+else ifeq ($(strip $(PLATFORM)),ARM_ARSAM)
+	# This shit's broken, surprise surprise.
 	LTO_ENABLE = no
-endif
-
-# platform-specific configs
-ifeq ($(OPT_OS),chibios)
-	RAW_ENABLE = yes
+	RAW_ENABLE = no
+else ifeq ($(strip $(PLATFORM)),AVR)
+	CONSOLE_ENABLE = no
+	RAW_ENABLE = no
+	ifeq ($(strip $(PROTOCOL)),LUFA)
+		# Empty atm
+	else ifeq ($(strip $(PROTOCOL)),VUSB)
+		# Empty atm
+	endif
 endif

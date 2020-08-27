@@ -26,19 +26,27 @@ uint16_t typing_mode;
 
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        case KC_APP_RAISE:
-        case KC_SFT_ENT:
-            return TAPPING_TERM + 120;
         default:
             return TAPPING_TERM;
     }
 }
 
+bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        default:
+            return false;
+    }
+}
+
 bool get_ignore_mod_tap_interrupt(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        case KC_SFT_ENT:
-        case KC_CTL_ESC:
-            return true;
+        default:
+            return false;
+    }
+}
+
+bool get_tapping_force_hold(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
         default:
             return false;
     }
