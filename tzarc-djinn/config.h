@@ -19,12 +19,12 @@
 #include "config_common.h"
 
 // Matrix
-#define MATRIX_ROWS 3
-#define MATRIX_COLS 3
+#define MATRIX_ROWS 7
+#define MATRIX_COLS 7
 #define MATRIX_ROW_PINS \
-    { C5, C4, A10 }
+    { B13, B14, B15, C6, C7, C8, C9 }
 #define MATRIX_COL_PINS \
-    { A9, B5, B10 }
+    { C0, C1, C2, C3, A0, A1, A2 }
 
 #define DIODE_DIRECTION ROW2COL
 
@@ -33,7 +33,16 @@
 
 // Bootloader
 #define STM32_BOOTLOADER_DUAL_BANK TRUE
-#define STM32_BOOTLOADER_DUAL_BANK_GPIO B0
+#define STM32_BOOTLOADER_DUAL_BANK_GPIO B7
+
+// Split configuration
+#define SERIAL_USART_DRIVER SD3
+#define SERIAL_USART_TX_PAL_MODE 7
+#define SOFT_SERIAL_PIN B9
+#define SERIAL_USART_SPEED 4000000
+#define SPLIT_USB_DETECT
+#define SPLIT_HAND_PIN B11
+#define SPLIT_PLUG_DETECT_PIN B12
 
 // USB Device parameters
 #define VENDOR_ID 0xF055
@@ -44,8 +53,8 @@
 #define DESCRIPTION Oversized Split
 
 // Power control pins
-#define LCD_POWER_ENABLE_PIN A1
-#define RGB_POWER_ENABLE_PIN A0
+#define LCD_POWER_ENABLE_PIN A6
+#define RGB_POWER_ENABLE_PIN B1
 
 // SPI Configuration
 #define SPI_DRIVER SPID3
@@ -57,7 +66,7 @@
 #define SPI_MISO_PAL_MODE 6
 
 // LCD Configuration
-#define ILI9341_SPI_DIVISOR 16
+#define ILI9341_SPI_DIVISOR 4
 #define ILI9341_PIXDATA_BUFSIZE 240
 #define LCD_RST_PIN B3
 #define LCD_CS_PIN D2
@@ -101,8 +110,8 @@
 
 // EEPROM configuration
 #define EXTERNAL_EEPROM_SPI_SLAVE_SELECT_PIN B5
-#define EXTERNAL_EEPROM_SPI_CLOCK_DIVISOR 8
-#define EXTERNAL_EEPROM_PAGE_SIZE 256
+#define EXTERNAL_EEPROM_SPI_CLOCK_DIVISOR 16
+#define EXTERNAL_EEPROM_PAGE_SIZE 64
 
 /* disable action features */
 #define NO_ACTION_LAYER

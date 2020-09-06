@@ -46,7 +46,7 @@
 // Completely incompatible with the change in RAW usage page and ID.
 #define VIA_EEPROM_MAGIC_ADDR (EECONFIG_SIZE + TZARC_EEPROM_ALLOCATION + 1)
 
-// #define DEBUG_MATRIX_SCAN_RATE
+#define DEBUG_MATRIX_SCAN_RATE
 
 // Disable old stuff
 #define NO_ACTION_MACRO

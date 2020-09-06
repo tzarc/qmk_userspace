@@ -26,6 +26,13 @@ void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
 
 painter_device_t lcd;
 
+/*
+bool is_keyboard_master(void) {
+    setPinInput(SPLIT_PLUG_DETECT_PIN);
+    return readPin(SPLIT_PLUG_DETECT_PIN);
+}
+*/
+
 void keyboard_post_init_kb(void) {
     debug_enable = true;
     debug_matrix = true;
@@ -36,11 +43,18 @@ void keyboard_post_init_kb(void) {
 
     // Turn on the RGB
     setPinOutput(RGB_POWER_ENABLE_PIN);
-    writePinLow(RGB_POWER_ENABLE_PIN);
+    writePinHigh(RGB_POWER_ENABLE_PIN);
+
+    // Turn on the backlight
+    backlight_enable();
+    backlight_level(BACKLIGHT_LEVELS);
 
     // Initialise the LCD
     lcd = qp_ili9341_make_device(LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, true);
-    qp_init(lcd, QP_ROTATION_180);
+    qp_init(lcd, QP_ROTATION_0);
+
+    // Turn on the LCD
+    qp_power(lcd, true);
 
 #define NUM_ROWS (320 - IMAGE->height)
 #define NUM_COLS (240)
@@ -59,13 +73,6 @@ void keyboard_post_init_kb(void) {
         qp_viewport(lcd, 0, r, NUM_COLS - 1, r);
         qp_pixdata(lcd, pix_data, sizeof(pix_data));
     }
-
-    // Turn on the backlight
-    backlight_enable();
-    backlight_level(BACKLIGHT_LEVELS);
-
-    // Turn on the LCD
-    qp_power(lcd, true);
 
     // Test drawing
     qp_line(lcd, 60, 130, 240 - 60, 130, HSV_BLUE);

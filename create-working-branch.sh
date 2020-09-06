@@ -7,7 +7,7 @@ script_dir="$(readlink -f "$(dirname "$this_script")")"
 
 unset upgrade_chibios
 unset upgrade_chibios_confs
-upgrade_chibios=1
+#upgrade_chibios=1
 #upgrade_chibios_confs=1
 
 target_branch="generated-workarea"
@@ -23,16 +23,9 @@ prs_to_apply+=(10088) # ChibiOS USB Wakeup
 prs_to_apply+=(10174) # Quantum Painter
 #prs_to_apply+=(8893) # F4 inout endpoint refactor
 #prs_to_apply+=(6165) # ARM audio DAC/PWM change
-#prs_to_apply+=(8778) # Dual-bank bootloader
-#prs_to_apply+=(8291) # GPT ARM backlight
-#prs_to_apply+=(7959) # PWM ARM backlight
-#prs_to_apply+=(8559) # V-USB Console
-#prs_to_apply+=(8916) # qmk compiledb
-#prs_to_apply+=(8834) # raw usage id override
-#prs_to_apply+=(9258) # fix IGNORE_MOD_TAP_INTERRUPT_PER_KEY
 
 declare -a cherry_picks
-cherry_picks+=(ba542a0164a10a1958aa5054d2a0cc333bb3ce64)
+#cherry_picks+=(ba542a0164a10a1958aa5054d2a0cc333bb3ce64)
 
 rm -f "$script_dir"/*.patch || true
 

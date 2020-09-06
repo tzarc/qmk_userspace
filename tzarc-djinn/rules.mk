@@ -21,18 +21,20 @@ EXTRAKEY_ENABLE = yes       # Audio control and System control
 CONSOLE_ENABLE = yes        # Console for debug
 COMMAND_ENABLE = no         # Commands for debug and configuration
 SLEEP_LED_ENABLE = no       # Breathing sleep LED during USB suspend
-NKRO_ENABLE = yes           # USB Nkey Rollover
+NKRO_ENABLE = no            # USB Nkey Rollover
 BACKLIGHT_ENABLE = yes      # Enable keyboard backlight functionality on B7 by default
-RGBLIGHT_ENABLE = no        # Enable keyboard RGB underglow
+RGBLIGHT_ENABLE = yes       # Enable keyboard RGB underglow
 UNICODE_ENABLE = no         # Unicode
 AUDIO_ENABLE = yes          # Audio output
+
+#SPLIT_KEYBOARD = yes
+#SERIAL_DRIVER = usart
 
 BACKLIGHT_DRIVER = pwm
 
 WS2812_DRIVER = pwm
 CIE1931_CURVE = yes
 
-RGBLIGHT_ENABLE = yes
 #RGB_MATRIX_ENABLE = WS2812
 
 #EEPROM_DRIVER = spi
@@ -42,3 +44,5 @@ AUDIO_PIN = A5
 AUDIO_PIN_ALT = A4
 
 QUANTUM_PAINTER_DRIVERS = ili9341
+
+# OPT_DEFS += -g -O0
