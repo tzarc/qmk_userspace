@@ -26,7 +26,7 @@ prs_to_apply+=(10260) # Backlight limit
 #prs_to_apply+=(6165) # ARM audio DAC/PWM change
 
 declare -a cherry_picks
-#cherry_picks+=(ba542a0164a10a1958aa5054d2a0cc333bb3ce64)
+cherry_picks+=(ba542a0164a10a1958aa5054d2a0cc333bb3ce64) # Audio
 
 rm -f "$script_dir"/*.patch || true
 

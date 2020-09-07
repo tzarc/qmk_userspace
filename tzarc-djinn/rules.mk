@@ -25,7 +25,7 @@ NKRO_ENABLE = no            # USB Nkey Rollover
 BACKLIGHT_ENABLE = yes      # Enable keyboard backlight functionality on B7 by default
 RGBLIGHT_ENABLE = yes       # Enable keyboard RGB underglow
 UNICODE_ENABLE = no         # Unicode
-AUDIO_ENABLE = yes          # Audio output
+AUDIO_ENABLE = no           # Audio output
 
 #SPLIT_KEYBOARD = yes
 #SERIAL_DRIVER = usart
@@ -44,5 +44,8 @@ AUDIO_PIN = A5
 AUDIO_PIN_ALT = A4
 
 QUANTUM_PAINTER_DRIVERS = ili9341
+
+LTO_ENABLE = yes
+OPT = 2
 
 # OPT_DEFS += -g -O0
