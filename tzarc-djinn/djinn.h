@@ -40,5 +40,5 @@
         {KC_NO, KC_NO, k60,   k70,   k71,   k72,   k80},    \
         {KC_NO, KC_NO, KC_NO, KC_NO, k50,   k51,   k52},    \
     }
-    
+
 // clang-format on

@@ -39,15 +39,14 @@ void keyboard_post_init_kb(void) {
 
     // Turn on the LCD
     setPinOutput(LCD_POWER_ENABLE_PIN);
-    writePinLow(LCD_POWER_ENABLE_PIN);
+    writePinHigh(LCD_POWER_ENABLE_PIN);
 
     // Turn on the RGB
     setPinOutput(RGB_POWER_ENABLE_PIN);
     writePinHigh(RGB_POWER_ENABLE_PIN);
 
-    // Turn on the backlight
-    backlight_enable();
-    backlight_level(BACKLIGHT_LEVELS);
+    // Let the LCD get some power...
+    wait_ms(50);
 
     // Initialise the LCD
     lcd = qp_ili9341_make_device(LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, true);
@@ -79,4 +78,8 @@ void keyboard_post_init_kb(void) {
     qp_rect(lcd, 20, 20, 120, 100, HSV_RED, true);
     qp_rect(lcd, 20, 20, 120, 100, HSV_WHITE, false);
     qp_drawimage(lcd, (240 - IMAGE->width) / 2, 320 - IMAGE->height, IMAGE);
+
+    // Turn on the backlight
+    backlight_enable();
+    backlight_level(BACKLIGHT_LEVELS);
 }
