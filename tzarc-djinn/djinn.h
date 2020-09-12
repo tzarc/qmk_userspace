@@ -21,15 +21,15 @@
 // clang-format off
 
 #define LAYOUT( \
-        k00, k01, k02, k03, k04, k05, k06,                  \
-        k10, k11, k12, k13, k14, k15, k16,                  \
-        k20, k21, k22, k23, k24, k25, k26,                  \
-        k30, k31, k32, k33, k34, k35, k36,                  \
-                       k40, k41, k42, k43,                  \
-                                            k50, k51, k52,  \
-                              k60,                          \
-                         k70, k71, k72,                     \
-                              k80                           \
+        k00, k01, k02, k03, k04, k05, k06,                                                  k07, k08, k09, k0A, k0B, k0C, k0D,   \
+        k10, k11, k12, k13, k14, k15, k16,                                                  k17, k18, k19, k1A, k1B, k1C, k1D,   \
+        k20, k21, k22, k23, k24, k25, k26,                                                  k27, k28, k29, k2A, k2B, k2C, k2D,   \
+        k30, k31, k32, k33, k34, k35, k36,                                                  k37, k38, k39, k3A, k3B, k3C, k3D,   \
+                       k40, k41, k42, k43,                                                  k44, k45, k46, k47,                  \
+                                            k50, k51, k52,                   k53, k54, k55,                                      \
+                              k60,                                                                 k61,                          \
+                         k70, k71, k72,                                                       k73, k74, k75,                     \
+                              k80,                                                                 k81                           \
     )                                                       \
     {                                                       \
         {k00,   k01,   k02,   k03,   k04,   k05,   k06},    \
@@ -39,6 +39,13 @@
         {KC_NO, KC_NO, KC_NO, k40,   k41,   k42,   k43},    \
         {KC_NO, KC_NO, k60,   k70,   k71,   k72,   k80},    \
         {KC_NO, KC_NO, KC_NO, KC_NO, k50,   k51,   k52},    \
+        {k0D,   k0C,   k0B,   k0A,   k09,   k08,   k07},    \
+        {k1D,   k1C,   k1B,   k1A,   k19,   k18,   k17},    \
+        {k2D,   k2C,   k2B,   k2A,   k29,   k28,   k27},    \
+        {k3D,   k3C,   k3B,   k3A,   k39,   k38,   k37},    \
+        {KC_NO, KC_NO, KC_NO, k47,   k46,   k45,   k44},    \
+        {KC_NO, KC_NO, k61,   k75,   k74,   k73,   k81},    \
+        {KC_NO, KC_NO, KC_NO, KC_NO, k53,   k54,   k55},    \
     }
 
 // clang-format on

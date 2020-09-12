@@ -21,17 +21,10 @@
 
 #include "gfx-djinn.c"
 #define IMAGE gfx_djinn
+painter_device_t lcd;
 
 void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
 
-painter_device_t lcd;
-
-/*
-bool is_keyboard_master(void) {
-    setPinInput(SPLIT_PLUG_DETECT_PIN);
-    return readPin(SPLIT_PLUG_DETECT_PIN);
-}
-*/
 
 void keyboard_post_init_kb(void) {
     debug_enable = true;

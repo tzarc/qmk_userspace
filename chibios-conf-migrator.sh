@@ -4,7 +4,7 @@ umask 022
 
 set -eEuo pipefail
 
-target_branch="chibios-conf-migration"
+target_branch="generated-chibios-conf-migration"
 this_script="$(realpath "${BASH_SOURCE[0]}")"
 script_dir="$(realpath "$(dirname "$this_script")")"
 qmk_firmware_dir="$(realpath "$script_dir/qmk_firmware/")" # change this once moved to util
@@ -145,7 +145,7 @@ pushd "$script_dir/qmk_firmware"
 
 echo -n > "$script_dir/chibios-upgrade-output/upgrade.log"
 
-if [[ 1 == 0 ]] ; then
+if [[ 1 == 1 ]] ; then
     hard_reset qmk qmk_firmware develop
     pcmd make git-submodule
 

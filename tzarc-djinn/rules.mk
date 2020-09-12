@@ -15,7 +15,7 @@ DFU_SUFFIX_ARGS = -v 0483 -p df11
 # Build Options
 #   change yes to no to disable
 #
-BOOTMAGIC_ENABLE = no       # Virtual DIP switch configuration
+BOOTMAGIC_ENABLE = lite       # Virtual DIP switch configuration
 MOUSEKEY_ENABLE = no        # Mouse keys
 EXTRAKEY_ENABLE = yes       # Audio control and System control
 CONSOLE_ENABLE = yes        # Console for debug
@@ -27,8 +27,8 @@ RGBLIGHT_ENABLE = yes       # Enable keyboard RGB underglow
 UNICODE_ENABLE = no         # Unicode
 AUDIO_ENABLE = no           # Audio output
 
-#SPLIT_KEYBOARD = yes
-#SERIAL_DRIVER = usart
+SPLIT_KEYBOARD = yes
+SERIAL_DRIVER = usart
 
 BACKLIGHT_DRIVER = pwm
 
