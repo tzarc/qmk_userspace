@@ -25,6 +25,7 @@ painter_device_t lcd;
 
 void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
 
+extern bool is_keyboard_left(void);
 
 void keyboard_post_init_kb(void) {
     debug_enable = true;
@@ -43,7 +44,7 @@ void keyboard_post_init_kb(void) {
 
     // Initialise the LCD
     lcd = qp_ili9341_make_device(LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, true);
-    qp_init(lcd, QP_ROTATION_0);
+    qp_init(lcd, is_keyboard_left() ? QP_ROTATION_0 : QP_ROTATION_180);
 
     // Turn on the LCD
     qp_power(lcd, true);
@@ -75,4 +76,9 @@ void keyboard_post_init_kb(void) {
     // Turn on the backlight
     backlight_enable();
     backlight_level(BACKLIGHT_LEVELS);
+}
+
+void encoder_update_user(uint8_t index, bool clockwise);
+void encoder_update_kb(uint8_t index, bool clockwise) {
+    encoder_update_user(index, clockwise);
 }

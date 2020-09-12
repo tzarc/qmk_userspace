@@ -27,6 +27,8 @@ RGBLIGHT_ENABLE = yes       # Enable keyboard RGB underglow
 UNICODE_ENABLE = no         # Unicode
 AUDIO_ENABLE = no           # Audio output
 
+ENCODER_ENABLE = yes
+
 SPLIT_KEYBOARD = yes
 SERIAL_DRIVER = usart
 
