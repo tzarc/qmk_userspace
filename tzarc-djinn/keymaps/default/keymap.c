@@ -37,22 +37,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 void encoder_update_user(uint8_t index, bool clockwise) {
     if (index == 0) { /* First encoder */
-        uint16_t held_keycode_timer = timer_read();
-        uint16_t mapped_code = 0;
-        if (clockwise) {
-            mapped_code = KC_VOLD;
-        } else {
-            mapped_code = KC_VOLU;
-        }
-
-        register_code(mapped_code);
-        while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY){ /* no-op */ }
-        unregister_code(mapped_code);
-    } else if (index == 1) { /* Second encoder */
         if (clockwise) {
             rgblight_increase_hue_noeeprom();
         } else {
             rgblight_decrease_hue_noeeprom();
+        }
+    } else if (index == 1) { /* Second encoder */
+        if (clockwise) {
+            rgblight_increase_sat_noeeprom();
+        } else {
+            rgblight_decrease_sat_noeeprom();
         }
     }
 }
