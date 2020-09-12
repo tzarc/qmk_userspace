@@ -88,8 +88,8 @@
 // RGB configuration
 #define WS2812_EXTERNAL_PULLUP
 #define RGB_DI_PIN B2
-#define RGBLED_NUM 6
-#define RGBLED_SPLIT { 3, 3 }
+#define RGBLED_NUM 20
+#define RGBLED_SPLIT { 10, 10 }
 #define WS2812_PWM_DRIVER PWMD20
 #define WS2812_PWM_CHANNEL 1
 #define WS2812_PWM_PAL_MODE 3
