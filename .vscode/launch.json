@@ -29,7 +29,7 @@
           "text": "cd ${workspaceRoot}\\qmk_firmware\\.build"
         },
         {
-          "text": "target extended-remote \\\\.\\COM6"
+          "text": "target extended-remote \\\\.\\COM4"
         },
         {
           "text": "file handwired_tzarc_djinn_default.elf"
@@ -48,14 +48,11 @@
         },
         {
           "text": "set mem inaccessible-by-default off"
-        },
-        {
-          "text": "break main"
         }
       ],
       "serverLaunchTimeout": 10000,
       "windows": {
-        "miDebuggerPath": "E:\\gcc-arm-none-eabi-8-2018-q4-major-win32\\bin\\arm-none-eabi-gdb.exe"
+        "miDebuggerPath": "E:\\gcc-arm-none-eabi-9-2020-q2-update-win32\\bin\\arm-none-eabi-gdb.exe"
       }
     },
     {
@@ -75,7 +72,7 @@
           "text": "cd ${workspaceRoot}\\qmk_firmware\\.build"
         },
         {
-          "text": "target extended-remote \\\\.\\COM16"
+          "text": "target extended-remote \\\\.\\COM3"
         },
         {
           "text": "file handwired_tzarc_cyclone_default.elf"
@@ -94,14 +91,11 @@
         },
         {
           "text": "set mem inaccessible-by-default off"
-        },
-        {
-          "text": "break main"
         }
       ],
       "serverLaunchTimeout": 10000,
       "windows": {
-        "miDebuggerPath": "E:\\gcc-arm-none-eabi-8-2018-q4-major-win32\\bin\\arm-none-eabi-gdb.exe"
+        "miDebuggerPath": "E:\\gcc-arm-none-eabi-9-2020-q2-update-win32\\bin\\arm-none-eabi-gdb.exe"
       }
     },
     {
@@ -144,7 +138,7 @@
       ],
       "serverLaunchTimeout": 10000,
       "windows": {
-        "miDebuggerPath": "E:\\gcc-arm-none-eabi-8-2018-q4-major-win32\\bin\\arm-none-eabi-gdb.exe"
+        "miDebuggerPath": "E:\\gcc-arm-none-eabi-9-2020-q2-update-win32\\bin\\arm-none-eabi-gdb.exe"
       }
     }
   ]

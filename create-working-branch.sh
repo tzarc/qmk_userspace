@@ -24,8 +24,8 @@ prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(10260) # Backlight limit
 prs_to_apply+=(10418) # ChibiOS conf upgrade
 prs_to_apply+=(10420) # Build platform filter
-#prs_to_apply+=(8893) # F4 inout endpoint refactor
-#prs_to_apply+=(6165) # ARM audio DAC/PWM change
+prs_to_apply+=(10437) # Decouple USB events
+prs_to_apply+=(10438) # eeprom_driver_init()
 
 declare -a cherry_picks
 cherry_picks+=(ba542a0164a10a1958aa5054d2a0cc333bb3ce64) # Audio

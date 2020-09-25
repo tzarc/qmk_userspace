@@ -82,6 +82,11 @@ void matrix_scan_user(void) {
         tmp.bytes[3] = prng();
 
         eeconfig_update_user(tmp.raw);
-        eeconfig_read_user();
+        uint32_t value = eeconfig_read_user();
+        if (value != tmp.raw) {
+            dprint("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+            dprint("!! EEPROM readback mismatch!\n");
+            dprint("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+        }
     }
 }

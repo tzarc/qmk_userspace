@@ -17,7 +17,7 @@ DFU_SUFFIX_ARGS = -v 0483 -p df11
 #
 BOOTMAGIC_ENABLE = lite       # Virtual DIP switch configuration
 MOUSEKEY_ENABLE = no        # Mouse keys
-EXTRAKEY_ENABLE = yes       # Audio control and System control
+#EXTRAKEY_ENABLE = yes       # Audio control and System control
 CONSOLE_ENABLE = yes        # Console for debug
 COMMAND_ENABLE = no         # Commands for debug and configuration
 SLEEP_LED_ENABLE = no       # Breathing sleep LED during USB suspend
@@ -39,7 +39,7 @@ CIE1931_CURVE = yes
 
 #RGB_MATRIX_ENABLE = WS2812
 
-#EEPROM_DRIVER = spi
+EEPROM_DRIVER = spi
 
 AUDIO_DRIVER = pwm_software
 AUDIO_PIN = A5
@@ -47,7 +47,8 @@ AUDIO_PIN_ALT = A4
 
 QUANTUM_PAINTER_DRIVERS = ili9341
 
-LTO_ENABLE = yes
-OPT = 2
+#LTO_ENABLE = yes
+#OPT = 2
 
-# OPT_DEFS += -g -O0
+#OPT = 0
+#OPT_DEFS += -g

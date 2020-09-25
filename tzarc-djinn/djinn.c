@@ -15,13 +15,15 @@
  */
 
 #include "djinn.h"
-#include "qp_ili9341.h"
 #include "rgblight_list.h"
 #include "color.h"
 
-#include "gfx-djinn.c"
-#define IMAGE gfx_djinn
+#ifdef QUANTUM_PAINTER_ENABLE
+#    include "qp_ili9341.h"
+#    include "gfx-djinn.c"
+#    define IMAGE gfx_djinn
 painter_device_t lcd;
+#endif
 
 void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
 
@@ -31,13 +33,19 @@ void keyboard_post_init_kb(void) {
     debug_enable = true;
     debug_matrix = true;
 
-    // Turn on the LCD
-    setPinOutput(LCD_POWER_ENABLE_PIN);
-    writePinHigh(LCD_POWER_ENABLE_PIN);
+    // Force a read initially so that the SPI driver is initialised and the backlight driver doesn't choke
+    eeconfig_read_user();
 
+#ifdef RGBLIGHT_ENABLE
     // Turn on the RGB
     setPinOutput(RGB_POWER_ENABLE_PIN);
     writePinHigh(RGB_POWER_ENABLE_PIN);
+#endif
+
+#ifdef QUANTUM_PAINTER_ENABLE
+    // Turn on the LCD
+    setPinOutput(LCD_POWER_ENABLE_PIN);
+    writePinHigh(LCD_POWER_ENABLE_PIN);
 
     // Let the LCD get some power...
     wait_ms(50);
@@ -49,8 +57,8 @@ void keyboard_post_init_kb(void) {
     // Turn on the LCD
     qp_power(lcd, true);
 
-#define NUM_ROWS (320 - IMAGE->height)
-#define NUM_COLS (240)
+#    define NUM_ROWS (320 - IMAGE->height)
+#    define NUM_COLS (240)
     for (int r = 0; r < 320; ++r) {
         uint8_t pix_data[2 * NUM_COLS] = {0};
         if (r < NUM_ROWS) {
@@ -72,13 +80,58 @@ void keyboard_post_init_kb(void) {
     qp_rect(lcd, 20, 20, 120, 100, HSV_RED, true);
     qp_rect(lcd, 20, 20, 120, 100, HSV_WHITE, false);
     qp_drawimage(lcd, (240 - IMAGE->width) / 2, 320 - IMAGE->height, IMAGE);
+#endif
 
+#ifdef BACKLIGHT_ENABLE
     // Turn on the backlight
     backlight_enable();
     backlight_level(BACKLIGHT_LEVELS);
+#endif
 }
 
 void encoder_update_user(uint8_t index, bool clockwise);
-void encoder_update_kb(uint8_t index, bool clockwise) {
-    encoder_update_user(index, clockwise);
+void encoder_update_kb(uint8_t index, bool clockwise) { encoder_update_user(index, clockwise); }
+
+uint8_t prng(void) {
+    static uint8_t s = 0xAA, a = 0;
+    s ^= s << 3;
+    s ^= s >> 5;
+    s ^= a++ >> 2;
+    return s;
+}
+
+void keyboard_post_init_user(void) {
+    // Customise these values to desired behaviour
+    debug_enable = true;
+    // debug_matrix = true;
+    // debug_keyboard=true;
+    // debug_mouse=true;
+}
+
+void matrix_scan_user(void) {
+    static uint32_t last_eeprom_access = 0;
+    uint32_t        now                = timer_read32();
+    if (now - last_eeprom_access > 5000) {
+        dprint("reading eeprom\n");
+        last_eeprom_access = now;
+
+        union {
+            uint8_t  bytes[4];
+            uint32_t raw;
+        } tmp;
+        tmp.bytes[0] = prng();
+        tmp.bytes[1] = prng();
+        tmp.bytes[2] = prng();
+        tmp.bytes[3] = prng();
+
+        eeconfig_update_user(tmp.raw);
+        uint32_t value = eeconfig_read_user();
+        if (value != tmp.raw) {
+            dprint("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+            dprint("!! EEPROM readback mismatch!\n");
+            dprint("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+            while (1)
+                ;
+q        }
+    }
 }

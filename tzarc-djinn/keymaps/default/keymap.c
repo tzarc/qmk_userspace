@@ -1,5 +1,7 @@
 #include QMK_KEYBOARD_H
-#include "qp.h"
+#ifdef QUANTUM_PAINTER_ENABLE
+#    include "qp.h"
+#endif
 
 #define MEDIA_KEY_DELAY 10
 
@@ -22,6 +24,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // clang-format on
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+#ifdef QUANTUM_PAINTER_ENABLE
     static bool lcd_power = true;
     switch (keycode) {
         case KC_TOGGLE_LCD_POWER:
@@ -32,10 +35,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             break;
     }
+#endif
     return true;
 }
 
 void encoder_update_user(uint8_t index, bool clockwise) {
+#ifdef RGBLIGHT_ENABLE
     if (index == 0) { /* First encoder */
         if (clockwise) {
             rgblight_increase_hue_noeeprom();
@@ -49,4 +54,5 @@ void encoder_update_user(uint8_t index, bool clockwise) {
             rgblight_decrease_sat_noeeprom();
         }
     }
+#endif
 }

@@ -29,11 +29,14 @@
 #define DIODE_DIRECTION ROW2COL
 
 // Encoders
-#define ENCODERS_PAD_A { C14 }
-#define ENCODERS_PAD_B { C15 }
+#define ENCODERS_PAD_A \
+    { C14 }
+#define ENCODERS_PAD_B \
+    { C15 }
 
-// Matrix debugging
+// Debugging
 #define DEBUG_MATRIX_SCAN_RATE
+#define DEBUG_EEPROM_OUTPUT
 
 // Bootloader
 #define STM32_BOOTLOADER_DUAL_BANK TRUE
@@ -89,7 +92,8 @@
 #define WS2812_EXTERNAL_PULLUP
 #define RGB_DI_PIN B2
 #define RGBLED_NUM 20
-#define RGBLED_SPLIT { 10, 10 }
+#define RGBLED_SPLIT \
+    { 10, 10 }
 #define WS2812_PWM_DRIVER PWMD20
 #define WS2812_PWM_CHANNEL 1
 #define WS2812_PWM_PAL_MODE 3
