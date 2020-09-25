@@ -8,7 +8,7 @@ script_dir="$(readlink -f "$(dirname "$this_script")")"
 unset upgrade_chibios
 unset upgrade_chibios_confs
 upgrade_chibios=1
-#upgrade_chibios_confs=1
+upgrade_chibios_confs=1
 
 target_branch="generated-workarea"
 target_qmk="develop"
@@ -22,6 +22,8 @@ prs_to_apply+=(9603) # Matrix delay
 prs_to_apply+=(10088) # ChibiOS USB Wakeup
 prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(10260) # Backlight limit
+prs_to_apply+=(10418) # ChibiOS conf upgrade
+prs_to_apply+=(10420) # Build platform filter
 #prs_to_apply+=(8893) # F4 inout endpoint refactor
 #prs_to_apply+=(6165) # ARM audio DAC/PWM change
 
@@ -76,15 +78,8 @@ upgrade-chibios() {
 }
 
 upgrade-chibios-confs() {
-    pushd "$script_dir"
-    pcmd make links
-    popd
-
     pushd "$script_dir/qmk_firmware"
     pcmd ./util/chibios-upgrader.sh
-    pcmd clang-format-7 -i quantum/stm32/chconf.h
-    pcmd clang-format-7 -i quantum/stm32/halconf.h
-    pcmd clang-format-7 -i quantum/stm32/mcuconf.h
     popd
 
     pushd "$script_dir"
@@ -109,9 +104,6 @@ pushd "$script_dir"
 if [ ! -z ${upgrade_chibios:-} ] ; then
     upgrade-chibios
 fi
-if [ ! -z ${upgrade_chibios_confs:-} ] ; then
-    upgrade-chibios-confs
-fi
 popd
 
 pushd "$script_dir/qmk_firmware"
@@ -120,9 +112,30 @@ for pr in ${prs_to_apply[@]} ; do
     pcmd hub merge https://github.com/qmk/qmk_firmware/pull/${pr}
     pcmd git commit --amend -m "Merge qmk_firmware upstream PR ${pr}"
 done
+popd
+
+pushd "$script_dir/qmk_firmware"
 for hash in ${cherry_picks[@]} ; do
     echo -e "\e[38;5;203mCherry-picking $hash\e[0m"
     pcmd git cherry-pick $hash
 done
+popd
+
+if [ ! -z ${upgrade_chibios_confs:-} ] ; then
+    upgrade-chibios-confs
+fi
+
+pushd "$script_dir/qmk_firmware"
+OIFS=$IFS
+IFS=$'\n'
+for file in $(find "$script_dir/qmk_firmware/keyboards" "$script_dir/qmk_firmware/platforms" -name 'chconf.h') ; do
+    echo $file
+    sed -i 's@#define CH_CFG_USE_JOBS                     TRUE@#define CH_CFG_USE_JOBS                     FALSE@g' "$file"
+done
+IFS=$OIFS
+pcmd git commit -am "Disable ChibiOS jobs by default"
+popd
+
+pushd "$script_dir/qmk_firmware"
 pcmd git push origin $target_branch --set-upstream --force-with-lease
 popd
