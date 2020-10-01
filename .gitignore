@@ -6,3 +6,4 @@ PR-*.patchbuild.log
 /build.log
 /.project
 compile_commands.json
+chibios-upgrade-output
