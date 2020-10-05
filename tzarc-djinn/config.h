@@ -62,6 +62,8 @@
 // Power control pins
 #define LCD_POWER_ENABLE_PIN A6
 #define RGB_POWER_ENABLE_PIN B1
+#define RGB_CURR_1500mA_OK_PIN B0
+#define RGB_CURR_3000mA_OK_PIN C5
 
 // SPI Configuration
 #define SPI_DRIVER SPID3

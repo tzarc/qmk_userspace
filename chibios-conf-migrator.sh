@@ -2,7 +2,7 @@
 
 umask 022
 
-set -xeEuo pipefail
+set -eEuo pipefail
 
 target_branch="generated-chibios-conf-migration"
 this_script="$(realpath "${BASH_SOURCE[0]}")"
@@ -72,11 +72,15 @@ upgrade_one_keyboard() {
     local chibios_board
     local ignore_checksum_mismatch
     local force_builds
+    local no_mcuconf
 
     while [[ ! -z "${1:-}" ]] ; do
         case "${1:-}" in
             --force)
                 force_builds=1
+                ;;
+            --no-mcuconf)
+                no_mcuconf=1
                 ;;
             --keyboard)
                 shift
@@ -127,6 +131,10 @@ upgrade_one_keyboard() {
             before_hash+=($before)
         done
 
+        if function_exists "${binary_basename}_beforeconf" ; then
+            "${binary_basename}_beforeconf"
+        fi
+
         if [[ -f "keyboards/$keyboard/chconf.h" ]] && [[ -z "$(grep 'include_next' "keyboards/$keyboard/chconf.h" 2>/dev/null || true)" ]] ; then
             echo "-------------------------------------------------------------------------" | append_log
             echo "-- $keyboard : migrating chconf.h" | append_log
@@ -141,7 +149,7 @@ upgrade_one_keyboard() {
             ./bin/qmk chibios-confmigrate -o -d -i keyboards/$keyboard/halconf.h -r platforms/chibios/common/configs/halconf.h 2>&1 | append_log
         fi
 
-        if [[ -f "keyboards/$keyboard/mcuconf.h" ]] && [[ -z "$(grep 'include_next' "keyboards/$keyboard/mcuconf.h" 2>/dev/null || true)" ]] ; then
+        if [[ -z "${no_mcuconf:-}" ]] && [[ -f "keyboards/$keyboard/mcuconf.h" ]] && [[ -z "$(grep 'include_next' "keyboards/$keyboard/mcuconf.h" 2>/dev/null || true)" ]] ; then
             echo "-------------------------------------------------------------------------" | append_log
             echo "-- $keyboard : migrating mcuconf.h" | append_log
             echo "-------------------------------------------------------------------------" | append_log
@@ -158,8 +166,8 @@ upgrade_one_keyboard() {
             fi
         done
 
-        if function_exists "${binary_basename}_after" ; then
-            "${binary_basename}_after"
+        if function_exists "${binary_basename}_afterconf" ; then
+            "${binary_basename}_afterconf"
         fi
 
         for build in ${builds[@]} ; do
@@ -245,31 +253,15 @@ if [[ 1 == 1 ]] ; then
     sed -i "s@ upstream/master@@g" util/chibios-upgrader.sh
     sed -i "s@ origin/master@@g" util/chibios-upgrader.sh
     pcmd git commit -am "Retarget ChibiOS upgrader script to current revision"
-
-    pcmd git checkout upstream/develop -- keyboards/cannonkeys/an_c/mcuconf.h
-    cat keyboards/cannonkeys/satisfaction75/mcuconf.h \
-        | sed -e 's@#define STM32_I2C_USE_I2C1 TRUE@#define STM32_I2C_USE_I2C1 FALSE@g' \
-              -e 's@#define STM32_RTCSEL STM32_RTCSEL_LSE@#define STM32_RTCSEL STM32_RTCSEL_LSI@g' \
-              -e 's@#define STM32_LSE_ENABLED TRUE@#define STM32_LSE_ENABLED FALSE@g' \
-        > platforms/chibios/GENERIC_STM32_F072XB/configs/mcuconf.h
-    pcmd git add -A
-    pcmd git commit -m "Setup F072"
-
-    pcmd git checkout upstream/develop -- keyboards/converter/siemens_tastatur/mcuconf.h
-    pcmd mkdir -p platforms/chibios/STM32_F103_STM32DUINO/configs
-    #pcmd mv keyboards/handwired/bluepill/bluepill70/bootloader_defs.h platforms/chibios/STM32_F103_STM32DUINO/configs/bootloader_defs.h
-    pcmd cp keyboards/converter/siemens_tastatur/mcuconf.h platforms/chibios/STM32_F103_STM32DUINO/configs/mcuconf.h
-    pcmd git add -A
-    pcmd git commit -m "Setup F103"
-
-    pcmd git checkout upstream/develop -- keyboards/vinta/mcuconf.h
-    pcmd mkdir -p platforms/chibios/GENERIC_STM32_F042X6/configs
-    pcmd cp keyboards/vinta/mcuconf.h platforms/chibios/GENERIC_STM32_F042X6/configs/mcuconf.h
-    pcmd git add -A
-    pcmd git commit -m "Setup F042"
 fi
 
-handwired_onekey_blackpill_f401_default_after() {
+chavdai40_rev2_default_afterconf() {
+    pushd "$script_dir/qmk_firmware"
+    pcmd git rm -rf keyboards/chavdai40/boards
+    popd
+}
+
+handwired_onekey_blackpill_f401_default_afterconf() {
     pushd "$script_dir/qmk_firmware"
     pcmd git rm platforms/chibios/BLACKPILL_STM32_F401/configs/chconf.h || true
     pcmd git rm platforms/chibios/BLACKPILL_STM32_F401/configs/halconf.h || true
@@ -279,7 +271,7 @@ handwired_onekey_blackpill_f401_default_after() {
     popd
 }
 
-handwired_onekey_blackpill_f411_default_after() {
+handwired_onekey_blackpill_f411_default_afterconf() {
     pushd "$script_dir/qmk_firmware"
     pcmd git rm platforms/chibios/BLACKPILL_STM32_F411/configs/chconf.h || true
     pcmd git rm platforms/chibios/BLACKPILL_STM32_F411/configs/halconf.h || true
@@ -289,66 +281,107 @@ handwired_onekey_blackpill_f411_default_after() {
     popd
 }
 
-#upgrade_one_keyboard --keyboard 1upkeyboards/sweet16/v2/proton_c --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard acheron/arctic --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard acheron/austin --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard acheron/keebspcb --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard acheron/shark --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard aeboards/ext65/rev2 --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard ai03/vega --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard at_at/660m --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard boston_meetup/2019 --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard cannonkeys/an_c --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard cannonkeys/atlas --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard cannonkeys/chimera65 --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard cannonkeys/db60 --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard cannonkeys/devastatingtkl --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard cannonkeys/instant60 --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard cannonkeys/instant65 --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard cannonkeys/iron165 --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard cannonkeys/obliterated75 --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard cannonkeys/ortho48 --chibios-board STM32_F103_STM32DUINO
-#upgrade_one_keyboard --keyboard cannonkeys/ortho60 --chibios-board STM32_F103_STM32DUINO
-#upgrade_one_keyboard --keyboard cannonkeys/ortho75 --chibios-board STM32_F103_STM32DUINO
-#upgrade_one_keyboard --keyboard cannonkeys/practice60 --chibios-board STM32_F103_STM32DUINO
-#upgrade_one_keyboard --keyboard cannonkeys/practice65 --chibios-board STM32_F103_STM32DUINO
-#upgrade_one_keyboard --keyboard cannonkeys/rekt1800 --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard cannonkeys/satisfaction75 --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard cannonkeys/savage65 --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard cannonkeys/tmov2 --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard chavdai40 --chibios-board GENERIC_STM32_F042X6 chavdai40/rev1 chavdai40/rev2
-#upgrade_one_keyboard --keyboard cheshire/curiosity --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard ckeys/thedora --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard clueboard/60 --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard clueboard/66_hotswap/gen1 --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard clueboard/66/rev4 --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard clueboard/california --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard converter/siemens_tastatur --chibios-board STM32_F103_STM32DUINO
-#upgrade_one_keyboard --keyboard dztech/dz60rgb_ansi/v1 --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard dztech/dz60rgb_wkl/v1 --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard dztech/dz60rgb/v1 --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard dztech/dz65rgb/v1 --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard function96 --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard generic_panda/panda65_01 --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard hadron/ver3 --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard handwired/ck4x4 --chibios-board GENERIC_STM32_F072XB
-#upgrade_one_keyboard --keyboard handwired/co60/rev6 --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard handwired/co60/rev7 --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard handwired/d48 --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard handwired/ddg_56 --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard handwired/floorboard --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard handwired/onekey/bluepill --chibios-board STM32_F103_STM32DUINO
-#upgrade_one_keyboard --keyboard handwired/onekey/proton_c --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard handwired/onekey/pytest --chibios-board GENERIC_STM32_F303XC
-#upgrade_one_keyboard --keyboard handwired/onekey/stm32f0_disco --chibios-board GENERIC_STM32_F072XB
+akegata_denki_device_one_default_afterconf() {
+    pushd "$script_dir/qmk_firmware"
+    pcmd git rm -rf keyboards/akegata_denki/device_one/boards
+    popd
+}
+
+ergodox_stm32_default_afterconf() {
+    pushd "$script_dir/qmk_firmware"
+    pcmd git rm -rf keyboards/ergodox_stm32/boards
+    popd
+}
+
+jm60_default_afterconf() {
+    pushd "$script_dir/qmk_firmware"
+    pcmd git rm -rf keyboards/jm60/boards
+    popd
+}
+
+handwired_bluepill_bluepill70_default_afterconf() {
+    pushd "$script_dir/qmk_firmware"
+    pcmd git rm -rf keyboards/handwired/bluepill/boards
+
+    echo >> keyboards/handwired/bluepill/bluepill70/config.h
+    echo '// During the ChibiOS upgrade, we swapped base boards... replicate the original.' >> keyboards/handwired/bluepill/bluepill70/config.h
+    echo '#define BOARD_GENERIC_STM32_F103' >> keyboards/handwired/bluepill/bluepill70/config.h
+
+    echo >> keyboards/handwired/bluepill/bluepill70/rules.mk
+    echo 'BOARD = STM32_F103_STM32DUINO' >> keyboards/handwired/bluepill/bluepill70/rules.mk
+    popd
+}
+
+upgrade_one_keyboard --keyboard 1upkeyboards/sweet16/v2/proton_c --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard acheron/arctic --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard acheron/austin --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard acheron/keebspcb --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard acheron/shark --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard aeboards/ext65/rev2 --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard ai03/vega --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard akegata_denki/device_one --chibios-board GENERIC_STM32_F042X6
+upgrade_one_keyboard --keyboard at_at/660m --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard boston_meetup/2019 --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard cannonkeys/an_c --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard cannonkeys/atlas --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard cannonkeys/chimera65 --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard cannonkeys/db60 --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard cannonkeys/devastatingtkl --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard cannonkeys/instant60 --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard cannonkeys/instant65 --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard cannonkeys/iron165 --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard cannonkeys/obliterated75 --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard cannonkeys/ortho48 --chibios-board STM32_F103_STM32DUINO
+upgrade_one_keyboard --keyboard cannonkeys/ortho60 --chibios-board STM32_F103_STM32DUINO
+upgrade_one_keyboard --keyboard cannonkeys/ortho75 --chibios-board STM32_F103_STM32DUINO
+upgrade_one_keyboard --keyboard cannonkeys/practice60 --chibios-board STM32_F103_STM32DUINO
+upgrade_one_keyboard --keyboard cannonkeys/practice65 --chibios-board STM32_F103_STM32DUINO
+upgrade_one_keyboard --keyboard cannonkeys/rekt1800 --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard cannonkeys/satisfaction75 --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard cannonkeys/savage65 --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard cannonkeys/tmov2 --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard chavdai40 --chibios-board GENERIC_STM32_F042X6 chavdai40/rev1 chavdai40/rev2
+upgrade_one_keyboard --keyboard cheshire/curiosity --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard ckeys/thedora --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard clueboard/60 --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard clueboard/66_hotswap/gen1 --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard clueboard/66/rev4 --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard clueboard/california --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard converter/siemens_tastatur --chibios-board STM32_F103_STM32DUINO
+upgrade_one_keyboard --keyboard dztech/dz60rgb_ansi/v1 --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard dztech/dz60rgb_wkl/v1 --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard dztech/dz60rgb/v1 --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard dztech/dz65rgb/v1 --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard ergodox_infinity --chibios-board PJRC_TEENSY_3_1 --no-mcuconf
+upgrade_one_keyboard --keyboard ergodox_stm32 --chibios-board STM32_F103_STM32DUINO
+upgrade_one_keyboard --keyboard function96 --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard generic_panda/panda65_01 --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard hadron/ver3 --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard handwired/bluepill/bluepill70 --chibios-board STM32_F103_STM32DUINO
+upgrade_one_keyboard --keyboard handwired/ck4x4 --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard handwired/co60/rev6 --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard handwired/co60/rev7 --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard handwired/d48 --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard handwired/ddg_56 --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard handwired/floorboard --chibios-board GENERIC_STM32_F303XC
 upgrade_one_keyboard --keyboard handwired/onekey/blackpill_f401 --chibios-board BLACKPILL_STM32_F401 --force
 upgrade_one_keyboard --keyboard handwired/onekey/blackpill_f411 --chibios-board BLACKPILL_STM32_F411 --force
+upgrade_one_keyboard --keyboard handwired/onekey/bluepill --chibios-board STM32_F103_STM32DUINO
+upgrade_one_keyboard --keyboard handwired/onekey/proton_c --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard handwired/onekey/pytest --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard handwired/onekey/stm32f0_disco --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard handwired/onekey/teensy_32 --chibios-board PJRC_TEENSY_3_1 --no-mcuconf
+upgrade_one_keyboard --keyboard handwired/onekey/teensy_lc --chibios-board PJRC_TEENSY_LC --no-mcuconf
 upgrade_one_keyboard --keyboard handwired/riblee_f401 --chibios-board BLACKPILL_STM32_F401
 upgrade_one_keyboard --keyboard handwired/selene --chibios-board GENERIC_STM32_F303XC
 upgrade_one_keyboard --keyboard handwired/steamvan/rev1 --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard handwired/twadlee/tp69 --chibios-board PJRC_TEENSY_LC --no-mcuconf
 upgrade_one_keyboard --keyboard handwired/wulkan --chibios-board GENERIC_STM32_F303XC
 upgrade_one_keyboard --keyboard handwired/z150 --chibios-board STM32_F103_STM32DUINO
 upgrade_one_keyboard --keyboard hs60/v2 --chibios-board GENERIC_STM32_F303XC hs60/v2/ansi hs60/v2/hhkb hs60/v2/iso
+upgrade_one_keyboard --keyboard infinity60 --chibios-board MCHCK_K20 --no-mcuconf
+upgrade_one_keyboard --keyboard jm60 --chibios-board STM32_F103_STM32DUINO
+upgrade_one_keyboard --keyboard k_type --chibios-board PJRC_TEENSY_3_1 --no-mcuconf
 upgrade_one_keyboard --keyboard kbdfans/kbd67/mkiirgb/v1 --chibios-board GENERIC_STM32_F303XC
 upgrade_one_keyboard --keyboard keebio/bdn9/rev2 --chibios-board GENERIC_STM32_F072XB
 upgrade_one_keyboard --keyboard keebio/choconum --chibios-board GENERIC_STM32_F072XB
@@ -380,6 +413,7 @@ upgrade_one_keyboard --keyboard tkc/candybar/righty --chibios-board GENERIC_STM3
 upgrade_one_keyboard --keyboard tkc/godspeed75 --chibios-board GENERIC_STM32_F072XB
 upgrade_one_keyboard --keyboard vinta --chibios-board GENERIC_STM32_F042X6
 upgrade_one_keyboard --keyboard westfoxtrot/prophet --chibios-board GENERIC_STM32_F072XB
+upgrade_one_keyboard --keyboard whitefox --chibios-board PJRC_TEENSY_3_1 --no-mcuconf
 upgrade_one_keyboard --keyboard wolfmarkclub/wm1 --chibios-board STM32_F103_STM32DUINO
 upgrade_one_keyboard --keyboard xelus/trinityxttkl --chibios-board GENERIC_STM32_F072XB
 upgrade_one_keyboard --keyboard xiaomi/mk02 --chibios-board GENERIC_STM32_F072XB --ignore-checksum "ignored as we've changed the base board from an F072 discovery to the generic F072 board in QMK"
@@ -387,19 +421,34 @@ upgrade_one_keyboard --keyboard zvecr/split_blackpill --chibios-board STM32_F103
 upgrade_one_keyboard --keyboard zvecr/zv48/f401 --chibios-board BLACKPILL_STM32_F401
 upgrade_one_keyboard --keyboard zvecr/zv48/f411 --chibios-board BLACKPILL_STM32_F411
 
-#clear_old_bluepill_files() {
-#    pcmd git rm -rf keyboards/handwired/bluepill/boards keyboards/handwired/bluepill/ld
-#}
-#upgrade_one_keyboard --keyboard handwired/bluepill/bluepill70 --chibios-board STM32_F103_STM32DUINO -callback clear_old_bluepill_files
-
 git push --set-upstream origin $target_branch --force-with-lease
 
-leftover_boards() {
-    for file in $(find keyboards/ -name 'chconf.h' -or -name 'halconf.h' -or -name 'mcuconf.h') ; do
+leftover_chconf() {
+    for file in $(find keyboards/ -name 'chconf.h') ; do
         if [[ -z "$(grep include_next "$file")" ]] ; then
-            echo $file | sed -e 's#keyboards/##g' -e 's#/chconf.h##g' -e 's#/halconf.h##g' -e 's#/mcuconf.h##g'
+            echo $file | sed -e 's#keyboards/##g' -e 's#/chconf.h##g'
         fi
     done | sort | uniq
+}
+
+leftover_halconf() {
+    for file in $(find keyboards/ -name 'halconf.h') ; do
+        if [[ -z "$(grep include_next "$file")" ]] ; then
+            echo $file | sed -e 's#keyboards/##g' -e 's#/halconf.h##g'
+        fi
+    done | sort | uniq
+}
+
+leftover_mcuconf() {
+    for file in $(find keyboards/ -name 'mcuconf.h') ; do
+        if [[ -z "$(grep include_next "$file")" ]] ; then
+            echo $file | sed -e 's#keyboards/##g' -e 's#/mcuconf.h##g'
+        fi
+    done | sort | uniq
+}
+
+leftover_boards() {
+    { leftover_chconf ; leftover_halconf ; } | sort | uniq
 }
 
 leftovers=$(leftover_boards)

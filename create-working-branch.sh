@@ -23,9 +23,8 @@ prs_to_apply+=(10088) # ChibiOS USB Wakeup
 prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(10260) # Backlight limit
 prs_to_apply+=(10418) # ChibiOS conf upgrade
-prs_to_apply+=(10420) # Build platform filter
 prs_to_apply+=(10437) # Decouple USB events
-prs_to_apply+=(10438) # eeprom_driver_init()
+prs_to_apply+=(10530) # housekeeping
 
 declare -a cherry_picks
 cherry_picks+=(ba542a0164a10a1958aa5054d2a0cc333bb3ce64) # Audio

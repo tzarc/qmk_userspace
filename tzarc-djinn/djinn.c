@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <hal.h>
 #include "djinn.h"
 #include "rgblight_list.h"
 #include "color.h"
@@ -29,6 +30,22 @@ void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
 
 extern bool is_keyboard_left(void);
 
+bool is_keyboard_master(void) {
+    static bool determined = false;
+    static bool is_master;
+    if (!determined) {
+        determined = true;
+        setPinInputLow(SPLIT_PLUG_DETECT_PIN);
+        wait_ms(10);
+        is_master = readPin(SPLIT_PLUG_DETECT_PIN) ? true : false;
+        if (!is_master) {
+            usbStop(&USBD1);
+        }
+    }
+
+    return is_master;
+}
+
 void keyboard_post_init_kb(void) {
     debug_enable = true;
     debug_matrix = true;
@@ -37,6 +54,11 @@ void keyboard_post_init_kb(void) {
     eeconfig_read_user();
 
 #ifdef RGBLIGHT_ENABLE
+    // Turn off increased current limits
+    setPinOutput(RGB_CURR_1500mA_OK_PIN);
+    writePinLow(RGB_CURR_1500mA_OK_PIN);
+    setPinOutput(RGB_CURR_3000mA_OK_PIN);
+    writePinLow(RGB_CURR_3000mA_OK_PIN);
     // Turn on the RGB
     setPinOutput(RGB_POWER_ENABLE_PIN);
     writePinHigh(RGB_POWER_ENABLE_PIN);
@@ -135,3 +157,5 @@ void matrix_scan_user(void) {
         }
     }
 }
+
+void housekeeping_task_kb(void) { __WFI(); }
