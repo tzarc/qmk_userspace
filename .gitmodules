@@ -2,3 +2,9 @@
 	path = qmk_firmware
 	url = git@github.com:tzarc/qmk_firmware.git
 	branch = chibios-upgrade
+[submodule "qmk_chibios"]
+	path = qmk_chibios
+	url = git@github.com:qmk/ChibiOS.git
+[submodule "qmk_chibios-contrib"]
+	path = qmk_chibios-contrib
+	url = git@github.com:qmk/ChibiOS-Contrib.git
