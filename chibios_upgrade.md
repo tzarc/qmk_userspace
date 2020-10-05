@@ -1,6 +1,6 @@
 # Upgrading the ChibiOS repositories
 
-```shell
+```sh
 # Get ChibiOS
 git clone git@github.com:qmk/ChibiOS.git qmk_chibios
 cd qmk_chibios
@@ -15,7 +15,7 @@ git tag -a develop_2020_q4 -m develop_2020_q4 ver20.3.2
 git push origin develop_2020_q4
 ```
 
-```shell
+```sh
 # Get ChibiOS-Contrib
 git clone git@github.com:qmk/ChibiOS-Contrib.git qmk_chibios-contrib
 cd qmk_chibios-contrib
@@ -32,6 +32,36 @@ git push origin develop_2020_q4
 
 # Upgrading ChibiOS within QMK
 
-```shell
+```sh
+# From your QMK directory:
+cd $QMK_FIRMWARE_DIR
+git checkout develop
+make git-submodule
+git checkout -b chibios-upgrade-ver20.3.2
 
+# Upgrade ChibiOS, using the tag we created before
+cd $QMK_FIRMWARE_DIR
+cd lib/chibios
+git fetch --all --tags --prune
+git checkout develop_2020_q4
+
+# Upgrade ChibiOS-Contrib, using the tag we created before
+cd $QMK_FIRMWARE_DIR
+cd lib/chibios-contrib
+git fetch --all --tags --prune
+git checkout develop_2020_q4
+
+# Upgrade ChibiOS configs:
+cd $QMK_FIRMWARE_DIR
+./util/chibios-upgrader.sh
+
+# Commit...
+cd $QMK_FIRMWARE_DIR
+git commit -am 'ChibiOS upgrade to ver20.3.2.'
+
+# Build...
+make -j -O all-chibios:default
+
+# Push...
+git push origin chibios-upgrade-ver20.3.2
 ```
