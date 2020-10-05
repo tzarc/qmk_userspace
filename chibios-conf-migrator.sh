@@ -73,6 +73,7 @@ upgrade_one_keyboard() {
     local ignore_checksum_mismatch
     local force_builds
     local no_mcuconf
+    local keep_output_files
 
     while [[ ! -z "${1:-}" ]] ; do
         case "${1:-}" in
@@ -94,6 +95,9 @@ upgrade_one_keyboard() {
                 shift
                 ignore_checksum_mismatch="$1"
                 ;;
+            --keep-output)
+                keep_output_files=1
+                ;;
             *)
                 builds+=($1)
                 ;;
@@ -105,7 +109,8 @@ upgrade_one_keyboard() {
         builds+=($keyboard)
     fi
 
-    git checkout -- .
+    git reset --hard >/dev/null 2>&1
+    git checkout -- . >/dev/null 2>&1
 
     if [[ ! -z "${force_builds:-}" ]] \
     || { [[ -f "keyboards/$keyboard/chconf.h" ]] && [[ -z "$(grep 'include_next' "keyboards/$keyboard/chconf.h" 2>/dev/null || true)" ]] ; } \
@@ -127,6 +132,7 @@ upgrade_one_keyboard() {
             find "$script_dir/chibios-upgrade-output/${binary_basename}_before_build" -name '*.lst' -exec sed -i 's#/tmp/cc......\.s#/tmp/ccTEMPFL.s#g' '{}' +
             arm-none-eabi-objdump -S "$script_dir/chibios-upgrade-output/${binary_basename}_before_build/${binary_basename}.elf" \
                 > "$script_dir/chibios-upgrade-output/${binary_basename}_before_asm.txt"
+            [[ -e "${binary_basename}.bin" ]] || exit 1
             local before=$(sha1sum "${binary_basename}.bin" | awk '{print $1}')
             before_hash+=($before)
         done
@@ -182,6 +188,7 @@ upgrade_one_keyboard() {
             find "$script_dir/chibios-upgrade-output/${binary_basename}_after_build" -name '*.lst' -exec sed -i 's#/tmp/cc......\.s#/tmp/ccTEMPFL.s#g' '{}' +
             { arm-none-eabi-objdump -S "$script_dir/chibios-upgrade-output/${binary_basename}_after_build/${binary_basename}.elf" \
                 > "$script_dir/chibios-upgrade-output/${binary_basename}_after_asm.txt" ; } || true
+            [[ -e "${binary_basename}.bin" ]] || exit 1
             local after=$(sha1sum "${binary_basename}.bin" | awk '{print $1}' || echo "UNKNOWN")
             after_hash+=($after)
         done
@@ -192,9 +199,10 @@ upgrade_one_keyboard() {
         fi
         local builds_ok="yes"
         for (( i = 0 ; i < ${#builds[@]} ; i++ )) ; do
+            unset before after
             local build=${builds[$i]}
             local before=${before_hash[$i]}
-            local after=${before_hash[$i]}
+            local after=${after_hash[$i]}
 
             commit_message="$commit_message"$'\n'"- $build: $after"
 
@@ -209,15 +217,17 @@ upgrade_one_keyboard() {
 
         if [[ "$builds_ok" == "yes" ]] || [[ ! -z "${ignore_checksum_mismatch:-}" ]]; then
             for build in ${builds[@]} ; do
-                local binary_basename="$(make $build:default:dump_vars COMMAND_ENABLE=no SKIP_GIT=yes | grep -P '^TARGET=' | cut -d'=' -f2)"
-                rm -rf "$script_dir/chibios-upgrade-output/${binary_basename}_before_build" \
-                        "$script_dir/chibios-upgrade-output/${binary_basename}_before_vars.txt" \
-                        "$script_dir/chibios-upgrade-output/${binary_basename}_before_asm.txt" \
-                        "$script_dir/chibios-upgrade-output/${binary_basename}_before_cflags.txt" \
-                        "$script_dir/chibios-upgrade-output/${binary_basename}_after_build" \
-                        "$script_dir/chibios-upgrade-output/${binary_basename}_after_vars.txt" \
-                        "$script_dir/chibios-upgrade-output/${binary_basename}_after_asm.txt" \
-                        "$script_dir/chibios-upgrade-output/${binary_basename}_after_cflags.txt"
+                if [[ -z "${keep_output_files:-}" ]] ; then
+                    local binary_basename="$(make $build:default:dump_vars COMMAND_ENABLE=no SKIP_GIT=yes | grep -P '^TARGET=' | cut -d'=' -f2)"
+                    rm -rf "$script_dir/chibios-upgrade-output/${binary_basename}_before_build" \
+                            "$script_dir/chibios-upgrade-output/${binary_basename}_before_vars.txt" \
+                            "$script_dir/chibios-upgrade-output/${binary_basename}_before_asm.txt" \
+                            "$script_dir/chibios-upgrade-output/${binary_basename}_before_cflags.txt" \
+                            "$script_dir/chibios-upgrade-output/${binary_basename}_after_build" \
+                            "$script_dir/chibios-upgrade-output/${binary_basename}_after_vars.txt" \
+                            "$script_dir/chibios-upgrade-output/${binary_basename}_after_asm.txt" \
+                            "$script_dir/chibios-upgrade-output/${binary_basename}_after_cflags.txt"
+                fi
             done
 
             git add -A
@@ -225,7 +235,8 @@ upgrade_one_keyboard() {
         fi
     fi
 
-    git checkout -- .
+    git reset --hard >/dev/null 2>&1
+    git checkout -- . >/dev/null 2>&1
 }
 
 pushd "$script_dir/qmk_firmware"
@@ -312,6 +323,26 @@ handwired_bluepill_bluepill70_default_afterconf() {
     popd
 }
 
+matrix_noah_default_afterconf() {
+    pushd "$script_dir/qmk_firmware"
+    pcmd git rm platforms/chibios/BLACKPILL_STM32_F411/configs/chconf.h || true
+    pcmd git rm platforms/chibios/BLACKPILL_STM32_F411/configs/halconf.h || true
+    pcmd git rm -rf keyboards/matrix/noah/boards
+    pcmd cp -f "$script_dir/chibios-upgrade-staging/matrix_noah_board.h" \
+        "$script_dir/qmk_firmware/keyboards/matrix/noah/board.h"
+    pcmd git add "$script_dir/qmk_firmware/keyboards/matrix/noah/board.h"
+}
+
+matrix_m20add_default_afterconf() {
+    pushd "$script_dir/qmk_firmware"
+    pcmd git rm platforms/chibios/BLACKPILL_STM32_F411/configs/chconf.h || true
+    pcmd git rm platforms/chibios/BLACKPILL_STM32_F411/configs/halconf.h || true
+    pcmd git rm -rf keyboards/matrix/m20add/boards
+    pcmd cp -f "$script_dir/chibios-upgrade-staging/matrix_m20add_board.h" \
+        "$script_dir/qmk_firmware/keyboards/matrix/m20add/board.h"
+    pcmd git add "$script_dir/qmk_firmware/keyboards/matrix/m20add/board.h"
+}
+
 upgrade_one_keyboard --keyboard 1upkeyboards/sweet16/v2/proton_c --chibios-board GENERIC_STM32_F303XC
 upgrade_one_keyboard --keyboard acheron/arctic --chibios-board GENERIC_STM32_F072XB
 upgrade_one_keyboard --keyboard acheron/austin --chibios-board GENERIC_STM32_F072XB
@@ -386,6 +417,8 @@ upgrade_one_keyboard --keyboard kbdfans/kbd67/mkiirgb/v1 --chibios-board GENERIC
 upgrade_one_keyboard --keyboard keebio/bdn9/rev2 --chibios-board GENERIC_STM32_F072XB
 upgrade_one_keyboard --keyboard keebio/choconum --chibios-board GENERIC_STM32_F072XB
 upgrade_one_keyboard --keyboard kv/revt --chibios-board GENERIC_STM32_F303XC
+upgrade_one_keyboard --keyboard matrix/m20add --chibios-board BLACKPILL_STM32_F411
+upgrade_one_keyboard --keyboard matrix/noah --chibios-board BLACKPILL_STM32_F411
 upgrade_one_keyboard --keyboard mechlovin/adelais --chibios-board GENERIC_STM32_F303XC
 upgrade_one_keyboard --keyboard mechlovin/hannah60rgb --chibios-board GENERIC_STM32_F303XC
 upgrade_one_keyboard --keyboard mechlovin/infinity87 --chibios-board GENERIC_STM32_F303XC
