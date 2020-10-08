@@ -10,6 +10,7 @@ BOARD_DEFS := \
 	chocopad!tzarc-chocopad!keebio/chocopad/keymaps/tzarc!tzarc \
 	cyclone!tzarc-cyclone!handwired/tzarc/cyclone!tzarc \
 	djinn!tzarc-djinn!handwired/tzarc/djinn!default \
+	onekey_h743!alternates/nucleo144_h743zi!handwired/onekey/nucleo144_h743zi!reset \
 	onekey_l152!alternates/nucleo64_l152re!handwired/onekey/nucleo64_l152re!reset \
 	onekey_g431!alternates/nucleo64_g431rb!handwired/onekey/nucleo64_g431rb!reset \
 	onekey_g474!alternates/nucleo64_g474re!handwired/onekey/nucleo64_g474re!reset \
