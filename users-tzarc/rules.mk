@@ -15,13 +15,13 @@ UNICODE_ENABLE = yes
 LTO_ENABLE = yes
 RAW_ENABLE = yes
 
-ifeq ($(strip $(PLATFORM)),CHIBIOS)
+ifeq ($(strip $(PLATFORM_KEY)),chibios)
 	# Uses defaults above
-else ifeq ($(strip $(PLATFORM)),ARM_ARSAM)
+else ifeq ($(strip $(PLATFORM_KEY)),arm_atsam)
 	# This shit's broken, surprise surprise.
 	LTO_ENABLE = no
 	RAW_ENABLE = no
-else ifeq ($(strip $(PLATFORM)),AVR)
+else ifeq ($(strip $(PLATFORM_KEY)),avr)
 	CONSOLE_ENABLE = no
 	RAW_ENABLE = no
 	ifeq ($(strip $(PROTOCOL)),LUFA)
