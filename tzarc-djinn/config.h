@@ -75,7 +75,6 @@
 #define SPI_MISO_PAL_MODE 6
 
 // LCD Configuration
-#define ILI9341_SPI_DIVISOR 4
 #define ILI9341_PIXDATA_BUFSIZE 240
 #define LCD_RST_PIN B3
 #define LCD_CS_PIN D2
