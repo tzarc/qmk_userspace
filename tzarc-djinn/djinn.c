@@ -182,3 +182,18 @@ void housekeeping_task_kb(void) {
         }
     }
 }
+
+static bool current_1500mA = false;
+static bool current_3000mA = false;
+
+RGB rgblight_hsv_to_rgb(HSV hsv) {
+    float scale = 0.35f;
+    if (current_3000mA) {
+        scale = 0.82f;
+    } else if (current_1500mA) {
+        scale = 0.55f;
+    }
+
+    hsv.v = (uint8_t)(hsv.v * scale);
+    return hsv_to_rgb(hsv);
+}

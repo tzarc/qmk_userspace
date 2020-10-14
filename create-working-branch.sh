@@ -25,6 +25,7 @@ prs_to_apply+=(10260) # Backlight limit
 prs_to_apply+=(10418) # ChibiOS conf upgrade
 prs_to_apply+=(10437) # Decouple USB events
 prs_to_apply+=(10530) # housekeeping
+prs_to_apply+=(10638) # RGB hooks
 
 declare -a cherry_picks
 cherry_picks+=(ba542a0164a10a1958aa5054d2a0cc333bb3ce64) # Audio

@@ -49,9 +49,9 @@ void encoder_update_user(uint8_t index, bool clockwise) {
         }
     } else if (index == 1) { /* Second encoder */
         if (clockwise) {
-            rgblight_increase_sat_noeeprom();
+            rgblight_decrease_val_noeeprom();
         } else {
-            rgblight_decrease_sat_noeeprom();
+            rgblight_increase_val_noeeprom();
         }
     }
 #endif
