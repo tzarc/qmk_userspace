@@ -30,7 +30,7 @@ AUDIO_ENABLE = no           # Audio output
 ENCODER_ENABLE = yes
 
 SPLIT_KEYBOARD = yes
-SERIAL_DRIVER = usart
+SERIAL_DRIVER = usart_userxfer
 
 BACKLIGHT_DRIVER = pwm
 
@@ -50,6 +50,6 @@ QUANTUM_PAINTER_DRIVERS = ili9341 ili9488
 LTO_ENABLE = yes
 OPT = 2
 
-#LTO_ENABLE = no
+LTO_ENABLE = no
 #OPT = 0
 #OPT_DEFS += -g

@@ -18,6 +18,7 @@
 #include "djinn.h"
 #include "rgblight_list.h"
 #include "color.h"
+#include "serial_usart_userxfer.h"
 
 #ifdef QUANTUM_PAINTER_ENABLE
 #    include "qp_ili9341.h"
@@ -133,7 +134,7 @@ void keyboard_post_init_user(void) {
 void matrix_scan_user(void) {
     static uint32_t last_eeprom_access = 0;
     uint32_t        now                = timer_read32();
-    if (now - last_eeprom_access > 5000) {
+    if (now - last_eeprom_access > 60000) {
         dprint("reading eeprom\n");
         last_eeprom_access = now;
 
@@ -158,4 +159,28 @@ void matrix_scan_user(void) {
     }
 }
 
-void housekeeping_task_kb(void) { __WFI(); }
+static struct data_xfer {
+    uint8_t value;
+} data_xfer;
+
+bool serial_userxfer_receive(const void* data, size_t len) {
+    struct data_xfer* xfer = (struct data_xfer*)data;
+    xfer->value++;
+    serial_userxfer_respond(data, sizeof(struct data_xfer));
+    return true;
+}
+
+void housekeeping_task_kb(void) {
+    static uint32_t last_sync = 0;
+    uint32_t        now       = timer_read32();
+    if (now - last_sync > 5000) {
+        last_sync = now;
+
+        if (is_keyboard_master()) {
+            dprint("Sync'ing data with slave\n");
+            dprintf("Before: %d\n", (int)data_xfer.value);
+            serial_userxfer_transaction(&data_xfer, sizeof(data_xfer), &data_xfer, sizeof(data_xfer));
+            dprintf("After: %d\n", (int)data_xfer.value);
+        }
+    }
+}

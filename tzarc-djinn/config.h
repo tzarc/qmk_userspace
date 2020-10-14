@@ -46,8 +46,7 @@
 #define SERIAL_USART_DRIVER SD3
 #define SERIAL_USART_TX_PAL_MODE 7
 #define SOFT_SERIAL_PIN B9
-#define SERIAL_USART_SPEED 460800
-#define SPLIT_USB_DETECT
+#define SERIAL_USART_SPEED 640000
 #define SPLIT_HAND_PIN B11
 #define SPLIT_PLUG_DETECT_PIN B12
 
@@ -57,7 +56,6 @@
 #define DEVICE_VER 0x0001
 #define MANUFACTURER Tzarc
 #define PRODUCT Djinn
-#define DESCRIPTION Oversized Split
 
 // Power control pins
 #define LCD_POWER_ENABLE_PIN A6
