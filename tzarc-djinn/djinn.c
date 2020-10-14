@@ -159,9 +159,7 @@ void matrix_scan_user(void) {
     }
 }
 
-static struct data_xfer {
-    uint8_t value;
-} data_xfer;
+static struct data_xfer { uint8_t value; } data_xfer;
 
 bool serial_userxfer_receive(const void* data, size_t len) {
     struct data_xfer* xfer = (struct data_xfer*)data;
