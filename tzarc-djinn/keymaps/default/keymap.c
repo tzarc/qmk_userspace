@@ -16,9 +16,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LSFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_END,                                                         KC_PGDN,  KC_N,  KC_M,    KC_COMM, KC_DOT, KC_SLSH, KC_ENT,
                         KC_NO, KC_LGUI, KC_NO, KC_SPACE,                                                       KC_SPACE, KC_NO, KC_LALT, KC_NO,
                                                          BL_STEP, KC_MUTE, RESET,    EEP_RST, KC_MUTE, RESET,
-                                    KC_UP,                               RGB_RMOD,   RGB_MOD,                                KC_UP,
-                           KC_LEFT, KC_MUTE, KC_RIGHT,                                                              KC_LEFT, KC_MUTE, KC_RIGHT,
-                                    KC_DOWN,                                                                                 KC_DOWN
+                                    KC_UP,                               RGB_RMOD,   RGB_MOD,                                RGB_VAI,
+                           KC_LEFT, KC_MUTE, KC_RIGHT,                                                              RGB_SAD, KC_MUTE, RGB_SAI,
+                                    KC_DOWN,                                                                                 RGB_VAD
     )
 };
 // clang-format on

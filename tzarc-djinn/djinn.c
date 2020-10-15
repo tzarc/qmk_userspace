@@ -187,11 +187,11 @@ static bool current_1500mA = false;
 static bool current_3000mA = false;
 
 RGB rgblight_hsv_to_rgb(HSV hsv) {
-    float scale = 0.35f;
+    float scale = 0.25f;
     if (current_3000mA) {
-        scale = 0.82f;
+        scale = 0.60f;
     } else if (current_1500mA) {
-        scale = 0.55f;
+        scale = 0.40f;
     }
 
     hsv.v = (uint8_t)(hsv.v * scale);
