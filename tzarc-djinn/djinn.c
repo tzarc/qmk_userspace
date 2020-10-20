@@ -31,6 +31,7 @@ void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
 
 extern bool is_keyboard_left(void);
 
+/*
 bool is_keyboard_master(void) {
     static bool determined = false;
     static bool is_master;
@@ -46,6 +47,7 @@ bool is_keyboard_master(void) {
 
     return is_master;
 }
+*/
 
 void keyboard_post_init_kb(void) {
     debug_enable = true;
@@ -75,7 +77,7 @@ void keyboard_post_init_kb(void) {
 
     // Initialise the LCD
     lcd = qp_ili9341_make_device(LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, 4, true);
-    qp_init(lcd, is_keyboard_left() ? QP_ROTATION_0 : QP_ROTATION_180);
+    qp_init(lcd, QP_ROTATION_0);
 
     // Turn on the LCD
     qp_power(lcd, true);

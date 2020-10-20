@@ -15,6 +15,7 @@
  */
 
 #include QMK_KEYBOARD_H
+#include "tzarc_layout.h"
 
 enum { _BASE = 0, _LAYER1, _LAYER2, _LAYER3, _LAYER4 };
 
@@ -24,7 +25,7 @@ enum { _BASE = 0, _LAYER1, _LAYER2, _LAYER3, _LAYER4 };
 #define LAYER4 MO(_LAYER4)
 
 enum {
-    TBL_FLIP = SAFE_RANGE,
+    TBL_FLIP = KEYMAP_SAFE_RANGE,
 };
 
 // clang-format off
