@@ -17,13 +17,13 @@
 #pragma once
 
 // Must only be use from the master side, initiates a request/response transaction from the slave
-size_t serial_userxfer_transaction_kb(const void* sendData, size_t sendLen, void* recvData, size_t recvLen);
-size_t serial_userxfer_transaction_user(const void* sendData, size_t sendLen, void* recvData, size_t recvLen);
+size_t serial_dataxfer_transaction_kb(const void* sendData, size_t sendLen, void* recvData, size_t recvLen);
+size_t serial_dataxfer_transaction_user(const void* sendData, size_t sendLen, void* recvData, size_t recvLen);
 
 // Must be implemented by the slave side (weak function) -- handles receiving arbitrary data from the master
-__attribute__((weak)) bool serial_userxfer_receive_kb(const void* data, size_t len);
-__attribute__((weak)) bool serial_userxfer_receive_user(const void* data, size_t len);
+__attribute__((weak)) bool serial_dataxfer_receive_kb(const void* data, size_t len);
+__attribute__((weak)) bool serial_dataxfer_receive_user(const void* data, size_t len);
 
 // Must only be used from the slave side -- transmits responses back to the master
-void serial_userxfer_respond_kb(const void* data, size_t len);
-void serial_userxfer_respond_user(const void* data, size_t len);
+void serial_dataxfer_respond_kb(const void* data, size_t len);
+void serial_dataxfer_respond_user(const void* data, size_t len);

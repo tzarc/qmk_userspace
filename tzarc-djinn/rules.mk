@@ -30,7 +30,7 @@ AUDIO_ENABLE = yes          # Audio output
 ENCODER_ENABLE = yes
 
 SPLIT_KEYBOARD = yes
-SERIAL_DRIVER = usart_userxfer
+SERIAL_DRIVER = usart_dataxfer
 
 BACKLIGHT_DRIVER = pwm
 

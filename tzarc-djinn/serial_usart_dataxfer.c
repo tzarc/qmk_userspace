@@ -16,7 +16,7 @@
 
 #include "quantum.h"
 #include "serial.h"
-#include "serial_usart_userxfer.h"
+#include "serial_usart_dataxfer.h"
 #include "printf.h"
 
 #include "ch.h"
@@ -26,9 +26,9 @@
 #define SERIAL_NAMESPACE_KB 0x52
 #define SERIAL_NAMESPACE_USER 0x53
 
-#ifndef SERIAL_USERXFER_MAX_SIZE
-#    define SERIAL_USERXFER_MAX_SIZE 32
-#endif  //  SERIAL_USERXFER_MAX_SIZE
+#ifndef SERIAL_DATAXFER_MAX_SIZE
+#    define SERIAL_DATAXFER_MAX_SIZE 32
+#endif  //  SERIAL_DATAXFER_MAX_SIZE
 
 #ifndef USART_CR1_M0
 #    define USART_CR1_M0 USART_CR1_M  // some platforms (f1xx) dont have this so
@@ -125,25 +125,12 @@ static SerialConfig sdcfg = {
 
 void handle_soft_serial_slave(void);
 
-/*
- * This thread runs on the slave and responds to transactions initiated
- * by the master
- */
-static THD_WORKING_AREA(waSlaveThread, 2048);
-static THD_FUNCTION(SlaveThread, arg) {
-    (void)arg;
-    chRegSetThreadName("slave_transport");
 
-    while (true) {
-        handle_soft_serial_slave();
-    }
-}
-
-size_t serial_userxfer_transaction_impl(uint8_t namespace, const void* sendData, size_t sendLen, void* recvData, size_t recvLen) {
+size_t serial_dataxfer_transaction_impl(uint8_t namespace, const void* sendData, size_t sendLen, void* recvData, size_t recvLen) {
     msg_t res = 0;
 
     sdClear(&SERIAL_USART_DRIVER);
-    if (sendLen > SERIAL_USERXFER_MAX_SIZE || recvLen > SERIAL_USERXFER_MAX_SIZE) {
+    if (sendLen > SERIAL_DATAXFER_MAX_SIZE || recvLen > SERIAL_DATAXFER_MAX_SIZE) {
         // Unsupported size
         return 0;
     }
@@ -197,15 +184,28 @@ size_t serial_userxfer_transaction_impl(uint8_t namespace, const void* sendData,
     return bufLen;
 }
 
-size_t serial_userxfer_transaction_kb(const void* sendData, size_t sendLen, void* recvData, size_t recvLen) { return serial_userxfer_transaction_impl(SERIAL_NAMESPACE_KB, sendData, sendLen, recvData, recvLen); }
+size_t serial_dataxfer_transaction_kb(const void* sendData, size_t sendLen, void* recvData, size_t recvLen) { return serial_dataxfer_transaction_impl(SERIAL_NAMESPACE_KB, sendData, sendLen, recvData, recvLen); }
+size_t serial_dataxfer_transaction_user(const void* sendData, size_t sendLen, void* recvData, size_t recvLen) { return serial_dataxfer_transaction_impl(SERIAL_NAMESPACE_USER, sendData, sendLen, recvData, recvLen); }
 
-size_t serial_userxfer_transaction_user(const void* sendData, size_t sendLen, void* recvData, size_t recvLen) { return serial_userxfer_transaction_impl(SERIAL_NAMESPACE_USER, sendData, sendLen, recvData, recvLen); }
+void serial_dataxfer_respond_kb(const void* data, size_t len) { serial_dataxfer_transaction_impl(SERIAL_NAMESPACE_KB, data, len, NULL, 0); }
+void serial_dataxfer_respond_user(const void* data, size_t len) { serial_dataxfer_transaction_impl(SERIAL_NAMESPACE_USER, data, len, NULL, 0); }
 
-void serial_userxfer_respond_kb(const void* data, size_t len) { serial_userxfer_transaction_impl(SERIAL_NAMESPACE_KB, data, len, NULL, 0); }
-void serial_userxfer_respond_user(const void* data, size_t len) { serial_userxfer_transaction_impl(SERIAL_NAMESPACE_USER, data, len, NULL, 0); }
+__attribute__((weak)) bool serial_dataxfer_receive_kb(const void* data, size_t len) { return false; }
+__attribute__((weak)) bool serial_dataxfer_receive_user(const void* data, size_t len) { return false; }
 
-__attribute__((weak)) bool serial_userxfer_receive_kb(const void* data, size_t len) { return false; }
-__attribute__((weak)) bool serial_userxfer_receive_user(const void* data, size_t len) { return false; }
+/*
+ * This thread runs on the slave and responds to transactions initiated
+ * by the master
+ */
+static THD_WORKING_AREA(waSlaveThread, 2048);
+static THD_FUNCTION(SlaveThread, arg) {
+    (void)arg;
+    chRegSetThreadName("slave_transport");
+
+    while (true) {
+        handle_soft_serial_slave();
+    }
+}
 
 __attribute__((weak)) void usart_init(void) {
 #if defined(USE_GPIOV1)
@@ -275,18 +275,18 @@ void handle_soft_serial_slave(void) {
         }
     } else if (namespace == SERIAL_NAMESPACE_KB || namespace == SERIAL_NAMESPACE_USER) {
         size_t  len;
-        uint8_t buf[SERIAL_USERXFER_MAX_SIZE];
+        uint8_t buf[SERIAL_DATAXFER_MAX_SIZE];
         sdRead(&SERIAL_USART_DRIVER, (uint8_t*)&len, sizeof(len));
-        if (len >= SERIAL_USERXFER_MAX_SIZE) {
+        if (len >= SERIAL_DATAXFER_MAX_SIZE) {
             sdClear(&SERIAL_USART_DRIVER);
             // Unable to handle the transfer size, send back an empty result
-            serial_userxfer_transaction_impl(namespace, NULL, 0, NULL, 0);
+            serial_dataxfer_transaction_impl(namespace, NULL, 0, NULL, 0);
         } else {
             sdRead(&SERIAL_USART_DRIVER, buf, len);
-            bool res = namespace == SERIAL_NAMESPACE_KB ? serial_userxfer_receive_kb(buf, len) : serial_userxfer_receive_user(buf, len);
+            bool res = namespace == SERIAL_NAMESPACE_KB ? serial_dataxfer_receive_kb(buf, len) : serial_dataxfer_receive_user(buf, len);
             if (!res) {
                 // Unhandled by user-mode code, send back an empty result
-                serial_userxfer_transaction_impl(namespace, NULL, 0, NULL, 0);
+                serial_dataxfer_transaction_impl(namespace, NULL, 0, NULL, 0);
             }
         }
     } else {

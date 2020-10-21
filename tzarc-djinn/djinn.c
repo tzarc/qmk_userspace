@@ -18,7 +18,7 @@
 #include "djinn.h"
 #include "rgblight_list.h"
 #include "color.h"
-#include "serial_usart_userxfer.h"
+#include "serial_usart_dataxfer.h"
 
 #include "qp_ili9341.h"
 #include "gfx-djinn.c"
@@ -129,18 +129,11 @@ void encoder_update_kb(uint8_t index, bool clockwise) {
     encoder_update_user(index, clockwise);
 }
 
-bool serial_userxfer_receive_kb(const void* data, size_t len) {
-    // Cast to the dataatype transmitted
+bool serial_dataxfer_receive_kb(const void* data, size_t len) {
     struct data_xfer_kb* xfer = (struct data_xfer_kb*)data;
-
-    // Increment the dummy variable
     xfer->values.dummy++;
-
-    // Copy across the raw value to the slave side
     data_xfer.raw = xfer->raw;
-
-    // Repsond with any new value
-    serial_userxfer_respond_kb(&data_xfer, sizeof(data_xfer));
+    serial_dataxfer_respond_kb(&data_xfer, sizeof(data_xfer));
     return true;
 }
 
@@ -153,7 +146,7 @@ void housekeeping_task_kb(void) {
         if (is_keyboard_master()) {
             dprint("Sync'ing data with slave\n");
             dprintf("Before: %d\n", (int)data_xfer.raw);
-            serial_userxfer_transaction_kb(&data_xfer, sizeof(data_xfer), &data_xfer, sizeof(data_xfer));
+            serial_dataxfer_transaction_kb(&data_xfer, sizeof(data_xfer), &data_xfer, sizeof(data_xfer));
             dprintf("After: %d\n", (int)data_xfer.raw);
         }
     }
