@@ -23,7 +23,8 @@
 #include "hal.h"
 
 #define SERIAL_NAMESPACE_QMK 0x51
-#define SERIAL_NAMESPACE_USER 0x52
+#define SERIAL_NAMESPACE_KB 0x52
+#define SERIAL_NAMESPACE_USER 0x53
 
 #ifndef SERIAL_USERXFER_MAX_SIZE
 #    define SERIAL_USERXFER_MAX_SIZE 32
@@ -138,7 +139,7 @@ static THD_FUNCTION(SlaveThread, arg) {
     }
 }
 
-size_t serial_userxfer_transaction(const void* sendData, size_t sendLen, void* recvData, size_t recvLen) {
+size_t serial_userxfer_transaction_impl(uint8_t namespace, const void* sendData, size_t sendLen, void* recvData, size_t recvLen) {
     msg_t res = 0;
 
     sdClear(&SERIAL_USART_DRIVER);
@@ -147,8 +148,7 @@ size_t serial_userxfer_transaction(const void* sendData, size_t sendLen, void* r
         return 0;
     }
 
-    uint8_t namespace = SERIAL_NAMESPACE_USER;
-    res               = sdWriteTimeout(&SERIAL_USART_DRIVER, &namespace, sizeof(namespace), TIME_MS2I(TIMEOUT));
+    res = sdWriteTimeout(&SERIAL_USART_DRIVER, &namespace, sizeof(namespace), TIME_MS2I(TIMEOUT));
     if (res != sizeof(namespace)) {
         sdClear(&SERIAL_USART_DRIVER);
         return 0;
@@ -170,7 +170,7 @@ size_t serial_userxfer_transaction(const void* sendData, size_t sendLen, void* r
     size_t bufLen = 0;
     if (recvData != NULL) {
         res = sdGetTimeout(&SERIAL_USART_DRIVER, TIME_MS2I(TIMEOUT));
-        if (res != SERIAL_NAMESPACE_USER) {
+        if (res != namespace) {
             sdClear(&SERIAL_USART_DRIVER);
             return 0;
         }
@@ -197,9 +197,15 @@ size_t serial_userxfer_transaction(const void* sendData, size_t sendLen, void* r
     return bufLen;
 }
 
-void serial_userxfer_respond(const void* data, size_t len) { serial_userxfer_transaction(data, len, NULL, 0); }
+size_t serial_userxfer_transaction_kb(const void* sendData, size_t sendLen, void* recvData, size_t recvLen) { return serial_userxfer_transaction_impl(SERIAL_NAMESPACE_KB, sendData, sendLen, recvData, recvLen); }
 
-__attribute__((weak)) bool serial_userxfer_receive(const void* data, size_t len) { return false; }
+size_t serial_userxfer_transaction_user(const void* sendData, size_t sendLen, void* recvData, size_t recvLen) { return serial_userxfer_transaction_impl(SERIAL_NAMESPACE_USER, sendData, sendLen, recvData, recvLen); }
+
+void serial_userxfer_respond_kb(const void* data, size_t len) { serial_userxfer_transaction_impl(SERIAL_NAMESPACE_KB, data, len, NULL, 0); }
+void serial_userxfer_respond_user(const void* data, size_t len) { serial_userxfer_transaction_impl(SERIAL_NAMESPACE_USER, data, len, NULL, 0); }
+
+__attribute__((weak)) bool serial_userxfer_receive_kb(const void* data, size_t len) { return false; }
+__attribute__((weak)) bool serial_userxfer_receive_user(const void* data, size_t len) { return false; }
 
 __attribute__((weak)) void usart_init(void) {
 #if defined(USE_GPIOV1)
@@ -267,21 +273,24 @@ void handle_soft_serial_slave(void) {
         if (trans->status) {
             *trans->status = TRANSACTION_ACCEPTED;
         }
-    } else if (namespace == SERIAL_NAMESPACE_USER) {
+    } else if (namespace == SERIAL_NAMESPACE_KB || namespace == SERIAL_NAMESPACE_USER) {
         size_t  len;
         uint8_t buf[SERIAL_USERXFER_MAX_SIZE];
         sdRead(&SERIAL_USART_DRIVER, (uint8_t*)&len, sizeof(len));
         if (len >= SERIAL_USERXFER_MAX_SIZE) {
             sdClear(&SERIAL_USART_DRIVER);
             // Unable to handle the transfer size, send back an empty result
-            serial_userxfer_respond(NULL, 0);
+            serial_userxfer_transaction_impl(namespace, NULL, 0, NULL, 0);
         } else {
             sdRead(&SERIAL_USART_DRIVER, buf, len);
-            if (!serial_userxfer_receive(buf, len)) {
+            bool res = namespace == SERIAL_NAMESPACE_KB ? serial_userxfer_receive_kb(buf, len) : serial_userxfer_receive_user(buf, len);
+            if (!res) {
                 // Unhandled by user-mode code, send back an empty result
-                serial_userxfer_respond(NULL, 0);
+                serial_userxfer_transaction_impl(namespace, NULL, 0, NULL, 0);
             }
         }
+    } else {
+        sdClear(&SERIAL_USART_DRIVER);
     }
 }
 

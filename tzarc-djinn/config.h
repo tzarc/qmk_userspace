@@ -18,11 +18,14 @@
 
 #include "config_common.h"
 
+// 1000Hz poll rate
+#define USB_POLLING_INTERVAL_MS 1
+
 // Matrix
-#define MATRIX_ROWS 14
+#define MATRIX_ROWS 12
 #define MATRIX_COLS 7
 #define MATRIX_ROW_PINS \
-    { B13, B14, B15, C6, C7, C8, C9 }
+    { B13, B14, B15, C6, C7, C8 }
 #define MATRIX_COL_PINS \
     { C0, C1, C2, C3, A0, A1, A2 }
 
@@ -36,10 +39,10 @@
 
 #ifndef ENCODER_RESOLUTION
 #    define ENCODER_RESOLUTION 2
-#endif // ENCODER_RESOLUTION
+#endif  // ENCODER_RESOLUTION
 
 // Debugging
-#define DEBUG_MATRIX_SCAN_RATE
+// #define DEBUG_MATRIX_SCAN_RATE
 #define DEBUG_EEPROM_OUTPUT
 
 // Bootloader

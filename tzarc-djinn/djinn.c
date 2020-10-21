@@ -20,16 +20,31 @@
 #include "color.h"
 #include "serial_usart_userxfer.h"
 
-#ifdef QUANTUM_PAINTER_ENABLE
-#    include "qp_ili9341.h"
-#    include "gfx-djinn.c"
-#    define IMAGE gfx_djinn
-painter_device_t lcd;
-#endif
+#include "qp_ili9341.h"
+#include "gfx-djinn.c"
+#define IMAGE gfx_djinn
 
-void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
+painter_device_t lcd;  // also usable from keymaps
 
-extern bool is_keyboard_left(void);
+struct data_xfer_kb {
+    union {
+        struct {
+            unsigned current_1500mA : 1;
+            unsigned current_3000mA : 1;
+            unsigned dummy : 6;
+        } values;
+        uint8_t raw;
+    };
+};
+
+static struct data_xfer_kb data_xfer;
+
+void matrix_io_delay(void) {
+    for (int i = 0; i < 250; ++i) {
+        // Give the matrix scanning a small amount of time to settle.
+        __asm__ volatile("nop\nnop\nnop\n");
+    }
+}
 
 /*
 bool is_keyboard_master(void) {
@@ -38,7 +53,7 @@ bool is_keyboard_master(void) {
     if (!determined) {
         determined = true;
         setPinInputLow(SPLIT_PLUG_DETECT_PIN);
-        wait_ms(10);
+        wait_ms(50);
         is_master = readPin(SPLIT_PLUG_DETECT_PIN) ? true : false;
         if (!is_master) {
             usbStop(&USBD1);
@@ -51,23 +66,20 @@ bool is_keyboard_master(void) {
 
 void keyboard_post_init_kb(void) {
     debug_enable = true;
-    debug_matrix = true;
 
-    // Force a read initially so that the SPI driver is initialised and the backlight driver doesn't choke
-    eeconfig_read_user();
+    // Reset the initial shared data value between master and slave
+    data_xfer.raw = 0;
 
-#ifdef RGBLIGHT_ENABLE
     // Turn off increased current limits
     setPinOutput(RGB_CURR_1500mA_OK_PIN);
     writePinLow(RGB_CURR_1500mA_OK_PIN);
     setPinOutput(RGB_CURR_3000mA_OK_PIN);
     writePinLow(RGB_CURR_3000mA_OK_PIN);
+
     // Turn on the RGB
     setPinOutput(RGB_POWER_ENABLE_PIN);
     writePinHigh(RGB_POWER_ENABLE_PIN);
-#endif
 
-#ifdef QUANTUM_PAINTER_ENABLE
     // Turn on the LCD
     setPinOutput(LCD_POWER_ENABLE_PIN);
     writePinHigh(LCD_POWER_ENABLE_PIN);
@@ -82,8 +94,8 @@ void keyboard_post_init_kb(void) {
     // Turn on the LCD
     qp_power(lcd, true);
 
-#    define NUM_ROWS (320 - IMAGE->height)
-#    define NUM_COLS (240)
+#define NUM_ROWS (320 - IMAGE->height)
+#define NUM_COLS (240)
     for (int r = 0; r < 320; ++r) {
         uint8_t pix_data[2 * NUM_COLS] = {0};
         if (r < NUM_ROWS) {
@@ -105,68 +117,30 @@ void keyboard_post_init_kb(void) {
     qp_rect(lcd, 20, 20, 120, 100, HSV_RED, true);
     qp_rect(lcd, 20, 20, 120, 100, HSV_WHITE, false);
     qp_drawimage(lcd, (240 - IMAGE->width) / 2, 320 - IMAGE->height, IMAGE);
-#endif
 
-#ifdef BACKLIGHT_ENABLE
-    // Turn on the backlight
+    // Turn on the LCD backlight
     backlight_enable();
     backlight_level(BACKLIGHT_LEVELS);
-#endif
 }
 
-void encoder_update_user(uint8_t index, bool clockwise);
-void encoder_update_kb(uint8_t index, bool clockwise) { encoder_update_user(index, clockwise); }
-
-uint8_t prng(void) {
-    static uint8_t s = 0xAA, a = 0;
-    s ^= s << 3;
-    s ^= s >> 5;
-    s ^= a++ >> 2;
-    return s;
+void encoder_update_kb(uint8_t index, bool clockwise) {
+    // Offload to the keymap instead.
+    extern void encoder_update_user(uint8_t index, bool clockwise);
+    encoder_update_user(index, clockwise);
 }
 
-void keyboard_post_init_user(void) {
-    // Customise these values to desired behaviour
-    debug_enable = true;
-    // debug_matrix = true;
-    // debug_keyboard=true;
-    // debug_mouse=true;
-}
+bool serial_userxfer_receive_kb(const void* data, size_t len) {
+    // Cast to the dataatype transmitted
+    struct data_xfer_kb* xfer = (struct data_xfer_kb*)data;
 
-void matrix_scan_user(void) {
-    static uint32_t last_eeprom_access = 0;
-    uint32_t        now                = timer_read32();
-    if (now - last_eeprom_access > 60000) {
-        dprint("reading eeprom\n");
-        last_eeprom_access = now;
+    // Increment the dummy variable
+    xfer->values.dummy++;
 
-        union {
-            uint8_t  bytes[4];
-            uint32_t raw;
-        } tmp;
-        tmp.bytes[0] = prng();
-        tmp.bytes[1] = prng();
-        tmp.bytes[2] = prng();
-        tmp.bytes[3] = prng();
+    // Copy across the raw value to the slave side
+    data_xfer.raw = xfer->raw;
 
-        eeconfig_update_user(tmp.raw);
-        uint32_t value = eeconfig_read_user();
-        if (value != tmp.raw) {
-            dprint("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-            dprint("!! EEPROM readback mismatch!\n");
-            dprint("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-            while (1)
-                ;
-        }
-    }
-}
-
-static struct data_xfer { uint8_t value; } data_xfer;
-
-bool serial_userxfer_receive(const void* data, size_t len) {
-    struct data_xfer* xfer = (struct data_xfer*)data;
-    xfer->value++;
-    serial_userxfer_respond(data, sizeof(struct data_xfer));
+    // Repsond with any new value
+    serial_userxfer_respond_kb(&data_xfer, sizeof(data_xfer));
     return true;
 }
 
@@ -178,21 +152,18 @@ void housekeeping_task_kb(void) {
 
         if (is_keyboard_master()) {
             dprint("Sync'ing data with slave\n");
-            dprintf("Before: %d\n", (int)data_xfer.value);
-            serial_userxfer_transaction(&data_xfer, sizeof(data_xfer), &data_xfer, sizeof(data_xfer));
-            dprintf("After: %d\n", (int)data_xfer.value);
+            dprintf("Before: %d\n", (int)data_xfer.raw);
+            serial_userxfer_transaction_kb(&data_xfer, sizeof(data_xfer), &data_xfer, sizeof(data_xfer));
+            dprintf("After: %d\n", (int)data_xfer.raw);
         }
     }
 }
 
-static bool current_1500mA = false;
-static bool current_3000mA = false;
-
 RGB rgblight_hsv_to_rgb(HSV hsv) {
-    float scale = 0.25f;
-    if (current_3000mA) {
+    float scale = 0.30f;
+    if (data_xfer.values.current_3000mA) {
         scale = 0.60f;
-    } else if (current_1500mA) {
+    } else if (data_xfer.values.current_1500mA) {
         scale = 0.40f;
     }
 
