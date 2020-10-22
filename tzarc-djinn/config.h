@@ -31,6 +31,8 @@
 
 #define DIODE_DIRECTION ROW2COL
 
+#define QUANTUM_PAINTER_SUPPORTS_256_PALETTE TRUE
+
 // Encoders
 #define ENCODERS_PAD_A \
     { C14 }

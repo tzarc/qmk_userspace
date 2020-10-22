@@ -45,7 +45,7 @@ nick: cyclone iris luddite mysterium-nick chocopad ctrl
 # QMK Logo generation
 $(ROOTDIR)/tzarc-djinn/gfx-djinn.c: $(ROOTDIR)/inject-root/util/convert_gfx.py $(ROOTDIR)/tzarc-djinn/djinn.png Makefile
 	cd $(ROOTDIR)/tzarc-djinn \
-		&& $(ROOTDIR)/inject-root/util/convert_gfx.py --compress --pal2bpp --chunk-size 4096 --image-file djinn.png --output djinn
+		&& $(ROOTDIR)/inject-root/util/convert_gfx.py --compress --pal4bpp --chunk-size 4096 --image-file djinn.png --output djinn
 
 gfx: $(ROOTDIR)/tzarc-djinn/gfx-djinn.c
 
