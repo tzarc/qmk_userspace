@@ -53,13 +53,13 @@ bool serial_dataxfer_receive_kb(const void* data, size_t len) {
 }
 
 void housekeeping_task_kb(void) {
-    // Turn off the LCD if there's been no matrix activity
-    kb_conf.values.lcd_power = (last_matrix_activity_elapsed() < LCD_ACTIVITY_TIMEOUT) ? 1 : 0;
-
     // If we're the master side, then propagate our runtime config to the slave
     if (is_keyboard_master()) {
         static uint32_t          last_sync = 0;
         static kb_runtime_config last_data;
+
+        // Turn off the LCD if there's been no matrix activity
+        kb_conf.values.lcd_power = (last_matrix_activity_elapsed() < LCD_ACTIVITY_TIMEOUT) ? 1 : 0;
 
         // Send the data from the master to the slave
         uint32_t now = timer_read32();
@@ -187,7 +187,6 @@ void keyboard_post_init_kb(void) {
 //----------------------------------------------------------
 // QMK overrides
 
-/*
 bool is_keyboard_master(void) {
     static bool determined = false;
     static bool is_master;
@@ -203,7 +202,6 @@ bool is_keyboard_master(void) {
 
     return is_master;
 }
-*/
 
 void matrix_io_delay(void) {
     for (int i = 0; i < 250; ++i) {
