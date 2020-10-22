@@ -296,19 +296,19 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
     elif fmt_mono4bpp:
         graphic_data = image_to_mono4bpp(graphic_image)
         newline_counter = int(width / 2)
-        image_format = "IMAGE_FORMAT_GREYSCALE"
+        image_format = "IMAGE_FORMAT_GRAYSCALE"
         format_name = "4bpp"
         image_bpp = 4
     elif fmt_mono2bpp:
         graphic_data = image_to_mono2bpp(graphic_image)
         newline_counter = int(width / 4)
-        image_format = "IMAGE_FORMAT_GREYSCALE"
+        image_format = "IMAGE_FORMAT_GRAYSCALE"
         format_name = "2bpp"
         image_bpp = 2
     elif fmt_mono1bpp:
         graphic_data = image_to_mono1bpp(graphic_image)
         newline_counter = int(width / 8)
-        image_format = "IMAGE_FORMAT_GREYSCALE"
+        image_format = "IMAGE_FORMAT_GRAYSCALE"
         format_name = "1bpp"
         image_bpp = 1
 
