@@ -58,8 +58,8 @@
 #define SPLIT_PLUG_DETECT_PIN B12
 
 // USB Device parameters
-#define VENDOR_ID 0xF055
-#define PRODUCT_ID 0x4920
+#define VENDOR_ID 0x1209
+#define PRODUCT_ID 0x4919
 #define DEVICE_VER 0x0001
 #define MANUFACTURER Tzarc
 #define PRODUCT Djinn
