@@ -125,23 +125,25 @@ static SerialConfig sdcfg = {
 
 void handle_soft_serial_slave(void);
 
-
 size_t serial_dataxfer_transaction_impl(uint8_t namespace, const void* sendData, size_t sendLen, void* recvData, size_t recvLen) {
     msg_t res = 0;
 
     sdClear(&SERIAL_USART_DRIVER);
     if (sendLen > SERIAL_DATAXFER_MAX_SIZE || recvLen > SERIAL_DATAXFER_MAX_SIZE) {
+        dprintf("serial::serial_dataxfer_transaction_impl UNSUPPORTED SIZE\n");
         // Unsupported size
         return 0;
     }
 
     res = sdWriteTimeout(&SERIAL_USART_DRIVER, &namespace, sizeof(namespace), TIME_MS2I(TIMEOUT));
     if (res != sizeof(namespace)) {
+        dprintf("serial::serial_dataxfer_transaction_impl NAMESPACE WRITE FAIL\n");
         sdClear(&SERIAL_USART_DRIVER);
         return 0;
     }
     res = sdWriteTimeout(&SERIAL_USART_DRIVER, (uint8_t*)&sendLen, sizeof(sendLen), TIME_MS2I(TIMEOUT));
     if (res != sizeof(sendLen)) {
+        dprintf("serial::serial_dataxfer_transaction_impl LENGTH WRITE FAIL\n");
         sdClear(&SERIAL_USART_DRIVER);
         return 0;
     }
@@ -149,21 +151,24 @@ size_t serial_dataxfer_transaction_impl(uint8_t namespace, const void* sendData,
     if (sendLen > 0) {
         res = sdWriteTimeout(&SERIAL_USART_DRIVER, sendData, sendLen, TIME_MS2I(TIMEOUT));
         if (res != sendLen) {
+            dprintf("serial::serial_dataxfer_transaction_impl BUFFER WRITE FAIL\n");
             sdClear(&SERIAL_USART_DRIVER);
             return 0;
         }
     }
 
     size_t bufLen = 0;
-    if (recvData != NULL) {
+    if (recvData != NULL && recvLen > 0) {
         res = sdGetTimeout(&SERIAL_USART_DRIVER, TIME_MS2I(TIMEOUT));
         if (res != namespace) {
+            dprintf("serial::serial_dataxfer_transaction_impl INVALID NAMESPACE\n");
             sdClear(&SERIAL_USART_DRIVER);
             return 0;
         }
 
         res = sdReadTimeout(&SERIAL_USART_DRIVER, (uint8_t*)&bufLen, sizeof(bufLen), TIME_MS2I(TIMEOUT));
         if (res != sizeof(bufLen)) {
+            dprintf("serial::serial_dataxfer_transaction_impl INVALID MESSAGE LENGTH\n");
             sdClear(&SERIAL_USART_DRIVER);
             return 0;
         }
@@ -172,10 +177,12 @@ size_t serial_dataxfer_transaction_impl(uint8_t namespace, const void* sendData,
             if (bufLen <= recvLen) {
                 res = sdReadTimeout(&SERIAL_USART_DRIVER, recvData, bufLen, TIME_MS2I(TIMEOUT));
                 if (res != bufLen) {
+                    dprintf("serial::serial_dataxfer_transaction_impl MESSAGE READ FAIL\n");
                     sdClear(&SERIAL_USART_DRIVER);
                     return 0;
                 }
             } else {
+                dprintf("serial::serial_dataxfer_transaction_impl BUFFER LENGTH MISMATCH\n");
                 sdClear(&SERIAL_USART_DRIVER);
             }
         }
@@ -283,7 +290,7 @@ void handle_soft_serial_slave(void) {
             serial_dataxfer_transaction_impl(namespace, NULL, 0, NULL, 0);
         } else {
             sdRead(&SERIAL_USART_DRIVER, buf, len);
-            bool res = namespace == SERIAL_NAMESPACE_KB ? serial_dataxfer_receive_kb(buf, len) : serial_dataxfer_receive_user(buf, len);
+            bool res = (namespace == SERIAL_NAMESPACE_KB) ? serial_dataxfer_receive_kb(buf, len) : serial_dataxfer_receive_user(buf, len);
             if (!res) {
                 // Unhandled by user-mode code, send back an empty result
                 serial_dataxfer_transaction_impl(namespace, NULL, 0, NULL, 0);
