@@ -107,19 +107,13 @@ void housekeeping_task_kb(void) {
     }
 
     if (lcd_on) {
-        static uint8_t last_hue = 0xFF;
-        static uint8_t last_sat = 0xFF;
-        static uint8_t last_val = 0xFF;
-        uint8_t        curr_hue = rgblight_get_hue();
-        uint8_t        curr_sat = rgblight_get_sat();
-        uint8_t        curr_val = rgblight_get_val();
-        if (last_hue != curr_hue || last_sat != curr_sat || last_val != curr_val) {
+        static uint16_t last_hue = 0xFFFF;
+        uint8_t         curr_hue = rgblight_get_hue();
+        if (last_hue != curr_hue) {
             last_hue = curr_hue;
-            last_sat = curr_sat;
-            last_val = curr_val;
-            qp_drawimage_recolor(lcd, 0, 0, gfx_djinn, curr_hue, curr_sat, curr_val);
-            qp_rect(lcd, 0, 0, 8, 319, curr_hue, curr_sat, curr_val, true);
-            qp_rect(lcd, 231, 0, 239, 319, curr_hue, curr_sat, curr_val, true);
+            qp_drawimage_recolor(lcd, 120 - gfx_djinn->width / 2, 0, gfx_djinn, curr_hue, 255, 255);
+            qp_rect(lcd, 0, 0, 8, 319, curr_hue, 255, 255, true);
+            qp_rect(lcd, 231, 0, 239, 319, curr_hue, 255, 255, true);
         }
     }
 }
@@ -177,7 +171,7 @@ void keyboard_post_init_kb(void) {
     // Turn on the LCD and draw the logo
     djinn_lcd_on();
     qp_power(lcd, true);
-    qp_drawimage(lcd, 0, 0, gfx_djinn);
+    qp_rect(lcd, 0, 0, 239, 319, 0, 0, 0, true);
 
     // Turn on the LCD backlight
     backlight_enable();
