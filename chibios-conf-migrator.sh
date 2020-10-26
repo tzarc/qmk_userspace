@@ -11,6 +11,10 @@ qmk_firmware_dir="$(realpath "$script_dir/qmk_firmware/")" # change this once mo
 
 cd "$qmk_firmware_dir"
 
+export PATH=/usr/lib/ccache:/home/nickb/gcc-arm/gcc-arm-none-eabi-9-2019-q4-major/bin:$PATH
+
+havecmd()  { type ${1} &>/dev/null || return 1; }
+
 spacer() {
     for f in $(seq 1 10) ; do
         echo
@@ -30,6 +34,16 @@ function_exists() {
     declare -f -F $1 > /dev/null
     return $?
 }
+
+#wipe_s3() {
+#    if havecmd qmk-s3 ; then
+#        for file in $(qmk-s3 ls | awk '{print $4}') ; do
+#            qmk-s3 rm "$file"
+#        done
+#    fi
+#}
+#
+#wipe_s3
 
 hard_reset() {
     local repo_upstream=$1

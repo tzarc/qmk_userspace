@@ -32,16 +32,16 @@ enum {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_BASE] = LAYOUT_ortho_4x4(
-    LAYER1,   KC_HOME,  KC_UP,    KC_END ,
-    LAYER2,   KC_LEFT,  KC_DOWN,  KC_RGHT,
-    LAYER3,   KC_VOLU,  KC_MPLY,  KC_MPRV,
-    LAYER4,   KC_VOLD,  KC_MUTE,  KC_MNXT
+    LAYER1,   KC_F23,   KC_MUTE,  KC_F24,
+    LAYER2,   KC_F14,   KC_F15,   KC_F16,
+    LAYER3,   KC_F17,   KC_F18,   KC_F19,
+    LAYER4,   KC_F20,   KC_F21,   KC_F22
   ),
   [_LAYER1] = LAYOUT_ortho_4x4(
-    _______,  _______,  _______,  _______,
-    _______,  _______,  _______,  _______,
-    _______,  _______,  _______,  _______,
-    _______,  _______,  _______,  _______
+    _______,  KC_HOME,  KC_UP,    KC_END,
+    _______,  KC_LEFT,  KC_DOWN,  KC_RGHT,
+    _______,  KC_VOLU,  KC_MPLY,  KC_MPRV,
+    _______,  KC_VOLD,  KC_MUTE,  KC_MNXT
   ),
   [_LAYER2] = LAYOUT_ortho_4x4(
     _______,  _______,  _______,  _______,
