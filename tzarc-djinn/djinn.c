@@ -73,19 +73,6 @@ void housekeeping_task_kb(void) {
         }
     }
 
-    static bool lcd_on = false;
-    if (lcd_on != (bool)kb_conf.values.lcd_power) {
-        lcd_on = (bool)kb_conf.values.lcd_power;
-        qp_power(lcd, lcd_on);
-    }
-
-    if (is_backlight_enabled() != lcd_on) {
-        if (lcd_on)
-            backlight_enable();
-        else
-            backlight_disable();
-    }
-
     static uint8_t current_setting = current_500mA;
     if (current_setting != kb_conf.values.current_setting) {
         current_setting = kb_conf.values.current_setting;
@@ -104,6 +91,19 @@ void housekeeping_task_kb(void) {
                 writePinHigh(RGB_CURR_3000mA_OK_PIN);
                 break;
         }
+    }
+
+    static bool lcd_on = false;
+    if (lcd_on != (bool)kb_conf.values.lcd_power) {
+        lcd_on = (bool)kb_conf.values.lcd_power;
+        qp_power(lcd, lcd_on);
+    }
+
+    if (is_backlight_enabled() != lcd_on) {
+        if (lcd_on)
+            backlight_enable();
+        else
+            backlight_disable();
     }
 
     if (lcd_on) {
@@ -208,6 +208,26 @@ void encoder_update_kb(uint8_t index, bool clockwise) {
     // Offload to the keymap instead.
     extern void encoder_update_user(uint8_t index, bool clockwise);
     encoder_update_user(index, clockwise);
+}
+
+void suspend_power_down_kb(void) {
+    suspend_power_down_user();
+
+    // djinn_lcd_off();
+    // qp_power(lcd, false);
+    // writePinLow(LCD_POWER_ENABLE_PIN);
+}
+
+void suspend_wakeup_init_kb(void) {
+    // writePinHigh(LCD_POWER_ENABLE_PIN);
+    // wait_ms(50);
+    // djinn_lcd_on();
+    // qp_init(lcd, QP_ROTATION_0);
+    // qp_power(lcd, true);
+    // qp_clear(lcd);
+    // qp_rect(lcd, 0, 0, 239, 319, 0, 0, 0, true);
+
+    suspend_wakeup_init_user();
 }
 
 RGB rgblight_hsv_to_rgb(HSV hsv) {
