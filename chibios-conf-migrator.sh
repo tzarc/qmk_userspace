@@ -257,9 +257,6 @@ upgrade_base() {
     hard_reset qmk qmk_firmware develop
     pcmd make git-submodule
 
-    # Migration scripts
-    pcmd hub merge https://github.com/qmk/qmk_firmware/pull/9952
-    pcmd git commit --amend -m "Merge qmk_firmware upstream PR 9952"
     # Fixup the ChibiOS conf upgrade script
     sed -i "s@ upstream/master@@g" util/chibios-upgrader.sh
     sed -i "s@ origin/master@@g" util/chibios-upgrader.sh
