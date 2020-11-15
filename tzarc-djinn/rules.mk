@@ -29,8 +29,12 @@ AUDIO_ENABLE = no           # Audio output
 
 ENCODER_ENABLE = yes
 
-SPLIT_KEYBOARD = yes
-SERIAL_DRIVER = usart_dataxfer
+# Allow for single-side builds to be overridden in keymaps
+SPLIT_KEYBOARD ?= yes
+
+ifeq ($(strip $(SPLIT_KEYBOARD)),yes)
+	SERIAL_DRIVER = usart_dataxfer
+endif
 
 BACKLIGHT_DRIVER = pwm
 

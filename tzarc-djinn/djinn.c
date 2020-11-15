@@ -45,14 +45,17 @@ _Static_assert(sizeof(kb_runtime_config) == 1, "Invalid data transfer size for k
 
 static kb_runtime_config kb_conf;
 
+#ifdef SPLIT_KEYBOARD
 bool serial_dataxfer_receive_kb(const void* data, size_t len) {
     const kb_runtime_config* xfer = (const kb_runtime_config*)data;
     kb_conf.raw                   = xfer->raw;
     serial_dataxfer_respond_kb(&kb_conf, sizeof(kb_conf));
     return true;
 }
+#endif  // SPLIT_KEYBOARD
 
 void housekeeping_task_kb(void) {
+#ifdef SPLIT_KEYBOARD
     // If we're the master side, then propagate our runtime config to the slave
     if (is_keyboard_master()) {
         static uint32_t          last_sync = 0;
@@ -72,6 +75,7 @@ void housekeeping_task_kb(void) {
             serial_dataxfer_transaction_kb(&kb_conf, sizeof(kb_conf), &slave_runtime_cfg, sizeof(slave_runtime_cfg));
         }
     }
+#endif  // SPLIT_KEYBOARD
 
     static uint8_t current_setting = current_500mA;
     if (current_setting != kb_conf.values.current_setting) {
@@ -181,6 +185,7 @@ void keyboard_post_init_kb(void) {
 //----------------------------------------------------------
 // QMK overrides
 
+#ifdef SPLIT_KEYBOARD
 bool is_keyboard_master(void) {
     static bool determined = false;
     static bool is_master;
@@ -196,6 +201,7 @@ bool is_keyboard_master(void) {
 
     return is_master;
 }
+#endif  // SPLIT_KEYBOARD
 
 void matrix_io_delay(void) {
     for (int i = 0; i < 250; ++i) {

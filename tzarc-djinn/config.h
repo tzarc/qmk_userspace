@@ -22,7 +22,11 @@
 #define USB_POLLING_INTERVAL_MS 1
 
 // Matrix
-#define MATRIX_ROWS 12
+#ifdef SPLIT_KEYBOARD
+#    define MATRIX_ROWS 12
+#else
+#    define MATRIX_ROWS 6
+#endif
 #define MATRIX_COLS 7
 #define MATRIX_ROW_PINS \
     { B13, B14, B15, C6, C7, C8 }
@@ -98,9 +102,13 @@
 // RGB configuration
 #define WS2812_EXTERNAL_PULLUP
 #define RGB_DI_PIN B2
-#define RGBLED_NUM 84
-#define RGBLED_SPLIT \
-    { 42, 42 }
+#ifdef SPLIT_KEYBOARD
+#    define RGBLED_NUM 84
+#    define RGBLED_SPLIT \
+        { 42, 42 }
+#else
+#    define RGBLED_NUM 42
+#endif
 #define WS2812_PWM_DRIVER PWMD20
 #define WS2812_PWM_CHANNEL 1
 #define WS2812_PWM_PAL_MODE 3
