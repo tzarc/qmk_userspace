@@ -185,6 +185,8 @@ void keyboard_post_init_kb(void) {
 //----------------------------------------------------------
 // QMK overrides
 
+// Disable plug detection for now, as it's not working for some people.
+#if 0
 #ifdef SPLIT_KEYBOARD
 bool is_keyboard_master(void) {
     static bool determined = false;
@@ -202,6 +204,7 @@ bool is_keyboard_master(void) {
     return is_master;
 }
 #endif  // SPLIT_KEYBOARD
+#endif
 
 void matrix_io_delay(void) {
     for (int i = 0; i < 250; ++i) {
