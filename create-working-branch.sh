@@ -20,7 +20,7 @@ fi
 declare -a prs_to_apply
 prs_to_apply+=(9603) # Matrix delay
 prs_to_apply+=(10174) # Quantum Painter
-prs_to_apply+=(10418) # ChibiOS conf upgrade
+#prs_to_apply+=(10418) # ChibiOS conf upgrade
 prs_to_apply+=(10437) # Decouple USB events
 prs_to_apply+=(10730) # Last matrix activity
 
@@ -130,9 +130,20 @@ for file in $(find "$script_dir/qmk_firmware/keyboards" "$script_dir/qmk_firmwar
     sed -i 's@#define CH_CFG_USE_JOBS                     TRUE@#define CH_CFG_USE_JOBS                     FALSE@g' "$file"
 done
 IFS=$OIFS
-pcmd git commit -am "Disable ChibiOS jobs by default"
+pcmd git commit -am "Disable ChibiOS jobs by default" || true
 popd
 
 pushd "$script_dir/qmk_firmware"
 pcmd git push origin $target_branch --set-upstream --force-with-lease
+popd
+
+# Set up the Djinn branch
+pushd "$script_dir/qmk_firmware"
+pcmd git branch -D djinn || true
+pcmd git checkout -b djinn generated-chibios-master-upgrade
+[[ -d keyboards/tzarc ]] || mkdir -p keyboards/tzarc
+pcmd rsync -avvP "$script_dir/tzarc-djinn/"* keyboards/tzarc/djinn
+pcmd git add keyboards/tzarc/djinn
+pcmd git commit -m "Import Djinn code."
+pcmd git push origin djinn --set-upstream --force-with-lease
 popd
