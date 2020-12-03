@@ -10,3 +10,4 @@ chibios-upgrade-output
 .DS_Store
 ._*
 .vscode/.cortex-debug*
+validation-output

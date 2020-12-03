@@ -8,7 +8,7 @@ script_dir="$(realpath "$(dirname "$this_script")")"
 qmk_firmware_dir="$(realpath "$script_dir/qmk_firmware/")" # change this once moved to util
 validation_output="$script_dir/validation-output"
 
-branch_under_test="chibios-defaults-off"
+branch_under_test="chibios-defaults-off-take2"
 
 export PATH=/home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$PATH
 
@@ -70,14 +70,8 @@ required_keyboard_builds() {
     pushd "$qmk_firmware_dir" >/dev/null 2>&1
     git checkout develop >/dev/null 2>&1
 
-    git grep '^\s*MCU\s*=\s*STM32F303' keyboards/ | grep -v keymaps | cut -d: -f1 | sed -e 's@^keyboards/@@g' -e 's@/rules.mk@:default@g'
-    git grep '^\s*MCU\s*=\s*STM32F303' keyboards/ | grep keymaps | cut -d: -f1 | sed -e 's@^keyboards/@@g' -e 's@/keymaps/@:@g' -e 's@/rules.mk@@g'
-
-    git grep '^\s*CTPC\s*=\s*yes' keyboards/ | grep -v keymaps | cut -d: -f1 | sed -e 's@^keyboards/@@g' -e 's@/rules.mk@:default@g'
-    git grep '^\s*CTPC\s*=\s*yes' keyboards/ | grep keymaps | cut -d: -f1 | sed -e 's@^keyboards/@@g' -e 's@/keymaps/@:@g' -e 's@/rules.mk@@g'
-
-    git grep '^\s*CONVERT_TO_PROTON_C\s*=\s*yes' keyboards/ | grep -v keymaps | cut -d: -f1 | sed -e 's@^keyboards/@@g' -e 's@/rules.mk@:default@g'
-    git grep '^\s*CONVERT_TO_PROTON_C\s*=\s*yes' keyboards/ | grep keymaps | cut -d: -f1 | sed -e 's@^keyboards/@@g' -e 's@/keymaps/@:@g' -e 's@/rules.mk@@g'
+    git grep '^\s*MCU\s*=\s*STM32F4' keyboards/ | grep -v keymaps | cut -d: -f1 | sed -e 's@^keyboards/@@g' -e 's@/rules.mk@:default@g'
+    git grep '^\s*MCU\s*=\s*STM32F4' keyboards/ | grep keymaps | cut -d: -f1 | sed -e 's@^keyboards/@@g' -e 's@/keymaps/@:@g' -e 's@/rules.mk@@g'
 
     popd >/dev/null 2>&1
 }
@@ -89,6 +83,3 @@ required_builds=$(required_keyboard_builds | sort | uniq | grep -v rgbkb/zen)
 for build_target in $required_builds ; do
     validate_build $build_target
 done
-
-validate_build rgbkb/zen/rev1:default CTPC=yes
-validate_build rgbkb/zen/rev2:default CTPC=yes
