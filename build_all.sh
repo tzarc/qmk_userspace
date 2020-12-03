@@ -3,7 +3,7 @@
 this_script=$(readlink -f "${BASH_SOURCE[@]}")
 script_dir=$(dirname "$this_script")
 
-export PATH=/usr/lib/ccache:/home/nickb/gcc-arm/gcc-arm-none-eabi-9-2019-q4-major/bin:$PATH
+export PATH=/home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$PATH
 MAKEFLAGS="-j --output-sync"
 
 pushd "$script_dir/qmk_firmware" >/dev/null 2>&1 \

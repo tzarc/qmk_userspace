@@ -10,8 +10,9 @@ validation_output="$script_dir/validation-output"
 
 branch_under_test="chibios-defaults-off"
 
-export PATH=/usr/lib/ccache:$PATH
+export PATH=/home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$PATH
 
+[[ -d "$validation_output" ]] || mkdir -p "$validation_output"
 echo -n >"$validation_output/upgrade.log"
 
 append_log() {
@@ -24,8 +25,8 @@ build_single() {
     local extraflags=${3:-}
 
     make distclean 2>&1 | append_log
-    local binary_basename="$(make -j$(nproc) ${build_target}:dump_vars COMMAND_ENABLE=no SKIP_VERSION=yes SKIP_GIT=yes ${extraflags:-} | grep -P '^TARGET=' | cut -d'=' -f2)"
-    make -j$(nproc) ${build_target}:dump_vars COMMAND_ENABLE=no SKIP_VERSION=yes SKIP_GIT=yes ${extraflags:-} 2>&1 > "${validation_output}/${binary_basename}_${build_stage}_vars.txt"
+    local binary_basename="$(make ${build_target}:dump_vars COMMAND_ENABLE=no SKIP_VERSION=yes SKIP_GIT=yes ${extraflags:-} | grep -P '^TARGET=' | cut -d'=' -f2)"
+    make ${build_target}:dump_vars COMMAND_ENABLE=no SKIP_VERSION=yes SKIP_GIT=yes ${extraflags:-} 2>&1 > "${validation_output}/${binary_basename}_${build_stage}_vars.txt"
     { make -j$(nproc) ${build_target} COMMAND_ENABLE=no SKIP_VERSION=yes SKIP_GIT=yes ${extraflags:-} 2>&1 || true ; } | append_log
     cat ".build/obj_${binary_basename}/cflags.txt" | sed -e 's/ /\n/g' > "$validation_output/${binary_basename}_${build_stage}_cflags.txt"
     [[ ! -d "$validation_output/${binary_basename}_${build_stage}_build" ]] \
