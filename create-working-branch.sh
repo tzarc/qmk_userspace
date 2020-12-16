@@ -22,9 +22,10 @@ prs_to_apply+=(9603) # Matrix delay
 prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(10437) # Decouple USB events
 prs_to_apply+=(10730) # Last matrix activity
+#prs_to_apply+=(6165) # Audio
 
 declare -a cherry_picks
-cherry_picks+=(ba542a0164a10a1958aa5054d2a0cc333bb3ce64) # Audio
+#cherry_picks+=(ba542a0164a10a1958aa5054d2a0cc333bb3ce64) # Audio
 
 rm -f "$script_dir"/*.patch || true
 

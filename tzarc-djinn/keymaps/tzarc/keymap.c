@@ -1,15 +1,27 @@
+/* Copyright 2018-2020 Nick Brassel (@tzarc)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include QMK_KEYBOARD_H
 #include "tzarc.h"
 
 #define MEDIA_KEY_DELAY 2
 
-enum { _QWERTY, _LOWER, _RAISE, _ADJUST };
-#define KC_LWR MO(_LOWER)
-#define KC_RSE MO(_RAISE)
-
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [_QWERTY] = LAYOUT_all_wrapper(
+    [LAYER_BASE] = LAYOUT_all_wrapper(
         ____________TZARC_7x4_BASE_R1_L__________,                                            ____________TZARC_7x4_BASE_R1_R__________,
         ____________TZARC_7x4_BASE_R2_L__________,                                            ____________TZARC_7x4_BASE_R2_R__________,
         ____________TZARC_7x4_BASE_R3_L__________,                                            ____________TZARC_7x4_BASE_R3_R__________,
@@ -20,7 +32,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                        KC_LEFT, KC_MUTE, KC_RIGHT,                                            KC_LEFT, KC_MUTE, KC_RIGHT,
                                 KC_DOWN,                                                               KC_DOWN
     ),
-    [_LOWER] = LAYOUT_all_wrapper(
+    [LAYER_LOWER] = LAYOUT_all_wrapper(
         ____________TZARC_7x4_LOWER_R1_L_________,                                            ____________TZARC_7x4_LOWER_R1_R_________,
         ____________TZARC_7x4_LOWER_R2_L_________,                                            ____________TZARC_7x4_LOWER_R2_R_________,
         ____________TZARC_7x4_LOWER_R3_L_________,                                            ____________TZARC_7x4_LOWER_R3_R_________,
@@ -31,7 +43,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                        _______, _______, _______,                                           _______, _______, _______,
                                 _______,                                                             _______
     ),
-    [_RAISE] = LAYOUT_all_wrapper(
+    [LAYER_RAISE] = LAYOUT_all_wrapper(
         ____________TZARC_7x4_RAISE_R1_L_________,                                            ____________TZARC_7x4_RAISE_R1_R_________,
         ____________TZARC_7x4_RAISE_R2_L_________,                                            ____________TZARC_7x4_RAISE_R2_R_________,
         ____________TZARC_7x4_RAISE_R3_L_________,                                            ____________TZARC_7x4_RAISE_R3_R_________,
@@ -42,7 +54,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                        _______, _______, _______,                                           _______, _______, _______,
                                 _______,                                                             _______
     ),
-    [_ADJUST] = LAYOUT_all_wrapper(
+    [LAYER_ADJUST] = LAYOUT_all_wrapper(
         ____________TZARC_7x4_ADJUST_R1_L________,                                            ____________TZARC_7x4_ADJUST_R1_R________,
         ____________TZARC_7x4_ADJUST_R2_L________,                                            ____________TZARC_7x4_ADJUST_R2_R________,
         ____________TZARC_7x4_ADJUST_R3_L________,                                            ____________TZARC_7x4_ADJUST_R3_R________,
@@ -56,9 +68,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-layer_state_t layer_state_set_keymap(layer_state_t state) {
-    // Default handler for lower/raise/adjust
-    return update_tri_layer_state(state, _LOWER, _RAISE, _ADJUST);
+void eeconfig_init_keymap(void) {
+    rgblight_mode(RGBLIGHT_MODE_STATIC_LIGHT);
+    rgblight_sethsv(0, 255, 255);
+    backlight_enable();
+    backlight_level(BACKLIGHT_LEVELS);
 }
 
 void encoder_update_keymap(uint8_t index, bool clockwise) {
