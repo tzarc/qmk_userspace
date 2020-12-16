@@ -94,6 +94,8 @@ __attribute__((weak)) void matrix_scan_keymap(void) {}
 
 __attribute__((weak)) layer_state_t layer_state_set_keymap(layer_state_t state) { return state; }
 
+__attribute__((weak)) void encoder_update_keymap(uint8_t index, bool clockwise) {}
+
 void tzarc_common_init(void) {
     config_enabled = false;
     typing_mode    = KC_NOMODE;
@@ -467,3 +469,5 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     state = update_tri_layer_state(state, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST);
     return layer_state_set_keymap(state);
 }
+
+void encoder_update_user(uint8_t index, bool clockwise) { encoder_update_keymap(index, clockwise); }

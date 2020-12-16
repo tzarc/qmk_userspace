@@ -1,5 +1,5 @@
 export ROOTDIR := $(shell pwd)
-export PATH := /usr/lib/ccache:/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q2-preview/bin:$(PATH)
+export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q2-preview//bin:$(PATH)
 
 BOARD_DEFS := \
 	iris!tzarc-iris_rev4!keebio/iris/rev4/keymaps/tzarc!tzarc \
@@ -9,7 +9,7 @@ BOARD_DEFS := \
 	mysterium-dad!tzarc-mysterium-dad!coseyfannitutti/mysterium/keymaps/tzarc-dad!tzarc-dad \
 	chocopad!tzarc-chocopad!keebio/chocopad/keymaps/tzarc!tzarc \
 	cyclone!tzarc-cyclone!handwired/tzarc/cyclone!tzarc \
-	djinn!tzarc-djinn!handwired/tzarc/djinn!default \
+	djinn!tzarc-djinn!handwired/tzarc/djinn!tzarc \
 	onekey_h743!alternates/nucleo144_h743zi!handwired/onekey/nucleo144_h743zi!reset \
 	onekey_l152!alternates/nucleo64_l152re!handwired/onekey/nucleo64_l152re!reset \
 	onekey_g431!alternates/nucleo64_g431rb!handwired/onekey/nucleo64_g431rb!reset \

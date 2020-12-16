@@ -39,6 +39,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 
 // Handle expansion of the helpers below
 #define LAYOUT_wrapper(...) LAYOUT(__VA_ARGS__)
+#define LAYOUT_all_wrapper(...) LAYOUT_all(__VA_ARGS__)
 #define LAYOUT_tkl_ansi_wrapper(...) LAYOUT_tkl_ansi(__VA_ARGS__)
 #define LAYOUT_60_ansi_wrapper(...) LAYOUT_60_ansi(__VA_ARGS__)
 

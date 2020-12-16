@@ -8,8 +8,8 @@ script_dir="$(realpath "$(dirname "$this_script")")"
 qmk_firmware_dir="$(realpath "$script_dir/qmk_firmware/")" # change this once moved to util
 validation_output="$script_dir/validation-output"
 
-source_branch="chibios-defaults-off-take2"
-branch_under_test="generated-chibios-conf-migration"
+source_branch="develop"
+branch_under_test="generated-upgrade-dekunukem-duckypad"
 
 export PATH=/home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$PATH
 
@@ -227,126 +227,7 @@ preconfigure_branch() {
 }
 
 upgrade_all_keyboards()  {
-    upgrade_one_keyboard --keyboard k_type --chibios-board IC_TEENSY_3_1 --no-mcuconf
-    upgrade_one_keyboard --keyboard whitefox --chibios-board IC_TEENSY_3_1 --no-mcuconf
-    upgrade_one_keyboard --keyboard acheron/arctic --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard acheron/austin --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard acheron/keebspcb --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard acheron/shark --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard aeboards/ext65/rev2 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard ai03/vega --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard at_at/660m --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard boston_meetup/2019 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard bt66tech/bt66tech60 --chibios-board STM32_F103_STM32DUINO
-    upgrade_one_keyboard --keyboard cannonkeys/an_c --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard cannonkeys/atlas --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard cannonkeys/chimera65 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard cannonkeys/db60 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard cannonkeys/devastatingtkl --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard cannonkeys/instant60 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard cannonkeys/instant65 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard cannonkeys/iron165 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard cannonkeys/obliterated75 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard cannonkeys/ortho48 --chibios-board STM32_F103_STM32DUINO
-    upgrade_one_keyboard --keyboard cannonkeys/ortho60 --chibios-board STM32_F103_STM32DUINO
-    upgrade_one_keyboard --keyboard cannonkeys/ortho75 --chibios-board STM32_F103_STM32DUINO
-    upgrade_one_keyboard --keyboard cannonkeys/practice60 --chibios-board STM32_F103_STM32DUINO
-    upgrade_one_keyboard --keyboard cannonkeys/practice65 --chibios-board STM32_F103_STM32DUINO
-    upgrade_one_keyboard --keyboard cannonkeys/rekt1800 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard cannonkeys/satisfaction75 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard cannonkeys/savage65 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard cannonkeys/tmov2 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard cheshire/curiosity --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard ckeys/thedora --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard clueboard/60 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard clueboard/66_hotswap/gen1 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard clueboard/66/rev4 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard clueboard/california --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard coarse/cordillera --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard converter/siemens_tastatur --chibios-board STM32_F103_STM32DUINO
-    upgrade_one_keyboard --keyboard dekunukem/duckypad --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard dztech/dz60rgb_ansi/v1 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard dztech/dz60rgb_wkl/v1 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard dztech/dz60rgb/v1 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard dztech/dz65rgb/v1 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard ergodox_infinity --chibios-board PJRC_TEENSY_3_1 --no-mcuconf
-    upgrade_one_keyboard --keyboard function96 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard generic_panda/panda65_01 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard hadron/ver3 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard handwired/ck4x4 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard handwired/co60/rev6 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard handwired/co60/rev7 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard handwired/d48 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard handwired/ddg_56 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard handwired/floorboard --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard handwired/onekey/blackpill_f401 --chibios-board BLACKPILL_STM32_F401
-    upgrade_one_keyboard --keyboard handwired/onekey/blackpill_f411 --chibios-board BLACKPILL_STM32_F411
-    upgrade_one_keyboard --keyboard handwired/onekey/bluepill --chibios-board STM32_F103_STM32DUINO
-    upgrade_one_keyboard --keyboard handwired/onekey/proton_c --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard handwired/onekey/pytest --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard handwired/onekey/stm32f0_disco --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard handwired/onekey/teensy_32 --chibios-board PJRC_TEENSY_3_1 --no-mcuconf
-    upgrade_one_keyboard --keyboard handwired/onekey/teensy_lc --chibios-board PJRC_TEENSY_LC --no-mcuconf
-    upgrade_one_keyboard --keyboard handwired/pill60/blackpill_f401 --chibios-board BLACKPILL_STM32_F401
-    upgrade_one_keyboard --keyboard handwired/pill60/blackpill_f411 --chibios-board BLACKPILL_STM32_F411
-    upgrade_one_keyboard --keyboard handwired/pill60/bluepill --chibios-board STM32_F103_STM32DUINO
-    upgrade_one_keyboard --keyboard handwired/riblee_f401 --chibios-board BLACKPILL_STM32_F401
-    upgrade_one_keyboard --keyboard handwired/riblee_f411 --chibios-board BLACKPILL_STM32_F411
-    upgrade_one_keyboard --keyboard handwired/selene --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard handwired/steamvan/rev1 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard handwired/t111 --chibios-board STM32_F103_STM32DUINO
-    upgrade_one_keyboard --keyboard handwired/twadlee/tp69 --chibios-board PJRC_TEENSY_LC --no-mcuconf
-    upgrade_one_keyboard --keyboard handwired/wulkan --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard handwired/z150 --chibios-board STM32_F103_STM32DUINO
-    upgrade_one_keyboard --keyboard hs60/v2 --chibios-board QMK_PROTON_C hs60/v2/ansi hs60/v2/hhkb hs60/v2/iso
-    upgrade_one_keyboard --keyboard infinity60 --chibios-board MCHCK_K20 --no-mcuconf
-    upgrade_one_keyboard --keyboard kbdfans/kbd67/mkiirgb/v1 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard keebio/bdn9/rev2 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard keebio/choconum --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard kv/revt --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard mechlovin/adelais --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard mechlovin/hannah60rgb --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard mechlovin/infinity87 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard misterknife/knife66 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard moonlander --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard nebula12 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard nebula68 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard nemui --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard nk65 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard nk87 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard peiorisboards/ixora --chibios-board GENERIC_STM32_F042X6
-    upgrade_one_keyboard --keyboard phoenix --chibios-board BLACKPILL_STM32_F401
-    upgrade_one_keyboard --keyboard planck/ez --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard planck/rev6 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard polilla --chibios-board GENERIC_STM32_F042X6
-    upgrade_one_keyboard --keyboard preonic/rev3 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard primekb/meridian --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard projectkb/alice --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard projectkb/alice/rev1 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard projectkb/alice/rev2 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard projectkb/signature87 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard ramonimbao/squishy65 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard ramonimbao/wete --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard rart/rartlice --chibios-board STM32_F103_STM32DUINO
-    upgrade_one_keyboard --keyboard retro_75 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard rocketboard_16 --chibios-board STM32_F103_STM32DUINO
-    upgrade_one_keyboard --keyboard satt/vision --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard tkc/candybar --chibios-board GENERIC_STM32_F072XB tkc/candybar/lefty tkc/candybar/righty
-    upgrade_one_keyboard --keyboard tkc/candybar/lefty --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard tkc/candybar/righty --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard tkc/godspeed75 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard tkw/stoutgat/v2/f411 --chibios-board BLACKPILL_STM32_F411
-    upgrade_one_keyboard --keyboard viktus/styrka --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard vinta --chibios-board GENERIC_STM32_F042X6
-    upgrade_one_keyboard --keyboard westfoxtrot/prophet --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard wolfmarkclub/wm1 --chibios-board STM32_F103_STM32DUINO
-    upgrade_one_keyboard --keyboard xelus/kangaroo --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard xelus/trinityxttkl --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard xelus/valor_frl_tkl --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard zoo/wampus --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard zvecr/split_blackpill --chibios-board STM32_F103_STM32DUINO
-    upgrade_one_keyboard --keyboard zvecr/zv48/f401 --chibios-board BLACKPILL_STM32_F401
-    upgrade_one_keyboard --keyboard zvecr/zv48/f411 --chibios-board BLACKPILL_STM32_F411
+    :
 }
 
 leftover_chconf() {
@@ -394,6 +275,6 @@ print_leftovers() {
     done
 }
 
-#preconfigure_branch
+preconfigure_branch
 upgrade_all_keyboards
 print_leftovers

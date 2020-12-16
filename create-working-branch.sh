@@ -20,7 +20,6 @@ fi
 declare -a prs_to_apply
 prs_to_apply+=(9603) # Matrix delay
 prs_to_apply+=(10174) # Quantum Painter
-#prs_to_apply+=(10418) # ChibiOS conf upgrade
 prs_to_apply+=(10437) # Decouple USB events
 prs_to_apply+=(10730) # Last matrix activity
 
@@ -76,7 +75,26 @@ upgrade-chibios() {
 
 upgrade-chibios-confs() {
     pushd "$script_dir/qmk_firmware"
-    pcmd ./util/chibios-upgrader.sh
+
+    OIFS=$IFS
+    IFS=$'\n'
+    for file in $(find "$script_dir/qmk_firmware/keyboards" "$script_dir/qmk_firmware/platforms" -name 'chconf.h') ; do
+        echo $file
+
+        sed -i 's@#define CH_CFG_USE_JOBS\s*TRUE@#define CH_CFG_USE_JOBS FALSE@g' "$file"
+        sed -i 's@#define CH_CFG_USE_FACTORY\s*TRUE@#define CH_CFG_USE_FACTORY FALSE@g' "$file"
+
+        if ! grep -q include_next "$file" ; then
+            echo '#define CH_CFG_USE_JOBS FALSE' >> "$file"
+            echo '#define CH_CFG_USE_FACTORY FALSE' >> "$file"
+        fi
+    done
+    IFS=$OIFS
+
+    sed -i 's@revert_chibi_files "@#revert_chibi_files "@g' ./util/chibios_conf_updater.sh
+    pcmd ./util/chibios_conf_updater.sh
+    sed -i 's@#revert_chibi_files "@revert_chibi_files "@g' ./util/chibios_conf_updater.sh
+
     popd
 
     pushd "$script_dir"
@@ -123,19 +141,10 @@ if [ ! -z ${upgrade_chibios_confs:-} ] ; then
 fi
 
 pushd "$script_dir/qmk_firmware"
-OIFS=$IFS
-IFS=$'\n'
-for file in $(find "$script_dir/qmk_firmware/keyboards" "$script_dir/qmk_firmware/platforms" -name 'chconf.h') ; do
-    echo $file
-    sed -i 's@#define CH_CFG_USE_JOBS                     TRUE@#define CH_CFG_USE_JOBS                     FALSE@g' "$file"
-done
-IFS=$OIFS
-pcmd git commit -am "Disable ChibiOS jobs by default" || true
-popd
-
-pushd "$script_dir/qmk_firmware"
 pcmd git push origin $target_branch --set-upstream --force-with-lease
 popd
+
+exit 0
 
 # Set up the Djinn branch
 pushd "$script_dir/qmk_firmware"

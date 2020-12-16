@@ -8,7 +8,8 @@ script_dir="$(realpath "$(dirname "$this_script")")"
 qmk_firmware_dir="$(realpath "$script_dir/qmk_firmware/")" # change this once moved to util
 validation_output="$script_dir/validation-output"
 
-branch_under_test="chibios-defaults-off-take2"
+source_branch="fauxpark-normalise-includes-base"
+branch_under_test="fauxpark-normalise-includes"
 
 export PATH=/home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$PATH
 
@@ -33,10 +34,17 @@ build_single() {
         || rm -rf "$validation_output/${binary_basename}_${build_stage}_build"
     mv ".build" "$validation_output/${binary_basename}_${build_stage}_build"
     find "$validation_output/${binary_basename}_${build_stage}_build" -name '*.lst' -exec sed -i 's#/tmp/cc......\.s#/tmp/ccTEMPFL.s#g' '{}' +
-    arm-none-eabi-objdump -S "$validation_output/${binary_basename}_${build_stage}_build/${binary_basename}.elf" \
-        > "$validation_output/${binary_basename}_${build_stage}_asm.txt"
-    [[ -e "${binary_basename}.bin" ]] || exit 1
-    sha1sum "${binary_basename}.bin" | awk '{print $1}'
+    if [[ -e "${binary_basename}.bin" ]] ; then
+        arm-none-eabi-objdump -S "$validation_output/${binary_basename}_${build_stage}_build/${binary_basename}.elf" \
+            > "$validation_output/${binary_basename}_${build_stage}_asm.txt"
+        sha1sum "${binary_basename}.bin" | awk '{print $1}'
+    elif [[ -e "${binary_basename}.hex" ]] ; then
+        avr-objdump -S "$validation_output/${binary_basename}_${build_stage}_build/${binary_basename}.elf" \
+            > "$validation_output/${binary_basename}_${build_stage}_asm.txt"
+        sha1sum "${binary_basename}.hex" | awk '{print $1}'
+    else
+        exit 1
+    fi
 }
 
 validate_build() {
@@ -47,12 +55,12 @@ validate_build() {
 
     git clean -xfd >/dev/null 2>&1
     git checkout -- . >/dev/null 2>&1
-    git checkout develop >/dev/null 2>&1
+    git checkout "$source_branch" >/dev/null 2>&1
     local before="$(build_single "$build_target" before ${extraflags:-})"
 
     git clean -xfd >/dev/null 2>&1
     git checkout -- . >/dev/null 2>&1
-    git checkout $branch_under_test >/dev/null 2>&1
+    git checkout "$branch_under_test" >/dev/null 2>&1
     local after="$(build_single "$build_target" after ${extraflags:-})"
 
     if [[ "$before" == "$after" ]] ; then
@@ -68,17 +76,20 @@ validate_build() {
 
 required_keyboard_builds() {
     pushd "$qmk_firmware_dir" >/dev/null 2>&1
-    git checkout develop >/dev/null 2>&1
+    git checkout "$source_branch" >/dev/null 2>&1
 
-    git grep '^\s*MCU\s*=\s*STM32F4' keyboards/ | grep -v keymaps | cut -d: -f1 | sed -e 's@^keyboards/@@g' -e 's@/rules.mk@:default@g'
-    git grep '^\s*MCU\s*=\s*STM32F4' keyboards/ | grep keymaps | cut -d: -f1 | sed -e 's@^keyboards/@@g' -e 's@/keymaps/@:@g' -e 's@/rules.mk@@g'
+    # All keyboards
+    find keyboards/ -type f -iname "rules.mk" | grep -v keymaps | sed 's!keyboards/\(.*\)/rules.mk!\1!' | sed -e 's@$@:default@g' | sort | uniq
+
+    #git grep '^\s*MCU\s*=\s*STM32F4' keyboards/ | grep -v keymaps | cut -d: -f1 | sed -e 's@^keyboards/@@g' -e 's@/rules.mk@:default@g'
+    #it grep '^\s*MCU\s*=\s*STM32F4' keyboards/ | grep keymaps | cut -d: -f1 | sed -e 's@^keyboards/@@g' -e 's@/keymaps/@:@g' -e 's@/rules.mk@@g'
 
     popd >/dev/null 2>&1
 }
 
 [[ -d "$validation_output" ]] || mkdir -p "$validation_output"
 
-required_builds=$(required_keyboard_builds | sort | uniq | grep -v rgbkb/zen)
+required_builds=$(required_keyboard_builds | sort | uniq)
 
 for build_target in $required_builds ; do
     validate_build $build_target

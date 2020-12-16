@@ -187,7 +187,7 @@ void keyboard_post_init_kb(void) {
 
 // Disable plug detection for now, as it's not working for some people.
 #if 0
-#ifdef SPLIT_KEYBOARD
+#    ifdef SPLIT_KEYBOARD
 bool is_keyboard_master(void) {
     static bool determined = false;
     static bool is_master;
@@ -203,7 +203,7 @@ bool is_keyboard_master(void) {
 
     return is_master;
 }
-#endif  // SPLIT_KEYBOARD
+#    endif  // SPLIT_KEYBOARD
 #endif
 
 void matrix_io_delay(void) {
