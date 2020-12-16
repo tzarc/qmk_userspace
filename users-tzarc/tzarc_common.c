@@ -96,6 +96,8 @@ __attribute__((weak)) layer_state_t layer_state_set_keymap(layer_state_t state) 
 
 __attribute__((weak)) void encoder_update_keymap(uint8_t index, bool clockwise) {}
 
+__attribute__((weak)) void housekeeping_task_keymap(void) {}
+
 void tzarc_common_init(void) {
     config_enabled = false;
     typing_mode    = KC_NOMODE;
@@ -471,3 +473,4 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 }
 
 void encoder_update_user(uint8_t index, bool clockwise) { encoder_update_keymap(index, clockwise); }
+void housekeeping_task_user(void) { housekeeping_task_keymap(); }

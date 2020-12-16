@@ -22,28 +22,9 @@
 #include "serial_usart_dataxfer.h"
 
 #include "qp_ili9341.h"
-#include "gfx-djinn.c"
 
-painter_device_t lcd;  // also usable from keymaps
-
-//----------------------------------------------------------
-// Runtime data sync
-
-enum { current_500mA = 0, current_1500mA, current_3000mA };
-
-#pragma pack(push)
-#pragma pack(1)
-typedef union kb_runtime_config {
-    struct {
-        unsigned lcd_power : 1;
-        unsigned current_setting : 2;
-    } values;
-    uint8_t raw;
-} kb_runtime_config;
-#pragma pack(pop)
-_Static_assert(sizeof(kb_runtime_config) == 1, "Invalid data transfer size for keyboard runtime data");
-
-static kb_runtime_config kb_conf;
+kb_runtime_config kb_conf;
+painter_device_t  lcd;
 
 #ifdef SPLIT_KEYBOARD
 bool serial_dataxfer_receive_kb(const void* data, size_t len) {
@@ -108,17 +89,6 @@ void housekeeping_task_kb(void) {
             backlight_enable();
         else
             backlight_disable();
-    }
-
-    if (lcd_on) {
-        static uint16_t last_hue = 0xFFFF;
-        uint8_t         curr_hue = rgblight_get_hue();
-        if (last_hue != curr_hue) {
-            last_hue = curr_hue;
-            qp_drawimage_recolor(lcd, 120 - gfx_djinn->width / 2, 0, gfx_djinn, curr_hue, 255, 255);
-            qp_rect(lcd, 0, 0, 8, 319, curr_hue, 255, 255, true);
-            qp_rect(lcd, 231, 0, 239, 319, curr_hue, 255, 255, true);
-        }
     }
 }
 

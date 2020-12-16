@@ -15,6 +15,10 @@
  */
 
 #include QMK_KEYBOARD_H
+#include <backlight.h>
+#include <qp.h>
+
+#include "gfx-djinn.c"
 
 #define MEDIA_KEY_DELAY 2
 
@@ -114,6 +118,19 @@ void encoder_update_user(uint8_t index, bool clockwise) {
             } else {
                 rgblight_increase_sat_noeeprom();
             }
+        }
+    }
+}
+
+void housekeeping_task_user(void) {
+    if (kb_conf.values.lcd_power) {
+        static uint16_t last_hue = 0xFFFF;
+        uint8_t         curr_hue = rgblight_get_hue();
+        if (last_hue != curr_hue) {
+            last_hue = curr_hue;
+            qp_drawimage_recolor(lcd, 120 - gfx_djinn->width / 2, 0, gfx_djinn, curr_hue, 255, 255);
+            qp_rect(lcd, 0, 0, 8, 319, curr_hue, 255, 255, true);
+            qp_rect(lcd, 231, 0, 239, 319, curr_hue, 255, 255, true);
         }
     }
 }
