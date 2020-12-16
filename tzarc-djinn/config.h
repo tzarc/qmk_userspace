@@ -136,6 +136,12 @@
 #define EXTERNAL_EEPROM_BYTE_COUNT 4096
 #define EXTERNAL_EEPROM_PAGE_SIZE 64
 
+// ADC Configuration
+#define ADC_COUNT 5
+#define ADC_IGNORE_OVERSAMPLING
+#define ADC_SAMPLING_RATE ADC_SMPR_SMP_2P5
+#define ADC_RESOLUTION ADC_CFGR_RES_10BITS
+
 /* disable these deprecated features by default */
 #define NO_ACTION_MACRO
 #define NO_ACTION_FUNCTION

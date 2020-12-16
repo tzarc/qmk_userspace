@@ -16,10 +16,9 @@
 
 #pragma once
 
+#define HAL_USE_ADC TRUE
 #define HAL_USE_PWM TRUE
-
 #define HAL_USE_SERIAL TRUE
-
 #define HAL_USE_SPI TRUE
 
 #define SERIAL_BUFFERS_SIZE 256

@@ -54,6 +54,13 @@ QUANTUM_PAINTER_DRIVERS = ili9341 ili9488
 LTO_ENABLE = yes
 OPT = 2
 
+ENABLE_ADC_USBPD_CHECK = no
+
+ifeq ($(strip $(ENABLE_ADC_USBPD_CHECK)), yes)
+	OPT_DEFS += -DENABLE_ADC_USBPD_CHECK
+	SRC += analog.c
+endif
+
 #LTO_ENABLE = no
 #OPT = 0
 #OPT_DEFS += -g

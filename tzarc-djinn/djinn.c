@@ -16,9 +16,12 @@
 
 #include <string.h>
 #include <hal.h>
+
+#ifdef ENABLE_ADC_USBPD_CHECK
+#    include <analog.h>
+#endif
+
 #include "djinn.h"
-#include "rgblight_list.h"
-#include "color.h"
 #include "serial_usart_dataxfer.h"
 
 #include "qp_ili9341.h"
@@ -39,14 +42,24 @@ void housekeeping_task_kb(void) {
 #ifdef SPLIT_KEYBOARD
     // If we're the master side, then propagate our runtime config to the slave
     if (is_keyboard_master()) {
-        static uint32_t          last_sync = 0;
         static kb_runtime_config last_data;
+        uint32_t                 now = timer_read32();
+
+#    ifdef ENABLE_ADC_USBPD_CHECK
+        static uint32_t last_adc_check = 0;
+        if (last_adc_check + 5000 < now) {
+            last_adc_check = now;
+            int16_t f0     = analogReadPin(F0);
+            int16_t f1     = analogReadPin(F1);
+            dprintf("analog read: F0=%d, F1=%d\n", (int)f0, (int)f1);
+        }
+#    endif
 
         // Turn off the LCD if there's been no matrix activity
         kb_conf.values.lcd_power = (last_matrix_activity_elapsed() < LCD_ACTIVITY_TIMEOUT) ? 1 : 0;
 
         // Send the data from the master to the slave
-        uint32_t now = timer_read32();
+        static uint32_t last_sync = 0;
         if (now - last_sync > 2500 || last_data.raw != kb_conf.raw) {  // At worst, resync every 250ms
             last_sync     = now;
             last_data.raw = kb_conf.raw;
@@ -155,9 +168,7 @@ void keyboard_post_init_kb(void) {
 //----------------------------------------------------------
 // QMK overrides
 
-// Disable plug detection for now, as it's not working for some people.
-#if 0
-#    ifdef SPLIT_KEYBOARD
+#if defined(SPLIT_KEYBOARD) && !defined(NO_PLUG_DETECT_PIN)
 bool is_keyboard_master(void) {
     static bool determined = false;
     static bool is_master;
@@ -173,8 +184,7 @@ bool is_keyboard_master(void) {
 
     return is_master;
 }
-#    endif  // SPLIT_KEYBOARD
-#endif
+#endif  // SPLIT_KEYBOARD
 
 void matrix_io_delay(void) {
     for (int i = 0; i < 250; ++i) {
@@ -227,3 +237,16 @@ RGB rgblight_hsv_to_rgb(HSV hsv) {
     hsv.v = (uint8_t)(hsv.v * scale);
     return hsv_to_rgb(hsv);
 }
+
+#ifdef ENABLE_ADC_USBPD_CHECK
+adc_mux pinToMux(pin_t pin) {
+    switch (pin) {
+        case F0:
+            return TO_MUX(ADC_CHANNEL_IN10, 0);
+        case F1:
+            return TO_MUX(ADC_CHANNEL_IN10, 1);
+    }
+
+    return TO_MUX(0, 0xFF);
+}
+#endif
