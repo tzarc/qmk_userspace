@@ -8,3 +8,6 @@
 [submodule "qmk_chibios-contrib"]
 	path = qmk_chibios-contrib
 	url = git@github.com:qmk/ChibiOS-Contrib.git
+[submodule "qmk_toolbox"]
+	path = qmk_toolbox
+	url = git@github.com:qmk/qmk_toolbox.git
