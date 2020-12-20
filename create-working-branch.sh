@@ -84,10 +84,12 @@ upgrade-chibios-confs() {
 
         sed -i 's@#define CH_CFG_USE_JOBS\s*TRUE@#define CH_CFG_USE_JOBS FALSE@g' "$file"
         sed -i 's@#define CH_CFG_USE_FACTORY\s*TRUE@#define CH_CFG_USE_FACTORY FALSE@g' "$file"
+        sed -i 's@#define CH_CFG_USE_MEMCORE\s*FALSE@#define CH_CFG_USE_MEMCORE TRUE@g' "$file"
 
         if ! grep -q include_next "$file" ; then
             echo '#define CH_CFG_USE_JOBS FALSE' >> "$file"
             echo '#define CH_CFG_USE_FACTORY FALSE' >> "$file"
+            echo '#define CH_CFG_USE_MEMCORE TRUE' >> "$file"
         fi
     done
     IFS=$OIFS

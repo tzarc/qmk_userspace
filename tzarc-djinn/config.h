@@ -57,9 +57,13 @@
 #define SERIAL_USART_DRIVER SD3
 #define SERIAL_USART_TX_PAL_MODE 7
 #define SOFT_SERIAL_PIN B9
-#define SERIAL_USART_SPEED 1200000
+#define SERIAL_USART_SPEED 800000
 #define SPLIT_HAND_PIN B11
 #define SPLIT_PLUG_DETECT_PIN B12
+
+// Split shared state types
+#define SPLIT_SYNC_TYPE_KB kb_runtime_config
+#define SPLIT_SYNC_TYPE_USER user_runtime_config
 
 // USB Device parameters
 #define VENDOR_ID 0x1209

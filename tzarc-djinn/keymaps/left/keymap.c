@@ -17,6 +17,8 @@
 #include QMK_KEYBOARD_H
 #include <qp.h>
 
+#include "serial_usart_statesync.h"
+
 #include "gfx-djinn.c"
 #include "gfx-lock_caps.c"
 #include "gfx-lock_scrl.c"
@@ -124,8 +126,15 @@ void encoder_update_user(uint8_t index, bool clockwise) {
     }
 }
 
+// "Hack" to provide the state sync object for non-split builds
+kb_runtime_config* get_split_sync_state_kb(void) {
+    static kb_runtime_config kb_state;
+    return &kb_state;
+}
+
 void housekeeping_task_user(void) {
-    if (kb_conf.values.lcd_power) {
+    kb_runtime_config* kb_state = get_split_sync_state_kb();
+    if (kb_state->values.lcd_power) {
         bool            redraw_required = false;
         static uint16_t last_hue        = 0xFFFF;
         uint8_t         curr_hue        = rgblight_get_hue();

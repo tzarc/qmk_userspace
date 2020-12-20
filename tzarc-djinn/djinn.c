@@ -22,58 +22,33 @@
 #endif
 
 #include "djinn.h"
-#include "serial_usart_dataxfer.h"
+#include "serial_usart_statesync.h"
 
 #include "qp_ili9341.h"
 
-kb_runtime_config kb_conf;
-painter_device_t  lcd;
-
-#ifdef SPLIT_KEYBOARD
-bool serial_dataxfer_receive_kb(const void* data, size_t len) {
-    const kb_runtime_config* xfer = (const kb_runtime_config*)data;
-    kb_conf.raw                   = xfer->raw;
-    serial_dataxfer_respond_kb(&kb_conf, sizeof(kb_conf));
-    return true;
-}
-#endif  // SPLIT_KEYBOARD
+painter_device_t lcd;
 
 void housekeeping_task_kb(void) {
+    kb_runtime_config* kb_state = get_split_sync_state_kb();
+
+    // State updates
 #ifdef SPLIT_KEYBOARD
     // If we're the master side, then propagate our runtime config to the slave
-    if (is_keyboard_master()) {
-        static kb_runtime_config last_data;
-        uint32_t                 now = timer_read32();
-
-#    ifdef ENABLE_ADC_USBPD_CHECK
-        static uint32_t last_adc_check = 0;
-        if (last_adc_check + 5000 < now) {
-            last_adc_check = now;
-            int16_t f0     = analogReadPin(F0);
-            int16_t f1     = analogReadPin(F1);
-            dprintf("analog read: F0=%d, F1=%d\n", (int)f0, (int)f1);
-        }
-#    endif
-
+    if (is_keyboard_master())
+#endif  // SPLIT_KEYBOARD
+    {
         // Turn off the LCD if there's been no matrix activity
-        kb_conf.values.lcd_power = (last_matrix_activity_elapsed() < LCD_ACTIVITY_TIMEOUT) ? 1 : 0;
-
-        // Send the data from the master to the slave
-        static uint32_t last_sync = 0;
-        if (now - last_sync > 250 || last_data.raw != kb_conf.raw) {  // At worst, resync every 250ms
-            last_sync     = now;
-            last_data.raw = kb_conf.raw;
-
-            kb_runtime_config slave_runtime_cfg;
-            slave_runtime_cfg.raw = 0;
-            serial_dataxfer_transaction_kb(&kb_conf, sizeof(kb_conf), &slave_runtime_cfg, sizeof(slave_runtime_cfg));
-        }
+        kb_state->values.lcd_power = (last_matrix_activity_elapsed() < LCD_ACTIVITY_TIMEOUT) ? 1 : 0;
     }
+
+#ifdef SPLIT_KEYBOARD
+    // Ensure state is sync'ed from master to slave, if required
+    split_sync_kb();
 #endif  // SPLIT_KEYBOARD
 
     static uint8_t current_setting = current_500mA;
-    if (current_setting != kb_conf.values.current_setting) {
-        current_setting = kb_conf.values.current_setting;
+    if (current_setting != kb_state->values.current_setting) {
+        current_setting = kb_state->values.current_setting;
         switch (current_setting) {
             default:
             case current_500mA:
@@ -89,11 +64,17 @@ void housekeeping_task_kb(void) {
                 writePinHigh(RGB_CURR_3000mA_OK_PIN);
                 break;
         }
+
+        // Toggle rgblight on and off, if it's already on, to force a brightness update
+        if (rgblight_is_enabled()) {
+            rgblight_disable_noeeprom();
+            rgblight_enable_noeeprom();
+        }
     }
 
     static bool lcd_on = false;
-    if (lcd_on != (bool)kb_conf.values.lcd_power) {
-        lcd_on = (bool)kb_conf.values.lcd_power;
+    if (lcd_on != (bool)kb_state->values.lcd_power) {
+        lcd_on = (bool)kb_state->values.lcd_power;
         qp_power(lcd, lcd_on);
     }
 
@@ -110,16 +91,19 @@ void housekeeping_task_kb(void) {
 
 void djinn_lcd_on(void) {
     dprint("djinn_lcd_on\n");
-    kb_conf.values.lcd_power = 1;
+    kb_runtime_config* kb_state = get_split_sync_state_kb();
+    kb_state->values.lcd_power  = 1;
 }
 
 void djinn_lcd_off(void) {
     dprint("djinn_lcd_off\n");
-    kb_conf.values.lcd_power = 0;
+    kb_runtime_config* kb_state = get_split_sync_state_kb();
+    kb_state->values.lcd_power  = 0;
 }
 
 void djinn_lcd_toggle(void) {
-    if (kb_conf.values.lcd_power)
+    kb_runtime_config* kb_state = get_split_sync_state_kb();
+    if (kb_state->values.lcd_power)
         djinn_lcd_off();
     else
         djinn_lcd_on();
@@ -130,9 +114,11 @@ void djinn_lcd_toggle(void) {
 
 void keyboard_post_init_kb(void) {
     debug_enable = true;
+    // debug_matrix = true;
 
     // Reset the initial shared data value between master and slave
-    kb_conf.raw = 0;
+    kb_runtime_config* kb_state = get_split_sync_state_kb();
+    kb_state->raw               = 0;
 
     // Turn off increased current limits
     setPinOutput(RGB_CURR_1500mA_OK_PIN);
@@ -186,13 +172,6 @@ bool is_keyboard_master(void) {
 }
 #endif  // SPLIT_KEYBOARD
 
-void matrix_io_delay(void) {
-    for (int i = 0; i < 250; ++i) {
-        // Give the matrix scanning a small amount of time to settle.
-        __asm__ volatile("nop\nnop\nnop\n");
-    }
-}
-
 void encoder_update_kb(uint8_t index, bool clockwise) {
     // Offload to the keymap instead.
     extern void encoder_update_user(uint8_t index, bool clockwise);
@@ -220,17 +199,18 @@ void suspend_wakeup_init_kb(void) {
 }
 
 RGB rgblight_hsv_to_rgb(HSV hsv) {
-    float scale;
-    switch (kb_conf.values.current_setting) {
+    kb_runtime_config* kb_state = get_split_sync_state_kb();
+    float              scale;
+    switch (kb_state->values.current_setting) {
         default:
         case current_500mA:
-            scale = 0.25f;
+            scale = 0.3f;
             break;
         case current_1500mA:
-            scale = 0.40f;
+            scale = 0.65f;
             break;
         case current_3000mA:
-            scale = 0.60f;
+            scale = 1.0f;
             break;
     }
 

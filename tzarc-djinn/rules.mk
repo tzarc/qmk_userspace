@@ -33,7 +33,7 @@ ENCODER_ENABLE = yes
 SPLIT_KEYBOARD ?= yes
 
 ifeq ($(strip $(SPLIT_KEYBOARD)),yes)
-	SERIAL_DRIVER = usart_dataxfer
+	SERIAL_DRIVER = usart_statesync
 endif
 
 BACKLIGHT_DRIVER = pwm

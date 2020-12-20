@@ -14,9 +14,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "quantum.h"
+#include <string.h>
+#include <quantum.h>
 #include "serial.h"
-#include "serial_usart_dataxfer.h"
+#include "serial_usart_statesync.h"
 #include "printf.h"
 
 #include "ch.h"
@@ -197,8 +198,66 @@ size_t serial_dataxfer_transaction_user(const void* sendData, size_t sendLen, vo
 void serial_dataxfer_respond_kb(const void* data, size_t len) { serial_dataxfer_transaction_impl(SERIAL_NAMESPACE_KB, data, len, NULL, 0); }
 void serial_dataxfer_respond_user(const void* data, size_t len) { serial_dataxfer_transaction_impl(SERIAL_NAMESPACE_USER, data, len, NULL, 0); }
 
-__attribute__((weak)) bool serial_dataxfer_receive_kb(const void* data, size_t len) { return false; }
-__attribute__((weak)) bool serial_dataxfer_receive_user(const void* data, size_t len) { return false; }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// State sync
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#ifdef SPLIT_SYNC_TYPE_KB
+
+static SPLIT_SYNC_TYPE_KB split_sync_state_kb;
+
+SPLIT_SYNC_TYPE_KB* get_split_sync_state_kb(void) { return &split_sync_state_kb; }
+
+__attribute__((weak)) void split_sync_on_receive_kb(SPLIT_SYNC_TYPE_KB* state) {}
+
+bool serial_dataxfer_receive_kb(const void* data, size_t len) {
+    memcpy(&split_sync_state_kb, data, sizeof(SPLIT_SYNC_TYPE_KB));
+    split_sync_on_receive_kb(&split_sync_state_kb);
+    serial_dataxfer_respond_kb(&split_sync_state_kb, sizeof(SPLIT_SYNC_TYPE_KB));
+    return true;
+}
+
+void split_sync_kb(void) {
+    if (is_keyboard_master()) {
+        static SPLIT_SYNC_TYPE_KB last_state;
+        if (memcmp(&last_state, &split_sync_state_kb, sizeof(SPLIT_SYNC_TYPE_KB)) != 0) {
+            serial_dataxfer_transaction_kb(&split_sync_state_kb, sizeof(SPLIT_SYNC_TYPE_KB), &last_state, sizeof(SPLIT_SYNC_TYPE_KB));
+            memcpy(&split_sync_state_kb, &last_state, sizeof(SPLIT_SYNC_TYPE_KB));
+        }
+    }
+}
+
+#endif
+
+#ifdef SPLIT_SYNC_TYPE_USER
+
+static SPLIT_SYNC_TYPE_USER split_sync_state_user;
+
+SPLIT_SYNC_TYPE_USER* get_split_sync_state_user(void) { return &split_sync_state_user; }
+
+__attribute__((weak)) void split_sync_on_receive_user(SPLIT_SYNC_TYPE_USER* state) {}
+
+bool serial_dataxfer_receive_user(const void* data, size_t len) {
+    memcpy(&split_sync_state_user, data, sizeof(SPLIT_SYNC_TYPE_USER));
+    split_sync_on_receive_user(&split_sync_state_user);
+    serial_dataxfer_respond_user(&split_sync_state_user, sizeof(SPLIT_SYNC_TYPE_USER));
+    return true;
+}
+
+void split_sync_user(void) {
+    if (is_keyboard_master()) {
+        static SPLIT_SYNC_TYPE_USER last_state;
+        if (memcmp(&last_state, &split_sync_state_user, sizeof(SPLIT_SYNC_TYPE_USER)) != 0) {
+            serial_dataxfer_transaction_user(&split_sync_state_user, sizeof(SPLIT_SYNC_TYPE_USER), &last_state, sizeof(SPLIT_SYNC_TYPE_USER));
+            memcpy(&split_sync_state_user, &last_state, sizeof(SPLIT_SYNC_TYPE_USER));
+        }
+    }
+}
+
+#endif
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
  * This thread runs on the slave and responds to transactions initiated
