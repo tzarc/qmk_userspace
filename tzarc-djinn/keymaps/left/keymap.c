@@ -128,7 +128,12 @@ void encoder_update_user(uint8_t index, bool clockwise) {
 
 // "Hack" to provide the state sync object for non-split builds
 kb_runtime_config* get_split_sync_state_kb(void) {
+    static bool              was_reset = false;
     static kb_runtime_config kb_state;
+    if (!was_reset) {
+        memset(&kb_state, 0, sizeof(kb_state));
+        was_reset = true;
+    }
     return &kb_state;
 }
 

@@ -206,7 +206,14 @@ void serial_dataxfer_respond_user(const void* data, size_t len) { serial_dataxfe
 
 static SPLIT_SYNC_TYPE_KB split_sync_state_kb;
 
-SPLIT_SYNC_TYPE_KB* get_split_sync_state_kb(void) { return &split_sync_state_kb; }
+SPLIT_SYNC_TYPE_KB* get_split_sync_state_kb(void) {
+    static bool was_reset = false;
+    if (!was_reset) {
+        memset(&split_sync_state_kb, 0, sizeof(SPLIT_SYNC_TYPE_KB));
+        was_reset = true;
+    }
+    return &split_sync_state_kb;
+}
 
 __attribute__((weak)) void split_sync_on_receive_kb(SPLIT_SYNC_TYPE_KB* state) {}
 
@@ -233,7 +240,14 @@ void split_sync_kb(void) {
 
 static SPLIT_SYNC_TYPE_USER split_sync_state_user;
 
-SPLIT_SYNC_TYPE_USER* get_split_sync_state_user(void) { return &split_sync_state_user; }
+SPLIT_SYNC_TYPE_USER* get_split_sync_state_user(void) {
+    static bool was_reset = false;
+    if (!was_reset) {
+        memset(&split_sync_state_user, 0, sizeof(SPLIT_SYNC_TYPE_USER));
+        was_reset = true;
+    }
+    return &split_sync_state_user;
+}
 
 __attribute__((weak)) void split_sync_on_receive_user(SPLIT_SYNC_TYPE_USER* state) {}
 
