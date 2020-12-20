@@ -15,6 +15,12 @@
  */
 
 #include QMK_KEYBOARD_H
+#include <qp.h>
+
+#include "gfx-djinn.c"
+#include "gfx-lock_caps.c"
+#include "gfx-lock_scrl.c"
+#include "gfx-lock_num.c"
 
 #define MEDIA_KEY_DELAY 2
 
@@ -58,7 +64,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                         _______
     ),
     [_ADJUST] = LAYOUT_rightonly(
-               _______, _______, _______, _______, _______, EEP_RST, RESET,
+               _______, KC_CLCK, KC_NLCK, KC_SLCK, _______, EEP_RST, RESET,
                _______, _______, _______, _______, _______, _______, _______,
                _______, _______, _______, _______, _______, _______, _______,
                _______, _______, _______, _______, _______, _______, _______,
@@ -114,6 +120,33 @@ void encoder_update_user(uint8_t index, bool clockwise) {
             } else {
                 rgblight_increase_sat_noeeprom();
             }
+        }
+    }
+}
+
+void housekeeping_task_user(void) {
+    if (kb_conf.values.lcd_power) {
+        bool            redraw_required = false;
+        static uint16_t last_hue        = 0xFFFF;
+        uint8_t         curr_hue        = rgblight_get_hue();
+        if (last_hue != curr_hue) {
+            redraw_required = true;
+        }
+
+        if (redraw_required) {
+            last_hue = curr_hue;
+            qp_drawimage_recolor(lcd, 120 - gfx_djinn->width / 2, 32, gfx_djinn, curr_hue, 255, 255);
+            qp_rect(lcd, 0, 0, 8, 319, curr_hue, 255, 255, true);
+            qp_rect(lcd, 231, 0, 239, 319, curr_hue, 255, 255, true);
+        }
+
+        static led_t last_led_state = {0};
+        led_t        curr_led_state = host_keyboard_led_state();
+        if (redraw_required || last_led_state.raw != curr_led_state.raw) {
+            last_led_state.raw = curr_led_state.raw;
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 3), 0, gfx_lock_caps, curr_hue, 255, last_led_state.caps_lock ? 255 : 32);
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 2), 0, gfx_lock_num, curr_hue, 255, last_led_state.num_lock ? 255 : 32);
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 1), 0, gfx_lock_scrl, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32);
         }
     }
 }

@@ -86,7 +86,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 #define ____________TZARC_6x4_LOWER_R2_L_________ _______,      _______,      KC_UP,        _______,      _______,      KC_1PASSWORD
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | Ctrl        | A           | S           | D           | F           | G           |
-#define ____________TZARC_6x4_LOWER_R3_L_________ KC_CAPS,      KC_LEFT,      KC_DOWN,      KC_RGHT,      _______,      KC_LBRC
+#define ____________TZARC_6x4_LOWER_R3_L_________ _______,      KC_LEFT,      KC_DOWN,      KC_RGHT,      _______,      KC_LBRC
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | Shift       | Z           | X           | C           | V           | B           |
 #define ____________TZARC_6x4_LOWER_R4_L_________ _______,      _______,      _______,      _______,      _______,      KC_LCBR
@@ -140,7 +140,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 // Adjust layer
 //                                               ┌─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────┐
 //                                               | Esc         | 1           | 2           | 3           | 4           | 5           |
-#define ____________TZARC_6x4_ADJUST_R1_L________ _______,      _______,      _______,      _______,      _______,      _______
+#define ____________TZARC_6x4_ADJUST_R1_L________ _______,      KC_CLCK,      KC_NLCK,      KC_SLCK,      _______,      _______
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | Tab         | Q           | W           | E           | R           | T           |
 #define ____________TZARC_6x4_ADJUST_R2_L________ KC_MUTE,      KC_VOLU,      KC_MSTP,      KC_MPLY,      KC_MPRV,      KC_MNXT

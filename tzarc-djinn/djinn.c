@@ -60,7 +60,7 @@ void housekeeping_task_kb(void) {
 
         // Send the data from the master to the slave
         static uint32_t last_sync = 0;
-        if (now - last_sync > 2500 || last_data.raw != kb_conf.raw) {  // At worst, resync every 250ms
+        if (now - last_sync > 250 || last_data.raw != kb_conf.raw) {  // At worst, resync every 250ms
             last_sync     = now;
             last_data.raw = kb_conf.raw;
 

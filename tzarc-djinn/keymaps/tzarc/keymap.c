@@ -19,8 +19,12 @@
 #include <qp.h>
 
 #include "tzarc.h"
+#include "serial_usart_dataxfer.h"
 
 #include "gfx-djinn.c"
+#include "gfx-lock_caps.c"
+#include "gfx-lock_scrl.c"
+#include "gfx-lock_num.c"
 
 #define MEDIA_KEY_DELAY 2
 
@@ -122,15 +126,67 @@ void encoder_update_keymap(uint8_t index, bool clockwise) {
     }
 }
 
+#pragma pack(push)
+#pragma pack(1)
+typedef union user_runtime_config {
+    struct {
+        led_t led_state;
+    } values;
+    uint8_t raw;
+} user_runtime_config;
+#pragma pack(pop)
+_Static_assert(sizeof(user_runtime_config) == 1, "Invalid data transfer size for user runtime data");
+
+static user_runtime_config user_conf;
+
+bool serial_dataxfer_receive_user(const void* data, size_t len) {
+    const user_runtime_config* xfer = (const user_runtime_config*)data;
+    user_conf.raw                   = xfer->raw;
+    serial_dataxfer_respond_user(&user_conf, sizeof(user_conf));
+    return true;
+}
+
 void housekeeping_task_keymap(void) {
+    if (is_keyboard_master()) {
+        static user_runtime_config last_data;
+        uint32_t                   now = timer_read32();
+
+        // Sync the LED state
+        user_conf.values.led_state = host_keyboard_led_state();
+
+        // Send the data from the master to the slave
+        static uint32_t last_sync = 0;
+        if (now - last_sync > 250 || last_data.raw != user_conf.raw) {  // At worst, resync every 250ms
+            last_sync     = now;
+            last_data.raw = user_conf.raw;
+
+            user_runtime_config slave_runtime_cfg;
+            slave_runtime_cfg.raw = 0;
+            serial_dataxfer_transaction_user(&user_conf, sizeof(user_conf), &slave_runtime_cfg, sizeof(slave_runtime_cfg));
+        }
+    }
+
     if (kb_conf.values.lcd_power) {
-        static uint16_t last_hue = 0xFFFF;
-        uint8_t         curr_hue = rgblight_get_hue();
+        bool            redraw_required = false;
+        static uint16_t last_hue        = 0xFFFF;
+        uint8_t         curr_hue        = rgblight_get_hue();
         if (last_hue != curr_hue) {
+            redraw_required = true;
+        }
+
+        if (redraw_required) {
             last_hue = curr_hue;
-            qp_drawimage_recolor(lcd, 120 - gfx_djinn->width / 2, 0, gfx_djinn, curr_hue, 255, 255);
+            qp_drawimage_recolor(lcd, 120 - gfx_djinn->width / 2, 32, gfx_djinn, curr_hue, 255, 255);
             qp_rect(lcd, 0, 0, 8, 319, curr_hue, 255, 255, true);
             qp_rect(lcd, 231, 0, 239, 319, curr_hue, 255, 255, true);
+        }
+
+        static led_t last_led_state = {0};
+        if (redraw_required || last_led_state.raw != user_conf.values.led_state.raw) {
+            last_led_state.raw = user_conf.values.led_state.raw;
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 3), 0, gfx_lock_caps, curr_hue, 255, last_led_state.caps_lock ? 255 : 32);
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 2), 0, gfx_lock_num, curr_hue, 255, last_led_state.num_lock ? 255 : 32);
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 1), 0, gfx_lock_scrl, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32);
         }
     }
 }

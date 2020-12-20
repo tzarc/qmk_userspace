@@ -61,10 +61,3 @@ void eeconfig_init_keymap(void) {
     backlight_enable();
     backlight_level(BACKLIGHT_LEVELS);
 }
-
-void matrix_scan_keymap(void) {
-    led_t led_state = host_keyboard_led_state();
-    if (!led_state.num_lock) {
-        tap_code(KC_NUMLOCK);
-    }
-}
