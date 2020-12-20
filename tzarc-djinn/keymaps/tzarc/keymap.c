@@ -79,7 +79,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 void eeconfig_init_keymap(void) {
     rgblight_mode(RGBLIGHT_MODE_STATIC_LIGHT);
-    rgblight_sethsv(0, 255, 255);
+    rgblight_sethsv(128, 255, 255);
     backlight_enable();
     backlight_level(BACKLIGHT_LEVELS);
 }
