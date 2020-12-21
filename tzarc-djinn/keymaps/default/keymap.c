@@ -41,7 +41,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                    KC_LGUI, KC_LWR,  KC_SPC,  KC_NO,                            KC_NO,   KC_SPC,  KC_RSE,  KC_LALT,
                                                                       RGB_RMOD,         RGB_MOD,
                                                      KC_UP,                                              KC_UP,
-                                            KC_LEFT, KC_MUTE, KC_RIGHT,                         KC_LEFT, KC_MUTE, KC_RIGHT,
+                                            KC_LEFT, _______, KC_RIGHT,                         KC_LEFT, _______, KC_RIGHT,
                                                      KC_DOWN,                                            KC_DOWN
     ),
     [_LOWER] = LAYOUT_all(
@@ -86,16 +86,45 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 }
 
 void encoder_update_user(uint8_t index, bool clockwise) {
-    uint8_t temp_mod   = get_mods();
-    uint8_t temp_osm   = get_oneshot_mods();
-    bool    is_shifted = (temp_mod | temp_osm) & MOD_MASK_SHIFT;
+    uint8_t temp_mod = get_mods();
+    uint8_t temp_osm = get_oneshot_mods();
+    bool    is_ctrl  = (temp_mod | temp_osm) & MOD_MASK_CTRL;
+    bool    is_shift = (temp_mod | temp_osm) & MOD_MASK_SHIFT;
 
-    if (!is_shifted) {
+    if (is_shift) {
         if (index == 0) { /* First encoder */
             if (clockwise) {
-                rgblight_increase_hue_noeeprom();
+                rgblight_increase_hue();
             } else {
-                rgblight_decrease_hue_noeeprom();
+                rgblight_decrease_hue();
+            }
+        } else if (index == 1) { /* Second encoder */
+            if (clockwise) {
+                rgblight_decrease_sat();
+            } else {
+                rgblight_increase_sat();
+            }
+        }
+    } else if (is_ctrl) {
+        if (index == 0) { /* First encoder */
+            if (clockwise) {
+                rgblight_increase_val();
+            } else {
+                rgblight_decrease_val();
+            }
+        } else if (index == 1) { /* Second encoder */
+            if (clockwise) {
+                rgblight_increase_speed();
+            } else {
+                rgblight_decrease_speed();
+            }
+        }
+    } else {
+        if (index == 0) { /* First encoder */
+            if (clockwise) {
+                tap_code16(KC_MS_WH_DOWN);
+            } else {
+                tap_code16(KC_MS_WH_UP);
             }
         } else if (index == 1) { /* Second encoder */
             uint16_t held_keycode_timer = timer_read();
@@ -109,20 +138,6 @@ void encoder_update_user(uint8_t index, bool clockwise) {
             while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY)
                 ; /* no-op */
             unregister_code(mapped_code);
-        }
-    } else {
-        if (index == 0) { /* First encoder */
-            if (clockwise) {
-                rgblight_increase_val_noeeprom();
-            } else {
-                rgblight_decrease_val_noeeprom();
-            }
-        } else if (index == 1) { /* Second encoder */
-            if (clockwise) {
-                rgblight_decrease_sat_noeeprom();
-            } else {
-                rgblight_increase_sat_noeeprom();
-            }
         }
     }
 }

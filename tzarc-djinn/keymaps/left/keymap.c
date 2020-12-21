@@ -40,7 +40,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                    KC_LGUI, KC_LWR,  KC_SPC,  KC_NO,
                                                                       RGB_RMOD,
                                                      KC_UP,
-                                            KC_LEFT, KC_MUTE, KC_RIGHT,
+                                            KC_LEFT, _______, KC_RIGHT,
                                                      KC_DOWN
     ),
     [_LOWER] = LAYOUT_leftonly(
@@ -90,38 +90,22 @@ void encoder_update_user(uint8_t index, bool clockwise) {
     bool    is_shifted = (temp_mod | temp_osm) & MOD_MASK_SHIFT;
 
     if (!is_shifted) {
-        if (index == 0) { /* First encoder */
-            if (clockwise) {
-                rgblight_increase_hue_noeeprom();
-            } else {
-                rgblight_decrease_hue_noeeprom();
-            }
-        } else if (index == 1) { /* Second encoder */
-            uint16_t held_keycode_timer = timer_read();
-            uint16_t mapped_code        = 0;
-            if (clockwise) {
-                mapped_code = KC_VOLD;
-            } else {
-                mapped_code = KC_VOLU;
-            }
-            register_code(mapped_code);
-            while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY)
-                ; /* no-op */
-            unregister_code(mapped_code);
+        uint16_t held_keycode_timer = timer_read();
+        uint16_t mapped_code        = 0;
+        if (clockwise) {
+            mapped_code = KC_VOLD;
+        } else {
+            mapped_code = KC_VOLU;
         }
+        register_code(mapped_code);
+        while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY)
+            ; /* no-op */
+        unregister_code(mapped_code);
     } else {
-        if (index == 0) { /* First encoder */
-            if (clockwise) {
-                rgblight_increase_val_noeeprom();
-            } else {
-                rgblight_decrease_val_noeeprom();
-            }
-        } else if (index == 1) { /* Second encoder */
-            if (clockwise) {
-                rgblight_decrease_sat_noeeprom();
-            } else {
-                rgblight_increase_sat_noeeprom();
-            }
+        if (clockwise) {
+            rgblight_increase_hue_noeeprom();
+        } else {
+            rgblight_decrease_hue_noeeprom();
         }
     }
 }

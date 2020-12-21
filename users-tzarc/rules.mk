@@ -5,13 +5,9 @@ SRC += \
 	tzarc_wow.c \
 	tzarc_diablo3.c
 
-NKRO_ENABLE = yes
-EXTRAKEY_ENABLE = yes
-KEYBOARD_SHARED_EP = no
-MOUSEKEY_ENABLE = no
-CONSOLE_ENABLE = yes
 BOOTMAGIC_ENABLE = lite
 UNICODE_ENABLE = yes
+CONSOLE_ENABLE = yes
 RAW_ENABLE = yes
 
 ifeq ($(strip $(PLATFORM_KEY)),chibios)

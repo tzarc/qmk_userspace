@@ -47,7 +47,7 @@
         {k2D,   k2C,   k2B,   k2A,   k29,   k28,   k27},    \
         {k3D,   k3C,   k3B,   k3A,   k39,   k38,   k37},    \
         {KC_NO, KC_NO, KC_NO, k47,   k46,   k45,   k44},    \
-        {KC_NO, k74,   k73,   k81,   k75,   k61,   k51},    \
+        {KC_NO, k61,   k73,   k81,   k75,   k74,   k51},    \
     }
 
 #define LAYOUT_leftonly( \
@@ -87,7 +87,7 @@
         {k2D,   k2C,   k2B,   k2A,   k29,   k28,   k27},    \
         {k3D,   k3C,   k3B,   k3A,   k39,   k38,   k37},    \
         {KC_NO, KC_NO, KC_NO, k47,   k46,   k45,   k44},    \
-        {KC_NO, k74,   k73,   k81,   k75,   k61,   k51},    \
+        {KC_NO, k61,   k73,   k81,   k75,   k74,   k51},    \
     }
 
 // clang-format on

@@ -155,6 +155,7 @@ pcmd git branch -D djinn || true
 pcmd git checkout -b djinn generated-chibios-master-upgrade
 [[ -d keyboards/tzarc ]] || mkdir -p keyboards/tzarc
 pcmd rsync -avvP "$script_dir/tzarc-djinn/"* keyboards/tzarc/djinn
+pcmd rm -rf keyboards/tzarc/djinn/keymaps/tzarc
 pcmd git add keyboards/tzarc/djinn
 pcmd git commit -m "Import Djinn code."
 pcmd git push origin djinn --set-upstream --force-with-lease
