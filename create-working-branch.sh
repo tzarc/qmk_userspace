@@ -160,3 +160,5 @@ pcmd git add keyboards/tzarc/djinn
 pcmd git commit -m "Import Djinn code."
 pcmd git push origin djinn --set-upstream --force-with-lease
 popd
+
+pcmd git checkout generated-chibios-master-upgrade
