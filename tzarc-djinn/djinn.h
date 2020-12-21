@@ -93,3 +93,25 @@
 // clang-format on
 
 extern painter_device_t lcd;
+
+//----------------------------------------------------------
+// Runtime data sync -- keyboard
+
+enum { current_500mA = 0, current_1500mA, current_3000mA };
+
+#pragma pack(push)
+#pragma pack(1)
+
+typedef union kb_runtime_config {
+    struct {
+        unsigned lcd_power : 1;
+        unsigned current_setting : 2;
+    } values;
+    uint8_t raw;
+} kb_runtime_config;
+
+#pragma pack(pop)
+
+_Static_assert(sizeof(kb_runtime_config) == 1, "Invalid data transfer size for keyboard runtime data");
+
+extern kb_runtime_config kb_state;

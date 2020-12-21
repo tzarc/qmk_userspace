@@ -15,6 +15,7 @@
  */
 
 #include QMK_KEYBOARD_H
+#include <string.h>
 #include <backlight.h>
 #include <qp.h>
 
@@ -141,20 +142,47 @@ void encoder_update_keymap(uint8_t index, bool clockwise) {
     }
 }
 
-void housekeeping_task_keymap(void) {
-    kb_runtime_config*   kb_state   = get_split_sync_state_kb();
-    user_runtime_config* user_state = get_split_sync_state_user();
+//----------------------------------------------------------
+// Runtime data sync -- user/keymap
 
-    // If we're the master side, then propagate our runtime config to the slave
+#pragma pack(push)
+#pragma pack(1)
+
+typedef union user_runtime_config {
+    struct {
+        led_t led_state;
+    } values;
+    uint8_t raw;
+} user_runtime_config;
+
+#pragma pack(pop)
+
+_Static_assert(sizeof(user_runtime_config) == 1, "Invalid data transfer size for user runtime data");
+static user_runtime_config user_state;
+
+void* get_split_sync_state_user(size_t* state_size) {
+    *state_size = sizeof(user_runtime_config);
+    return &user_state;
+}
+
+bool split_sync_update_task_user(void) {
     if (is_keyboard_master()) {
         // Sync the LED state
-        user_state->values.led_state = host_keyboard_led_state();
+        user_state.values.led_state = host_keyboard_led_state();
     }
 
-    // Ensure state is sync'ed from master to slave, if required
-    split_sync_user();
+    // Force an update if the state changed
+    static user_runtime_config last_state;
+    if (memcmp(&last_state, &user_state, sizeof(user_runtime_config)) != 0) {
+        memcpy(&last_state, &user_state, sizeof(user_runtime_config));
+        return true;
+    }
 
-    if (kb_state->values.lcd_power) {
+    return false;
+}
+
+void split_sync_action_task_user(void) {
+    if (kb_state.values.lcd_power) {
         bool            redraw_required = false;
         static uint16_t last_hue        = 0xFFFF;
         uint8_t         curr_hue        = rgblight_get_hue();
@@ -170,11 +198,16 @@ void housekeeping_task_keymap(void) {
         }
 
         static led_t last_led_state = {0};
-        if (redraw_required || last_led_state.raw != user_state->values.led_state.raw) {
-            last_led_state.raw = user_state->values.led_state.raw;
+        if (redraw_required || last_led_state.raw != user_state.values.led_state.raw) {
+            last_led_state.raw = user_state.values.led_state.raw;
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 3), 0, gfx_lock_caps, curr_hue, 255, last_led_state.caps_lock ? 255 : 32);
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 2), 0, gfx_lock_num, curr_hue, 255, last_led_state.num_lock ? 255 : 32);
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 1), 0, gfx_lock_scrl, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32);
         }
     }
+}
+
+void housekeeping_task_keymap(void) {
+    // Ensure state is sync'ed from master to slave, if required
+    split_sync_user(false);
 }

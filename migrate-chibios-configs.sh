@@ -8,8 +8,8 @@ script_dir="$(realpath "$(dirname "$this_script")")"
 qmk_firmware_dir="$(realpath "$script_dir/qmk_firmware/")" # change this once moved to util
 validation_output="$script_dir/validation-output"
 
-source_branch="develop"
-branch_under_test="generated-chibios-conf-migration"
+source_branch="generated-chibios-conf-migration"
+branch_under_test="generated-chibios-conf-migration-extras"
 
 export PATH=/home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$PATH
 
@@ -225,17 +225,14 @@ preconfigure_branch() {
     pcmd git checkout -b $branch_under_test
 
     # mcuconf SPI1 DMA stream definitions
-    git cherry-pick 31cdb598437c6b55d2edaade63d0b4922957c006
+    # git cherry-pick 31cdb598437c6b55d2edaade63d0b4922957c006
 
     popd >/dev/null 2>&1
 }
 
 upgrade_all_keyboards()  {
-    upgrade_one_keyboard --keyboard acheron/lasgweloth --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard box75 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard geekboards/macropad_v2 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard iron180 --chibios-board GENERIC_STM32_F072XB
-    upgrade_one_keyboard --keyboard technika --chibios-board GENERIC_STM32_F072XB
+    upgrade_one_keyboard --keyboard akegata_denki/device_one --chibios-board GENERIC_STM32_F042X6
+    :
 }
 
 leftover_chconf() {
@@ -286,4 +283,3 @@ print_leftovers() {
 preconfigure_branch
 upgrade_all_keyboards
 print_leftovers
-pcmd git push --set-upstream origin generated-chibios-conf-migration

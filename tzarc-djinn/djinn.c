@@ -28,27 +28,34 @@
 
 painter_device_t lcd;
 
-void housekeeping_task_kb(void) {
-    kb_runtime_config* kb_state = get_split_sync_state_kb();
+kb_runtime_config kb_state;
 
-    // State updates
-#ifdef SPLIT_KEYBOARD
-    // If we're the master side, then propagate our runtime config to the slave
-    if (is_keyboard_master())
-#endif  // SPLIT_KEYBOARD
-    {
+void* get_split_sync_state_kb(size_t* state_size) {
+    *state_size = sizeof(kb_runtime_config);
+    return &kb_state;
+}
+
+bool split_sync_update_task_kb(void) {
+    if (is_keyboard_master()) {
         // Turn off the LCD if there's been no matrix activity
-        kb_state->values.lcd_power = (last_matrix_activity_elapsed() < LCD_ACTIVITY_TIMEOUT) ? 1 : 0;
+        kb_state.values.lcd_power = (last_matrix_activity_elapsed() < LCD_ACTIVITY_TIMEOUT) ? 1 : 0;
     }
 
-#ifdef SPLIT_KEYBOARD
-    // Ensure state is sync'ed from master to slave, if required
-    split_sync_kb();
-#endif  // SPLIT_KEYBOARD
+    // Force an update if the state changed
+    static kb_runtime_config last_state;
+    if (memcmp(&last_state, &kb_state, sizeof(kb_runtime_config)) != 0) {
+        memcpy(&last_state, &kb_state, sizeof(kb_runtime_config));
+        return true;
+    }
 
+    return false;
+}
+
+void split_sync_action_task_kb(void) {
+    // Work out if we've changed our current limit, update the limiter circuit switches
     static uint8_t current_setting = current_500mA;
-    if (current_setting != kb_state->values.current_setting) {
-        current_setting = kb_state->values.current_setting;
+    if (current_setting != kb_state.values.current_setting) {
+        current_setting = kb_state.values.current_setting;
         switch (current_setting) {
             default:
             case current_500mA:
@@ -65,19 +72,21 @@ void housekeeping_task_kb(void) {
                 break;
         }
 
-        // Toggle rgblight on and off, if it's already on, to force a brightness update
+        // Toggle rgblight on and off, if it's already on, to force a brightness update on all LEDs
         if (rgblight_is_enabled()) {
             rgblight_disable_noeeprom();
             rgblight_enable_noeeprom();
         }
     }
 
+    // Turn on/off the LCD
     static bool lcd_on = false;
-    if (lcd_on != (bool)kb_state->values.lcd_power) {
-        lcd_on = (bool)kb_state->values.lcd_power;
+    if (lcd_on != (bool)kb_state.values.lcd_power) {
+        lcd_on = (bool)kb_state.values.lcd_power;
         qp_power(lcd, lcd_on);
     }
 
+    // Match the backlight to the LCD state
     if (is_backlight_enabled() != lcd_on) {
         if (lcd_on)
             backlight_enable();
@@ -86,27 +95,15 @@ void housekeeping_task_kb(void) {
     }
 }
 
-//----------------------------------------------------------
-// LCD power control
-
-void djinn_lcd_on(void) {
-    dprint("djinn_lcd_on\n");
-    kb_runtime_config* kb_state = get_split_sync_state_kb();
-    kb_state->values.lcd_power  = 1;
-}
-
-void djinn_lcd_off(void) {
-    dprint("djinn_lcd_off\n");
-    kb_runtime_config* kb_state = get_split_sync_state_kb();
-    kb_state->values.lcd_power  = 0;
-}
-
-void djinn_lcd_toggle(void) {
-    kb_runtime_config* kb_state = get_split_sync_state_kb();
-    if (kb_state->values.lcd_power)
-        djinn_lcd_off();
-    else
-        djinn_lcd_on();
+void housekeeping_task_kb(void) {
+#ifdef SPLIT_KEYBOARD
+    // Ensure state is sync'ed between master and slave, if required
+    split_sync_kb(false);
+#else   // SPLIT_KEYBOARD
+    // No split, so just run the update and actions sequentially
+    split_sync_update_task_kb();
+    split_sync_action_task_kb();
+#endif  // SPLIT_KEYBOARD
 }
 
 //----------------------------------------------------------
@@ -117,8 +114,7 @@ void keyboard_post_init_kb(void) {
     // debug_matrix = true;
 
     // Reset the initial shared data value between master and slave
-    kb_runtime_config* kb_state = get_split_sync_state_kb();
-    kb_state->raw               = 0;
+    kb_state.raw = 0;
 
     // Turn off increased current limits
     setPinOutput(RGB_CURR_1500mA_OK_PIN);
@@ -141,10 +137,10 @@ void keyboard_post_init_kb(void) {
     lcd = qp_ili9341_make_device(LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, 4, true);
     qp_init(lcd, QP_ROTATION_0);
 
-    // Turn on the LCD and draw the logo
-    djinn_lcd_on();
+    // Turn on the LCD and clear the display
+    kb_state.values.lcd_power = 1;
     qp_power(lcd, true);
-    qp_rect(lcd, 0, 0, 239, 319, 0, 0, 0, true);
+    qp_rect(lcd, 0, 0, 239, 319, HSV_BLACK, true);
 
     // Turn on the LCD backlight
     backlight_enable();
@@ -199,9 +195,8 @@ void suspend_wakeup_init_kb(void) {
 }
 
 RGB rgblight_hsv_to_rgb(HSV hsv) {
-    kb_runtime_config* kb_state = get_split_sync_state_kb();
-    float              scale;
-    switch (kb_state->values.current_setting) {
+    float scale;
+    switch (kb_state.values.current_setting) {
         default:
         case current_500mA:
             scale = 0.3f;

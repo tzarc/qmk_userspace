@@ -16,38 +16,52 @@
 
 #pragma once
 
-#ifdef SPLIT_SYNC_TYPE_KB
-
-#    include "sync_state_kb.h"
+//----------------------------------------------------------
+// Runtime data sync -- keyboard
 
 // Synchronises keyboard shared state between master and slave.
 // Any modifications by master should be made invoking the equivalent task.
 // Any modifications made by slave will be made available to master after invoking the equivalent task.
-void split_sync_kb(void);
+void split_sync_kb(bool force);
 
-// Getter for shared state for keyboard -- datatype needs to be defined in config.h
-SPLIT_SYNC_TYPE_KB* get_split_sync_state_kb(void);
+//---
+// To be implemented by keyboard code:
 
-// Slave-side callback for when state has been received from master
-// Any modifications made by the slave during this callback will propagate back to master.
-void split_sync_on_receive_kb(SPLIT_SYNC_TYPE_KB* state);
+// Get the keyboard shared state block of data
+// The parameter should be filled in with the size of the data block.
+// Return value is a pointer to the data block.
+void* get_split_sync_state_kb(size_t* state_size);
 
-#endif
+// Keyboard level callback to update the data block.
+// This is called for both master and slave, and both can fill in data accordingly.
+// Return value is whether a forced update should occur -- true if so
+bool split_sync_update_task_kb(void);
 
-#ifdef SPLIT_SYNC_TYPE_USER
+// Keyboard level callback to act upon the synchronised data block.
+// The view of master and slave will match at this point.
+void split_sync_action_task_kb(void);
 
-#    include "sync_state_user.h"
+//----------------------------------------------------------
+// Runtime data sync -- user/keymap
 
 // Synchronises user/keymap shared state between master and slave.
 // Any modifications by master should be made invoking the equivalent task.
 // Any modifications made by slave will be made available to master after invoking the equivalent task.
-void split_sync_user(void);
+void split_sync_user(bool force);
 
-// Getter for shared state for user/keymap -- datatype needs to be defined in config.h
-SPLIT_SYNC_TYPE_USER* get_split_sync_state_user(void);
+//---
+// To be implemented by user/keymap code:
 
-// Slave-side callback for when state has been received from master
-// Any modifications made by the slave during this callback will propagate back to master.
-void split_sync_on_receive_user(SPLIT_SYNC_TYPE_USER* state);
+// Get the user/keymap shared state block of data
+// The parameter should be filled in with the size of the data block.
+// Return value is a pointer to the data block.
+void* get_split_sync_state_user(size_t* state_size);
 
-#endif
+// user/keymap level callback to update the data block.
+// This is called for both master and slave, and both can fill in data accordingly.
+// Return value is whether a forced update should occur -- true if so
+bool split_sync_update_task_user(void);
+
+// User/keymap level callback to act upon the synchronised data block.
+// The view of master and slave will match at this point.
+void split_sync_action_task_user(void);

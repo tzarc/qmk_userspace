@@ -61,10 +61,6 @@
 #define SPLIT_HAND_PIN B11
 #define SPLIT_PLUG_DETECT_PIN B12
 
-// Split shared state types
-#define SPLIT_SYNC_TYPE_KB kb_runtime_config
-#define SPLIT_SYNC_TYPE_USER user_runtime_config
-
 // USB Device parameters
 #define VENDOR_ID 0x1209
 #define PRODUCT_ID 0x4919

@@ -110,20 +110,8 @@ void encoder_update_user(uint8_t index, bool clockwise) {
     }
 }
 
-// "Hack" to provide the state sync object for non-split builds
-kb_runtime_config* get_split_sync_state_kb(void) {
-    static bool              was_reset = false;
-    static kb_runtime_config kb_state;
-    if (!was_reset) {
-        memset(&kb_state, 0, sizeof(kb_state));
-        was_reset = true;
-    }
-    return &kb_state;
-}
-
-void housekeeping_task_user(void) {
-    kb_runtime_config* kb_state = get_split_sync_state_kb();
-    if (kb_state->values.lcd_power) {
+void housekeeping_task_keymap(void) {
+    if (kb_state.values.lcd_power) {
         bool            redraw_required = false;
         static uint16_t last_hue        = 0xFFFF;
         uint8_t         curr_hue        = rgblight_get_hue();
@@ -139,9 +127,8 @@ void housekeeping_task_user(void) {
         }
 
         static led_t last_led_state = {0};
-        led_t        curr_led_state = host_keyboard_led_state();
-        if (redraw_required || last_led_state.raw != curr_led_state.raw) {
-            last_led_state.raw = curr_led_state.raw;
+        if (redraw_required || last_led_state.raw != host_keyboard_led_state().raw) {
+            last_led_state.raw = host_keyboard_led_state().raw;
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 3), 0, gfx_lock_caps, curr_hue, 255, last_led_state.caps_lock ? 255 : 32);
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 2), 0, gfx_lock_num, curr_hue, 255, last_led_state.num_lock ? 255 : 32);
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 1), 0, gfx_lock_scrl, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32);

@@ -202,73 +202,113 @@ void serial_dataxfer_respond_user(const void* data, size_t len) { serial_dataxfe
 // State sync
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef SPLIT_SYNC_TYPE_KB
+#ifndef SPLIT_STATE_SYNC_FREQ_KB
+#    define SPLIT_STATE_SYNC_FREQ_KB 250
+#endif
 
-static SPLIT_SYNC_TYPE_KB split_sync_state_kb;
+#ifndef SPLIT_STATE_SYNC_FREQ_USER
+#    define SPLIT_STATE_SYNC_FREQ_USER 250
+#endif
 
-SPLIT_SYNC_TYPE_KB* get_split_sync_state_kb(void) {
-    static bool was_reset = false;
-    if (!was_reset) {
-        memset(&split_sync_state_kb, 0, sizeof(SPLIT_SYNC_TYPE_KB));
-        was_reset = true;
-    }
-    return &split_sync_state_kb;
+__attribute__((weak)) void* get_split_sync_state_kb(size_t* state_size) {
+    static uint8_t dummy;
+    *state_size = sizeof(uint8_t);
+    return &dummy;
 }
 
-__attribute__((weak)) void split_sync_on_receive_kb(SPLIT_SYNC_TYPE_KB* state) {}
+__attribute__((weak)) bool split_sync_update_task_kb(void) { return false; }
+__attribute__((weak)) void split_sync_action_task_kb(void) {}
 
 bool serial_dataxfer_receive_kb(const void* data, size_t len) {
-    memcpy(&split_sync_state_kb, data, sizeof(SPLIT_SYNC_TYPE_KB));
-    split_sync_on_receive_kb(&split_sync_state_kb);
-    serial_dataxfer_respond_kb(&split_sync_state_kb, sizeof(SPLIT_SYNC_TYPE_KB));
+    // Get the data block to act upon
+    size_t length     = 0;
+    void*  data_block = get_split_sync_state_kb(&length);
+
+    // Copy across the data received from the master
+    memcpy(data_block, data, length);
+
+    // Invoke the callback to allow the slave to fill in the data
+    split_sync_update_task_kb();
+
+    // Respond back to the master to give it the same view of the shared data
+    serial_dataxfer_respond_kb(data_block, length);
     return true;
 }
 
-void split_sync_kb(void) {
+void split_sync_kb(bool force) {
     if (is_keyboard_master()) {
-        static SPLIT_SYNC_TYPE_KB last_state;
-        if (memcmp(&last_state, &split_sync_state_kb, sizeof(SPLIT_SYNC_TYPE_KB)) != 0) {
-            serial_dataxfer_transaction_kb(&split_sync_state_kb, sizeof(SPLIT_SYNC_TYPE_KB), &last_state, sizeof(SPLIT_SYNC_TYPE_KB));
-            memcpy(&split_sync_state_kb, &last_state, sizeof(SPLIT_SYNC_TYPE_KB));
+        static uint32_t last_sync = 0;
+        uint32_t        now       = timer_read32();
+
+        // Master needs to collect info before transmitting to slave
+        force |= split_sync_update_task_kb();
+        force |= (last_sync + SPLIT_STATE_SYNC_FREQ_KB < now);
+
+        if (force) {
+            // Keep track of last sync time
+            last_sync = now;
+
+            // Get the data block to act upon
+            size_t length     = 0;
+            void*  data_block = get_split_sync_state_kb(&length);
+
+            // Transmit/receive the data block
+            serial_dataxfer_transaction_kb(data_block, length, data_block, length);
         }
     }
+
+    split_sync_action_task_kb();
 }
 
-#endif
-
-#ifdef SPLIT_SYNC_TYPE_USER
-
-static SPLIT_SYNC_TYPE_USER split_sync_state_user;
-
-SPLIT_SYNC_TYPE_USER* get_split_sync_state_user(void) {
-    static bool was_reset = false;
-    if (!was_reset) {
-        memset(&split_sync_state_user, 0, sizeof(SPLIT_SYNC_TYPE_USER));
-        was_reset = true;
-    }
-    return &split_sync_state_user;
+__attribute__((weak)) void* get_split_sync_state_user(size_t* state_size) {
+    static uint8_t dummy;
+    *state_size = sizeof(uint8_t);
+    return &dummy;
 }
 
-__attribute__((weak)) void split_sync_on_receive_user(SPLIT_SYNC_TYPE_USER* state) {}
+__attribute__((weak)) bool split_sync_update_task_user(void) { return false; }
+__attribute__((weak)) void split_sync_action_task_user(void) {}
 
 bool serial_dataxfer_receive_user(const void* data, size_t len) {
-    memcpy(&split_sync_state_user, data, sizeof(SPLIT_SYNC_TYPE_USER));
-    split_sync_on_receive_user(&split_sync_state_user);
-    serial_dataxfer_respond_user(&split_sync_state_user, sizeof(SPLIT_SYNC_TYPE_USER));
+    // Get the data block to act upon
+    size_t length     = 0;
+    void*  data_block = get_split_sync_state_user(&length);
+
+    // Copy across the data received from the master
+    memcpy(data_block, data, length);
+
+    // Invoke the callback to allow the slave to fill in the data
+    split_sync_update_task_user();
+
+    // Respond back to the master to give it the same view of the shared data
+    serial_dataxfer_respond_user(data_block, length);
     return true;
 }
 
-void split_sync_user(void) {
+void split_sync_user(bool force) {
     if (is_keyboard_master()) {
-        static SPLIT_SYNC_TYPE_USER last_state;
-        if (memcmp(&last_state, &split_sync_state_user, sizeof(SPLIT_SYNC_TYPE_USER)) != 0) {
-            serial_dataxfer_transaction_user(&split_sync_state_user, sizeof(SPLIT_SYNC_TYPE_USER), &last_state, sizeof(SPLIT_SYNC_TYPE_USER));
-            memcpy(&split_sync_state_user, &last_state, sizeof(SPLIT_SYNC_TYPE_USER));
+        static uint32_t last_sync = 0;
+        uint32_t        now       = timer_read32();
+
+        // Master needs to collect info before transmitting to slave
+        force |= split_sync_update_task_user();
+        force |= (last_sync + SPLIT_STATE_SYNC_FREQ_USER < now);
+
+        if (force) {
+            // Keep track of last sync time
+            last_sync = now;
+
+            // Get the data block to act upon
+            size_t length     = 0;
+            void*  data_block = get_split_sync_state_user(&length);
+
+            // Transmit/receive the data block
+            serial_dataxfer_transaction_user(data_block, length, data_block, length);
         }
     }
-}
 
-#endif
+    split_sync_action_task_user();
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
