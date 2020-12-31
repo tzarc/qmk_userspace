@@ -126,7 +126,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 //                                               | 6           | 7           | 8           | 9           | 0           | Backspace   |
 #define ____________TZARC_6x4_RAISE_R1_R_________ KC_F6,        KC_F7,        KC_F8,        KC_F9,        KC_F10,       KC_F11
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
-//                                               | Y           | U           | U           | O           | P           | Backslash   |
+//                                               | Y           | U           | Ｉ          | O           | P           | Backslash   |
 #define ____________TZARC_6x4_RAISE_R2_R_________ KC_NOMODE,    KC_WIDE,      KC_SCRIPT,    KC_BLOCKS,    KC_REGIONAL,  KC_AUSSIE
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | H           | J           | K           | L           | ;           | '           |

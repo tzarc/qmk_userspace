@@ -16,7 +16,7 @@ DFU_SUFFIX_ARGS = -v 0483 -p df11
 #   change yes to no to disable
 #
 BOOTMAGIC_ENABLE = lite     # Virtual DIP switch configuration
-MOUSEKEY_ENABLE = yes       # Mouse keys
+MOUSEKEY_ENABLE = no        # Mouse keys
 EXTRAKEY_ENABLE = yes       # Audio control and System control
 CONSOLE_ENABLE = yes        # Console for debug
 COMMAND_ENABLE = no         # Commands for debug and configuration
@@ -35,6 +35,8 @@ SPLIT_KEYBOARD ?= yes
 ifeq ($(strip $(SPLIT_KEYBOARD)),yes)
 	SERIAL_DRIVER = usart_statesync
 endif
+
+OPT_DEFS += -DNO_PLUG_DETECT_PIN
 
 BACKLIGHT_DRIVER = pwm
 
@@ -62,6 +64,6 @@ ifeq ($(strip $(ENABLE_ADC_USBPD_CHECK)), yes)
 	SRC += analog.c
 endif
 
-#LTO_ENABLE = no
-#OPT = 0
-#OPT_DEFS += -g
+LTO_ENABLE = no
+OPT = 0
+OPT_DEFS += -g

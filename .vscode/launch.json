@@ -18,7 +18,7 @@
       "request": "launch",
       "cwd": "${workspaceRoot}/qmk_firmware",
       "svdFile": "${workspaceRoot}/svd/STM32G474xx.svd",
-      "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_djinn_default.elf",
+      "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_djinn_tzarc.elf",
       "servertype": "bmp",
       "BMPGDBSerialPort": "COM4",
       "device": "STM32G474",
@@ -37,7 +37,7 @@
       "logging": {
         "engineLogging": true
       },
-      "program": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_djinn_default.elf",
+      "program": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_djinn_tzarc.elf",
       "miDebuggerPath": "arm-none-eabi-gdb",
       "customLaunchSetupCommands": [
         {
@@ -47,7 +47,7 @@
           "text": "target extended-remote \\\\.\\COM4"
         },
         {
-          "text": "file handwired_tzarc_djinn_default.elf"
+          "text": "file handwired_tzarc_djinn_tzarc.elf"
         },
         {
           "text": "monitor swdp_scan"

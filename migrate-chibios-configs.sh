@@ -8,8 +8,8 @@ script_dir="$(realpath "$(dirname "$this_script")")"
 qmk_firmware_dir="$(realpath "$script_dir/qmk_firmware/")" # change this once moved to util
 validation_output="$script_dir/validation-output"
 
-source_branch="generated-chibios-conf-migration"
-branch_under_test="generated-chibios-conf-migration-extras"
+source_branch="develop"
+branch_under_test="generated-chibios-conf-migration"
 
 export PATH=/home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$PATH
 
@@ -223,10 +223,6 @@ preconfigure_branch() {
     pcmd make git-submodule
     pcmd git branch -D $branch_under_test || true
     pcmd git checkout -b $branch_under_test
-
-    # mcuconf SPI1 DMA stream definitions
-    # git cherry-pick 31cdb598437c6b55d2edaade63d0b4922957c006
-
     popd >/dev/null 2>&1
 }
 

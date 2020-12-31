@@ -55,7 +55,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // clang-format on
 
 void eeconfig_init_keymap(void) {
-    breathing_disable();
     rgblight_mode(RGBLIGHT_MODE_STATIC_LIGHT);
     rgblight_sethsv(58, 255, 80);
     backlight_enable();
