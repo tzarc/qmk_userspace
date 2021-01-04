@@ -7,7 +7,7 @@ export PATH=/home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$PATH
 MAKEFLAGS="-j --output-sync"
 
 pushd "$script_dir/qmk_firmware" >/dev/null 2>&1 \
-    && time make $MAKEFLAGS all-chibios:default "$@" 2>&1 | tee "$script_dir/build.log" | egrep '\[(ERRORS|WARNINGS|OK)\]' \
+    && time remake $MAKEFLAGS all:default "$@" 2>&1 | tee "$script_dir/build.log" | egrep '\[(ERRORS|WARNINGS|OK)\]' \
     && popd >/dev/null 2>&1
 
 num_successes=$(cat "$script_dir/build.log" | egrep '\[(OK)\]' | wc -l)

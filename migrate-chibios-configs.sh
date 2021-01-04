@@ -227,7 +227,7 @@ preconfigure_branch() {
 }
 
 upgrade_all_keyboards()  {
-    upgrade_one_keyboard --keyboard akegata_denki/device_one --chibios-board GENERIC_STM32_F042X6
+    #upgrade_one_keyboard --keyboard handwired/sono1 --chibios-board STM32_F103_STM32DUINO
     :
 }
 

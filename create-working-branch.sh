@@ -22,7 +22,6 @@ prs_to_apply+=(9603) # Matrix delay
 prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(10437) # Decouple USB events
 prs_to_apply+=(10730) # Last matrix activity
-prs_to_apply+=(11261) # More conf migrations
 #prs_to_apply+=(6165) # Audio
 
 declare -a cherry_picks
