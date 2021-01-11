@@ -11,3 +11,6 @@
 [submodule "qmk_toolbox"]
 	path = qmk_toolbox
 	url = git@github.com:qmk/qmk_toolbox.git
+[submodule "qmk_distro_msys"]
+	path = qmk_distro_msys
+	url = https://github.com/qmk/qmk_distro_msys

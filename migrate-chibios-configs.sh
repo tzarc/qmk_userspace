@@ -58,8 +58,9 @@ hard_reset() {
     pcmd git fetch --all --tags --prune
     pcmd git fetch upstream || true
     pcmd git checkout -f $repo_branch
-    pcmd git reset --hard upstream/$repo_branch || pcmd git reset --hard $repo_branch
-    pcmd git push origin $repo_branch --force-with-lease
+    pcmd git reset --hard upstream/$repo_branch  \
+        && pcmd git push origin $repo_branch --force-with-lease \
+        || pcmd git reset --hard $repo_branch
 }
 
 build_single() {
@@ -109,6 +110,18 @@ validate_build() {
     fi
 
     popd >/dev/null 2>&1
+}
+
+disable_chconf_extras() {
+    for chconf in $(find "$script_dir/qmk_firmware/platforms" "$script_dir/qmk_firmware/keyboards" -name chconf.h) ; do
+        cat "$chconf" \
+            | sed \
+                -e 's@#define CH_CFG_USE_OBJ_CACHES               TRUE@#define CH_CFG_USE_OBJ_CACHES               FALSE@g' \
+                -e 's@#define CH_CFG_USE_DELEGATES                TRUE@#define CH_CFG_USE_DELEGATES                FALSE@g' \
+                -e 's@#define CH_CFG_USE_JOBS                     TRUE@#define CH_CFG_USE_JOBS                     FALSE@g' \
+            > "${chconf}.new"
+        mv "${chconf}.new" "${chconf}"
+    done
 }
 
 upgrade_one_keyboard() {
@@ -161,6 +174,8 @@ upgrade_one_keyboard() {
     git clean -xfd >/dev/null 2>&1
     git reset --hard >/dev/null 2>&1
     git checkout -- . >/dev/null 2>&1
+
+    disable_chconf_extras
 
     if [[ -f "keyboards/$keyboard/chconf.h" ]] && [[ -z "$(grep 'include_next' "keyboards/$keyboard/chconf.h" 2>/dev/null || true)" ]] ; then
         echo "-------------------------------------------------------------------------" | append_log
@@ -227,7 +242,8 @@ preconfigure_branch() {
 }
 
 upgrade_all_keyboards()  {
-    #upgrade_one_keyboard --keyboard handwired/sono1 --chibios-board STM32_F103_STM32DUINO
+    #upgrade_one_keyboard --keyboard cannonkeys/sagittarius --chibios-board GENERIC_STM32_F072XB
+    #upgrade_one_keyboard --keyboard evolv --chibios-board GENERIC_STM32_F072XB
     :
 }
 

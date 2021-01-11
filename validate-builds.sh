@@ -8,8 +8,8 @@ script_dir="$(realpath "$(dirname "$this_script")")"
 qmk_firmware_dir="$(realpath "$script_dir/qmk_firmware/")" # change this once moved to util
 validation_output="$script_dir/validation-output"
 
-source_branch="fauxpark-normalise-includes-base"
-branch_under_test="fauxpark-normalise-includes"
+source_branch="develop"
+branch_under_test="disable-all-chibios-subsystems"
 
 export PATH=/home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$PATH
 
@@ -74,17 +74,33 @@ validate_build() {
     popd >/dev/null 2>&1
 }
 
+#required_keyboard_builds() {
+#    pushd "$qmk_firmware_dir" >/dev/null 2>&1
+#    git checkout "$source_branch" >/dev/null 2>&1
+#
+#    # All keyboards
+#    find keyboards/ -type f -iname "rules.mk" | grep -v keymaps | sed 's!keyboards/\(.*\)/rules.mk!\1!' | sed -e 's@$@:default@g' | sort | uniq
+#
+#    #git grep '^\s*MCU\s*=\s*STM32F4' keyboards/ | grep -v keymaps | cut -d: -f1 | sed -e 's@^keyboards/@@g' -e 's@/rules.mk@:default@g'
+#    #it grep '^\s*MCU\s*=\s*STM32F4' keyboards/ | grep keymaps | cut -d: -f1 | sed -e 's@^keyboards/@@g' -e 's@/keymaps/@:@g' -e 's@/rules.mk@@g'
+#
+#    popd >/dev/null 2>&1
+#}
+
 required_keyboard_builds() {
-    pushd "$qmk_firmware_dir" >/dev/null 2>&1
-    git checkout "$source_branch" >/dev/null 2>&1
-
-    # All keyboards
-    find keyboards/ -type f -iname "rules.mk" | grep -v keymaps | sed 's!keyboards/\(.*\)/rules.mk!\1!' | sed -e 's@$@:default@g' | sort | uniq
-
-    #git grep '^\s*MCU\s*=\s*STM32F4' keyboards/ | grep -v keymaps | cut -d: -f1 | sed -e 's@^keyboards/@@g' -e 's@/rules.mk@:default@g'
-    #it grep '^\s*MCU\s*=\s*STM32F4' keyboards/ | grep keymaps | cut -d: -f1 | sed -e 's@^keyboards/@@g' -e 's@/keymaps/@:@g' -e 's@/rules.mk@@g'
-
-    popd >/dev/null 2>&1
+    #echo chavdai40/rev2:default
+    #echo ergodox_infinity:default
+    #echo infinity60:default
+    #echo k_type:default
+    #echo keebwerk/mega/ansi:default
+    #echo peiorisboards/ixora:default
+    #echo phoenix:default
+    #echo polilla/rev1:default
+    #echo tkw/stoutgat/v2/f411:default
+    #echo vinta:default
+    #echo whitefox:default
+    echo zvecr/zv48/f401:default
+    echo zvecr/zv48/f411:default
 }
 
 [[ -d "$validation_output" ]] || mkdir -p "$validation_output"

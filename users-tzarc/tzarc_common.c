@@ -71,9 +71,11 @@ void tap_code16_nomods(uint8_t kc) {
 }
 
 void tap_unicode_glyph(uint32_t glyph) {
+#ifdef UNICODE_ENABLE
     unicode_input_start();
     register_hex32(glyph);
     unicode_input_finish();
+#endif
 }
 
 void tap_unicode_glyph_nomods(uint32_t glyph) {
@@ -104,7 +106,9 @@ void tzarc_common_init(void) {
 }
 
 void eeconfig_init_user(void) {
+#ifdef UNICODE_ENABLE
     set_unicode_input_mode(UC_WINC);
+#endif
     tzarc_eeprom_reset();
     eeconfig_init_keymap();
 }
@@ -459,7 +463,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 void matrix_scan_user(void) {
     static uint32_t last_numlock_check = 0;
     uint32_t        now                = timer_read32();
-    if (last_numlock_check + 2500 < now) {
+    if (timer_elapsed32(last_numlock_check) > 2500) {
         last_numlock_check = now;
         led_t led_state    = host_keyboard_led_state();
         if (!led_state.num_lock) {

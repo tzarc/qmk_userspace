@@ -74,6 +74,18 @@ upgrade-chibios() {
     popd
 }
 
+disable_chconf_extras() {
+    for chconf in $(find "$script_dir/qmk_firmware/platforms" "$script_dir/qmk_firmware/keyboards" -name chconf.h) ; do
+        cat "$chconf" \
+            | sed \
+                -e 's@#define CH_CFG_USE_OBJ_CACHES               TRUE@#define CH_CFG_USE_OBJ_CACHES               FALSE@g' \
+                -e 's@#define CH_CFG_USE_DELEGATES                TRUE@#define CH_CFG_USE_DELEGATES                FALSE@g' \
+                -e 's@#define CH_CFG_USE_JOBS                     TRUE@#define CH_CFG_USE_JOBS                     FALSE@g' \
+            > "${chconf}.new"
+        mv "${chconf}.new" "${chconf}"
+    done
+}
+
 upgrade-chibios-confs() {
     pushd "$script_dir/qmk_firmware"
 
@@ -103,6 +115,8 @@ upgrade-chibios-confs() {
     pushd "$script_dir"
     pcmd make clean
     popd
+
+    disable_chconf_extras
 
     pushd "$script_dir/qmk_firmware"
     pcmd git add -A

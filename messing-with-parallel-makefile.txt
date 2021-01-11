@@ -1,0 +1,33 @@
+
+ALL_COMMANDS =
+ALL_TARGETS =
+define COMMAND_PROCESSOR
+ALL_COMMANDS += $2
+ALL_TARGETS += TARGET_$2
+TARGET_$2: prerequisite-commands
+	+error_occurred=0 ; \
+	$$(COMMAND_$$(SILENT_MODE)_$2) \
+	if [ $$$$error_occurred -gt 0 ]; then $$(HANDLE_ERROR); fi;
+endef
+
+define GOAL_PROCESSOR
+$(eval $(call PARSE_RULE,$1))
+$(foreach COMMAND,$(COMMANDS),$(eval $(call COMMAND_PROCESSOR,$1,$(COMMAND))))
+endef
+
+define SET_SILENT_MODE_V2
+    ifdef SUB_IS_SILENT
+        SILENT_MODE := $(SUB_IS_SILENT)
+    else ifeq ($$(words $$(ALL_COMMANDS)),1)
+        SILENT_MODE := false
+    else
+        SILENT_MODE := true
+    endif
+endef
+
+$(foreach GOAL,$(MAKECMDGOALS),$(eval $(call GOAL_PROCESSOR,$(GOAL))))
+$(eval $(call SET_SILENT_MODE_V2))
+
+# Catch everything and parse the command line ourselves.
+.PHONY: %
+%: $(ALL_TARGETS) ; +:

@@ -1,5 +1,5 @@
 export ROOTDIR := $(shell pwd)
-export PATH := /usr/lib/ccache:/home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$(PATH)
+export PATH := /usr/lib/ccache:/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q2-preview/bin:$(PATH)
 
 BOARD_DEFS := \
 	iris!tzarc-iris_rev4!keebio/iris/rev4/keymaps/tzarc!tzarc \
@@ -59,10 +59,10 @@ remove_artifacts:
 	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format >/dev/null 2>&1 || true
 
 clean: remove_artifacts
-	@$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" clean || true
+	+$(MAKE) -C "$(ROOTDIR)/qmk_firmware" clean || true
 
 distclean: remove_artifacts
-	@$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" distclean || true
+	+$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" distclean || true
 
 format_prereq:
 	@ln -sf $(ROOTDIR)/qmk_firmware/.clang-format $(ROOTDIR)/.clang-format
@@ -119,7 +119,7 @@ board_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f | so
 
 bin_$$(board_name_$1): links #compiledb_$$(board_name_$1)
 	@echo "\e[38;5;14mBuilding: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
-	@MAKEFLAGS="$$(MAKEFLAGS)" intercept-build make -C "$(ROOTDIR)/qmk_firmware" $$(board_qmk_$1):$$(board_keymap_$1)
+	+bash -c 'time intercept-build $$(MAKE) $$(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" $$(board_qmk_$1):$$(board_keymap_$1)'
 	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR)
 
 flash_$$(board_name_$1): bin_$$(board_name_$1)

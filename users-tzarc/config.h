@@ -40,7 +40,7 @@
 #if !defined(VIA_ENABLE)
 // Modify the RAW usage page and id
 #    define RAW_USAGE_PAGE 0xFF9C
-#    define RAW_USAGE_ID 0x01
+#    define RAW_USAGE_ID 0x02
 #endif
 
 // If we ever decide we're going to use VIA, then make sure we're not going to collide with any of the EEPROM settings for userspace.

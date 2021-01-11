@@ -6,6 +6,8 @@ SRC += \
 	tzarc_diablo3.c
 
 BOOTMAGIC_ENABLE = lite
+EXTRAKEY_ENABLE = yes
+MOUSEKEY_ENABLE = yes
 UNICODE_ENABLE = yes
 CONSOLE_ENABLE = yes
 RAW_ENABLE = yes

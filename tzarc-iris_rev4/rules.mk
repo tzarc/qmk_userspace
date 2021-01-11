@@ -4,4 +4,6 @@ ENCODER_ENABLE = no
 
 LTO_ENABLE = yes
 
+SPACE_CADET_ENABLE = no
+
 OPT = s
