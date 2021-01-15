@@ -242,8 +242,10 @@ preconfigure_branch() {
 }
 
 upgrade_all_keyboards()  {
-    #upgrade_one_keyboard --keyboard cannonkeys/sagittarius --chibios-board GENERIC_STM32_F072XB
-    #upgrade_one_keyboard --keyboard evolv --chibios-board GENERIC_STM32_F072XB
+    #upgrade_one_keyboard --keyboard alpine65 --chibios-board GENERIC_STM32_F072XB
+    #upgrade_one_keyboard --keyboard cannonkeys/onyx --chibios-board GENERIC_STM32_F072XB
+    #upgrade_one_keyboard --keyboard ck60i --chibios-board GENERIC_STM32_F072XB
+    #upgrade_one_keyboard --keyboard cutie_club/borsdorf --chibios-board GENERIC_STM32_F072XB
     :
 }
 

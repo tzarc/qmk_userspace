@@ -64,6 +64,6 @@ ifeq ($(strip $(ENABLE_ADC_USBPD_CHECK)), yes)
 	SRC += analog.c
 endif
 
-#LTO_ENABLE = no
-#OPT = 0
-#OPT_DEFS += -g
+LTO_ENABLE = no
+OPT = 0
+OPT_DEFS += -g

@@ -20,11 +20,22 @@
 #define EE_HANDS
 
 #undef RGBLED_NUM
-#undef RGBLIGHT_ANIMATIONS
 #define RGBLED_NUM 12
 #define RGBLIGHT_HUE_STEP 8
 #define RGBLIGHT_SAT_STEP 8
 #define RGBLIGHT_VAL_STEP 8
+
+#ifdef RGBLIGHT_ENABLE
+#    undef RGBLIGHT_ANIMATIONS
+#    if defined(__AVR__) && !defined(__AVR_AT90USB1286__)
+#        define RGBLIGHT_SLEEP
+#        define RGBLIGHT_EFFECT_BREATHING
+#        define RGBLIGHT_EFFECT_SNAKE
+#        define RGBLIGHT_EFFECT_KNIGHT
+#    else
+#        define RGBLIGHT_ANIMATIONS
+#    endif
+#endif  // RGBLIGHT_ENABLE
 
 #define NO_ACTION_MACRO
 #define NO_ACTION_FUNCTION
