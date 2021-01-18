@@ -38,7 +38,7 @@ void* get_split_sync_state_kb(size_t* state_size) {
 bool split_sync_update_task_kb(void) {
     if (is_keyboard_master()) {
         // Turn off the LCD if there's been no matrix activity
-        kb_state.values.lcd_power = (last_matrix_activity_elapsed() < LCD_ACTIVITY_TIMEOUT) ? 1 : 0;
+        kb_state.values.lcd_power = (last_input_activity_elapsed() < LCD_ACTIVITY_TIMEOUT) ? 1 : 0;
     }
 
     // Force an update if the state changed
@@ -110,6 +110,10 @@ void housekeeping_task_kb(void) {
 // Initialisation
 
 void keyboard_post_init_kb(void) {
+    void* dummy = malloc(1);
+    free(dummy);
+    dummy = alloca(1);
+
     debug_enable = true;
     // debug_matrix = true;
 

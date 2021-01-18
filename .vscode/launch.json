@@ -20,8 +20,23 @@
       "svdFile": "${workspaceRoot}/svd/STM32G474xx.svd",
       "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_djinn_tzarc.elf",
       "servertype": "bmp",
-      "BMPGDBSerialPort": "COM4",
+      "BMPGDBSerialPort": "COM8",
       "device": "STM32G474",
+      "v1": false,
+      "windows": {
+        "armToolchainPath": "E:\\gcc-arm-none-eabi-9-2020-q2-update-win32\\bin"
+      }
+    },
+    {
+      "name": "Black Magic Probe (Satisfaction75, cortex-debug)",
+      "type": "cortex-debug",
+      "request": "launch",
+      "cwd": "${workspaceRoot}/qmk_firmware",
+      "svdFile": "${workspaceRoot}/svd/STM32F072x.svd",
+      "executable": "${workspaceRoot}\\qmk_firmware\\.build\\cannonkeys_satisfaction75_rev1_default.elf",
+      "servertype": "bmp",
+      "BMPGDBSerialPort": "COM4",
+      "device": "STM32F072x",
       "v1": false,
       "windows": {
         "armToolchainPath": "E:\\gcc-arm-none-eabi-9-2020-q2-update-win32\\bin"

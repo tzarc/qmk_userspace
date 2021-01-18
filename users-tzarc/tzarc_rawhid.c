@@ -1,5 +1,9 @@
 #include <quantum.h>
+
+#ifdef RGBLIGHT_ENABLE
 #include <rgblight.h>
+#endif
+
 #include <raw_hid.h>
 #include "tzarc.h"
 

@@ -18,10 +18,8 @@ target_qmk="develop"
 fi
 
 declare -a prs_to_apply
-prs_to_apply+=(9603) # Matrix delay
 prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(10437) # Decouple USB events
-prs_to_apply+=(11552) # Last matrix activity
 #prs_to_apply+=(6165) # Audio
 
 declare -a cherry_picks

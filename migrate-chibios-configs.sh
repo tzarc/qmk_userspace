@@ -242,10 +242,13 @@ preconfigure_branch() {
 }
 
 upgrade_all_keyboards()  {
-    #upgrade_one_keyboard --keyboard alpine65 --chibios-board GENERIC_STM32_F072XB
-    #upgrade_one_keyboard --keyboard cannonkeys/onyx --chibios-board GENERIC_STM32_F072XB
-    #upgrade_one_keyboard --keyboard ck60i --chibios-board GENERIC_STM32_F072XB
-    #upgrade_one_keyboard --keyboard cutie_club/borsdorf --chibios-board GENERIC_STM32_F072XB
+    upgrade_one_keyboard --keyboard akegata_denki/device_one --chibios-board DEVICE_ONE --no-mcuconf
+    upgrade_one_keyboard --keyboard ergodox_stm32 --chibios-board ERGODOX_STM32_BOARD --no-mcuconf
+    upgrade_one_keyboard --keyboard jm60 --chibios-board JM60_BOARD --no-mcuconf
+    upgrade_one_keyboard --keyboard matrix/m20add --chibios-board m20add_bd --no-mcuconf
+    upgrade_one_keyboard --keyboard matrix/noah --chibios-board noah_bd --no-mcuconf
+    upgrade_one_keyboard --keyboard nibiria/stream15 --chibios-board GENERIC_STM32_F072XB
+    upgrade_one_keyboard --keyboard xiaomi/mk02 --chibios-board ST_STM32F072B_DISCOVERY --no-mcuconf
     :
 }
 
