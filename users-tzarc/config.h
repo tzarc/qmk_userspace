@@ -16,6 +16,8 @@
 
 #pragma once
 
+//#define DEBUG_MATRIX_SCAN_RATE
+
 // 1000Hz poll rate
 #define USB_POLLING_INTERVAL_MS 1
 
@@ -46,8 +48,6 @@
 // If we ever decide we're going to use VIA, then make sure we're not going to collide with any of the EEPROM settings for userspace.
 // Completely incompatible with the change in RAW usage page and ID.
 #define VIA_EEPROM_MAGIC_ADDR (EECONFIG_SIZE + TZARC_EEPROM_ALLOCATION + 1)
-
-#define DEBUG_MATRIX_SCAN_RATE
 
 // Disable old stuff
 #define NO_ACTION_MACRO

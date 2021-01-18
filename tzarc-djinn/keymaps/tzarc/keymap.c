@@ -256,8 +256,8 @@ void test_lua(void) {
 
         lua_newtable(L); // new table
         lua_pushnumber(L, 1); // table index
-        lua_pushstring(L, "aaa"); // value
-        lua_rawset(L, -3); // set tbl[1]='aaa'
+        lua_pushstring(L, "This is a test from executing lua code"); // value
+        lua_rawset(L, -3); // set tbl[1]='This is a test from executing lua code'
 
         // Set the "blah" global table to the newly-created table
         lua_setglobal(L, "blah");
@@ -265,9 +265,9 @@ void test_lua(void) {
         lua_pushcfunction(L, &dprint_wrapper);
         lua_setglobal(L, "dprint");
 
-        // now we can use blah[1] == 'aaa'
+        // now we can use blah[1] == 'This is a test from executing lua code'
 
-        const char *code = "dprint(blah[1])"; // should debug print "aaa" in console
+        const char *code = "dprint(blah[1])"; // should debug print "This is a test from executing lua code" in QMK Toolbox
         if(luaL_loadstring(L, code) == LUA_OK) {
             if(lua_pcall(L, 0, 1, 0) == LUA_OK) {
                 lua_pop(L, lua_gettop(L));

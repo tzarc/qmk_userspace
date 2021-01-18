@@ -128,11 +128,11 @@ flash_$$(board_name_$1): bin_$$(board_name_$1)
 		&& qmk flash -kb $$(board_qmk_$1) -km $$(board_keymap_$1)
 
 format_$$(board_name_$1): format_prereq
-	for file in $$(board_files_$1) ; do \
+	@for file in $$(board_files_$1) ; do \
 		echo "\e[38;5;14mclang-format'ing: $$$$file\e[0m" ; \
-		clang-format-7 -i "$$$$file" >/dev/null 2>&1 ; \
+		clang-format-7 -i "$$$$file" >/dev/null 2>&1 || true ; \
 	done
-	for file in $$(board_files_all_$1) ; do \
+	@for file in $$(board_files_all_$1) ; do \
 		dos2unix "$$$$file" >/dev/null 2>&1 ; \
 	done
 
