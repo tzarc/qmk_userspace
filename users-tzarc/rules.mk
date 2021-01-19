@@ -5,6 +5,8 @@ SRC += \
 	tzarc_wow.c \
 	tzarc_diablo3.c
 
+DEBOUNCE_TYPE ?= sym_eager_pk
+
 BOOTMAGIC_ENABLE = lite
 EXTRAKEY_ENABLE = yes
 MOUSEKEY_ENABLE = no

@@ -1,5 +1,6 @@
 export ROOTDIR := $(shell pwd)
-export PATH := /usr/lib/ccache:/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH)
+#export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH)
+export PATH := /usr/lib/ccache:$(PATH)
 
 BOARD_DEFS := \
 	iris!tzarc-iris_rev4!keebio/iris/rev4/keymaps/tzarc!tzarc \

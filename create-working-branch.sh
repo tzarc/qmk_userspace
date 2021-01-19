@@ -20,6 +20,10 @@ fi
 declare -a prs_to_apply
 prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(10437) # Decouple USB events
+prs_to_apply+=(11595) # encoder activity
+prs_to_apply+=(11600) # develop build fixes
+prs_to_apply+=(11607) # nano.specs
+prs_to_apply+=(11608) # syscalls v2
 #prs_to_apply+=(6165) # Audio
 
 declare -a cherry_picks
