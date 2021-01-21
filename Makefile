@@ -1,5 +1,5 @@
 export ROOTDIR := $(shell pwd)
-#export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH)
+export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH)
 export PATH := /usr/lib/ccache:$(PATH)
 
 BOARD_DEFS := \

@@ -9,7 +9,7 @@ qmk_firmware_dir="$(realpath "$script_dir/qmk_firmware/")" # change this once mo
 validation_output="$script_dir/validation-output"
 
 source_branch="develop"
-branch_under_test="generated-chibios-conf-migration"
+branch_under_test="generated-chibios-conf-migrations"
 
 export PATH=/home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$PATH
 
@@ -61,6 +61,15 @@ hard_reset() {
     pcmd git reset --hard upstream/$repo_branch  \
         && pcmd git push origin $repo_branch --force-with-lease \
         || pcmd git reset --hard $repo_branch
+}
+
+preconfigure_branch() {
+    pushd "$qmk_firmware_dir" >/dev/null 2>&1
+    hard_reset qmk qmk_firmware $source_branch
+    pcmd make git-submodule
+    pcmd git branch -D $branch_under_test || true
+    pcmd git checkout -b $branch_under_test
+    popd >/dev/null 2>&1
 }
 
 build_single() {
@@ -131,14 +140,14 @@ upgrade_one_keyboard() {
     local keyboard
     local chibios_board
     local ignore_checksum_mismatch
-    local force_builds
+    local force_upgrade
     local no_mcuconf
     local keep_output_files
 
     while [[ ! -z "${1:-}" ]] ; do
         case "${1:-}" in
             --force)
-                force_builds=1
+                force_upgrade=1
                 ;;
             --no-mcuconf)
                 no_mcuconf=1
@@ -177,29 +186,41 @@ upgrade_one_keyboard() {
 
     disable_chconf_extras
 
-    if [[ -f "keyboards/$keyboard/chconf.h" ]] && [[ -z "$(grep 'include_next' "keyboards/$keyboard/chconf.h" 2>/dev/null || true)" ]] ; then
+    # Run any pre-migration function if it exists
+    local premigrate_cmd="premigrate_$(echo $keyboard | tr '/' '_')"
+    if type "$premigrate_cmd" >/dev/null 2>&1 ; then
+        "$premigrate_cmd"
+    fi
+
+    if [[ -d "$qmk_firmware_dir/keyboards/$keyboard/boards" ]] ; then
+        pushd "$qmk_firmware_dir" >/dev/null 2>&1
+        git rm -rf keyboards/$keyboard/boards >/dev/null 2>&1
+        popd >/dev/null 2>&1
+    fi
+
+    if [[ -f "keyboards/$keyboard/chconf.h" ]] && { [[ ! -z "${force_upgrade:-}" ]] || [[ -z "$(grep 'include_next' "keyboards/$keyboard/chconf.h" 2>/dev/null || true)" ]] ; } ; then
         echo "-------------------------------------------------------------------------" | append_log
         echo "-- $keyboard : migrating chconf.h" | append_log
         echo "-------------------------------------------------------------------------" | append_log
         local chconf_path="platforms/chibios/common/configs/chconf.h"
         [[ ! -f "platforms/chibios/$chibios_board/configs/chconf.h" ]] || chconf_path="platforms/chibios/$chibios_board/configs/chconf.h"
-        ./bin/qmk chibios-confmigrate -o -d -i keyboards/$keyboard/chconf.h -r $chconf_path 2>&1 | append_log
+        ./bin/qmk chibios-confmigrate -o -d -i keyboards/$keyboard/chconf.h -r $chconf_path -f 2>&1 | append_log
     fi
 
-    if [[ -f "keyboards/$keyboard/halconf.h" ]] && [[ -z "$(grep 'include_next' "keyboards/$keyboard/halconf.h" 2>/dev/null || true)" ]] ; then
+    if [[ -f "keyboards/$keyboard/halconf.h" ]] && { [[ ! -z "${force_upgrade:-}" ]] || [[ -z "$(grep 'include_next' "keyboards/$keyboard/halconf.h" 2>/dev/null || true)" ]] ; } ; then
         echo "-------------------------------------------------------------------------" | append_log
         echo "-- $keyboard : migrating halconf.h" | append_log
         echo "-------------------------------------------------------------------------" | append_log
         local halconf_path="platforms/chibios/common/configs/halconf.h"
         [[ ! -f "platforms/chibios/$chibios_board/configs/halconf.h" ]] || halconf_path="platforms/chibios/$chibios_board/configs/halconf.h"
-        ./bin/qmk chibios-confmigrate -o -d -i keyboards/$keyboard/halconf.h -r $halconf_path 2>&1 | append_log
+        ./bin/qmk chibios-confmigrate -o -d -i keyboards/$keyboard/halconf.h -r $halconf_path -f 2>&1 | append_log
     fi
 
-    if [[ -z "${no_mcuconf:-}" ]] && [[ -f "keyboards/$keyboard/mcuconf.h" ]] && [[ -z "$(grep 'include_next' "keyboards/$keyboard/mcuconf.h" 2>/dev/null || true)" ]] ; then
+    if [[ -z "${no_mcuconf:-}" ]] && [[ -f "keyboards/$keyboard/mcuconf.h" ]] && { [[ ! -z "${force_upgrade:-}" ]] || [[ -z "$(grep 'include_next' "keyboards/$keyboard/mcuconf.h" 2>/dev/null || true)" ]] ; } ; then
         echo "-------------------------------------------------------------------------" | append_log
         echo "-- $keyboard : migrating mcuconf.h" | append_log
         echo "-------------------------------------------------------------------------" | append_log
-        ./bin/qmk chibios-confmigrate -o -d -i keyboards/$keyboard/mcuconf.h -r platforms/chibios/$chibios_board/configs/mcuconf.h 2>&1 | append_log
+        ./bin/qmk chibios-confmigrate -o -d -i keyboards/$keyboard/mcuconf.h -r platforms/chibios/$chibios_board/configs/mcuconf.h -f 2>&1 | append_log
     fi
 
     # Fixup the 'BOARD = ...' line in rules.mk
@@ -212,6 +233,12 @@ upgrade_one_keyboard() {
         fi
     done
 
+    # Run any post-migration function if it exists
+    local postmigrate_cmd="postmigrate_$(echo $keyboard | tr '/' '_')"
+    if type "$postmigrate_cmd" >/dev/null 2>&1 ; then
+        "$postmigrate_cmd"
+    fi
+
     local commit_message="ChibiOS conf upgrade for $keyboard"$'\n'""
     git add -A
     if git commit -qm "$commit_message" >/dev/null 2>&1 ; then
@@ -221,10 +248,15 @@ upgrade_one_keyboard() {
             commit_message="${commit_message}"$'\n'"$(echo -e ${output} | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g")"
         done
 
-        if is_failed ; then
+        if is_failed && [[ -z "${ignore_checksum_mismatch:-}" ]] ; then
+            echo "Failed... Press enter to continue"
+            read dummy
             clear_failure
             git reset --hard ${branch_under_test}^
         else
+            if [[ ! -z "${ignore_checksum_mismatch:-}" ]] ; then
+                commit_message="${commit_message}"$'\n'""$'\n'"Checksum mismatch ignored:"$'\n'"${ignore_checksum_mismatch}"
+            fi
             git commit --amend -qm "$commit_message" || true
         fi
     fi
@@ -232,23 +264,33 @@ upgrade_one_keyboard() {
     popd >/dev/null 2>&1
 }
 
-preconfigure_branch() {
+postmigrate_jm60() {
     pushd "$qmk_firmware_dir" >/dev/null 2>&1
-    hard_reset qmk qmk_firmware $source_branch
-    pcmd make git-submodule
-    pcmd git branch -D $branch_under_test || true
-    pcmd git checkout -b $branch_under_test
+    popd >/dev/null 2>&1
+}
+
+premigrate_chavdai40() {
+    pushd "$qmk_firmware_dir" >/dev/null 2>&1
     popd >/dev/null 2>&1
 }
 
 upgrade_all_keyboards()  {
-    #upgrade_one_keyboard --keyboard akegata_denki/device_one --chibios-board DEVICE_ONE --no-mcuconf
-    #upgrade_one_keyboard --keyboard ergodox_stm32 --chibios-board ERGODOX_STM32_BOARD --no-mcuconf
-    #upgrade_one_keyboard --keyboard jm60 --chibios-board JM60_BOARD --no-mcuconf
-    #upgrade_one_keyboard --keyboard matrix/m20add --chibios-board m20add_bd --no-mcuconf
-    #upgrade_one_keyboard --keyboard matrix/noah --chibios-board noah_bd --no-mcuconf
-    #upgrade_one_keyboard --keyboard nibiria/stream15 --chibios-board GENERIC_STM32_F072XB
-    #upgrade_one_keyboard --keyboard xiaomi/mk02 --chibios-board ST_STM32F072B_DISCOVERY --no-mcuconf
+#    pushd "$qmk_firmware_dir" >/dev/null 2>&1
+#    for kb in $(./util/list_keyboards.sh | sort) ; do
+#        local vars=$(make ${kb}:default:dump_vars)
+#        if [[ "$(echo "$vars" | grep '^PLATFORM_KEY=' | cut -d'=' -f2)" == "chibios" ]] ; then
+#            local board=$(echo "$vars" | grep '^BOARD=' | cut -d'=' -f2)
+#            upgrade_one_keyboard --keyboard $kb --chibios-board $board --no-mcuconf --force
+#        fi
+#    done
+#    popd >/dev/null 2>&1
+
+    #upgrade_one_keyboard --keyboard akegata_denki/device_one --chibios-board ST_NUCLEO32_F042K6 --no-mcuconf
+    #upgrade_one_keyboard --keyboard chavdai40 --chibios-board ST_NUCLEO32_F042K6 --no-mcuconf chavdai40/rev1 chavdai40/rev2
+    #upgrade_one_keyboard --keyboard ergodox_stm32 --chibios-board ST_NUCLEO64_F103RB --no-mcuconf
+    #upgrade_one_keyboard --keyboard jm60 --chibios-board ST_NUCLEO64_F103RB --no-mcuconf
+    #upgrade_one_keyboard --keyboard matrix/m20add --chibios-board ST_NUCLEO64_F411RE --no-mcuconf
+    #upgrade_one_keyboard --keyboard matrix/noah --chibios-board ST_NUCLEO64_F411RE --no-mcuconf
     :
 }
 
@@ -282,8 +324,19 @@ leftover_mcuconf() {
     popd >/dev/null 2>&1
 }
 
+leftover_boardh() {
+    pushd "$qmk_firmware_dir" >/dev/null 2>&1
+    for file in $(find keyboards/ -name 'board.h') ; do
+        if [[ -z "$(grep include_next "$file")" ]] ; then
+            echo $file | sed -e 's#keyboards/##g' -e 's#/boards/[^/]\+/board.h##g'
+        fi
+    done | sort | uniq
+    popd >/dev/null 2>&1
+}
+
 leftover_boards() {
     { leftover_chconf ; leftover_halconf ; } | sort | uniq
+    # { leftover_chconf ; leftover_halconf ; leftover_boardh ; } | sort | uniq
 }
 
 print_leftovers() {

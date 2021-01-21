@@ -7,8 +7,8 @@ script_dir="$(readlink -f "$(dirname "$this_script")")"
 
 unset upgrade_chibios
 unset upgrade_chibios_confs
-upgrade_chibios=1
-upgrade_chibios_confs=1
+#upgrade_chibios=1
+#upgrade_chibios_confs=1
 
 target_branch="generated-workarea"
 target_qmk="develop"
@@ -20,10 +20,6 @@ fi
 declare -a prs_to_apply
 prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(10437) # Decouple USB events
-prs_to_apply+=(11595) # encoder activity
-prs_to_apply+=(11600) # develop build fixes
-prs_to_apply+=(11607) # nano.specs
-prs_to_apply+=(11608) # syscalls v2
 #prs_to_apply+=(6165) # Audio
 
 declare -a cherry_picks
@@ -80,9 +76,11 @@ disable_chconf_extras() {
     for chconf in $(find "$script_dir/qmk_firmware/platforms" "$script_dir/qmk_firmware/keyboards" -name chconf.h) ; do
         cat "$chconf" \
             | sed \
-                -e 's@#define CH_CFG_USE_OBJ_CACHES               TRUE@#define CH_CFG_USE_OBJ_CACHES               FALSE@g' \
-                -e 's@#define CH_CFG_USE_DELEGATES                TRUE@#define CH_CFG_USE_DELEGATES                FALSE@g' \
-                -e 's@#define CH_CFG_USE_JOBS                     TRUE@#define CH_CFG_USE_JOBS                     FALSE@g' \
+                -e 's@#define CH_CFG_USE_OBJ_CACHES\(\s\+\)TRUE@#define CH_CFG_USE_OBJ_CACHES\1FALSE@g' \
+                -e 's@#define CH_CFG_USE_DELEGATES\(\s\+\)TRUE@#define CH_CFG_USE_DELEGATES\1FALSE@g' \
+                -e 's@#define CH_CFG_USE_JOBS\(\s\+\)TRUE@#define CH_CFG_USE_JOBS\1FALSE@g' \
+                -e 's@#define CH_CFG_USE_FACTORY\(\s\+\)TRUE@#define CH_CFG_USE_FACTORY\1FALSE@g' \
+                -e 's@#define CH_CFG_USE_MEMCORE\(\s\+\)FALSE@#define CH_CFG_USE_MEMCORE\1TRUE@g' \
             > "${chconf}.new"
         mv "${chconf}.new" "${chconf}"
     done
@@ -101,6 +99,8 @@ upgrade-chibios-confs() {
         sed -i 's@#define CH_CFG_USE_MEMCORE\s*FALSE@#define CH_CFG_USE_MEMCORE TRUE@g' "$file"
 
         if ! grep -q include_next "$file" ; then
+            echo '#define CH_CFG_USE_OBJ_CACHES FALSE' >> "$file"
+            echo '#define CH_CFG_USE_DELEGATES FALSE' >> "$file"
             echo '#define CH_CFG_USE_JOBS FALSE' >> "$file"
             echo '#define CH_CFG_USE_FACTORY FALSE' >> "$file"
             echo '#define CH_CFG_USE_MEMCORE TRUE' >> "$file"
@@ -158,6 +158,11 @@ popd
 if [ ! -z ${upgrade_chibios_confs:-} ] ; then
     upgrade-chibios-confs
 fi
+
+pushd "$script_dir/qmk_firmware"
+disable_chconf_extras
+pcmd git commit -am "Fixup ChibiOS configs" || true
+popd
 
 pushd "$script_dir/qmk_firmware"
 pcmd git push origin $target_branch --set-upstream --force-with-lease
