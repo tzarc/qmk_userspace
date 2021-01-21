@@ -51,7 +51,7 @@ AUDIO_DRIVER = pwm_software
 AUDIO_PIN = A5
 AUDIO_PIN_ALT = A4
 
-QUANTUM_PAINTER_DRIVERS = ili9341
+QUANTUM_PAINTER_DRIVERS = ili9341 ili9488
 
 # Disable LTO as it messes with data transactions between sides
 LTO_ENABLE = no

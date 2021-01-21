@@ -194,7 +194,13 @@ void split_sync_action_task_user(void) {
             last_hue = curr_hue;
             qp_drawimage_recolor(lcd, 120 - gfx_djinn->width / 2, 32, gfx_djinn, curr_hue, 255, 255);
             qp_rect(lcd, 0, 0, 8, 319, curr_hue, 255, 255, true);
+            for(int i = 0; i < 8; ++i)
+                qp_circle(lcd, 20, (i * 40) + 20, 10, curr_hue, 255, 255, (i % 2) == 0);
+//            for(int i = 0; i < 8; ++i)
+//                qp_ellipse(lcd, 20, (i * 40) + 20, 20, 12, curr_hue, 255, 255, (i % 2) == 0);
             qp_rect(lcd, 231, 0, 239, 319, curr_hue, 255, 255, true);
+            qp_line(lcd, 8, 0, 32, 319, curr_hue, 255, 255);
+            qp_line(lcd, 32, 0, 8, 319, curr_hue, 255, 255);
         }
 
         static led_t last_led_state = {0};
