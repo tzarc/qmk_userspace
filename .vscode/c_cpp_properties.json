@@ -5,13 +5,13 @@
             "includePath": [
                 "${workspaceFolder}\\**",
                 "W:\\qmk_build\\**",
-                "W:\\gcc-arm\\gcc-arm-none-eabi-10-2020-q4-major\\arm-none-eabi\\include\\**"
+                "E:\\gcc-arm-none-eabi-10-2020-q4-major\\arm-none-eabi\\include\\**"
             ],
             "defines": [],
-            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.28.29333/bin/Hostx64/x64/cl.exe",
+            "compilerPath": "E:\\gcc-arm-none-eabi-10-2020-q4-major\\bin\\arm-none-eabi-g++.exe",
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "msvc-arm",
+            "intelliSenseMode": "gcc-arm",
             "compileCommands": "${workspaceFolder}\\compile_commands.json"
         },
         {
