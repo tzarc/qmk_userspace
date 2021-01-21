@@ -98,7 +98,7 @@ format: format_$$(link_source_$1)
 format_$$(link_source_$1): format_prereq
 	@for file in $$(link_files_$1) ; do \
 		echo "\e[38;5;14mclang-format'ing: $$$$file\e[0m" ; \
-		clang-format-7 -i "$$$$file" >/dev/null 2>&1 ; \
+		clang-format -i "$$$$file" >/dev/null 2>&1 ; \
 	done ; \
 	for file in $$(link_files_all_$1) ; do \
 		dos2unix "$$$$file" >/dev/null 2>&1 ; \
