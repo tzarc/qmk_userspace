@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import math
 import argparse
 import sys
 import os
@@ -13,7 +12,6 @@ try:
     from PIL import ImageDraw
     from PIL import ImageFont
     from PIL import ImageChops
-    from PIL import ImageOps
 except ImportError:
     print("%s depends on the Python Image Library, please install:" % sys.argv[0])
     print("pip3 install Pillow")
@@ -53,79 +51,162 @@ fileHeader = """\
 
 """
 
-def palettize_image(im, ncolors, mono=False):
-    """Convert an image to a palette and packed byte array combo
-    """
-
-    # Work out where we're getting the bytes from
-    if mono:
-        im = im.convert("RGB")
-        image_bytes = im.tobytes("raw","R") # Create a byte array from the red channel of the input image
-    else:
-        im = im.convert("RGB")
-        im = im.convert("P", palette=Image.ADAPTIVE, colors=ncolors)
-        image_bytes = im.tobytes("raw", "P")
-
-    # Work out how much data we're actually processing
-    image_bytes_len = len(image_bytes)
-    shifter = math.log2(ncolors)
-    pixels_per_byte = int(8 / shifter)
-
-    # If in RGB mode, convert the palette to rgb triplet
-    palarray = []
-    if not mono:
-        pal = im.getpalette()
-        for n in range(0, ncolors * 3, 3):
-            palarray.append([pal[n + 0], pal[n + 1], pal[n + 2]])
-
-    # Convert to packed image
-    bytearray = []
-    for x in range(int(image_bytes_len / pixels_per_byte)):
-        byte = 0
-        for n in range(pixels_per_byte):
-            byte_offset = x*pixels_per_byte + n
-            if byte_offset < image_bytes_len:
-                if mono:
-                    byte = byte | (rescale(image_bytes[byte_offset], ncolors - 1) << int(n*shifter))
-                else:
-                    byte = byte | ((image_bytes[byte_offset] & (ncolors - 1)) << int(n*shifter))
-        bytearray.append(byte)
-    return (palarray, bytearray)
-
 """Convert an image to a 8bpp (256-colour) palette image
 """
 def image_to_palette8bpp(im):
-    return palettize_image(im, 256)
+    im = im.convert("RGB")
+    im = im.convert("P", palette = Image.ADAPTIVE, colors=256)
+    pal = im.getpalette()
+    image_bytes = im.tobytes("raw","P")
+    image_bytes_len = len(image_bytes)
+
+    # Convert the palette to rgb565 array
+    palarray = []
+    for n in range(0, 256*3, 3):
+        palarray.append([pal[n+0],pal[n+1],pal[n+2]])
+
+    # Convert to packed 4bpp palette image
+    pal8array = []
+    for x in range(int(image_bytes_len)):
+        pal8array.append(
+            (image_bytes[x]&255))
+    return (palarray, pal8array)
 
 """Convert an image to a 4bpp (16-colour) palette image
 """
 def image_to_palette4bpp(im):
-    return palettize_image(im, 16)
+    im = im.convert("RGB")
+    im = im.convert("P", palette = Image.ADAPTIVE, colors=16)
+    pal = im.getpalette()
+    image_bytes = im.tobytes("raw","P")
+    image_bytes += b'\0' # Dummy value at the end for alignment
+    image_bytes_len = len(image_bytes)
+
+    # Convert the palette to rgb565 array
+    palarray = []
+    for n in range(0, 16*3, 3):
+        palarray.append([pal[n+0],pal[n+1],pal[n+2]])
+
+    # Convert to packed 4bpp palette image
+    pal4array = []
+    for x in range(int(image_bytes_len / 2)):
+        pal4array.append(
+            (image_bytes[x*2+1]&15) << 4 |
+            (image_bytes[x*2+0]&15))
+    return (palarray, pal4array)
 
 """Convert an image to a 2bpp (4-colour) palette image
 """
 def image_to_palette2bpp(im):
-    return palettize_image(im, 4)
+    im = im.convert("RGB")
+    im = im.convert("P", palette = Image.ADAPTIVE, colors=4)
+    pal = im.getpalette()
+    image_bytes = im.tobytes("raw","P")
+    image_bytes += b'\0\0\0' # Dummy value at the end for alignment
+    image_bytes_len = len(image_bytes)
+
+    # Convert the palette to rgb565 array
+    palarray = []
+    for n in range(0, 4*3, 3):
+        palarray.append([pal[n+0],pal[n+1],pal[n+2]])
+
+    # Convert to packed 2bpp palette image
+    pal2array = []
+    for x in range(int(image_bytes_len / 4)):
+        pal2array.append(
+            (image_bytes[x*4+3]&3) << 6 |
+            (image_bytes[x*4+2]&3) << 4 |
+            (image_bytes[x*4+1]&3) << 2 |
+            (image_bytes[x*4+0]&3))
+    return (palarray, pal2array)
 
 """Convert an image to a 1bpp (2-colour) palette image
 """
 def image_to_palette1bpp(im):
-    return palettize_image(im, 2)
+    im = im.convert("RGB")
+    im = im.convert("P", palette = Image.ADAPTIVE, colors=2)
+    pal = im.getpalette()
+    image_bytes = im.tobytes("raw","P")
+    image_bytes += b'\0\0\0\0\0\0\0' # Dummy value at the end for alignment
+    image_bytes_len = len(image_bytes)
+
+    # Convert the palette to rgb565 array
+    palarray = []
+    for n in range(0, 2*3, 3):
+        palarray.append([pal[n+0],pal[n+1],pal[n+2]])
+
+    # Convert to packed 1bpp palette image
+    pal1array = []
+    for x in range(int(image_bytes_len / 8)):
+        pal1array.append(
+            (image_bytes[x*8+7]&1) << 7 |
+            (image_bytes[x*8+6]&1) << 6 |
+            (image_bytes[x*8+5]&1) << 5 |
+            (image_bytes[x*8+4]&1) << 4 |
+            (image_bytes[x*8+3]&1) << 3 |
+            (image_bytes[x*8+2]&1) << 2 |
+            (image_bytes[x*8+1]&1) << 1 |
+            (image_bytes[x*8+0]&1))
+    return (palarray, pal1array)
 
 """Convert an image to a packed mono 4bpp byte array
 """
 def image_to_mono4bpp(im):
-    return palettize_image(im, 16, True)
+    im = im.convert("RGB")
+    image_bytes = im.tobytes("raw","R") # Create a byte array from the red channel of the input image
+    image_bytes += b'\0' # Dummy value at the end for alignment
+    image_bytes_len = len(image_bytes)
+
+    # Convert 8bpp to packed 4bpp
+    mono4array = []
+    for x in range(int(image_bytes_len / 2)):
+        mono4array.append(
+            rescale(image_bytes[x*2+1], 15) << 4 |
+            rescale(image_bytes[x*2+0], 15))
+
+    return mono4array
 
 """Convert an image to a packed mono 2bpp byte array
 """
 def image_to_mono2bpp(im):
-    return palettize_image(im, 4, True)
+    im = im.convert("RGB")
+    image_bytes = im.tobytes("raw","R") # Create a byte array from the red channel of the input image
+    image_bytes += b'\0\0\0' # Dummy value at the end for alignment
+    image_bytes_len = len(image_bytes)
+
+    # Convert 8bpp to packed 2bpp
+    mono2array = []
+    for x in range(int(image_bytes_len / 4)):
+        mono2array.append(
+            rescale(image_bytes[x*4+3], 3) << 6 |
+            rescale(image_bytes[x*4+2], 3) << 4 |
+            rescale(image_bytes[x*4+1], 3) << 2 |
+            rescale(image_bytes[x*4+0], 3))
+
+    return mono2array
 
 """Convert an image to a packed mono 1bpp byte array
 """
 def image_to_mono1bpp(im):
-    return palettize_image(im, 2, True)
+    im = im.convert("RGB")
+    image_bytes = im.tobytes("raw","R") # Create a byte array from the red channel of the input image
+    image_bytes += b'\0\0\0\0\0\0\0' # Dummy value at the end for alignment
+    image_bytes_len = len(image_bytes)
+
+    # Convert 8bpp to packed 1bpp
+    mono1array = []
+    for x in range(int(image_bytes_len / 8)):
+        mono1array.append(
+            rescale(image_bytes[x*8+7], 1) << 7 |
+            rescale(image_bytes[x*8+6], 1) << 6 |
+            rescale(image_bytes[x*8+5], 1) << 5 |
+            rescale(image_bytes[x*8+4], 1) << 4 |
+            rescale(image_bytes[x*8+3], 1) << 3 |
+            rescale(image_bytes[x*8+2], 1) << 2 |
+            rescale(image_bytes[x*8+1], 1) << 1 |
+            rescale(image_bytes[x*8+0], 1))
+
+    return mono1array
 
 """Convert an image to a rgb565 byte array
 """
@@ -270,7 +351,7 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
         gfx_source_file.write("};\n\n")
 
     if compress == True:
-        image_data = graphic_data[1]
+        image_data = graphic_data[1] if has_palette else graphic_data
         compressed_data = []
         compressed_chunk_offsets = []
         uncompressed_graphic_data = image_data.copy()
@@ -320,7 +401,7 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
 
     else:
         # Generate image data lookup table
-        image_data = graphic_data[1]
+        image_data = graphic_data[1] if has_palette else graphic_data
         gfx_source_file.write("static const uint8_t gfx_%s_data[%d] = {\n " % (sane_name, len(image_data)))
         count = 0
         for j in image_data:
