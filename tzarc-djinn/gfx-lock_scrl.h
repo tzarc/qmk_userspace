@@ -24,4 +24,4 @@
 
 #include <qp.h>
 
-extern painter_image_t gfx_lock_scrl;
+extern painter_image_t gfx_lock_scrl PROGMEM;

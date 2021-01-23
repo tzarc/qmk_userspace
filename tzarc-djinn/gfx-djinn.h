@@ -24,4 +24,4 @@
 
 #include <qp.h>
 
-extern painter_image_t gfx_djinn;
+extern painter_image_t gfx_djinn PROGMEM;

@@ -24,4 +24,4 @@
 
 #include <qp.h>
 
-extern painter_image_t gfx_lock_num;
+extern painter_image_t gfx_lock_num PROGMEM;

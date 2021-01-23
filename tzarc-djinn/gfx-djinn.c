@@ -20,9 +20,14 @@
 
 /* generated from djinn.png */
 
+#include <progmem.h>
 #include <stdint.h>
 #include <qp.h>
 #include <qp_internal.h>
+
+#ifndef QUANTUM_PAINTER_COMPRESSION_ENABLE
+#    error Compression is not available on your selected platform. Please regenerate djinn without compression.
+#endif
 
 #if (QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE < 4096)
 #    error Need to "#define QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE 4096" or greater in your config.h
@@ -30,14 +35,14 @@
 
 // clang-format off
 
-const uint32_t gfx_djinn_chunk_offsets[4] = {
+static const uint32_t gfx_djinn_chunk_offsets[4] PROGMEM = {
        0,  // chunk 0      // compressed size: 1329 /  32.45%
     1329,  // chunk 1      // compressed size: 1653 /  40.36%
     2982,  // chunk 2      // compressed size: 1242 /  30.32%
     4224,  // chunk 3      // compressed size:  535 /  13.06%
 };
 
-static const uint8_t gfx_djinn_chunk_data[4759] = {
+static const uint8_t gfx_djinn_chunk_data[4759] PROGMEM = {
   0x01, 0x00, 0x00, 0xE0, 0x73, 0x00, 0x00, 0x22, 0xE0, 0x28, 0x7C, 0x02, 0x10, 0x96, 0x02, 0xE0, 0x27, 0x33, 0x02, 0x10, 0xE7, 0x28, 0xE0, 0x28, 0x32, 0x02, 0xF9, 0x7E, 0x01, 0xE0, 0x26, 0x33,
   0x03, 0x20, 0xFC, 0xDF, 0x05, 0xE0, 0x26, 0x32, 0x03, 0x30, 0xFE, 0xFF, 0x2B, 0xE0, 0x26, 0x32, 0x03, 0x90, 0xFF, 0xFF, 0x7F, 0xE0, 0x26, 0x99, 0x04, 0xE3, 0xFF, 0xFF, 0xEF, 0x03, 0xE0, 0x24,
   0x66, 0x05, 0x20, 0xFC, 0xFF, 0xFF, 0xFF, 0x08, 0xE0, 0x24, 0x32, 0x00, 0xA2, 0x20, 0x31, 0x02, 0xFF, 0x2D, 0x10, 0xE0, 0x22, 0x9A, 0x01, 0x30, 0xFA, 0x20, 0x31, 0x03, 0xFF, 0x5F, 0x30, 0x27,
@@ -189,7 +194,7 @@ static const uint8_t gfx_djinn_chunk_data[4759] = {
   0x00, 0x00, 0x50, 0xAB, 0x79, 0x24, 0x20, 0x06, 0xE0, 0x23, 0x00, 0x01, 0x10, 0x22, 0xE0, 0x25, 0x95, 0xE0, 0x50, 0x00, 0x01, 0x00, 0x00
 };
 
-const painter_compressed_image_descriptor_t gfx_djinn_compressed = {
+static const painter_compressed_image_descriptor_t gfx_djinn_compressed PROGMEM = {
   .base = {
     .image_format = IMAGE_FORMAT_GRAYSCALE,
     .compression  = IMAGE_COMPRESSED_LZF,
@@ -205,6 +210,6 @@ const painter_compressed_image_descriptor_t gfx_djinn_compressed = {
   .compressed_size = 4759  // original = 14688 bytes (4bpp) /  32.40% of original // rgb24 = 88128 bytes /   5.40% of rgb24
 };
 
-painter_image_t gfx_djinn = (painter_image_t)&gfx_djinn_compressed;
+painter_image_t gfx_djinn PROGMEM = (painter_image_t)&gfx_djinn_compressed;
 
 // clang-format on

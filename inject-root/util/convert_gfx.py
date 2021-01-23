@@ -59,12 +59,11 @@ def palettize_image(im, ncolors, mono=False):
 
     # Work out where we're getting the bytes from
     if mono:
-        im = im.convert("RGB")
-        image_bytes = im.tobytes("raw","R") # Create a byte array from the red channel of the input image
+        # If mono, convert input to grayscale, then to RGB, then grab the raw bytes corresponding to the intensity of the red channel
+        image_bytes = ImageOps.grayscale(im).convert("RGB").tobytes("raw","R")
     else:
-        im = im.convert("RGB")
-        im = im.convert("P", palette=Image.ADAPTIVE, colors=ncolors)
-        image_bytes = im.tobytes("raw", "P")
+        # If color, convert input to RGB, palettize based on the supplied number of colours, then get the raw palette bytes
+        image_bytes = im.convert("RGB").convert("P", palette=Image.ADAPTIVE, colors=ncolors).tobytes("raw", "P")
 
     # Work out how much data we're actually processing
     image_bytes_len = len(image_bytes)
@@ -72,13 +71,13 @@ def palettize_image(im, ncolors, mono=False):
     pixels_per_byte = int(8 / shifter)
 
     # If in RGB mode, convert the palette to rgb triplet
-    palarray = []
+    palette = []
     if not mono:
         pal = im.getpalette()
         for n in range(0, ncolors * 3, 3):
-            palarray.append([pal[n + 0], pal[n + 1], pal[n + 2]])
+            palette.append([pal[n + 0], pal[n + 1], pal[n + 2]])
 
-    # Convert to packed image
+    # Convert to packed pixel byte array
     bytearray = []
     for x in range(int(image_bytes_len / pixels_per_byte)):
         byte = 0
@@ -86,11 +85,13 @@ def palettize_image(im, ncolors, mono=False):
             byte_offset = x*pixels_per_byte + n
             if byte_offset < image_bytes_len:
                 if mono:
+                    # If mono, each input byte is a grayscale [0,255] pixel -- rescale to the range we want then pack together
                     byte = byte | (rescale(image_bytes[byte_offset], ncolors - 1) << int(n*shifter))
                 else:
+                    # If color, each input byte is the index into the colour palette -- pack them together
                     byte = byte | ((image_bytes[byte_offset] & (ncolors - 1)) << int(n*shifter))
         bytearray.append(byte)
-    return (palarray, bytearray)
+    return (palette, bytearray)
 
 """Convert an image to a 8bpp (256-colour) palette image
 """
@@ -241,12 +242,17 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
 
     gfx_source_file.write("/* generated from %s */\n\n" % (graphic_fname))
 
+    gfx_source_file.write("#include <progmem.h>\n")
     gfx_source_file.write("#include <stdint.h>\n")
     gfx_source_file.write("#include <qp.h>\n")
     gfx_source_file.write("#include <qp_internal.h>\n\n")
 
     # Compile-time safety check: if compressed, ensure the buffer size is large enough
     if compress == True:
+        gfx_source_file.write("#ifndef QUANTUM_PAINTER_COMPRESSION_ENABLE\n")
+        gfx_source_file.write("#    error Compression is not available on your selected platform. Please regenerate %s without compression.\n" % (output_filename))
+        gfx_source_file.write("#endif\n\n")
+
         gfx_source_file.write("#if (QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE < %d)\n" % (int(chunksize)))
         gfx_source_file.write("#    error Need to \"#define QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE %d\" or greater in your config.h\n" % (int(chunksize)))
         gfx_source_file.write("#endif\n\n")
@@ -262,7 +268,7 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
     # Generate image palette lookup table
     if has_palette:
         image_palette = graphic_data[0]
-        gfx_source_file.write("static const uint8_t gfx_%s_palette[%d] = {\n" % (sane_name, len(image_palette)*3))
+        gfx_source_file.write("static const uint8_t gfx_%s_palette[%d] PROGMEM = {\n" % (sane_name, len(image_palette)*3))
         count = 0
         for j in image_palette:
             gfx_source_file.write("  0x{0:02X}, 0x{1:02X}, 0x{2:02X},  // {3:3d} / 0x{3:02X}\n".format(j[0], j[1], j[2], count))
@@ -283,13 +289,13 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
             compressed_data.extend(compressed)
 
         # Write out the compressed chunk offsets
-        gfx_source_file.write("const uint32_t gfx_%s_chunk_offsets[%d] = {\n" % (sane_name, len(compressed_chunk_offsets)))
+        gfx_source_file.write("static const uint32_t gfx_%s_chunk_offsets[%d] PROGMEM = {\n" % (sane_name, len(compressed_chunk_offsets)))
         for n in range(0,len(compressed_chunk_offsets)):
             gfx_source_file.write("  %6d,  // chunk %-6d // compressed size: %4d / %6.2f%%\n" % (compressed_chunk_offsets[n][0], n, compressed_chunk_offsets[n][1], (100*compressed_chunk_offsets[n][1]/chunksize)))
         gfx_source_file.write("};\n\n")
 
         # Write out the compressed chunk data
-        gfx_source_file.write("static const uint8_t gfx_%s_chunk_data[%d] = {\n " % (sane_name, len(compressed_data)))
+        gfx_source_file.write("static const uint8_t gfx_%s_chunk_data[%d] PROGMEM = {\n " % (sane_name, len(compressed_data)))
         count = 0
         for j in compressed_data:
             gfx_source_file.write(" 0x{0:02X}".format(j))
@@ -301,7 +307,7 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
         gfx_source_file.write("\n};\n\n")
 
         # Write out the image descriptor
-        gfx_source_file.write("const painter_compressed_image_descriptor_t gfx_%s_compressed = {" % (sane_name))
+        gfx_source_file.write("static const painter_compressed_image_descriptor_t gfx_%s_compressed PROGMEM = {" % (sane_name))
         gfx_source_file.write("\n  .base = {")
         gfx_source_file.write("\n    .image_format = %s," % (image_format))
         gfx_source_file.write("\n    .compression  = IMAGE_COMPRESSED_LZF,")
@@ -316,12 +322,12 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
         gfx_source_file.write("\n  .compressed_data = gfx_%s_chunk_data," % (sane_name))
         gfx_source_file.write("\n  .compressed_size = %d  // original = %d bytes (%s) / %6.2f%% of original // rgb24 = %d bytes / %6.2f%% of rgb24" % (len(compressed_data), len(image_data), format_name, (100*len(compressed_data)/len(image_data)), (3*width*height), (100*len(compressed_data)/(3*width*height))))
         gfx_source_file.write("\n};\n\n")
-        gfx_source_file.write("painter_image_t gfx_%s = (painter_image_t)&gfx_%s_compressed;\n\n" % (sane_name, sane_name))
+        gfx_source_file.write("painter_image_t gfx_%s PROGMEM = (painter_image_t)&gfx_%s_compressed;\n\n" % (sane_name, sane_name))
 
     else:
         # Generate image data lookup table
         image_data = graphic_data[1]
-        gfx_source_file.write("static const uint8_t gfx_%s_data[%d] = {\n " % (sane_name, len(image_data)))
+        gfx_source_file.write("static const uint8_t gfx_%s_data[%d] PROGMEM = {\n " % (sane_name, len(image_data)))
         count = 0
         for j in image_data:
             gfx_source_file.write(" 0b{0:08b}".format(j))
@@ -333,7 +339,7 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
         gfx_source_file.write("\n};\n\n")
 
         # Write out the image descriptor
-        gfx_source_file.write("const painter_raw_image_descriptor_t gfx_%s_raw = {" % (sane_name))
+        gfx_source_file.write("const painter_raw_image_descriptor_t gfx_%s_raw PROGMEM = {" % (sane_name))
         gfx_source_file.write("\n  .base = {")
         gfx_source_file.write("\n    .image_format = %s," % (image_format))
         gfx_source_file.write("\n    .compression  = IMAGE_UNCOMPRESSED,")
@@ -345,7 +351,7 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
         gfx_source_file.write("\n  .byte_count    = %d," % (len(image_data)))
         gfx_source_file.write("\n  .image_data    = gfx_%s_data," % (sane_name))
         gfx_source_file.write("\n};\n\n")
-        gfx_source_file.write("painter_image_t gfx_%s = (painter_image_t)&gfx_%s_raw;\n\n" % (sane_name, sane_name))
+        gfx_source_file.write("painter_image_t gfx_%s PROGMEM = (painter_image_t)&gfx_%s_raw;\n\n" % (sane_name, sane_name))
 
     gfx_source_file.write("// clang-format on\n")
     gfx_source_file.close()
@@ -356,7 +362,7 @@ def convert_graphic_to_c(graphic_fname, output_filename, compress, chunksize, fm
     gfx_header_file.write("/* generated from %s */\n\n" % (graphic_fname))
     gfx_header_file.write("#pragma once\n\n")
     gfx_header_file.write("#include <qp.h>\n\n")
-    gfx_header_file.write("extern painter_image_t gfx_%s;\n" % (sane_name))
+    gfx_header_file.write("extern painter_image_t gfx_%s PROGMEM;\n" % (sane_name))
     gfx_header_file.close()
 
 def main():

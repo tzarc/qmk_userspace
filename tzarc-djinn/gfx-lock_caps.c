@@ -20,9 +20,14 @@
 
 /* generated from lock-caps.png */
 
+#include <progmem.h>
 #include <stdint.h>
 #include <qp.h>
 #include <qp_internal.h>
+
+#ifndef QUANTUM_PAINTER_COMPRESSION_ENABLE
+#    error Compression is not available on your selected platform. Please regenerate lock_caps without compression.
+#endif
 
 #if (QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE < 4096)
 #    error Need to "#define QUANTUM_PAINTER_COMPRESSED_CHUNK_SIZE 4096" or greater in your config.h
@@ -30,11 +35,11 @@
 
 // clang-format off
 
-const uint32_t gfx_lock_caps_chunk_offsets[1] = {
+static const uint32_t gfx_lock_caps_chunk_offsets[1] PROGMEM = {
        0,  // chunk 0      // compressed size:  175 /   4.27%
 };
 
-static const uint8_t gfx_lock_caps_chunk_data[175] = {
+static const uint8_t gfx_lock_caps_chunk_data[175] PROGMEM = {
   0x01, 0x00, 0x00, 0xA0, 0x00, 0x09, 0x40, 0xFE, 0xFF, 0xFF, 0xBF, 0x01, 0x00, 0x00, 0xF4, 0xFF, 0x20, 0x00, 0x02, 0x1F, 0x00, 0x00, 0x20, 0x0E, 0x20, 0x10, 0x01, 0x00, 0x80, 0x20, 0x05, 0x20,
   0x00, 0x01, 0x02, 0xD0, 0x20, 0x04, 0x20, 0x00, 0x01, 0x07, 0xF0, 0x20, 0x04, 0x20, 0x00, 0x00, 0x0F, 0x20, 0x26, 0x01, 0x6F, 0xF9, 0x20, 0x28, 0x00, 0xF8, 0x20, 0x03, 0x20, 0x0B, 0x01, 0x2F,
   0xFC, 0x20, 0x13, 0x20, 0x1B, 0x00, 0x3F, 0xE0, 0x02, 0x07, 0x01, 0x0B, 0xE0, 0x80, 0x0F, 0x01, 0x4B, 0xD1, 0x80, 0x07, 0x01, 0x47, 0xD2, 0x80, 0x07, 0x01, 0x83, 0xC2, 0x80, 0x07, 0x01, 0xC3,
@@ -43,7 +48,7 @@ static const uint8_t gfx_lock_caps_chunk_data[175] = {
   0xA7, 0xC0, 0xB7, 0xC0, 0xC7, 0xE0, 0x00, 0xD7, 0xC0, 0xE7, 0x60, 0x00, 0x01, 0x00, 0x00
 };
 
-const painter_compressed_image_descriptor_t gfx_lock_caps_compressed = {
+static const painter_compressed_image_descriptor_t gfx_lock_caps_compressed PROGMEM = {
   .base = {
     .image_format = IMAGE_FORMAT_GRAYSCALE,
     .compression  = IMAGE_COMPRESSED_LZF,
@@ -59,6 +64,6 @@ const painter_compressed_image_descriptor_t gfx_lock_caps_compressed = {
   .compressed_size = 175  // original = 256 bytes (2bpp) /  68.36% of original // rgb24 = 3072 bytes /   5.70% of rgb24
 };
 
-painter_image_t gfx_lock_caps = (painter_image_t)&gfx_lock_caps_compressed;
+painter_image_t gfx_lock_caps PROGMEM = (painter_image_t)&gfx_lock_caps_compressed;
 
 // clang-format on
