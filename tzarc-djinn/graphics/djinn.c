@@ -34,10 +34,10 @@
 // clang-format off
 
 static const uint32_t gfx_djinn_chunk_offsets[4] PROGMEM = {
-         0,  // chunk   0 // compressed size:   1329 bytes / 32.45% of 4096 bytes
-      1329,  // chunk   1 // compressed size:   1653 bytes / 40.36% of 4096 bytes
-      2982,  // chunk   2 // compressed size:   1242 bytes / 30.32% of 4096 bytes
-      4224,  // chunk   3 // compressed size:    535 bytes / 13.06% of 4096 bytes
+         0,  // chunk   0 // compressed size:   1329 bytes /  32.45% of 4096 bytes
+      1329,  // chunk   1 // compressed size:   1653 bytes /  40.36% of 4096 bytes
+      2982,  // chunk   2 // compressed size:   1242 bytes /  30.32% of 4096 bytes
+      4224,  // chunk   3 // compressed size:    535 bytes /  13.06% of 4096 bytes
 };
 
 static const uint8_t gfx_djinn_chunk_data[4759] PROGMEM = {

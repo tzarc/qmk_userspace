@@ -34,7 +34,7 @@
 // clang-format off
 
 static const uint32_t gfx_lock_caps_chunk_offsets[1] PROGMEM = {
-         0,  // chunk   0 // compressed size:    175 bytes / 4.27% of 4096 bytes
+         0,  // chunk   0 // compressed size:    175 bytes /   4.27% of 4096 bytes
 };
 
 static const uint8_t gfx_lock_caps_chunk_data[175] PROGMEM = {

@@ -45,7 +45,7 @@ arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
 nick: cyclone iris luddite mysterium-nick chocopad ctrl
 
 # QMK Logo generation
-$(ROOTDIR)/tzarc-djinn/gfx-djinn.c: $(ROOTDIR)/inject-root/util/convert_gfx.py $(ROOTDIR)/tzarc-djinn/graphics/djinn.png Makefile
+$(ROOTDIR)/tzarc-djinn/gfx-djinn.c: Makefile $(ROOTDIR)/tzarc-djinn/graphics/djinn.png $(ROOTDIR)/tzarc-djinn/graphics/lock-caps.png $(ROOTDIR)/tzarc-djinn/graphics/lock-scrl.png $(ROOTDIR)/tzarc-djinn/graphics/lock-num.png
 	cd $(ROOTDIR)/tzarc-djinn/graphics \
 		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i djinn.png -f mono16 -c -s 4096 \
 		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-caps.png -f mono4 -c -s 4096 \
