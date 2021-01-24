@@ -22,10 +22,10 @@
 #include "tzarc.h"
 #include "serial_usart_statesync.h"
 
-#include "gfx-djinn.c"
-#include "gfx-lock_caps.c"
-#include "gfx-lock_scrl.c"
-#include "gfx-lock_num.c"
+#include "graphics/djinn.c"
+#include "graphics/lock-caps.c"
+#include "graphics/lock-scrl.c"
+#include "graphics/lock-num.c"
 
 #define MEDIA_KEY_DELAY 2
 

@@ -45,12 +45,12 @@ arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
 nick: cyclone iris luddite mysterium-nick chocopad ctrl
 
 # QMK Logo generation
-$(ROOTDIR)/tzarc-djinn/gfx-djinn.c: $(ROOTDIR)/inject-root/util/convert_gfx.py $(ROOTDIR)/tzarc-djinn/djinn.png Makefile
-	cd $(ROOTDIR)/tzarc-djinn \
-		&& $(ROOTDIR)/inject-root/util/convert_gfx.py --compress --4bpp --chunk-size 4096 --image-file djinn.png --output djinn \
-		&& $(ROOTDIR)/inject-root/util/convert_gfx.py --compress --2bpp --chunk-size 4096 --image-file lock-caps.png --output lock_caps \
-		&& $(ROOTDIR)/inject-root/util/convert_gfx.py --compress --2bpp --chunk-size 4096 --image-file lock-scrl.png --output lock_scrl \
-		&& $(ROOTDIR)/inject-root/util/convert_gfx.py --compress --2bpp --chunk-size 4096 --image-file lock-num.png --output lock_num
+$(ROOTDIR)/tzarc-djinn/gfx-djinn.c: $(ROOTDIR)/inject-root/util/convert_gfx.py $(ROOTDIR)/tzarc-djinn/graphics/djinn.png Makefile
+	cd $(ROOTDIR)/tzarc-djinn/graphics \
+		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i djinn.png -f mono16 -c -s 4096 \
+		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-caps.png -f mono4 -c -s 4096 \
+		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-scrl.png -f mono4 -c -s 4096 \
+		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-num.png -f mono4 -c -s 4096
 
 gfx: $(ROOTDIR)/tzarc-djinn/gfx-djinn.c
 
