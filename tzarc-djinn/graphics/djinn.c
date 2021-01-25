@@ -195,11 +195,11 @@ static const uint8_t gfx_djinn_chunk_data[4759] PROGMEM = {
 static const painter_compressed_image_descriptor_t gfx_djinn_compressed PROGMEM = {
     .base = {
         .image_format = IMAGE_FORMAT_GRAYSCALE,
+        .image_bpp    = 4,
         .compression  = IMAGE_COMPRESSED_LZF,
         .width        = 102,
         .height       = 288
     },
-    .image_bpp       = 4,
     .image_palette   = NULL,
     .chunk_count     = 4,
     .chunk_size      = 4096,

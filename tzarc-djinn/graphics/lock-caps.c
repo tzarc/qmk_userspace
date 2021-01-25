@@ -49,11 +49,11 @@ static const uint8_t gfx_lock_caps_chunk_data[175] PROGMEM = {
 static const painter_compressed_image_descriptor_t gfx_lock_caps_compressed PROGMEM = {
     .base = {
         .image_format = IMAGE_FORMAT_GRAYSCALE,
+        .image_bpp    = 2,
         .compression  = IMAGE_COMPRESSED_LZF,
         .width        = 32,
         .height       = 32
     },
-    .image_bpp       = 2,
     .image_palette   = NULL,
     .chunk_count     = 1,
     .chunk_size      = 4096,

@@ -38,6 +38,10 @@
 static void draw_ui(void);
 #endif  // QWIIC_MICRO_OLED_ENABLE
 
+#ifdef QUANTUM_PAINTER_ENABLE
+static void draw_ui(void);
+#endif // QUANTUM_PAINTER_ENABLE
+
 #ifdef RGB_MATRIX_ENABLE
 led_config_t g_led_config = {{// Key Matrix to LED Index
                               {14, 12, 10, 8, 6, 4, 2, 0},
@@ -70,7 +74,7 @@ led_config_t g_led_config = {{// Key Matrix to LED Index
 
 void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
 
-void matrix_scan_keymap(void) {
+void housekeeping_task_kb(void) {
 #ifdef TEST_SPI_OUTPUT
     static const SPIConfig hs_spicfg = {0, NULL, GPIOA, 1, SPI_CR1_BR_0, 0};
 
@@ -89,10 +93,10 @@ void matrix_scan_keymap(void) {
     }
 #endif
 
-#ifdef QWIIC_MICRO_OLED_ENABLE
+#if defined(QWIIC_MICRO_OLED_ENABLE) || defined(QUANTUM_PAINTER_ENABLE)
     (void)draw_ui;
     draw_ui();
-#endif  // QWIIC_MICRO_OLED_ENABLE
+#endif  // defined(QWIIC_MICRO_OLED_ENABLE) || defined(QUANTUM_PAINTER_ENABLE)
 
     /*
     static uint32_t        last_oled_timer_print = 0;
@@ -155,7 +159,35 @@ void keyboard_post_init_kb(void) {
 #endif  // TEST_AUDIO_PIN_OUTPUT
 }
 
-#ifdef OLED_DRIVER_ENABLE
+#if defined(QUANTUM_PAINTER_ENABLE)
+#include <qp.h>
+#include <qp_qmk_oled_wrapper.h>
+#include "graphics/lock-caps.c"
+#include "graphics/lock-num.c"
+#include "graphics/lock-scrl.c"
+void draw_ui(void) {
+    static painter_device_t oled = NULL;
+    if(!oled) {
+        oled = qp_qmk_oled_wrapper_make_device();
+        qp_init(oled, QP_ROTATION_0);
+        qp_power(oled, true);
+    }
+
+    static uint32_t last_draw = 0;
+    if(timer_elapsed32(last_draw) > 300) {
+        last_draw = timer_read32();
+        qp_line(oled, 0, 0, 127, 31, HSV_WHITE);
+        qp_circle(oled, 10, 22, 8, HSV_WHITE, true);
+        qp_ellipse(oled, 107, 10, 18, 8, HSV_WHITE, false);
+
+        qp_drawimage(oled, 0, 32, gfx_lock_caps);
+        qp_drawimage(oled, 32, 32, gfx_lock_num);
+        qp_drawimage(oled, 64, 32, gfx_lock_scrl);
+    }
+}
+#endif  // defined(QUANTUM_PAINTER_ENABLE)
+
+#if defined(OLED_DRIVER_ENABLE) && !defined(QUANTUM_PAINTER_ENABLE)
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     // We're vertical...
     return OLED_ROTATION_270;
@@ -174,7 +206,7 @@ void    oled_task_user(void) {
         oled_write_ln_P(led_usb_state & (1 << USB_LED_SCROLL_LOCK) ? PSTR("SCR  ") : PSTR("     "), false);
     }
 }
-#endif  // OLED_DRIVER_ENABLE
+#endif  // defined(OLED_DRIVER_ENABLE) && !defined(QUANTUM_PAINTER_ENABLE)
 
 #ifdef QWIIC_MICRO_OLED_ENABLE
 uint8_t last_led_usb_state = 0xFF;

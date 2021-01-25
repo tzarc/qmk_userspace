@@ -39,7 +39,7 @@
 /* key matrix size */
 #define MATRIX_ROWS 8
 #define MATRIX_COLS 8
-#define DIODE_DIRECTION CUSTOM_MATRIX
+//#define DIODE_DIRECTION CUSTOM_MATRIX
 
 /* Bootmagic lite definitions */
 #define BOOTMAGIC_LITE_ROW 2

@@ -94,9 +94,9 @@ void encoder_update_keymap(uint8_t index, bool clockwise) {
     if (is_shift) {
         if (index == 0) { /* First encoder */
             if (clockwise) {
-                rgblight_increase_hue();
+                tap_code16(KC_MS_WH_DOWN);
             } else {
-                rgblight_decrease_hue();
+                tap_code16(KC_MS_WH_UP);
             }
         } else if (index == 1) { /* Second encoder */
             if (clockwise) {
@@ -122,9 +122,9 @@ void encoder_update_keymap(uint8_t index, bool clockwise) {
     } else {
         if (index == 0) { /* First encoder */
             if (clockwise) {
-                tap_code16(KC_MS_WH_DOWN);
+                rgblight_increase_hue();
             } else {
-                tap_code16(KC_MS_WH_UP);
+                rgblight_decrease_hue();
             }
         } else if (index == 1) { /* Second encoder */
             uint16_t held_keycode_timer = timer_read();
