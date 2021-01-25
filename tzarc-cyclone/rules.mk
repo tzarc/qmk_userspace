@@ -13,7 +13,7 @@ MCU_STARTUP = stm32l0xx
 
 # it should exist either in <chibios>/os/hal/boards/
 #  or <this_dir>/boards
-BOARD = GENERIC_STM32_L072KZ
+BOARD = ST_NUCLEO64_L073RZ
 
 # Cortex version
 MCU  = cortex-m0plus

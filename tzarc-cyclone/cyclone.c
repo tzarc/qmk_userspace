@@ -16,7 +16,6 @@
 
 #include "debug.h"
 #include "print.h"
-#include "stm32l072xx.h"
 
 #include "cyclone.h"
 

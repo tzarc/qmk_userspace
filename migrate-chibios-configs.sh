@@ -102,6 +102,8 @@ validate_build() {
     git clean -xfd >/dev/null 2>&1
     git checkout -- . >/dev/null 2>&1
     git checkout $source_branch >/dev/null 2>&1
+    ./util/chibios_conf_updater.sh >/dev/null 2>&1
+    disable_chconf_extras >/dev/null 2>&1
     local before="$(build_single "$build_target" before ${extraflags:-})"
 
     git clean -xfd >/dev/null 2>&1
@@ -285,7 +287,7 @@ upgrade_all_keyboards()  {
 #    done
 #    popd >/dev/null 2>&1
 
-    #upgrade_one_keyboard --keyboard akegata_denki/device_one --chibios-board ST_NUCLEO32_F042K6 --no-mcuconf
+    upgrade_one_keyboard --keyboard durgod/k320 --chibios-board ST_NUCLEO64_F070RB --no-mcuconf
     #upgrade_one_keyboard --keyboard chavdai40 --chibios-board ST_NUCLEO32_F042K6 --no-mcuconf chavdai40/rev1 chavdai40/rev2
     #upgrade_one_keyboard --keyboard ergodox_stm32 --chibios-board ST_NUCLEO64_F103RB --no-mcuconf
     #upgrade_one_keyboard --keyboard jm60 --chibios-board ST_NUCLEO64_F103RB --no-mcuconf
