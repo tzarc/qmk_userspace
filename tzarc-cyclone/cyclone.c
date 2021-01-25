@@ -165,6 +165,9 @@ void keyboard_post_init_kb(void) {
 #include "graphics/lock-caps.c"
 #include "graphics/lock-num.c"
 #include "graphics/lock-scrl.c"
+#include "graphics/lock-caps-OFF.c"
+#include "graphics/lock-num-OFF.c"
+#include "graphics/lock-scrl-OFF.c"
 void draw_ui(void) {
     static painter_device_t oled = NULL;
     if(!oled) {
@@ -179,10 +182,15 @@ void draw_ui(void) {
         qp_line(oled, 0, 0, 127, 31, HSV_WHITE);
         qp_circle(oled, 10, 22, 8, HSV_WHITE, true);
         qp_ellipse(oled, 107, 10, 18, 8, HSV_WHITE, false);
+    }
 
-        qp_drawimage(oled, 0, 32, gfx_lock_caps);
-        qp_drawimage(oled, 32, 32, gfx_lock_num);
-        qp_drawimage(oled, 64, 32, gfx_lock_scrl);
+    static led_t last_led_state = {0};
+    led_t led_state = host_keyboard_led_state();
+    if (last_led_state.raw != led_state.raw) {
+        last_led_state.raw = led_state.raw;
+        qp_drawimage(oled, 0, 32, last_led_state.caps_lock ? gfx_lock_caps : gfx_lock_caps_OFF);
+        qp_drawimage(oled, 32, 32, last_led_state.num_lock ? gfx_lock_num : gfx_lock_num_OFF);
+        qp_drawimage(oled, 64, 32, last_led_state.scroll_lock ? gfx_lock_scrl : gfx_lock_scrl_OFF);
     }
 }
 #endif  // defined(QUANTUM_PAINTER_ENABLE)
