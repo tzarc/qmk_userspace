@@ -47,10 +47,13 @@ nick: cyclone iris luddite mysterium-nick chocopad ctrl
 # QMK Logo generation
 $(ROOTDIR)/tzarc-djinn/gfx-djinn.c: Makefile $(ROOTDIR)/tzarc-djinn/graphics/djinn.png $(ROOTDIR)/tzarc-djinn/graphics/lock-caps.png $(ROOTDIR)/tzarc-djinn/graphics/lock-scrl.png $(ROOTDIR)/tzarc-djinn/graphics/lock-num.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-caps.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-scrl.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-num.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-caps-OFF.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-scrl-OFF.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-num-OFF.png
 	cd $(ROOTDIR)/tzarc-djinn/graphics \
-		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i djinn.png -f mono16 -c -s 4096 \
-		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-caps.png -f mono4 -c -s 4096 \
-		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-scrl.png -f mono4 -c -s 4096 \
-		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-num.png -f mono4 -c -s 4096 \
+		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i djinn.png -f mono16 -c -s 16384 \
+		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-caps.png -f mono4 -c -s 16384 \
+		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-scrl.png -f mono4 -c -s 16384 \
+		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-num.png -f mono4 -c -s 16384 \
+		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-caps-OFF.png -f mono4 -c -s 16384 \
+		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-scrl-OFF.png -f mono4 -c -s 16384 \
+		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-num-OFF.png -f mono4 -c -s 16384 \
 		&& cd $(ROOTDIR)/tzarc-cyclone/graphics \
 		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-caps.png -f mono2 -c \
 		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-scrl.png -f mono2 -c \
@@ -65,7 +68,7 @@ djinn: gfx
 cyclone: gfx
 
 remove_artifacts:
-	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format >/dev/null 2>&1 || true
+	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format "$(ROOTDIR)"/compile_commands.json "$(ROOTDIR)"/qmk_firmware/compile_commands.json >/dev/null 2>&1 || true
 
 clean: remove_artifacts
 	+$(MAKE) -C "$(ROOTDIR)/qmk_firmware" clean || true
