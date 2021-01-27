@@ -52,7 +52,7 @@ AUDIO_PIN = A5
 AUDIO_PIN_ALT = A4
 
 QUANTUM_PAINTER_ENABLE = yes
-QUANTUM_PAINTER_DRIVERS = ili9341 ili9488
+QUANTUM_PAINTER_DRIVERS = rgb565_surface ili9341
 
 # Disable LTO as it messes with data transactions between sides
 LTO_ENABLE = no

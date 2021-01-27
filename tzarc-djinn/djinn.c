@@ -25,8 +25,10 @@
 #include "serial_usart_statesync.h"
 
 #include "qp_ili9341.h"
+#include "qp_rgb565_surface.h"
 
 painter_device_t lcd;
+painter_device_t surf;
 
 kb_runtime_config kb_state;
 
@@ -137,6 +139,13 @@ void keyboard_post_init_kb(void) {
     // Let the LCD get some power...
     wait_ms(50);
 
+    // Initialise the framebuffer
+    surf = qp_rgb565_surface_make_device(8, 320);
+    qp_init(surf, QP_ROTATION_0);
+    for(int i = 0; i < 320; ++i) {
+        qp_line(surf, 0, i, 7, i, i % 256, 255, 255);
+    }
+
     // Initialise the LCD
     lcd = qp_ili9341_make_device(LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, 4, true);
     qp_init(lcd, QP_ROTATION_0);
@@ -145,6 +154,9 @@ void keyboard_post_init_kb(void) {
     kb_state.values.lcd_power = 1;
     qp_power(lcd, true);
     qp_rect(lcd, 0, 0, 239, 319, HSV_BLACK, true);
+
+    qp_viewport(lcd, 240-8-8, 0, 240-8-1, 319);
+    qp_pixdata(lcd, qp_rgb565_surface_get_buffer_ptr(surf), qp_rgb565_surface_get_pixel_count(surf));
 
     // Turn on the LCD backlight
     backlight_enable();
