@@ -60,12 +60,14 @@ $(ROOTDIR)/tzarc-djinn/gfx-djinn.c: Makefile $(ROOTDIR)/tzarc-djinn/graphics/dji
 		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-num.png -f mono2 \
 		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-caps-OFF.png -f mono2 \
 		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-scrl-OFF.png -f mono2 \
-		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-num-OFF.png -f mono2
+		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-num-OFF.png -f mono2 \
+		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-make-font-image --font CandC-Red-Alert-LAN.ttf --size 13 -o noto.png --unicode-glyphs "ĄȽɂɻɣɈʣ" \
+		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-font-image --input noto.png -f mono2 --unicode-glyphs "ĄȽɂɻɣɈʣ"
 
 gfx: $(ROOTDIR)/tzarc-djinn/gfx-djinn.c
 
-djinn: gfx
-cyclone: gfx
+bin_djinn: gfx
+bin_cyclone: gfx
 
 remove_artifacts:
 	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format "$(ROOTDIR)"/compile_commands.json "$(ROOTDIR)"/qmk_firmware/compile_commands.json >/dev/null 2>&1 || true

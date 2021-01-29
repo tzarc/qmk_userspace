@@ -5,12 +5,28 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: convert_gfx.py - pal256",
+      "name": "Python: painter-convert-graphics",
       "type": "python",
-      "cwd": "${workspaceRoot}/tzarc-djinn",
+      "cwd": "${workspaceRoot}",
       "request": "launch",
-      "program": "${workspaceRoot}/inject-root/util/convert_gfx.py",
-      "args": ["--pal4bpp", "--compress", "--image-file", "djinn.png", "--output", "djinn"]
+      "program": "${workspaceRoot}/qmk_firmware/bin/qmk",
+      "args": ["painter-convert-graphics", "--input", "tzarc-cyclone/graphics/lock-caps.png", "--format", "mono16"]
+    },
+    {
+      "name": "Python: painter-make-font-image",
+      "type": "python",
+      "cwd": "${workspaceRoot}",
+      "request": "launch",
+      "program": "${workspaceRoot}/qmk_firmware/bin/qmk",
+      "args": ["painter-make-font-image", "--font", "tzarc-cyclone/graphics/NotoSans-ExtraCondensedBold.ttf", "--size", "16", "--output", "tzarc-cyclone/graphics/noto.png", "--unicode-glyphs", "ĄȽɂɻɣɈʣ"]
+    },
+    {
+      "name": "Python: painter-convert-font-image",
+      "type": "python",
+      "cwd": "${workspaceRoot}",
+      "request": "launch",
+      "program": "${workspaceRoot}/qmk_firmware/bin/qmk",
+      "args": ["painter-convert-font-image", "--input", "tzarc-cyclone/graphics/noto.png", "--format", "mono4", "--unicode-glyphs", "ĄȽɂɻɣɈʣ"]
     },
     {
       "name": "Black Magic Probe (Djinn, cortex-debug)",

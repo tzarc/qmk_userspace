@@ -167,6 +167,7 @@ void keyboard_post_init_kb(void) {
 #include "graphics/lock-caps-OFF.c"
 #include "graphics/lock-num-OFF.c"
 #include "graphics/lock-scrl-OFF.c"
+#include "graphics/noto.c"
 void draw_ui(void) {
     static painter_device_t oled = NULL;
     if(!oled) {
@@ -176,11 +177,13 @@ void draw_ui(void) {
     }
 
     static uint32_t last_draw = 0;
-    if(timer_elapsed32(last_draw) > 300) {
+    if(timer_elapsed32(last_draw) > 2500) {
         last_draw = timer_read32();
         qp_line(oled, 0, 0, 127, 31, HSV_WHITE);
         qp_circle(oled, 10, 22, 8, HSV_WHITE, true);
         qp_ellipse(oled, 107, 10, 18, 8, HSV_WHITE, false);
+        qp_drawtext(oled, 0, 0, font_noto, "Hello there");
+        qp_drawtext(oled, 0, font_noto->glyph_height, font_noto, "General Kenobi");
     }
 
     static led_t last_led_state = {0};
