@@ -5,6 +5,7 @@
             "includePath": [
                 "${workspaceFolder}\\**",
                 "W:\\qmk_build\\**",
+                "W:\\qmk_build\\qmk_firmware\\**",
                 "E:\\gcc-arm-none-eabi-10-2020-q4-major\\arm-none-eabi\\include\\**"
             ],
             "defines": [],
@@ -19,7 +20,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/Volumes/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/arm-none-eabi/include/**",
-                "/Volumes/nickb/qmk_build/**"
+                "/Volumes/nickb/qmk_build/**",
+                "/Volumes/nickb/qmk_build/qmk_firmware/**"
             ],
             "defines": [],
             "macFrameworkPath": [
@@ -28,7 +30,7 @@
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "clang-x64",
+            "intelliSenseMode": "gcc-arm",
             "compileCommands": "${workspaceFolder}/compile_commands.json"
         }
     ],

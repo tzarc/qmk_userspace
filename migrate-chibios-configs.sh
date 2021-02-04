@@ -287,7 +287,8 @@ upgrade_all_keyboards()  {
 #    done
 #    popd >/dev/null 2>&1
 
-    upgrade_one_keyboard --keyboard durgod/k320 --chibios-board ST_NUCLEO64_F070RB --no-mcuconf
+    upgrade_one_keyboard --keyboard handwired/tzarc/djinn --chibios-board GENERIC_STM32_G474XE
+    upgrade_one_keyboard --keyboard handwired/onekey/nucleo64_g431rb --chibios-board GENERIC_STM32_G431XB
     #upgrade_one_keyboard --keyboard chavdai40 --chibios-board ST_NUCLEO32_F042K6 --no-mcuconf chavdai40/rev1 chavdai40/rev2
     #upgrade_one_keyboard --keyboard ergodox_stm32 --chibios-board ST_NUCLEO64_F103RB --no-mcuconf
     #upgrade_one_keyboard --keyboard jm60 --chibios-board ST_NUCLEO64_F103RB --no-mcuconf

@@ -119,6 +119,7 @@ void keyboard_post_init_user(void) {
     tzarc_wow_init();
     tzarc_diablo3_init();
     tzarc_eeprom_load();
+    keyboard_post_init_keymap();
 }
 
 typedef uint32_t (*translator_function_t)(bool is_shifted, uint32_t keycode);

@@ -7,12 +7,12 @@ SRC += \
 
 DEBOUNCE_TYPE ?= sym_eager_pk
 
-BOOTMAGIC_ENABLE = lite
-EXTRAKEY_ENABLE = yes
-MOUSEKEY_ENABLE = no
-CONSOLE_ENABLE = yes
-RAW_ENABLE = yes
-UNICODE_ENABLE = yes
+BOOTMAGIC_ENABLE ?= lite
+EXTRAKEY_ENABLE ?= yes
+MOUSEKEY_ENABLE ?= yes
+CONSOLE_ENABLE ?= yes
+RAW_ENABLE ?= yes
+UNICODE_ENABLE ?= yes
 
 ifeq ($(strip $(PLATFORM_KEY)),chibios)
 	# Uses defaults above
@@ -25,7 +25,7 @@ else ifeq ($(strip $(PLATFORM_KEY)),avr)
 	ifeq ($(strip $(PROTOCOL)),LUFA)
 		# Uses defaults above
 	else ifeq ($(strip $(PROTOCOL)),VUSB)
-		CONSOLE_ENABLE = no
+		CONSOLE_ENABLE = yes
 		RAW_ENABLE = no
 	endif
 endif

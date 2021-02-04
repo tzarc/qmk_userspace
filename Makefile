@@ -62,7 +62,8 @@ $(ROOTDIR)/tzarc-djinn/gfx-djinn.c: Makefile $(ROOTDIR)/tzarc-djinn/graphics/dji
 		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-scrl-OFF.png -f mono2 \
 		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-num-OFF.png -f mono2 \
 		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-make-font-image --font CandC-Red-Alert-LAN.ttf --size 13 -o noto.png --unicode-glyphs "ĄȽɂɻɣɈʣ" \
-		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-font-image --input noto.png -f mono2 --unicode-glyphs "ĄȽɂɻɣɈʣ"
+		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-font-image --input noto.png -f mono2 --unicode-glyphs "ĄȽɂɻɣɈʣ" \
+		# && for size in `seq 4 18` ; do $(ROOTDIR)/qmk_firmware/bin/qmk painter-make-font-image --font CandC-Red-Alert-LAN.ttf --size $$size -o noto$$size.png --unicode-glyphs "ĄȽɂɻɣɈʣ" ; done
 
 gfx: $(ROOTDIR)/tzarc-djinn/gfx-djinn.c
 
@@ -133,7 +134,7 @@ board_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f | so
 
 bin_$$(board_name_$1): links #compiledb_$$(board_name_$1)
 	@echo "\e[38;5;14mBuilding: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
-	+bash -c 'time intercept-build $$(MAKE) $$(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" $$(board_qmk_$1):$$(board_keymap_$1)'
+	+bear intercept-build $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false
 	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR)
 
 flash_$$(board_name_$1): bin_$$(board_name_$1)

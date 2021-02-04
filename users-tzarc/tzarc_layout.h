@@ -28,6 +28,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 #define KC_CTL_ESC MT(MOD_LCTL, KC_ESC)
 #define KC_SFT_ENT MT(MOD_RSFT, KC_ENT)  // KC_SFTENT doesn't seem to abide by tapping term timing?
 
+#define KC_RGUI_LOWER LT(LAYER_LOWER, KC_RGUI)
 #define KC_APP_RAISE LT(LAYER_RAISE, KC_APP)
 
 #define KC_1PASSWORD C(A(KC_BSLS))
@@ -244,7 +245,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 //                                               └────────────────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴──────────────────────────────────────┘
 //                                               ┌──────────────┬──────────────┬──────────────┬────────────────────────────────────────────────────────────────────────────────────────┬──────────────┬──────────────┬──────────────┬──────────────┐
 //                                               | LCtrl        | LGui         | LAlt         | Space                                                                                  | RAlt         | RGui         | AppMenu      | RCtrl        |
-#define ____________TZARC_BASE_R6_ALPHA__________ KC_LCTL,       KC_LGUI,       KC_LALT,       KC_SPC,                                                                                  KC_LALT,       KC_LOWER,      KC_APP_RAISE,  KC_RCTL
+#define ____________TZARC_BASE_R6_ALPHA__________ KC_LCTL,       KC_LGUI,       KC_LALT,       KC_SPC,                                                                                  KC_LALT,       KC_RGUI_LOWER, KC_APP_RAISE,  KC_RCTL
 //                                               └──────────────┴──────────────┴──────────────┴────────────────────────────────────────────────────────────────────────────────────────┴──────────────┴──────────────┴──────────────┴──────────────┘
 
 // Base, but grave-escape:
