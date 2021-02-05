@@ -32,6 +32,33 @@ painter_device_t surf;
 
 kb_runtime_config kb_state;
 
+void board_init(void) {
+    // Disable dead-battery signals
+    PWR->CR3 |= PWR_CR3_UCPD_DBDIS;
+    // Enable the clock for the UCPD1 peripheral
+    RCC->APB1ENR2 |= RCC_APB1ENR2_UCPD1EN;
+
+    // Copy the existing value
+    uint32_t CFG1 = UCPD1->CFG1;
+    // Force-disable UCPD1 before configuring
+    CFG1 &= ~UCPD_CFG1_UCPDEN;
+    // Configure UCPD1
+    CFG1 = UCPD_CFG1_PSC_UCPDCLK_0 | UCPD_CFG1_TRANSWIN_3 | UCPD_CFG1_IFRGAP_4 | UCPD_CFG1_HBITCLKDIV_4;
+    // Apply the changes
+    UCPD1->CFG1 = CFG1;
+    // Enable UCPD1
+    UCPD1->CFG1 |= UCPD_CFG1_UCPDEN;
+
+    // Copy the existing value
+    uint32_t CR = UCPD1->CR;
+    // Clear out ANASUBMODE (irrelevant as a sink device)
+    CR &= ~UCPD_CR_ANASUBMODE_Msk;
+    // Advertise our capabilities as a sink, with both CC lines enabled
+    CR |= UCPD_CR_ANAMODE | UCPD_CR_CCENABLE_Msk;
+    // Apply the changes
+    UCPD1->CR = CR;
+}
+
 void* get_split_sync_state_kb(size_t* state_size) {
     *state_size = sizeof(kb_runtime_config);
     return &kb_state;
@@ -106,6 +133,22 @@ void housekeeping_task_kb(void) {
     split_sync_update_task_kb();
     split_sync_action_task_kb();
 #endif  // SPLIT_KEYBOARD
+
+    static uint32_t last_read = 0;
+    if(timer_elapsed32(last_read) > 2500) {
+        last_read = timer_read32();
+
+        uint32_t CR = UCPD1->CR;
+        uint32_t SR = UCPD1->SR;
+        int ucpd_enabled = (UCPD1->CFG1 & UCPD_CFG1_UCPDEN_Msk) >> UCPD_CFG1_UCPDEN_Pos;
+        int anamode = (CR & UCPD_CR_ANAMODE_Msk) >> UCPD_CR_ANAMODE_Pos;
+        int anasubmode = (CR & UCPD_CR_ANASUBMODE_Msk) >> UCPD_CR_ANASUBMODE_Pos;
+        int cc_enabled = (CR & UCPD_CR_CCENABLE_Msk) >> UCPD_CR_CCENABLE_Pos;
+        int vstate_cc1 = (SR & UCPD_SR_TYPEC_VSTATE_CC1_Msk) >> UCPD_SR_TYPEC_VSTATE_CC1_Pos;
+        int vstate_cc2 = (SR & UCPD_SR_TYPEC_VSTATE_CC2_Msk) >> UCPD_SR_TYPEC_VSTATE_CC2_Pos;
+        int vstate_max = vstate_cc1 > vstate_cc2 ? vstate_cc1 : vstate_cc2;
+        dprintf("ucpd-enabled=%d, anamode=%d, anasubmode=%d, cc-enabled: %d, vstate-cc1=%d, vstate-cc2=%d\n", ucpd_enabled, anamode, anasubmode, cc_enabled, vstate_cc1, vstate_cc2);
+    }
 }
 
 //----------------------------------------------------------
