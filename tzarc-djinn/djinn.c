@@ -124,7 +124,45 @@ void split_sync_action_task_kb(void) {
     }
 }
 
+void usbpd_task_kb(void) {
+    if (is_keyboard_master()) {
+        static uint32_t last_read = 0;
+        if(timer_elapsed32(last_read) > 2500) {
+            last_read = timer_read32();
+
+            uint32_t CR = UCPD1->CR;
+            uint32_t SR = UCPD1->SR;
+            int ucpd_enabled = (UCPD1->CFG1 & UCPD_CFG1_UCPDEN_Msk) >> UCPD_CFG1_UCPDEN_Pos;
+            int anamode = (CR & UCPD_CR_ANAMODE_Msk) >> UCPD_CR_ANAMODE_Pos;
+            int anasubmode = (CR & UCPD_CR_ANASUBMODE_Msk) >> UCPD_CR_ANASUBMODE_Pos;
+            int cc_enabled = (CR & UCPD_CR_CCENABLE_Msk) >> UCPD_CR_CCENABLE_Pos;
+            int vstate_cc1 = (SR & UCPD_SR_TYPEC_VSTATE_CC1_Msk) >> UCPD_SR_TYPEC_VSTATE_CC1_Pos;
+            int vstate_cc2 = (SR & UCPD_SR_TYPEC_VSTATE_CC2_Msk) >> UCPD_SR_TYPEC_VSTATE_CC2_Pos;
+            int vstate_max = vstate_cc1 > vstate_cc2 ? vstate_cc1 : vstate_cc2;
+            dprintf("ucpd-enabled=%d, anamode=%d, anasubmode=%d, cc-enabled: %d, vstate-cc1=%d, vstate-cc2=%d\n", ucpd_enabled, anamode, anasubmode, cc_enabled, vstate_cc1, vstate_cc2);
+
+            switch(vstate_max) {
+                case 0:
+                    if(kb_state.values.current_setting != current_500mA) dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_500mA);
+                    kb_state.values.current_setting = current_500mA;
+                    break;
+                case 1:
+                    if(kb_state.values.current_setting != current_1500mA) dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_1500mA);
+                    kb_state.values.current_setting = current_1500mA;
+                    break;
+                case 2:
+                    if(kb_state.values.current_setting != current_3000mA) dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_3000mA);
+                    kb_state.values.current_setting = current_3000mA;
+                    break;
+            }
+        }
+    }
+}
+
 void housekeeping_task_kb(void) {
+    // Modify current limits
+    usbpd_task_kb();
+
 #ifdef SPLIT_KEYBOARD
     // Ensure state is sync'ed between master and slave, if required
     split_sync_kb(false);
@@ -133,22 +171,6 @@ void housekeeping_task_kb(void) {
     split_sync_update_task_kb();
     split_sync_action_task_kb();
 #endif  // SPLIT_KEYBOARD
-
-    static uint32_t last_read = 0;
-    if(timer_elapsed32(last_read) > 2500) {
-        last_read = timer_read32();
-
-        uint32_t CR = UCPD1->CR;
-        uint32_t SR = UCPD1->SR;
-        int ucpd_enabled = (UCPD1->CFG1 & UCPD_CFG1_UCPDEN_Msk) >> UCPD_CFG1_UCPDEN_Pos;
-        int anamode = (CR & UCPD_CR_ANAMODE_Msk) >> UCPD_CR_ANAMODE_Pos;
-        int anasubmode = (CR & UCPD_CR_ANASUBMODE_Msk) >> UCPD_CR_ANASUBMODE_Pos;
-        int cc_enabled = (CR & UCPD_CR_CCENABLE_Msk) >> UCPD_CR_CCENABLE_Pos;
-        int vstate_cc1 = (SR & UCPD_SR_TYPEC_VSTATE_CC1_Msk) >> UCPD_SR_TYPEC_VSTATE_CC1_Pos;
-        int vstate_cc2 = (SR & UCPD_SR_TYPEC_VSTATE_CC2_Msk) >> UCPD_SR_TYPEC_VSTATE_CC2_Pos;
-        int vstate_max = vstate_cc1 > vstate_cc2 ? vstate_cc1 : vstate_cc2;
-        dprintf("ucpd-enabled=%d, anamode=%d, anasubmode=%d, cc-enabled: %d, vstate-cc1=%d, vstate-cc2=%d\n", ucpd_enabled, anamode, anasubmode, cc_enabled, vstate_cc1, vstate_cc2);
-    }
 }
 
 //----------------------------------------------------------
