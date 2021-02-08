@@ -10,9 +10,10 @@ NKRO_ENABLE = no            # USB Nkey Rollover
 BACKLIGHT_ENABLE = yes      # Enable keyboard backlight functionality on B7 by default
 RGBLIGHT_ENABLE = yes       # Enable keyboard RGB underglow
 UNICODE_ENABLE = no         # Unicode
-AUDIO_ENABLE = no           # Audio output
+AUDIO_ENABLE = yes          # Audio output
 
 ENCODER_ENABLE = yes
+USBPD_ENABLE = yes
 
 # Allow for single-side builds to be overridden in keymaps
 SPLIT_KEYBOARD ?= yes
@@ -20,8 +21,6 @@ SPLIT_KEYBOARD ?= yes
 ifeq ($(strip $(SPLIT_KEYBOARD)),yes)
 	SERIAL_DRIVER = usart_statesync
 endif
-
-OPT_DEFS += -DNO_PLUG_DETECT_PIN
 
 BACKLIGHT_DRIVER = pwm
 
@@ -41,13 +40,6 @@ QUANTUM_PAINTER_DRIVERS = rgb565_surface ili9341
 
 LTO_ENABLE = yes
 OPT = 2
-
-ENABLE_ADC_USBPD_CHECK = no
-
-ifeq ($(strip $(ENABLE_ADC_USBPD_CHECK)), yes)
-	OPT_DEFS += -DENABLE_ADC_USBPD_CHECK
-	SRC += analog.c
-endif
 
 #LTO_ENABLE = no
 #OPT = 0

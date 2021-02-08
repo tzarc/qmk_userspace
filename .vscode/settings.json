@@ -12,6 +12,7 @@
   "files.associations": {
     "array": "cpp",
     "system_error": "c",
-    "regex": "c"
+    "regex": "c",
+    "serial_usart_statesync.h": "c"
   }
 }

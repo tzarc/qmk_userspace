@@ -17,10 +17,6 @@
 #include <string.h>
 #include <hal.h>
 
-#ifdef ENABLE_ADC_USBPD_CHECK
-#    include <analog.h>
-#endif
-
 #include "djinn.h"
 #include "serial_usart_statesync.h"
 
@@ -33,30 +29,7 @@ painter_device_t surf;
 kb_runtime_config kb_state;
 
 void board_init(void) {
-    // Disable dead-battery signals
-    PWR->CR3 |= PWR_CR3_UCPD_DBDIS;
-    // Enable the clock for the UCPD1 peripheral
-    RCC->APB1ENR2 |= RCC_APB1ENR2_UCPD1EN;
-
-    // Copy the existing value
-    uint32_t CFG1 = UCPD1->CFG1;
-    // Force-disable UCPD1 before configuring
-    CFG1 &= ~UCPD_CFG1_UCPDEN;
-    // Configure UCPD1
-    CFG1 = UCPD_CFG1_PSC_UCPDCLK_0 | UCPD_CFG1_TRANSWIN_3 | UCPD_CFG1_IFRGAP_4 | UCPD_CFG1_HBITCLKDIV_4;
-    // Apply the changes
-    UCPD1->CFG1 = CFG1;
-    // Enable UCPD1
-    UCPD1->CFG1 |= UCPD_CFG1_UCPDEN;
-
-    // Copy the existing value
-    uint32_t CR = UCPD1->CR;
-    // Clear out ANASUBMODE (irrelevant as a sink device)
-    CR &= ~UCPD_CR_ANASUBMODE_Msk;
-    // Advertise our capabilities as a sink, with both CC lines enabled
-    CR |= UCPD_CR_ANAMODE | UCPD_CR_CCENABLE_Msk;
-    // Apply the changes
-    UCPD1->CR = CR;
+    usbpd_init();
 }
 
 void* get_split_sync_state_kb(size_t* state_size) {
@@ -129,36 +102,24 @@ void usbpd_task_kb(void) {
         static uint32_t last_read = 0;
         if(timer_elapsed32(last_read) > 250) {
             last_read = timer_read32();
-
-            uint32_t CR = UCPD1->CR;
-            uint32_t SR = UCPD1->SR;
-            int ucpd_enabled = (UCPD1->CFG1 & UCPD_CFG1_UCPDEN_Msk) >> UCPD_CFG1_UCPDEN_Pos;
-            int anamode = (CR & UCPD_CR_ANAMODE_Msk) >> UCPD_CR_ANAMODE_Pos;
-            int cc_enabled = (CR & UCPD_CR_CCENABLE_Msk) >> UCPD_CR_CCENABLE_Pos;
-            if(ucpd_enabled && anamode && cc_enabled) {
-                int vstate_cc1 = (SR & UCPD_SR_TYPEC_VSTATE_CC1_Msk) >> UCPD_SR_TYPEC_VSTATE_CC1_Pos;
-                int vstate_cc2 = (SR & UCPD_SR_TYPEC_VSTATE_CC2_Msk) >> UCPD_SR_TYPEC_VSTATE_CC2_Pos;
-                int vstate_max = vstate_cc1 > vstate_cc2 ? vstate_cc1 : vstate_cc2;
-                switch(vstate_max) {
-                    case 0:
-                    case 1:
-                        if(kb_state.values.current_setting != current_500mA) dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_500mA);
-                        kb_state.values.current_setting = current_500mA;
-                        break;
-                    case 2:
-                        if(kb_state.values.current_setting != current_1500mA) dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_1500mA);
-                        kb_state.values.current_setting = current_1500mA;
-                        break;
-                    case 3:
-                        if(kb_state.values.current_setting != current_3000mA) dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_3000mA);
-                        kb_state.values.current_setting = current_3000mA;
-                        break;
-                }
+            switch(usbpd_get_allowance()) {
+                case USBPD_500MA:
+                case USBPD_900MA:
+                    if(kb_state.values.current_setting != current_500mA) dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_500mA);
+                    kb_state.values.current_setting = current_500mA;
+                    break;
+                case USBPD_1500MA:
+                    if(kb_state.values.current_setting != current_1500mA) dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_1500mA);
+                    kb_state.values.current_setting = current_1500mA;
+                    break;
+                case USBPD_3000MA:
+                    if(kb_state.values.current_setting != current_3000mA) dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_3000mA);
+                    kb_state.values.current_setting = current_3000mA;
+                    break;
             }
         }
     }
 }
-
 void housekeeping_task_kb(void) {
     // Modify current limits
     usbpd_task_kb();
@@ -231,7 +192,7 @@ void keyboard_post_init_kb(void) {
 //----------------------------------------------------------
 // QMK overrides
 
-#if defined(SPLIT_KEYBOARD) && !defined(NO_PLUG_DETECT_PIN)
+#if defined(SPLIT_KEYBOARD) && defined(USE_PLUG_DETECT_PIN)
 bool is_keyboard_master(void) {
     static bool determined = false;
     static bool is_master;
@@ -293,16 +254,3 @@ RGB rgblight_hsv_to_rgb(HSV hsv) {
     hsv.v = (uint8_t)(hsv.v * scale);
     return hsv_to_rgb(hsv);
 }
-
-#ifdef ENABLE_ADC_USBPD_CHECK
-adc_mux pinToMux(pin_t pin) {
-    switch (pin) {
-        case F0:
-            return TO_MUX(ADC_CHANNEL_IN10, 0);
-        case F1:
-            return TO_MUX(ADC_CHANNEL_IN10, 1);
-    }
-
-    return TO_MUX(0, 0xFF);
-}
-#endif

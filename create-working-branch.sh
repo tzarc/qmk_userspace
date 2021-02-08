@@ -19,9 +19,8 @@ fi
 
 declare -a prs_to_apply
 prs_to_apply+=(10174) # Quantum Painter
-prs_to_apply+=(11793) # Default ChibiOS confs for G474/G431
-#prs_to_apply+=(10437) # Decouple USB events
-#prs_to_apply+=(6165) # Audio
+prs_to_apply+=(11820) # Audio
+prs_to_apply+=(11824) # G4xx USBPD
 
 declare -a cherry_picks
 #cherry_picks+=(ba542a0164a10a1958aa5054d2a0cc333bb3ce64) # Audio
