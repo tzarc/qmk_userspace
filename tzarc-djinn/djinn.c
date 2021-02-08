@@ -28,9 +28,7 @@ painter_device_t surf;
 
 kb_runtime_config kb_state;
 
-void board_init(void) {
-    usbpd_init();
-}
+void board_init(void) { usbpd_init(); }
 
 void* get_split_sync_state_kb(size_t* state_size) {
     *state_size = sizeof(kb_runtime_config);
@@ -100,21 +98,27 @@ void split_sync_action_task_kb(void) {
 void usbpd_task_kb(void) {
     if (is_keyboard_master()) {
         static uint32_t last_read = 0;
-        if(timer_elapsed32(last_read) > 250) {
+        if (timer_elapsed32(last_read) > 250) {
             last_read = timer_read32();
-            switch(usbpd_get_allowance()) {
+            switch (usbpd_get_allowance()) {
                 case USBPD_500MA:
                 case USBPD_900MA:
-                    if(kb_state.values.current_setting != current_500mA) dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_500mA);
-                    kb_state.values.current_setting = current_500mA;
+                    if (kb_state.values.current_setting != current_500mA) {
+                        dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_500mA);
+                        kb_state.values.current_setting = current_500mA;
+                    }
                     break;
                 case USBPD_1500MA:
-                    if(kb_state.values.current_setting != current_1500mA) dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_1500mA);
-                    kb_state.values.current_setting = current_1500mA;
+                    if (kb_state.values.current_setting != current_1500mA) {
+                        dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_1500mA);
+                        kb_state.values.current_setting = current_1500mA;
+                    }
                     break;
                 case USBPD_3000MA:
-                    if(kb_state.values.current_setting != current_3000mA) dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_3000mA);
-                    kb_state.values.current_setting = current_3000mA;
+                    if (kb_state.values.current_setting != current_3000mA) {
+                        dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_3000mA);
+                        kb_state.values.current_setting = current_3000mA;
+                    }
                     break;
             }
         }
@@ -168,7 +172,7 @@ void keyboard_post_init_kb(void) {
     // Initialise the framebuffer
     surf = qp_rgb565_surface_make_device(8, 320);
     qp_init(surf, QP_ROTATION_0);
-    for(int i = 0; i < 320; ++i) {
+    for (int i = 0; i < 320; ++i) {
         qp_line(surf, 0, i, 7, i, i % 256, 255, 255);
     }
 
@@ -181,7 +185,7 @@ void keyboard_post_init_kb(void) {
     qp_power(lcd, true);
     qp_rect(lcd, 0, 0, 239, 319, HSV_BLACK, true);
 
-    qp_viewport(lcd, 240-8-8, 0, 240-8-1, 319);
+    qp_viewport(lcd, 240 - 8 - 8, 0, 240 - 8 - 1, 319);
     qp_pixdata(lcd, qp_rgb565_surface_get_buffer_ptr(surf), qp_rgb565_surface_get_pixel_count(surf));
 
     // Turn on the LCD backlight

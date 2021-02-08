@@ -39,7 +39,7 @@ static void draw_ui(void);
 
 #ifdef QUANTUM_PAINTER_ENABLE
 static void draw_ui(void);
-#endif // QUANTUM_PAINTER_ENABLE
+#endif  // QUANTUM_PAINTER_ENABLE
 
 #ifdef RGB_MATRIX_ENABLE
 led_config_t g_led_config = {{// Key Matrix to LED Index
@@ -159,25 +159,25 @@ void keyboard_post_init_kb(void) {
 }
 
 #if defined(QUANTUM_PAINTER_ENABLE)
-#include <qp.h>
-#include <qp_qmk_oled_wrapper.h>
-#include "graphics/lock-caps.c"
-#include "graphics/lock-num.c"
-#include "graphics/lock-scrl.c"
-#include "graphics/lock-caps-OFF.c"
-#include "graphics/lock-num-OFF.c"
-#include "graphics/lock-scrl-OFF.c"
-#include "graphics/noto.c"
+#    include <qp.h>
+#    include <qp_qmk_oled_wrapper.h>
+#    include "graphics/lock-caps.c"
+#    include "graphics/lock-num.c"
+#    include "graphics/lock-scrl.c"
+#    include "graphics/lock-caps-OFF.c"
+#    include "graphics/lock-num-OFF.c"
+#    include "graphics/lock-scrl-OFF.c"
+#    include "graphics/noto.c"
 void draw_ui(void) {
     static painter_device_t oled = NULL;
-    if(!oled) {
+    if (!oled) {
         oled = qp_qmk_oled_wrapper_make_device();
         qp_init(oled, QP_ROTATION_0);
         qp_power(oled, true);
     }
 
     static uint32_t last_draw = 0;
-    if(timer_elapsed32(last_draw) > 2500) {
+    if (timer_elapsed32(last_draw) > 2500) {
         last_draw = timer_read32();
         qp_line(oled, 0, 0, 127, 31, HSV_WHITE);
         qp_circle(oled, 10, 22, 8, HSV_WHITE, true);
@@ -187,7 +187,7 @@ void draw_ui(void) {
     }
 
     static led_t last_led_state = {0};
-    led_t led_state = host_keyboard_led_state();
+    led_t        led_state      = host_keyboard_led_state();
     if (last_led_state.raw != led_state.raw) {
         last_led_state.raw = led_state.raw;
         qp_drawimage(oled, 0, 32, last_led_state.caps_lock ? gfx_lock_caps : gfx_lock_caps_OFF);

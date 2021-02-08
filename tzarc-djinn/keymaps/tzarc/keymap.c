@@ -163,7 +163,7 @@ typedef union user_runtime_config {
 _Static_assert(sizeof(user_runtime_config) == 1, "Invalid data transfer size for user runtime data");
 static user_runtime_config user_state;
 
-void* get_split_sync_state_user(size_t* state_size) {
+void *get_split_sync_state_user(size_t *state_size) {
     *state_size = sizeof(user_runtime_config);
     return &user_state;
 }
@@ -197,10 +197,9 @@ void split_sync_action_task_user(void) {
             last_hue = curr_hue;
             qp_drawimage_recolor(lcd, 120 - gfx_djinn->width / 2, 32, gfx_djinn, curr_hue, 255, 255);
             qp_rect(lcd, 0, 0, 8, 319, curr_hue, 255, 255, true);
-            for(int i = 0; i < 8; ++i)
-                qp_circle(lcd, 20, (i * 40) + 20, 10, curr_hue, 255, 255, (i % 2) == 0);
-//            for(int i = 0; i < 8; ++i)
-//                qp_ellipse(lcd, 20, (i * 40) + 20, 20, 12, curr_hue, 255, 255, (i % 2) == 0);
+            for (int i = 0; i < 8; ++i) qp_circle(lcd, 20, (i * 40) + 20, 10, curr_hue, 255, 255, (i % 2) == 0);
+            //            for(int i = 0; i < 8; ++i)
+            //                qp_ellipse(lcd, 20, (i * 40) + 20, 20, 12, curr_hue, 255, 255, (i % 2) == 0);
             qp_rect(lcd, 232, 0, 239, 319, curr_hue, 255, 255, true);
             qp_line(lcd, 8, 0, 32, 319, curr_hue, 255, 255);
             qp_line(lcd, 32, 0, 8, 319, curr_hue, 255, 255);
@@ -223,50 +222,35 @@ void housekeeping_task_keymap(void) {
 #ifdef LUA_ENABLE
     void test_lua(void);
     test_lua();
-#endif // LUA_ENABLE
+#endif  // LUA_ENABLE
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #ifdef LUA_ENABLE
-#include <quantum.h>
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
+#    include <quantum.h>
+#    include <lua.h>
+#    include <lualib.h>
+#    include <lauxlib.h>
 
-lua_State *L = 0;
-bool lua_test_executed = false;
+lua_State *L                 = 0;
+bool       lua_test_executed = false;
 
 static int dprint_wrapper(lua_State *L) {
-    const char *arg = luaL_checkstring(L, 1); // first arg is what we want to print
+    const char *arg = luaL_checkstring(L, 1);  // first arg is what we want to print
     dprintf("%s\n", arg);
     return 0;
 }
 
 void test_lua(void) {
-    if(!lua_test_executed && timer_read32() > 15000) {
+    if (!lua_test_executed && timer_read32() > 15000) {
         lua_test_executed = true;
 
         L = luaL_newstate();
         luaL_openlibs(L);
 
-        lua_newtable(L); // new table
-        lua_pushnumber(L, 1); // table index
-        lua_pushstring(L, "This is a test from executing lua code"); // value
-        lua_rawset(L, -3); // set tbl[1]='This is a test from executing lua code'
+        lua_newtable(L);                                              // new table
+        lua_pushnumber(L, 1);                                         // table index
+        lua_pushstring(L, "This is a test from executing lua code");  // value
+        lua_rawset(L, -3);                                            // set tbl[1]='This is a test from executing lua code'
 
         // Set the "blah" global table to the newly-created table
         lua_setglobal(L, "blah");
@@ -276,20 +260,18 @@ void test_lua(void) {
 
         // now we can use blah[1] == 'This is a test from executing lua code'
 
-        const char *code = "dprint(blah[1])"; // should debug print "This is a test from executing lua code" in QMK Toolbox
-        if(luaL_loadstring(L, code) == LUA_OK) {
-            if(lua_pcall(L, 0, 1, 0) == LUA_OK) {
+        const char *code = "dprint(blah[1])";  // should debug print "This is a test from executing lua code" in QMK Toolbox
+        if (luaL_loadstring(L, code) == LUA_OK) {
+            if (lua_pcall(L, 0, 1, 0) == LUA_OK) {
                 lua_pop(L, lua_gettop(L));
-            }
-            else {
+            } else {
                 dprint("Failed lua_pcall\n");
             }
-        }
-        else {
+        } else {
             dprint("Failed luaL_loadstring\n");
         }
 
         lua_close(L);
     }
 }
-#endif // LUA_ENABLE
+#endif  // LUA_ENABLE
