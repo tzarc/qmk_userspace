@@ -16,12 +16,13 @@
 
 #pragma once
 
-#define HAL_USE_GPT TRUE
-#define HAL_USE_PWM TRUE
-#define HAL_USE_SERIAL TRUE
-#define HAL_USE_SPI TRUE
+// Encoder settings
+#define ENCODER_RESOLUTION 2
 
-#define SERIAL_BUFFERS_SIZE 256
+// LCD blanking period
+#define LCD_ACTIVITY_TIMEOUT 30000
 
-#include_next <halconf.h>
-
+// RGB settings
+#define RGBLIGHT_ANIMATIONS
+#define RGB_MATRIX_KEYPRESSES
+#define RGB_MATRIX_FRAMEBUFFER_EFFECTS

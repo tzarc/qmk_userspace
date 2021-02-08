@@ -16,12 +16,20 @@
 
 #pragma once
 
-#define HAL_USE_GPT TRUE
-#define HAL_USE_PWM TRUE
-#define HAL_USE_SERIAL TRUE
-#define HAL_USE_SPI TRUE
+// Debugging
+#define DEBUG_MATRIX_SCAN_RATE
+#define DEBUG_EEPROM_OUTPUT
 
-#define SERIAL_BUFFERS_SIZE 256
+// 1000Hz poll rate
+#define USB_POLLING_INTERVAL_MS 1
 
-#include_next <halconf.h>
+// Encoder settings
+#define ENCODER_RESOLUTION 2
 
+// LCD blanking period
+#define LCD_ACTIVITY_TIMEOUT 30000
+
+// RGB settings
+#define RGBLIGHT_ANIMATIONS
+#define RGB_MATRIX_KEYPRESSES
+#define RGB_MATRIX_FRAMEBUFFER_EFFECTS
