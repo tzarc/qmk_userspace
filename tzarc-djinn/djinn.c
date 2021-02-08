@@ -53,20 +53,20 @@ bool split_sync_update_task_kb(void) {
 
 void split_sync_action_task_kb(void) {
     // Work out if we've changed our current limit, update the limiter circuit switches
-    static uint8_t current_setting = current_500mA;
+    static uint8_t current_setting = USBPD_500MA;
     if (current_setting != kb_state.values.current_setting) {
         current_setting = kb_state.values.current_setting;
         switch (current_setting) {
             default:
-            case current_500mA:
+            case USBPD_500MA:
                 writePinLow(RGB_CURR_1500mA_OK_PIN);
                 writePinLow(RGB_CURR_3000mA_OK_PIN);
                 break;
-            case current_1500mA:
+            case USBPD_1500MA:
                 writePinHigh(RGB_CURR_1500mA_OK_PIN);
                 writePinLow(RGB_CURR_3000mA_OK_PIN);
                 break;
-            case current_3000mA:
+            case USBPD_3000MA:
                 writePinHigh(RGB_CURR_1500mA_OK_PIN);
                 writePinHigh(RGB_CURR_3000mA_OK_PIN);
                 break;
@@ -95,6 +95,19 @@ void split_sync_action_task_kb(void) {
     }
 }
 
+const char* usbpd_str(usbpd_allowance_t allowance) {
+    switch (allowance) {
+        case USBPD_500MA:
+            return "500mA";
+        case USBPD_1500MA:
+            return "1500mA";
+        case USBPD_3000MA:
+            return "3000mA";
+        default:
+            return "500mA";
+    }
+}
+
 void usbpd_task_kb(void) {
     if (is_keyboard_master()) {
         static uint32_t last_read = 0;
@@ -102,22 +115,21 @@ void usbpd_task_kb(void) {
             last_read = timer_read32();
             switch (usbpd_get_allowance()) {
                 case USBPD_500MA:
-                case USBPD_900MA:
-                    if (kb_state.values.current_setting != current_500mA) {
-                        dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_500mA);
-                        kb_state.values.current_setting = current_500mA;
+                    if (kb_state.values.current_setting != USBPD_500MA) {
+                        dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.values.current_setting), usbpd_str(USBPD_500MA));
+                        kb_state.values.current_setting = USBPD_500MA;
                     }
                     break;
                 case USBPD_1500MA:
-                    if (kb_state.values.current_setting != current_1500mA) {
-                        dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_1500mA);
-                        kb_state.values.current_setting = current_1500mA;
+                    if (kb_state.values.current_setting != USBPD_1500MA) {
+                        dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.values.current_setting), usbpd_str(USBPD_1500MA));
+                        kb_state.values.current_setting = USBPD_1500MA;
                     }
                     break;
                 case USBPD_3000MA:
-                    if (kb_state.values.current_setting != current_3000mA) {
-                        dprintf("Transitioning UCPD1 %d -> %d\n", (int)kb_state.values.current_setting, (int)current_3000mA);
-                        kb_state.values.current_setting = current_3000mA;
+                    if (kb_state.values.current_setting != USBPD_3000MA) {
+                        dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.values.current_setting), usbpd_str(USBPD_3000MA));
+                        kb_state.values.current_setting = USBPD_3000MA;
                     }
                     break;
             }
@@ -244,13 +256,13 @@ RGB rgblight_hsv_to_rgb(HSV hsv) {
     float scale;
     switch (kb_state.values.current_setting) {
         default:
-        case current_500mA:
+        case USBPD_500MA:
             scale = 0.3f;
             break;
-        case current_1500mA:
+        case USBPD_1500MA:
             scale = 0.65f;
             break;
-        case current_3000mA:
+        case USBPD_3000MA:
             scale = 1.0f;
             break;
     }

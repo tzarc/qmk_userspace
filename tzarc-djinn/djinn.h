@@ -57,15 +57,13 @@
 
 extern painter_device_t lcd;
 
-enum { current_500mA = 0, current_1500mA, current_3000mA };
-
 #pragma pack(push)
 #pragma pack(1)
 
 typedef union kb_runtime_config {
     struct {
-        unsigned lcd_power : 1;
-        unsigned current_setting : 2;
+        unsigned          lcd_power : 1;
+        usbpd_allowance_t current_setting : 2;
     } values;
     uint8_t raw;
 } kb_runtime_config;
