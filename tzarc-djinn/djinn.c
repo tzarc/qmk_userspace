@@ -27,6 +27,7 @@ painter_device_t lcd;
 painter_device_t surf;
 
 kb_runtime_config kb_state;
+uint32_t          last_slave_sync_time = 0;
 
 void board_init(void) { usbpd_init(); }
 
@@ -39,6 +40,8 @@ bool split_sync_update_task_kb(void) {
     if (is_keyboard_master()) {
         // Turn off the LCD if there's been no matrix activity
         kb_state.values.lcd_power = (last_input_activity_elapsed() < LCD_ACTIVITY_TIMEOUT) ? 1 : 0;
+    } else {
+        last_slave_sync_time = timer_read32();
     }
 
     // Force an update if the state changed
@@ -140,14 +143,15 @@ void housekeeping_task_kb(void) {
     // Modify current limits
     usbpd_task_kb();
 
-#ifdef SPLIT_KEYBOARD
     // Ensure state is sync'ed between master and slave, if required
     split_sync_kb(false);
-#else   // SPLIT_KEYBOARD
-    // No split, so just run the update and actions sequentially
-    split_sync_update_task_kb();
-    split_sync_action_task_kb();
-#endif  // SPLIT_KEYBOARD
+
+    if (!is_keyboard_master()) {
+        // If we're the slave, and haven't received a sync request from the master for some time, reset the board
+        if (timer_elapsed32(last_slave_sync_time) > 3000) {
+            NVIC_SystemReset();
+        }
+    }
 }
 
 //----------------------------------------------------------
@@ -208,7 +212,7 @@ void keyboard_post_init_kb(void) {
 //----------------------------------------------------------
 // QMK overrides
 
-#if defined(SPLIT_KEYBOARD) && defined(USE_PLUG_DETECT_PIN)
+#ifdef USE_PLUG_DETECT_PIN
 bool is_keyboard_master(void) {
     static bool determined = false;
     static bool is_master;
@@ -224,7 +228,7 @@ bool is_keyboard_master(void) {
 
     return is_master;
 }
-#endif  // SPLIT_KEYBOARD
+#endif  // USE_PLUG_DETECT_PIN
 
 void encoder_update_kb(uint8_t index, bool clockwise) {
     // Offload to the keymap instead.

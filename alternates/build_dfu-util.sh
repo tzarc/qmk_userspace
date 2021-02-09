@@ -24,7 +24,6 @@ git checkout -- .
 git clean -xfd
 git pull
 git reset --hard origin/master
-patch -p1 < "$script_dir/patches/dfu-util_retry.diff"
 ./autogen.sh
 
 cd "$script_dir/dfu-util-build-linux"
