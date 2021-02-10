@@ -21,6 +21,7 @@ declare -a prs_to_apply
 prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(11820) # Audio
 prs_to_apply+=(11824) # G4xx USBPD
+prs_to_apply+=(11055) # RGB Matrix
 
 declare -a cherry_picks
 #cherry_picks+=(ba542a0164a10a1958aa5054d2a0cc333bb3ce64) # Audio

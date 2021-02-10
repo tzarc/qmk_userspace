@@ -7,30 +7,30 @@ CONSOLE_ENABLE = no         # Console for debug
 COMMAND_ENABLE = no         # Commands for debug and configuration
 SLEEP_LED_ENABLE = no       # Breathing sleep LED during USB suspend
 NKRO_ENABLE = no            # USB Nkey Rollover
-BACKLIGHT_ENABLE = yes      # Enable keyboard backlight functionality on B7 by default
-RGBLIGHT_ENABLE = yes       # Enable keyboard RGB underglow
 UNICODE_ENABLE = no         # Unicode
-AUDIO_ENABLE = yes          # Audio output
+
+SPLIT_KEYBOARD = yes
+SERIAL_DRIVER = usart_statesync
 
 ENCODER_ENABLE = yes
+
 USBPD_ENABLE = yes
 
-# Allow for single-side builds to be overridden in keymaps
-SPLIT_KEYBOARD ?= yes
-
-ifeq ($(strip $(SPLIT_KEYBOARD)),yes)
-	SERIAL_DRIVER = usart_statesync
-endif
-
+BACKLIGHT_ENABLE = yes
 BACKLIGHT_DRIVER = pwm
 
 WS2812_DRIVER = pwm
 CIE1931_CURVE = yes
 
-#RGB_MATRIX_ENABLE = WS2812
+RGBLIGHT_ENABLE = no
+RGBLIGHT_DRIVER = WS2812
+
+RGB_MATRIX_ENABLE = yes
+RGB_MATRIX_DRIVER = WS2812
 
 EEPROM_DRIVER = spi
 
+AUDIO_ENABLE = yes
 AUDIO_DRIVER = pwm_software
 AUDIO_PIN = A5
 AUDIO_PIN_ALT = A4
