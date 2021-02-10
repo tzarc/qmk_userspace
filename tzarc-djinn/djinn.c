@@ -151,10 +151,6 @@ void housekeeping_task_kb(void) {
 // Initialisation
 
 void keyboard_post_init_kb(void) {
-    void* dummy = malloc(1);
-    free(dummy);
-    dummy = alloca(1);
-
     debug_enable = true;
     // debug_matrix = true;
 
