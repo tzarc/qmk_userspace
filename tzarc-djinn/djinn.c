@@ -145,13 +145,6 @@ void housekeeping_task_kb(void) {
 
     // Ensure state is sync'ed between master and slave, if required
     split_sync_kb(false);
-
-    if (!is_keyboard_master()) {
-        // If we're the slave, and haven't received a sync request from the master for some time, reset the board
-        if (timer_elapsed32(last_slave_sync_time) > 3000) {
-            NVIC_SystemReset();
-        }
-    }
 }
 
 //----------------------------------------------------------
