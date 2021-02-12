@@ -166,10 +166,10 @@ pcmd git commit -am "Fixup ChibiOS configs" || true
 popd
 
 pushd "$script_dir/qmk_firmware"
-#pcmd git push origin $target_branch --set-upstream --force-with-lease
+pcmd git push origin $target_branch --set-upstream --force-with-lease
 popd
 
-exit 0
+#exit 0
 
 # Set up the Djinn branch
 pushd "$script_dir/qmk_firmware"
@@ -184,4 +184,6 @@ pcmd git commit -m "Import Djinn code."
 pcmd git push origin djinn --set-upstream --force-with-lease
 popd
 
+pushd "$script_dir/qmk_firmware"
 pcmd git checkout "$target_branch"
+popd
