@@ -169,7 +169,7 @@ pushd "$script_dir/qmk_firmware"
 #pcmd git push origin $target_branch --set-upstream --force-with-lease
 popd
 
-#exit 0
+exit 0
 
 # Set up the Djinn branch
 pushd "$script_dir/qmk_firmware"
