@@ -21,10 +21,10 @@ declare -a prs_to_apply
 prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(11820) # Audio
 prs_to_apply+=(11824) # G4xx USBPD
-#prs_to_apply+=(11055) # RGB Matrix
+prs_to_apply+=(11055) # RGB Matrix
 
 declare -a cherry_picks
-#cherry_picks+=(ba542a0164a10a1958aa5054d2a0cc333bb3ce64) # Audio
+cherry_picks+=(749aca03c90c9316189b58e3236bea9242f3990f) # RGB_MATRIX slave scan
 
 rm -f "$script_dir"/*.patch || true
 
@@ -166,7 +166,7 @@ pcmd git commit -am "Fixup ChibiOS configs" || true
 popd
 
 pushd "$script_dir/qmk_firmware"
-pcmd git push origin $target_branch --set-upstream --force-with-lease
+#pcmd git push origin $target_branch --set-upstream --force-with-lease
 popd
 
 exit 0

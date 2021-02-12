@@ -25,7 +25,7 @@ else ifeq ($(strip $(PLATFORM_KEY)),avr)
 	ifeq ($(strip $(PROTOCOL)),LUFA)
 		# Uses defaults above
 	else ifeq ($(strip $(PROTOCOL)),VUSB)
-		CONSOLE_ENABLE = yes
+		CONSOLE_ENABLE = no
 		RAW_ENABLE = no
 	endif
 endif
