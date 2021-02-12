@@ -13,6 +13,7 @@
     "array": "cpp",
     "system_error": "c",
     "regex": "c",
-    "serial_usart_statesync.h": "c"
+    "serial_usart_statesync.h": "c",
+    "*.inc": "c"
   }
 }

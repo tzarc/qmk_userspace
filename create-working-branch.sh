@@ -169,12 +169,13 @@ pushd "$script_dir/qmk_firmware"
 #pcmd git push origin $target_branch --set-upstream --force-with-lease
 popd
 
-exit 0
+#exit 0
 
 # Set up the Djinn branch
 pushd "$script_dir/qmk_firmware"
 pcmd git branch -D djinn || true
-pcmd git checkout -b djinn generated-chibios-master-upgrade
+pcmd git checkout -b djinn "$target_branch"
+pcmd make git-submodule
 [[ -d keyboards/tzarc ]] || mkdir -p keyboards/tzarc
 pcmd rsync -avvP "$script_dir/tzarc-djinn/"* keyboards/tzarc/djinn
 pcmd rm -rf keyboards/tzarc/djinn/keymaps/tzarc
@@ -183,4 +184,4 @@ pcmd git commit -m "Import Djinn code."
 pcmd git push origin djinn --set-upstream --force-with-lease
 popd
 
-pcmd git checkout generated-chibios-master-upgrade
+pcmd git checkout "$target_branch"

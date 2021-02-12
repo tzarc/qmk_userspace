@@ -245,7 +245,12 @@ void suspend_wakeup_init_kb(void) {
     suspend_wakeup_init_user();
 }
 
-RGB rgblight_hsv_to_rgb(HSV hsv) {
+#if defined(RGB_MATRIX_ENABLE)
+#define rgb_to_hsv_hook_func rgb_matrix_hsv_to_rgb
+#elif defined(RGBLIGHT_ENABLE)
+#define rgb_to_hsv_hook_func rgblight_hsv_to_rgb
+#endif
+RGB rgb_to_hsv_hook_func(HSV hsv) {
     float scale;
     switch (kb_state.values.current_setting) {
         default:
@@ -269,7 +274,7 @@ RGB rgblight_hsv_to_rgb(HSV hsv) {
 #define RLO 42
 #define LLI(x) (x)
 #define LLP(x,y) {(x),(y)}
-#define RLI(x) (RLO-(x))
+#define RLI(x) (RLO+(x))
 #define RLP(x,y) {(224-(x)),((y))}
 led_config_t g_led_config = {
     {
@@ -292,19 +297,19 @@ led_config_t g_led_config = {
         // Underglow left
         LLP(110, 30), LLP(110, 80), LLP(110, 130), LLP(95, 180), LLP(75, 195), LLP(60, 210), LLP(45, 190), LLP(35, 175), LLP(20, 160), LLP(5, 160),
         // Matrix left
-        LLP(78, 150), LLP(104, 150), LLP(130, 150), LLP(156, 150),
-        LLP( 0, 150), LLP( 26, 150), LLP( 52, 150), LLP( 78, 150), LLP( 104, 150), LLP(130, 150), LLP(156, 150),
-        LLP( 0, 150), LLP( 26, 150), LLP( 52, 150), LLP( 78, 150), LLP( 104, 150), LLP(130, 150), LLP(156, 150),
-        LLP( 0, 150), LLP( 26, 150), LLP( 52, 150), LLP( 78, 150), LLP( 104, 150), LLP(130, 150), LLP(156, 150),
-        LLP( 0, 150), LLP( 26, 150), LLP( 52, 150), LLP( 78, 150), LLP( 104, 150), LLP(130, 150), LLP(156, 150),
+        LLP( 78, 150), LLP(104, 150), LLP(130, 150), LLP(156, 150),
+        LLP(156, 150), LLP(130, 150), LLP(104, 150), LLP( 78, 150), LLP( 52, 150), LLP( 26, 150), LLP(  0, 150),
+        LLP(  0, 150), LLP( 26, 150), LLP( 52, 150), LLP( 78, 150), LLP(104, 150), LLP(130, 150), LLP(156, 150),
+        LLP(156, 150), LLP(130, 150), LLP(104, 150), LLP( 78, 150), LLP( 52, 150), LLP( 26, 150), LLP(  0, 150),
+        LLP(  0, 150), LLP( 26, 150), LLP( 52, 150), LLP( 78, 150), LLP(104, 150), LLP(130, 150), LLP(156, 150),
         // Underglow right
         RLP(110, 30), RLP(110, 80), RLP(110, 130), RLP(95, 180), RLP(75, 195), RLP(60, 210), RLP(45, 190), RLP(35, 175), RLP(20, 160), RLP(5, 160),
         // Matrix right
-        RLP(78, 150), RLP(104, 150), RLP(130, 150), RLP(156, 150),
-        RLP( 0, 150), RLP( 26, 150), RLP( 52, 150), RLP( 78, 150), RLP(104, 150), RLP(130, 150), RLP(156, 150),
-        RLP( 0, 150), RLP( 26, 150), RLP( 52, 150), RLP( 78, 150), RLP(104, 150), RLP(130, 150), RLP(156, 150),
-        RLP( 0, 150), RLP( 26, 150), RLP( 52, 150), RLP( 78, 150), RLP(104, 150), RLP(130, 150), RLP(156, 150),
-        RLP( 0, 150), RLP( 26, 150), RLP( 52, 150), RLP( 78, 150), RLP(104, 150), RLP(130, 150), RLP(156, 150),
+        RLP( 78, 150), RLP(104, 150), RLP(130, 150), RLP(156, 150),
+        RLP(156, 150), RLP(130, 150), RLP(104, 150), RLP( 78, 150), RLP( 52, 150), RLP( 26, 150), RLP(  0, 150),
+        RLP(  0, 150), RLP( 26, 150), RLP( 52, 150), RLP( 78, 150), RLP(104, 150), RLP(130, 150), RLP(156, 150),
+        RLP(156, 150), RLP(130, 150), RLP(104, 150), RLP( 78, 150), RLP( 52, 150), RLP( 26, 150), RLP(  0, 150),
+        RLP(  0, 150), RLP( 26, 150), RLP( 52, 150), RLP( 78, 150), RLP(104, 150), RLP(130, 150), RLP(156, 150),
     },
     {
         // LED Index to Flag
