@@ -18,6 +18,7 @@
 #include <string.h>
 #include <backlight.h>
 #include <qp.h>
+#include <serial.h>
 
 #include "tzarc.h"
 #include "qp_rgb565_surface.h"
@@ -34,6 +35,8 @@
 #include "redalert13.c"
 
 #define MEDIA_KEY_DELAY 2
+
+enum { USER_STATE_SYNC = SAFE_USER_SERIAL_TRANSACTION_ID };
 
 painter_device_t surf;
 
@@ -91,18 +94,6 @@ void eeconfig_init_keymap(void) {
     rgblight_sethsv(128, 255, 255);
     backlight_enable();
     backlight_level(BACKLIGHT_LEVELS);
-}
-
-void keyboard_post_init_keymap(void) {
-    // Initialise the framebuffer
-    surf = qp_rgb565_surface_make_device(8, 320);
-    qp_init(surf, QP_ROTATION_0);
-    for (int i = 0; i < 320; ++i) {
-        qp_line(surf, 0, i, 7, i, i % 256, 255, 255);
-    }
-
-    qp_viewport(lcd, 240 - 8 - 8, 0, 240 - 8 - 1, 319);
-    qp_pixdata(lcd, qp_rgb565_surface_get_buffer_ptr(surf), qp_rgb565_surface_get_pixel_count(surf));
 }
 
 void encoder_update_keymap(uint8_t index, bool clockwise) {
@@ -163,89 +154,173 @@ void encoder_update_keymap(uint8_t index, bool clockwise) {
 }
 
 //----------------------------------------------------------
-// Runtime data sync -- user/keymap
+// Sync
 
 #pragma pack(push)
 #pragma pack(1)
 
-typedef union user_runtime_config {
-    struct {
-        led_t led_state;
-    } values;
-    uint8_t raw;
+typedef struct user_runtime_config {
+    uint32_t layer_state;
+    led_t    led_state;
 } user_runtime_config;
 
 #pragma pack(pop)
 
-_Static_assert(sizeof(user_runtime_config) == 1, "Invalid data transfer size for user runtime data");
-static user_runtime_config user_state;
+_Static_assert(sizeof(user_runtime_config) == 5, "Invalid data transfer size for user sync data");
 
-void *get_split_sync_state_user(size_t *state_size) {
-    *state_size = sizeof(user_runtime_config);
-    return &user_state;
+user_runtime_config user_state;
+
+void keyboard_post_init_keymap(void) {
+    // Initialise the framebuffer
+    surf = qp_rgb565_surface_make_device(8, 320);
+    qp_init(surf, QP_ROTATION_0);
+    for (int i = 0; i < 320; ++i) {
+        qp_line(surf, 0, i, 7, i, i % 256, 255, 255);
+    }
+
+    qp_viewport(lcd, 240 - 8 - 8, 0, 240 - 8 - 1, 319);
+    qp_pixdata(lcd, qp_rgb565_surface_get_buffer_ptr(surf), qp_rgb565_surface_get_pixel_count(surf));
+
+    // Register keyboard state sync split transaction
+    static uint8_t dummy_transaction_status;
+    soft_serial_register_transaction(USER_STATE_SYNC, &dummy_transaction_status, sizeof(user_state), &user_state, sizeof(user_state), &user_state);
+
+    // Reset the initial shared data value between master and slave
+    memset(&user_state, 0, sizeof(user_state));
 }
 
-bool split_sync_update_task_user(void) {
+void user_state_update(void) {
     if (is_keyboard_master()) {
-        // Sync the LED state
-        user_state.values.led_state = host_keyboard_led_state();
-    }
+        // Keep the LED state in sync
+        user_state.led_state = host_keyboard_led_state();
 
-    // Force an update if the state changed
-    static user_runtime_config last_state;
-    if (memcmp(&last_state, &user_state, sizeof(user_runtime_config)) != 0) {
-        memcpy(&last_state, &user_state, sizeof(user_runtime_config));
-        return true;
+        // Keep the layer state in sync
+        user_state.layer_state = layer_state;
     }
-
-    return false;
 }
 
-void split_sync_action_task_user(void) {
-    if (kb_state.values.lcd_power) {
-        bool            redraw_required = false;
-        static uint16_t last_hue        = 0xFFFF;
-        uint8_t         curr_hue        = rgblight_get_hue();
-        if (last_hue != curr_hue) {
-            redraw_required = true;
+void user_state_sync(void) {
+    if (is_keyboard_master()) {
+        // Keep track of the last state, so that we can tell if we need to propagate to slave
+        static user_runtime_config last_user_state;
+        static uint32_t            last_sync;
+        bool                       needs_sync = false;
+
+        // Check if the state values are different
+        if (memcmp(&user_state, &last_user_state, sizeof(user_runtime_config))) {
+            needs_sync = true;
+            memcpy(&last_user_state, &user_state, sizeof(user_runtime_config));
         }
 
-        if (redraw_required) {
-            last_hue = curr_hue;
-            qp_drawimage_recolor(lcd, 120 - gfx_djinn->width / 2, 32, gfx_djinn, curr_hue, 255, 255);
-            qp_rect(lcd, 0, 0, 8, 319, curr_hue, 255, 255, true);
-            for (int i = 0; i < 8; ++i) qp_circle(lcd, 20, (i * 40) + 20, 10, curr_hue, 255, 255, (i % 2) == 0);
-            //            for(int i = 0; i < 8; ++i)
-            //                qp_ellipse(lcd, 20, (i * 40) + 20, 20, 12, curr_hue, 255, 255, (i % 2) == 0);
-            qp_rect(lcd, 232, 0, 239, 319, curr_hue, 255, 255, true);
-            qp_line(lcd, 8, 0, 32, 319, curr_hue, 255, 255);
-            qp_line(lcd, 32, 0, 8, 319, curr_hue, 255, 255);
+        // Send to slave every 500ms regardless of state change
+        if (timer_elapsed32(last_sync) > 500) {
+            needs_sync = true;
         }
 
-        static led_t last_led_state = {0};
-        if (redraw_required || last_led_state.raw != user_state.values.led_state.raw) {
-            last_led_state.raw = user_state.values.led_state.raw;
-            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 3), 0, last_led_state.caps_lock ? gfx_lock_caps_ON : gfx_lock_caps_OFF, curr_hue, 255, last_led_state.caps_lock ? 255 : 32);
-            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 2), 0, last_led_state.num_lock ? gfx_lock_num_ON : gfx_lock_num_OFF, curr_hue, 255, last_led_state.num_lock ? 255 : 32);
-            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 1), 0, last_led_state.scroll_lock ? gfx_lock_scrl_ON : gfx_lock_scrl_OFF, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32);
-            qp_drawtext(lcd, 0, 0, font_noto16, "So this is a test of font rendering");
-            qp_drawtext_recolor(lcd, 0, font_noto16->glyph_height, font_noto16, "with Quantum Painter...", 0, 255, 255, 0, 255, 0);
-            qp_drawtext_recolor(lcd, 0, 2 * font_noto16->glyph_height, font_noto16, "Perhaps a different background?", 43, 255, 255, 169, 255, 255);
-            qp_drawtext(lcd, 0, 3 * font_noto16->glyph_height, font_noto28, "Unicode: ĄȽɂɻɣɈʣ");
-            qp_drawtext(lcd, 0, 3 * font_noto16->glyph_height + font_noto28->glyph_height, font_redalert13, "And here we are, with another font!");
+        // Perform the sync if requested
+        if (needs_sync) {
+            last_sync = timer_read32();
+            if (soft_serial_transaction(USER_STATE_SYNC) != TRANSACTION_END) {
+                dprint("Failed to perform data transaction\n");
+            }
         }
     }
 }
 
 void housekeeping_task_keymap(void) {
-    // Ensure state is sync'ed from master to slave, if required
-    split_sync_user(false);
+    // Update kb_state so we can send to slave
+    user_state_update();
+
+    // Data sync from master to slave
+    user_state_sync();
 
 #ifdef LUA_ENABLE
     void test_lua(void);
     test_lua();
 #endif  // LUA_ENABLE
 }
+
+//----------------------------------------------------------
+// Display
+
+void draw_ui_user(void) {
+    bool            redraw_required = false;
+    static uint16_t last_hue        = 0xFFFF;
+    uint8_t         curr_hue        = rgblight_get_hue();
+    if (last_hue != curr_hue) {
+        last_hue        = curr_hue;
+        redraw_required = true;
+    }
+
+    // Show the Djinn logo and two vertical bars on both sides
+    if (redraw_required) {
+        qp_drawimage_recolor(lcd, 120 - gfx_djinn->width / 2, 32, gfx_djinn, curr_hue, 255, 255);
+        qp_rect(lcd, 0, 0, 8, 319, curr_hue, 255, 255, true);
+        qp_rect(lcd, 231, 0, 239, 319, curr_hue, 255, 255, true);
+    }
+
+    // Show layer info on the left side
+    if (is_keyboard_left()) {
+        static uint32_t last_layer_state = 0;
+        if (redraw_required || last_layer_state != user_state.layer_state) {
+            last_layer_state = user_state.layer_state;
+
+            const char *layer_name = "unknown";
+            switch (get_highest_layer(user_state.layer_state)) {
+                case LAYER_BASE:
+                    layer_name = "qwerty";
+                    break;
+                case LAYER_LOWER:
+                    layer_name = "lower";
+                    break;
+                case LAYER_RAISE:
+                    layer_name = "raise";
+                    break;
+                case LAYER_ADJUST:
+                    layer_name = "adjust";
+                    break;
+            }
+
+            static int max_xpos = 0;
+            int        xpos     = 16;
+            int        ypos     = 4;
+            char       buf[32]  = {0};
+            snprintf(buf, sizeof(buf), "layer: %s", layer_name);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_redalert13, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            if (max_xpos < xpos) {
+                max_xpos = xpos;
+            }
+            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_redalert13->glyph_height, 0, 0, 0, true);
+        }
+    }
+
+    // Show LED lock indicators on the right side
+    if (!is_keyboard_left()) {
+        static led_t last_led_state = {0};
+        if (redraw_required || last_led_state.raw != user_state.led_state.raw) {
+            last_led_state.raw = user_state.led_state.raw;
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 3), 0, last_led_state.caps_lock ? gfx_lock_caps_ON : gfx_lock_caps_OFF, curr_hue, 255, last_led_state.caps_lock ? 255 : 32);
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 2), 0, last_led_state.num_lock ? gfx_lock_num_ON : gfx_lock_num_OFF, curr_hue, 255, last_led_state.num_lock ? 255 : 32);
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 1), 0, last_led_state.scroll_lock ? gfx_lock_scrl_ON : gfx_lock_scrl_OFF, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32);
+        }
+    }
+
+#if 0
+    // Test code
+    if (redraw_required) {
+        qp_line(lcd, 8, 0, 32, 319, curr_hue, 255, 255);
+        qp_line(lcd, 32, 0, 8, 319, curr_hue, 255, 255);
+        for (int i = 0; i < 8; ++i) qp_circle(lcd, 20, (i * 40) + 20, 10, curr_hue, 255, 255, (i % 2) == 0);
+        qp_drawtext(lcd, 0, 0, font_noto16, "So this is a test of font rendering");
+        qp_drawtext_recolor(lcd, 0, font_noto16->glyph_height, font_noto16, "with Quantum Painter...", 0, 255, 255, 0, 255, 0);
+        qp_drawtext_recolor(lcd, 0, 2 * font_noto16->glyph_height, font_noto16, "Perhaps a different background?", 43, 255, 255, 169, 255, 255);
+        qp_drawtext(lcd, 0, 3 * font_noto16->glyph_height, font_noto28, "Unicode: ĄȽɂɻɣɈʣ");
+        qp_drawtext(lcd, 0, 3 * font_noto16->glyph_height + font_noto28->glyph_height, font_redalert13, "And here we are, with another font!");
+    }
+#endif
+}
+//----------------------------------------------------------
+// Lua
 
 #ifdef LUA_ENABLE
 #    include <quantum.h>

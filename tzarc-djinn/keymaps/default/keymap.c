@@ -153,8 +153,8 @@ void encoder_update_user(uint8_t index, bool clockwise) {
 #pragma pack(1)
 
 typedef struct user_runtime_config {
-    uint32_t          layer_state;
-    led_t             led_state;
+    uint32_t layer_state;
+    led_t    led_state;
 } user_runtime_config;
 
 #pragma pack(pop)
@@ -172,7 +172,6 @@ void keyboard_post_init_user(void) {
     memset(&user_state, 0, sizeof(user_state));
 }
 
-
 void user_state_update(void) {
     if (is_keyboard_master()) {
         // Keep the LED state in sync
@@ -187,8 +186,8 @@ void user_state_sync(void) {
     if (is_keyboard_master()) {
         // Keep track of the last state, so that we can tell if we need to propagate to slave
         static user_runtime_config last_user_state;
-        static uint32_t          last_sync;
-        bool                     needs_sync = false;
+        static uint32_t            last_sync;
+        bool                       needs_sync = false;
 
         // Check if the state values are different
         if (memcmp(&user_state, &last_user_state, sizeof(user_runtime_config))) {
@@ -261,12 +260,12 @@ void draw_ui_user(void) {
             }
 
             static int max_xpos = 0;
-            int  xpos    = 16;
-            int  ypos    = 8;
-            char buf[32] = {0};
+            int        xpos     = 16;
+            int        ypos     = 8;
+            char       buf[32]  = {0};
             snprintf(buf, sizeof(buf), "layer: %s", layer_name);
             xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_redalert13, buf, curr_hue, 255, 255, curr_hue, 255, 0);
-            if(max_xpos < xpos) {
+            if (max_xpos < xpos) {
                 max_xpos = xpos;
             }
             qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_redalert13->glyph_height, 0, 0, 0, true);
