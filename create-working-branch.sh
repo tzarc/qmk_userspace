@@ -19,12 +19,10 @@ fi
 
 declare -a prs_to_apply
 prs_to_apply+=(10174) # Quantum Painter
-prs_to_apply+=(11820) # Audio
-prs_to_apply+=(11824) # G4xx USBPD
 prs_to_apply+=(11055) # RGB Matrix
 
 declare -a cherry_picks
-cherry_picks+=(749aca03c90c9316189b58e3236bea9242f3990f) # RGB_MATRIX slave scan
+#cherry_picks+=(749aca03c90c9316189b58e3236bea9242f3990f) # RGB_MATRIX slave scan
 
 rm -f "$script_dir"/*.patch || true
 
@@ -169,7 +167,7 @@ pushd "$script_dir/qmk_firmware"
 pcmd git push origin $target_branch --set-upstream --force-with-lease
 popd
 
-#exit 0
+exit 0
 
 # Set up the Djinn branch
 pushd "$script_dir/qmk_firmware"

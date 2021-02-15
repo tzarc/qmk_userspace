@@ -40,7 +40,7 @@
       "device": "STM32G474",
       "v1": false,
       "windows": {
-        "armToolchainPath": "E:\\gcc-arm-none-eabi-9-2020-q2-update-win32\\bin"
+        "armToolchainPath": "E:\\QMK_MSYS\\mingw64\\bin"
       }
     },
     {
@@ -55,7 +55,7 @@
       "device": "STM32F072x",
       "v1": false,
       "windows": {
-        "armToolchainPath": "E:\\gcc-arm-none-eabi-9-2020-q2-update-win32\\bin"
+        "armToolchainPath": "E:\\QMK_MSYS\\mingw64\\bin"
       }
     },
   ]

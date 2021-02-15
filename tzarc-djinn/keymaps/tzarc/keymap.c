@@ -29,6 +29,7 @@
 #include "graphics/lock-caps-OFF.c"
 #include "graphics/lock-scrl-OFF.c"
 #include "graphics/lock-num-OFF.c"
+#include "graphics/noto.c"
 
 #define MEDIA_KEY_DELAY 2
 
@@ -211,6 +212,10 @@ void split_sync_action_task_user(void) {
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 3), 0, last_led_state.caps_lock ? gfx_lock_caps : gfx_lock_caps_OFF, curr_hue, 255, last_led_state.caps_lock ? 255 : 32);
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 2), 0, last_led_state.num_lock ? gfx_lock_num : gfx_lock_num_OFF, curr_hue, 255, last_led_state.num_lock ? 255 : 32);
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 1), 0, last_led_state.scroll_lock ? gfx_lock_scrl : gfx_lock_scrl_OFF, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32);
+            qp_drawtext(lcd, 0, 0, font_noto, "So this is a test of font rendering");
+            qp_drawtext_recolor(lcd, 0, font_noto->glyph_height, font_noto, "with Quantum Painter...", 0, 255, 255, 0, 255, 0);
+            qp_drawtext_recolor(lcd, 0, 2*font_noto->glyph_height, font_noto, "Perhaps a different background?", 43, 255, 255, 169, 255, 255);
+            qp_drawtext(lcd, 0, 3*font_noto->glyph_height, font_noto, "Unicode: ĄȽɂɻɣɈʣ");
         }
     }
 }

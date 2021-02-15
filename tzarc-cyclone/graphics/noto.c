@@ -178,6 +178,7 @@ static const painter_raw_font_descriptor_t font_noto_raw PROGMEM = {
     },
     .image_palette             = NULL,
     .image_data                = font_noto_data,
+    .byte_count                = 967,
     .ascii_glyph_definitions   = font_noto_ascii_defs,
 #ifdef UNICODE_ENABLE
     .unicode_glyph_definitions = font_noto_unicode_defs,

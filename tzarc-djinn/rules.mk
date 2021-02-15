@@ -40,9 +40,3 @@ QUANTUM_PAINTER_DRIVERS = rgb565_surface ili9341
 
 LTO_ENABLE = yes
 OPT = 2
-
-#LTO_ENABLE = no
-#OPT = 0
-#OPT_DEFS += -g
-
-LUA_ENABLE = yes
