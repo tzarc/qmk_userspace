@@ -260,12 +260,16 @@ void draw_ui_user(void) {
                     break;
             }
 
-            int  xpos    = 12;
-            int  ypos    = 3;
+            static int max_xpos = 0;
+            int  xpos    = 16;
+            int  ypos    = 8;
             char buf[32] = {0};
             snprintf(buf, sizeof(buf), "layer: %s", layer_name);
             xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_redalert13, buf, curr_hue, 255, 255, curr_hue, 255, 0);
-            qp_rect(lcd, xpos, 3, 120, 3 + font_redalert13->glyph_height, 0, 0, 0, true);
+            if(max_xpos < xpos) {
+                max_xpos = xpos;
+            }
+            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_redalert13->glyph_height, 0, 0, 0, true);
         }
     }
 
