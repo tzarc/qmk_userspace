@@ -18,6 +18,7 @@
     "color.h": "c",
     "stdlib.h": "c",
     "string.h": "c",
-    "quantum.h": "c"
+    "quantum.h": "c",
+    "qp.h": "c"
   }
 }

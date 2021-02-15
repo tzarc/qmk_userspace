@@ -64,14 +64,12 @@ extern painter_device_t lcd;
 #pragma pack(1)
 
 typedef struct kb_runtime_config {
-    uint32_t          layer_state;
-    led_t             led_state;
     unsigned          lcd_power : 1;
     usbpd_allowance_t current_setting : 2;
 } kb_runtime_config;
 
 #pragma pack(pop)
 
-_Static_assert(sizeof(kb_runtime_config) == 6, "Invalid data transfer size for keyboard runtime data");
+_Static_assert(sizeof(kb_runtime_config) == 1, "Invalid data transfer size for keyboard sync data");
 
 extern kb_runtime_config kb_state;

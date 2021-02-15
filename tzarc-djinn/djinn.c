@@ -78,12 +78,6 @@ void kb_state_update(void) {
 
         // Turn off the LCD if there's been no matrix activity
         kb_state.lcd_power = (last_input_activity_elapsed() < LCD_ACTIVITY_TIMEOUT) ? 1 : 0;
-
-        // Keep the LED state in sync
-        kb_state.led_state = host_keyboard_led_state();
-
-        // Keep the layer state in sync
-        kb_state.layer_state = layer_state;
     }
 }
 
@@ -178,8 +172,8 @@ void keyboard_post_init_kb(void) {
     // debug_matrix = true;
 
     // Register keyboard state sync split transaction
-    static uint8_t transaction_status;
-    soft_serial_register_transaction(KB_STATE_SYNC, &transaction_status, sizeof(kb_state), &kb_state, sizeof(kb_state), &kb_state);
+    static uint8_t dummy_transaction_status;
+    soft_serial_register_transaction(KB_STATE_SYNC, &dummy_transaction_status, sizeof(kb_state), &kb_state, sizeof(kb_state), &kb_state);
 
     // Reset the initial shared data value between master and slave
     memset(&kb_state, 0, sizeof(kb_state));
@@ -213,6 +207,9 @@ void keyboard_post_init_kb(void) {
     // Turn on the LCD backlight
     backlight_enable();
     backlight_level(BACKLIGHT_LEVELS);
+
+    // Allow for user post-init
+    keyboard_post_init_user();
 }
 
 //----------------------------------------------------------

@@ -19,6 +19,7 @@
 #include <printf.h>
 #include <backlight.h>
 #include <qp.h>
+#include <serial.h>
 
 #include "graphics/djinn.c"
 #include "graphics/lock-caps.c"
@@ -27,6 +28,8 @@
 #include "graphics/redalert13.c"
 
 #define MEDIA_KEY_DELAY 2
+
+enum { USER_STATE_SYNC = SAFE_USER_SERIAL_TRANSACTION_ID };
 
 enum { _QWERTY, _LOWER, _RAISE, _ADJUST };
 #define KC_LWR MO(_LOWER)
@@ -144,6 +147,79 @@ void encoder_update_user(uint8_t index, bool clockwise) {
 }
 
 //----------------------------------------------------------
+// Sync
+
+#pragma pack(push)
+#pragma pack(1)
+
+typedef struct user_runtime_config {
+    uint32_t          layer_state;
+    led_t             led_state;
+} user_runtime_config;
+
+#pragma pack(pop)
+
+_Static_assert(sizeof(user_runtime_config) == 5, "Invalid data transfer size for user sync data");
+
+user_runtime_config user_state;
+
+void keyboard_post_init_user(void) {
+    // Register keyboard state sync split transaction
+    static uint8_t dummy_transaction_status;
+    soft_serial_register_transaction(USER_STATE_SYNC, &dummy_transaction_status, sizeof(user_state), &user_state, sizeof(user_state), &user_state);
+
+    // Reset the initial shared data value between master and slave
+    memset(&user_state, 0, sizeof(user_state));
+}
+
+
+void user_state_update(void) {
+    if (is_keyboard_master()) {
+        // Keep the LED state in sync
+        user_state.led_state = host_keyboard_led_state();
+
+        // Keep the layer state in sync
+        user_state.layer_state = layer_state;
+    }
+}
+
+void user_state_sync(void) {
+    if (is_keyboard_master()) {
+        // Keep track of the last state, so that we can tell if we need to propagate to slave
+        static user_runtime_config last_user_state;
+        static uint32_t          last_sync;
+        bool                     needs_sync = false;
+
+        // Check if the state values are different
+        if (memcmp(&user_state, &last_user_state, sizeof(user_runtime_config))) {
+            needs_sync = true;
+            memcpy(&last_user_state, &user_state, sizeof(user_runtime_config));
+        }
+
+        // Send to slave every 500ms regardless of state change
+        if (timer_elapsed32(last_sync) > 500) {
+            needs_sync = true;
+        }
+
+        // Perform the sync if requested
+        if (needs_sync) {
+            last_sync = timer_read32();
+            if (soft_serial_transaction(USER_STATE_SYNC) != TRANSACTION_END) {
+                dprint("Failed to perform data transaction\n");
+            }
+        }
+    }
+}
+
+void housekeeping_task_user(void) {
+    // Update kb_state so we can send to slave
+    user_state_update();
+
+    // Data sync from master to slave
+    user_state_sync();
+}
+
+//----------------------------------------------------------
 // Display
 
 void draw_ui_user(void) {
@@ -165,11 +241,11 @@ void draw_ui_user(void) {
     // Show layer info on the left side
     if (is_keyboard_left()) {
         static uint32_t last_layer_state = 0;
-        if (redraw_required || last_layer_state != kb_state.layer_state) {
-            last_layer_state = kb_state.layer_state;
+        if (redraw_required || last_layer_state != user_state.layer_state) {
+            last_layer_state = user_state.layer_state;
 
             const char *layer_name = "unknown";
-            switch (get_highest_layer(kb_state.layer_state)) {
+            switch (get_highest_layer(user_state.layer_state)) {
                 case _QWERTY:
                     layer_name = "qwerty";
                     break;
@@ -196,8 +272,8 @@ void draw_ui_user(void) {
     // Show LED lock indicators on the right side
     if (!is_keyboard_left()) {
         static led_t last_led_state = {0};
-        if (redraw_required || last_led_state.raw != kb_state.led_state.raw) {
-            last_led_state.raw = kb_state.led_state.raw;
+        if (redraw_required || last_led_state.raw != user_state.led_state.raw) {
+            last_led_state.raw = user_state.led_state.raw;
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 3), 0, gfx_lock_caps, curr_hue, 255, last_led_state.caps_lock ? 255 : 32);
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 2), 0, gfx_lock_num, curr_hue, 255, last_led_state.num_lock ? 255 : 32);
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 1), 0, gfx_lock_scrl, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32);

@@ -20,7 +20,6 @@
 #include <qp.h>
 
 #include "tzarc.h"
-#include "serial_usart_statesync.h"
 #include "qp_rgb565_surface.h"
 
 #include "graphics/djinn.c"
