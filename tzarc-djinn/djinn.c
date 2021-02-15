@@ -44,37 +44,38 @@ const char* usbpd_str(usbpd_allowance_t allowance) {
     }
 }
 
-void usbpd_task_kb(void) {
-    if (is_keyboard_master()) {
-        static uint32_t last_read = 0;
-        if (timer_elapsed32(last_read) > 250) {
-            last_read = timer_read32();
-            switch (usbpd_get_allowance()) {
-                case USBPD_500MA:
-                    if (kb_state.current_setting != USBPD_500MA) {
-                        dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.current_setting), usbpd_str(USBPD_500MA));
-                        kb_state.current_setting = USBPD_500MA;
-                    }
-                    break;
-                case USBPD_1500MA:
-                    if (kb_state.current_setting != USBPD_1500MA) {
-                        dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.current_setting), usbpd_str(USBPD_1500MA));
-                        kb_state.current_setting = USBPD_1500MA;
-                    }
-                    break;
-                case USBPD_3000MA:
-                    if (kb_state.current_setting != USBPD_3000MA) {
-                        dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.current_setting), usbpd_str(USBPD_3000MA));
-                        kb_state.current_setting = USBPD_3000MA;
-                    }
-                    break;
-            }
+void usbpd_update(void) {
+    static uint32_t last_read = 0;
+    if (timer_elapsed32(last_read) > 250) {
+        last_read = timer_read32();
+        switch (usbpd_get_allowance()) {
+            case USBPD_500MA:
+                if (kb_state.current_setting != USBPD_500MA) {
+                    dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.current_setting), usbpd_str(USBPD_500MA));
+                    kb_state.current_setting = USBPD_500MA;
+                }
+                break;
+            case USBPD_1500MA:
+                if (kb_state.current_setting != USBPD_1500MA) {
+                    dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.current_setting), usbpd_str(USBPD_1500MA));
+                    kb_state.current_setting = USBPD_1500MA;
+                }
+                break;
+            case USBPD_3000MA:
+                if (kb_state.current_setting != USBPD_3000MA) {
+                    dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.current_setting), usbpd_str(USBPD_3000MA));
+                    kb_state.current_setting = USBPD_3000MA;
+                }
+                break;
         }
     }
 }
 
 void kb_state_update(void) {
     if (is_keyboard_master()) {
+        // Modify allowed current limits
+        usbpd_update();
+
         // Turn off the LCD if there's been no matrix activity
         kb_state.lcd_power = (last_input_activity_elapsed() < LCD_ACTIVITY_TIMEOUT) ? 1 : 0;
 
@@ -115,19 +116,11 @@ void kb_state_sync(void) {
 }
 
 void housekeeping_task_kb(void) {
-    // Modify current limits
-    usbpd_task_kb();
-
     // Update kb_state so we can send to slave
     kb_state_update();
 
     // Data sync from master to slave
     kb_state_sync();
-
-    // Draw the UI
-    if (kb_state.lcd_power) {
-        draw_ui_user();
-    }
 
     // Work out if we've changed our current limit, update the limiter circuit switches
     static uint8_t current_setting = USBPD_500MA;
@@ -169,6 +162,11 @@ void housekeeping_task_kb(void) {
             backlight_enable();
         else
             backlight_disable();
+    }
+
+    // Draw the UI
+    if (kb_state.lcd_power) {
+        draw_ui_user();
     }
 }
 
