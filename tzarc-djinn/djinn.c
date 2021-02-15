@@ -18,85 +18,18 @@
 #include <hal.h>
 
 #include "djinn.h"
-#include "serial_usart_statesync.h"
+#include "serial.h"
 
 #include "qp_ili9341.h"
-#include "qp_rgb565_surface.h"
 
 painter_device_t lcd;
-painter_device_t surf;
 
 kb_runtime_config kb_state;
 uint32_t          last_slave_sync_time = 0;
 
 void board_init(void) { usbpd_init(); }
 
-void* get_split_sync_state_kb(size_t* state_size) {
-    *state_size = sizeof(kb_runtime_config);
-    return &kb_state;
-}
-
-bool split_sync_update_task_kb(void) {
-    if (is_keyboard_master()) {
-        // Turn off the LCD if there's been no matrix activity
-        kb_state.values.lcd_power = (last_input_activity_elapsed() < LCD_ACTIVITY_TIMEOUT) ? 1 : 0;
-    } else {
-        last_slave_sync_time = timer_read32();
-    }
-
-    // Force an update if the state changed
-    static kb_runtime_config last_state;
-    if (memcmp(&last_state, &kb_state, sizeof(kb_runtime_config)) != 0) {
-        memcpy(&last_state, &kb_state, sizeof(kb_runtime_config));
-        return true;
-    }
-
-    return false;
-}
-
-void split_sync_action_task_kb(void) {
-    // Work out if we've changed our current limit, update the limiter circuit switches
-    static uint8_t current_setting = USBPD_500MA;
-    if (current_setting != kb_state.values.current_setting) {
-        current_setting = kb_state.values.current_setting;
-        switch (current_setting) {
-            default:
-            case USBPD_500MA:
-                writePinLow(RGB_CURR_1500mA_OK_PIN);
-                writePinLow(RGB_CURR_3000mA_OK_PIN);
-                break;
-            case USBPD_1500MA:
-                writePinHigh(RGB_CURR_1500mA_OK_PIN);
-                writePinLow(RGB_CURR_3000mA_OK_PIN);
-                break;
-            case USBPD_3000MA:
-                writePinHigh(RGB_CURR_1500mA_OK_PIN);
-                writePinHigh(RGB_CURR_3000mA_OK_PIN);
-                break;
-        }
-
-        // Toggle rgblight on and off, if it's already on, to force a brightness update on all LEDs
-        if (rgblight_is_enabled()) {
-            rgblight_disable_noeeprom();
-            rgblight_enable_noeeprom();
-        }
-    }
-
-    // Turn on/off the LCD
-    static bool lcd_on = false;
-    if (lcd_on != (bool)kb_state.values.lcd_power) {
-        lcd_on = (bool)kb_state.values.lcd_power;
-        qp_power(lcd, lcd_on);
-    }
-
-    // Match the backlight to the LCD state
-    if (is_backlight_enabled() != lcd_on) {
-        if (lcd_on)
-            backlight_enable();
-        else
-            backlight_disable();
-    }
-}
+__attribute__((weak)) void draw_ui_user(void) {}
 
 const char* usbpd_str(usbpd_allowance_t allowance) {
     switch (allowance) {
@@ -118,44 +51,140 @@ void usbpd_task_kb(void) {
             last_read = timer_read32();
             switch (usbpd_get_allowance()) {
                 case USBPD_500MA:
-                    if (kb_state.values.current_setting != USBPD_500MA) {
-                        dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.values.current_setting), usbpd_str(USBPD_500MA));
-                        kb_state.values.current_setting = USBPD_500MA;
+                    if (kb_state.current_setting != USBPD_500MA) {
+                        dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.current_setting), usbpd_str(USBPD_500MA));
+                        kb_state.current_setting = USBPD_500MA;
                     }
                     break;
                 case USBPD_1500MA:
-                    if (kb_state.values.current_setting != USBPD_1500MA) {
-                        dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.values.current_setting), usbpd_str(USBPD_1500MA));
-                        kb_state.values.current_setting = USBPD_1500MA;
+                    if (kb_state.current_setting != USBPD_1500MA) {
+                        dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.current_setting), usbpd_str(USBPD_1500MA));
+                        kb_state.current_setting = USBPD_1500MA;
                     }
                     break;
                 case USBPD_3000MA:
-                    if (kb_state.values.current_setting != USBPD_3000MA) {
-                        dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.values.current_setting), usbpd_str(USBPD_3000MA));
-                        kb_state.values.current_setting = USBPD_3000MA;
+                    if (kb_state.current_setting != USBPD_3000MA) {
+                        dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.current_setting), usbpd_str(USBPD_3000MA));
+                        kb_state.current_setting = USBPD_3000MA;
                     }
                     break;
             }
         }
     }
 }
+
+void kb_state_update(void) {
+    if (is_keyboard_master()) {
+        // Turn off the LCD if there's been no matrix activity
+        kb_state.lcd_power = (last_input_activity_elapsed() < LCD_ACTIVITY_TIMEOUT) ? 1 : 0;
+
+        // Keep the LED state in sync
+        kb_state.led_state = host_keyboard_led_state();
+
+        // Keep the layer state in sync
+        kb_state.layer_state = layer_state;
+    }
+}
+
+void kb_state_sync(void) {
+    if (is_keyboard_master()) {
+        // Keep track of the last state, so that we can tell if we need to propagate to slave
+        static kb_runtime_config last_kb_state;
+        static uint32_t          last_sync;
+        bool                     needs_sync = false;
+
+        // Check if the state values are different
+        if (memcmp(&kb_state, &last_kb_state, sizeof(kb_runtime_config))) {
+            needs_sync = true;
+            memcpy(&last_kb_state, &kb_state, sizeof(kb_runtime_config));
+        }
+
+        // Send to slave every 500ms regardless of state change
+        if (timer_elapsed32(last_sync) > 500) {
+            needs_sync = true;
+        }
+
+        // Perform the sync if requested
+        if (needs_sync) {
+            last_sync = timer_read32();
+            if (soft_serial_transaction(KB_STATE_SYNC) != TRANSACTION_END) {
+                dprint("Failed to perform data transaction\n");
+            }
+        }
+    }
+}
+
 void housekeeping_task_kb(void) {
     // Modify current limits
     usbpd_task_kb();
 
-    // Ensure state is sync'ed between master and slave, if required
-    split_sync_kb(false);
+    // Update kb_state so we can send to slave
+    kb_state_update();
+
+    // Data sync from master to slave
+    kb_state_sync();
+
+    // Draw the UI
+    if (kb_state.lcd_power) {
+        draw_ui_user();
+    }
+
+    // Work out if we've changed our current limit, update the limiter circuit switches
+    static uint8_t current_setting = USBPD_500MA;
+    if (current_setting != kb_state.current_setting) {
+        current_setting = kb_state.current_setting;
+        switch (current_setting) {
+            default:
+            case USBPD_500MA:
+                writePinLow(RGB_CURR_1500mA_OK_PIN);
+                writePinLow(RGB_CURR_3000mA_OK_PIN);
+                break;
+            case USBPD_1500MA:
+                writePinHigh(RGB_CURR_1500mA_OK_PIN);
+                writePinLow(RGB_CURR_3000mA_OK_PIN);
+                break;
+            case USBPD_3000MA:
+                writePinHigh(RGB_CURR_1500mA_OK_PIN);
+                writePinHigh(RGB_CURR_3000mA_OK_PIN);
+                break;
+        }
+
+        // Toggle rgblight on and off, if it's already on, to force a brightness update on all LEDs
+        if (is_keyboard_master() && rgblight_is_enabled()) {
+            rgblight_disable_noeeprom();
+            rgblight_enable_noeeprom();
+        }
+    }
+
+    // Turn on/off the LCD
+    static bool lcd_on = false;
+    if (lcd_on != (bool)kb_state.lcd_power) {
+        lcd_on = (bool)kb_state.lcd_power;
+        qp_power(lcd, lcd_on);
+    }
+
+    // Match the backlight to the LCD state
+    if (is_keyboard_master() && is_backlight_enabled() != lcd_on) {
+        if (lcd_on)
+            backlight_enable();
+        else
+            backlight_disable();
+    }
 }
 
 //----------------------------------------------------------
 // Initialisation
 
 void keyboard_post_init_kb(void) {
-    debug_enable = true;
+    // debug_enable = true;
     // debug_matrix = true;
 
+    // Register keyboard state sync split transaction
+    static uint8_t transaction_status;
+    soft_serial_register_transaction(KB_STATE_SYNC, &transaction_status, sizeof(kb_state), &kb_state, sizeof(kb_state), &kb_state);
+
     // Reset the initial shared data value between master and slave
-    kb_state.raw = 0;
+    memset(&kb_state, 0, sizeof(kb_state));
 
     // Turn off increased current limits
     setPinOutput(RGB_CURR_1500mA_OK_PIN);
@@ -174,24 +203,14 @@ void keyboard_post_init_kb(void) {
     // Let the LCD get some power...
     wait_ms(50);
 
-    // Initialise the framebuffer
-    surf = qp_rgb565_surface_make_device(8, 320);
-    qp_init(surf, QP_ROTATION_0);
-    for (int i = 0; i < 320; ++i) {
-        qp_line(surf, 0, i, 7, i, i % 256, 255, 255);
-    }
-
     // Initialise the LCD
     lcd = qp_ili9341_make_device(LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, 4, true);
     qp_init(lcd, QP_ROTATION_0);
 
     // Turn on the LCD and clear the display
-    kb_state.values.lcd_power = 1;
+    kb_state.lcd_power = 1;
     qp_power(lcd, true);
     qp_rect(lcd, 0, 0, 239, 319, HSV_BLACK, true);
-
-    qp_viewport(lcd, 240 - 8 - 8, 0, 240 - 8 - 1, 319);
-    qp_pixdata(lcd, qp_rgb565_surface_get_buffer_ptr(surf), qp_rgb565_surface_get_pixel_count(surf));
 
     // Turn on the LCD backlight
     backlight_enable();
@@ -246,13 +265,13 @@ void suspend_wakeup_init_kb(void) {
 }
 
 #if defined(RGB_MATRIX_ENABLE)
-#define rgb_to_hsv_hook_func rgb_matrix_hsv_to_rgb
+#    define rgb_to_hsv_hook_func rgb_matrix_hsv_to_rgb
 #elif defined(RGBLIGHT_ENABLE)
-#define rgb_to_hsv_hook_func rgblight_hsv_to_rgb
+#    define rgb_to_hsv_hook_func rgblight_hsv_to_rgb
 #endif
 RGB rgb_to_hsv_hook_func(HSV hsv) {
     float scale;
-    switch (kb_state.values.current_setting) {
+    switch (kb_state.current_setting) {
         default:
         case USBPD_500MA:
             scale = 0.3f;

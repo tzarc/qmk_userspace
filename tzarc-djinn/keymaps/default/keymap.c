@@ -16,15 +16,15 @@
 
 #include QMK_KEYBOARD_H
 #include <string.h>
+#include <printf.h>
 #include <backlight.h>
 #include <qp.h>
-
-#include "serial_usart_statesync.h"
 
 #include "graphics/djinn.c"
 #include "graphics/lock-caps.c"
 #include "graphics/lock-scrl.c"
 #include "graphics/lock-num.c"
+#include "graphics/redalert13.c"
 
 #define MEDIA_KEY_DELAY 2
 
@@ -95,9 +95,9 @@ void encoder_update_user(uint8_t index, bool clockwise) {
     if (is_shift) {
         if (index == 0) { /* First encoder */
             if (clockwise) {
-                rgblight_increase_hue();
+                tap_code16(KC_MS_WH_DOWN);
             } else {
-                rgblight_decrease_hue();
+                tap_code16(KC_MS_WH_UP);
             }
         } else if (index == 1) { /* Second encoder */
             if (clockwise) {
@@ -123,9 +123,9 @@ void encoder_update_user(uint8_t index, bool clockwise) {
     } else {
         if (index == 0) { /* First encoder */
             if (clockwise) {
-                tap_code16(KC_MS_WH_DOWN);
+                rgblight_increase_hue();
             } else {
-                tap_code16(KC_MS_WH_UP);
+                rgblight_decrease_hue();
             }
         } else if (index == 1) { /* Second encoder */
             uint16_t held_keycode_timer = timer_read();
@@ -144,71 +144,63 @@ void encoder_update_user(uint8_t index, bool clockwise) {
 }
 
 //----------------------------------------------------------
-// Runtime data sync -- user/keymap
+// Display
 
-#pragma pack(push)
-#pragma pack(1)
-
-typedef union user_runtime_config {
-    struct {
-        led_t led_state;
-    } values;
-    uint8_t raw;
-} user_runtime_config;
-
-#pragma pack(pop)
-
-_Static_assert(sizeof(user_runtime_config) == 1, "Invalid data transfer size for user runtime data");
-static user_runtime_config user_state;
-
-void* get_split_sync_state_user(size_t* state_size) {
-    *state_size = sizeof(user_runtime_config);
-    return &user_state;
-}
-
-bool split_sync_update_task_user(void) {
-    if (is_keyboard_master()) {
-        // Sync the LED state
-        user_state.values.led_state = host_keyboard_led_state();
+void draw_ui_user(void) {
+    bool            redraw_required = false;
+    static uint16_t last_hue        = 0xFFFF;
+    uint8_t         curr_hue        = rgblight_get_hue();
+    if (last_hue != curr_hue) {
+        last_hue        = curr_hue;
+        redraw_required = true;
     }
 
-    // Force an update if the state changed
-    static user_runtime_config last_state;
-    if (memcmp(&last_state, &user_state, sizeof(user_runtime_config)) != 0) {
-        memcpy(&last_state, &user_state, sizeof(user_runtime_config));
-        return true;
+    // Show the Djinn logo and two vertical bars on both sides
+    if (redraw_required) {
+        qp_drawimage_recolor(lcd, 120 - gfx_djinn->width / 2, 32, gfx_djinn, curr_hue, 255, 255);
+        qp_rect(lcd, 0, 0, 8, 319, curr_hue, 255, 255, true);
+        qp_rect(lcd, 231, 0, 239, 319, curr_hue, 255, 255, true);
     }
 
-    return false;
-}
+    // Show layer info on the left side
+    if (is_keyboard_left()) {
+        static uint32_t last_layer_state = 0;
+        if (redraw_required || last_layer_state != kb_state.layer_state) {
+            last_layer_state = kb_state.layer_state;
 
-void split_sync_action_task_user(void) {
-    if (kb_state.values.lcd_power) {
-        bool            redraw_required = false;
-        static uint16_t last_hue        = 0xFFFF;
-        uint8_t         curr_hue        = rgblight_get_hue();
-        if (last_hue != curr_hue) {
-            redraw_required = true;
+            const char *layer_name = "unknown";
+            switch (get_highest_layer(kb_state.layer_state)) {
+                case _QWERTY:
+                    layer_name = "qwerty";
+                    break;
+                case _LOWER:
+                    layer_name = "lower";
+                    break;
+                case _RAISE:
+                    layer_name = "raise";
+                    break;
+                case _ADJUST:
+                    layer_name = "adjust";
+                    break;
+            }
+
+            int  xpos    = 12;
+            int  ypos    = 3;
+            char buf[32] = {0};
+            snprintf(buf, sizeof(buf), "layer: %s", layer_name);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_redalert13, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            qp_rect(lcd, xpos, 3, 120, 3 + font_redalert13->glyph_height, 0, 0, 0, true);
         }
+    }
 
-        if (redraw_required) {
-            last_hue = curr_hue;
-            qp_drawimage_recolor(lcd, 120 - gfx_djinn->width / 2, 32, gfx_djinn, curr_hue, 255, 255);
-            qp_rect(lcd, 0, 0, 8, 319, curr_hue, 255, 255, true);
-            qp_rect(lcd, 231, 0, 239, 319, curr_hue, 255, 255, true);
-        }
-
+    // Show LED lock indicators on the right side
+    if (!is_keyboard_left()) {
         static led_t last_led_state = {0};
-        if (redraw_required || last_led_state.raw != user_state.values.led_state.raw) {
-            last_led_state.raw = user_state.values.led_state.raw;
+        if (redraw_required || last_led_state.raw != kb_state.led_state.raw) {
+            last_led_state.raw = kb_state.led_state.raw;
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 3), 0, gfx_lock_caps, curr_hue, 255, last_led_state.caps_lock ? 255 : 32);
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 2), 0, gfx_lock_num, curr_hue, 255, last_led_state.num_lock ? 255 : 32);
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 1), 0, gfx_lock_scrl, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32);
         }
     }
-}
-
-void housekeeping_task_keymap(void) {
-    // Ensure state is sync'ed from master to slave, if required
-    split_sync_user(false);
 }

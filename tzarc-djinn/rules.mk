@@ -3,14 +3,14 @@ MCU = STM32G474
 BOOTMAGIC_ENABLE = lite     # Virtual DIP switch configuration
 MOUSEKEY_ENABLE = no        # Mouse keys
 EXTRAKEY_ENABLE = no        # Audio control and System control
-CONSOLE_ENABLE = no         # Console for debug
+CONSOLE_ENABLE = yes        # Console for debug
 COMMAND_ENABLE = no         # Commands for debug and configuration
 SLEEP_LED_ENABLE = no       # Breathing sleep LED during USB suspend
 NKRO_ENABLE = no            # USB Nkey Rollover
 UNICODE_ENABLE = no         # Unicode
 
 SPLIT_KEYBOARD = yes
-SERIAL_DRIVER = usart_statesync
+SERIAL_DRIVER = usart
 
 ENCODER_ENABLE = yes
 
@@ -36,7 +36,11 @@ AUDIO_PIN = A5
 AUDIO_PIN_ALT = A4
 
 QUANTUM_PAINTER_ENABLE = yes
-QUANTUM_PAINTER_DRIVERS = rgb565_surface ili9341
+QUANTUM_PAINTER_DRIVERS = ili9341
 
 LTO_ENABLE = yes
 OPT = 2
+
+#LTO_ENABLE = no
+#OPT = 0
+#OPT_DEFS += -g

@@ -52,11 +52,6 @@ $(ROOTDIR)/tzarc-djinn/gfx-djinn.c: Makefile $(ROOTDIR)/tzarc-djinn/graphics/dji
 		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-caps.png -f mono4 \
 		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-scrl.png -f mono4 \
 		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-num.png -f mono4 \
-		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-caps-OFF.png -f mono4 \
-		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-scrl-OFF.png -f mono4 \
-		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-num-OFF.png -f mono4 \
-		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-make-font-image --font ProggyClean.ttf --size 16 -o noto.png --unicode-glyphs "ĄȽɂɻɣɈʣ" \
-		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-font-image --input noto.png -f mono2 --unicode-glyphs "ĄȽɂɻɣɈʣ" \
 		&& cd $(ROOTDIR)/tzarc-cyclone/graphics \
 		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-caps.png -f mono2 \
 		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-scrl.png -f mono2 \

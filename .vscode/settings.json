@@ -15,6 +15,9 @@
     "regex": "c",
     "serial_usart_statesync.h": "c",
     "*.inc": "c",
-    "color.h": "c"
+    "color.h": "c",
+    "stdlib.h": "c",
+    "string.h": "c",
+    "quantum.h": "c"
   }
 }

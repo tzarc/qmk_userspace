@@ -21,17 +21,22 @@
 
 #include "tzarc.h"
 #include "serial_usart_statesync.h"
+#include "qp_rgb565_surface.h"
 
 #include "graphics/djinn.c"
-#include "graphics/lock-caps.c"
-#include "graphics/lock-scrl.c"
-#include "graphics/lock-num.c"
-#include "graphics/lock-caps-OFF.c"
-#include "graphics/lock-scrl-OFF.c"
-#include "graphics/lock-num-OFF.c"
-#include "graphics/noto.c"
+#include "lock-caps-ON.c"
+#include "lock-scrl-ON.c"
+#include "lock-num-ON.c"
+#include "lock-caps-OFF.c"
+#include "lock-scrl-OFF.c"
+#include "lock-num-OFF.c"
+#include "noto16.c"
+#include "noto28.c"
+#include "redalert13.c"
 
 #define MEDIA_KEY_DELAY 2
+
+painter_device_t surf;
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -87,6 +92,18 @@ void eeconfig_init_keymap(void) {
     rgblight_sethsv(128, 255, 255);
     backlight_enable();
     backlight_level(BACKLIGHT_LEVELS);
+}
+
+void keyboard_post_init_keymap(void) {
+    // Initialise the framebuffer
+    surf = qp_rgb565_surface_make_device(8, 320);
+    qp_init(surf, QP_ROTATION_0);
+    for (int i = 0; i < 320; ++i) {
+        qp_line(surf, 0, i, 7, i, i % 256, 255, 255);
+    }
+
+    qp_viewport(lcd, 240 - 8 - 8, 0, 240 - 8 - 1, 319);
+    qp_pixdata(lcd, qp_rgb565_surface_get_buffer_ptr(surf), qp_rgb565_surface_get_pixel_count(surf));
 }
 
 void encoder_update_keymap(uint8_t index, bool clockwise) {
@@ -209,13 +226,14 @@ void split_sync_action_task_user(void) {
         static led_t last_led_state = {0};
         if (redraw_required || last_led_state.raw != user_state.values.led_state.raw) {
             last_led_state.raw = user_state.values.led_state.raw;
-            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 3), 0, last_led_state.caps_lock ? gfx_lock_caps : gfx_lock_caps_OFF, curr_hue, 255, last_led_state.caps_lock ? 255 : 32);
-            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 2), 0, last_led_state.num_lock ? gfx_lock_num : gfx_lock_num_OFF, curr_hue, 255, last_led_state.num_lock ? 255 : 32);
-            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 1), 0, last_led_state.scroll_lock ? gfx_lock_scrl : gfx_lock_scrl_OFF, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32);
-            qp_drawtext(lcd, 0, 0, font_noto, "So this is a test of font rendering");
-            qp_drawtext_recolor(lcd, 0, font_noto->glyph_height, font_noto, "with Quantum Painter...", 0, 255, 255, 0, 255, 0);
-            qp_drawtext_recolor(lcd, 0, 2*font_noto->glyph_height, font_noto, "Perhaps a different background?", 43, 255, 255, 169, 255, 255);
-            qp_drawtext(lcd, 0, 3*font_noto->glyph_height, font_noto, "Unicode: ĄȽɂɻɣɈʣ");
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 3), 0, last_led_state.caps_lock ? gfx_lock_caps_ON : gfx_lock_caps_OFF, curr_hue, 255, last_led_state.caps_lock ? 255 : 32);
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 2), 0, last_led_state.num_lock ? gfx_lock_num_ON : gfx_lock_num_OFF, curr_hue, 255, last_led_state.num_lock ? 255 : 32);
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 1), 0, last_led_state.scroll_lock ? gfx_lock_scrl_ON : gfx_lock_scrl_OFF, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32);
+            qp_drawtext(lcd, 0, 0, font_noto16, "So this is a test of font rendering");
+            qp_drawtext_recolor(lcd, 0, font_noto16->glyph_height, font_noto16, "with Quantum Painter...", 0, 255, 255, 0, 255, 0);
+            qp_drawtext_recolor(lcd, 0, 2 * font_noto16->glyph_height, font_noto16, "Perhaps a different background?", 43, 255, 255, 169, 255, 255);
+            qp_drawtext(lcd, 0, 3 * font_noto16->glyph_height, font_noto28, "Unicode: ĄȽɂɻɣɈʣ");
+            qp_drawtext(lcd, 0, 3 * font_noto16->glyph_height + font_noto28->glyph_height, font_redalert13, "And here we are, with another font!");
         }
     }
 }

@@ -14,6 +14,8 @@ CONSOLE_ENABLE ?= yes
 RAW_ENABLE ?= yes
 UNICODE_ENABLE ?= yes
 
+VPATH += $(USER_PATH)/graphics/src
+
 ifeq ($(strip $(PLATFORM_KEY)),chibios)
 	# Uses defaults above
 	UNICODE_ENABLE = yes
