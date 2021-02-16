@@ -39,3 +39,8 @@
 
 #define NO_ACTION_MACRO
 #define NO_ACTION_FUNCTION
+
+// Allow for an extra sync command over the split
+#define SERIAL_USE_MULTI_TRANSACTION
+#define SPLIT_NUM_TRANSACTIONS_USER 2
+#define I2C_SLAVE_USER_REG_COUNT 9
