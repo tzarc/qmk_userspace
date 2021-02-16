@@ -102,7 +102,7 @@ void kb_state_sync(void) {
         // Perform the sync if requested
         if (needs_sync) {
             last_sync = timer_read32();
-            if (soft_serial_transaction(KB_STATE_SYNC) != TRANSACTION_END) {
+            if (!split_sync_execute_transaction(KB_STATE_SYNC)) {
                 dprint("Failed to perform data transaction\n");
             }
         }
@@ -172,8 +172,7 @@ void keyboard_post_init_kb(void) {
     // debug_matrix = true;
 
     // Register keyboard state sync split transaction
-    static uint8_t dummy_transaction_status;
-    soft_serial_register_transaction(KB_STATE_SYNC, &dummy_transaction_status, sizeof(kb_state), &kb_state, sizeof(kb_state), &kb_state);
+    split_sync_register_transaction(KB_STATE_SYNC, sizeof(kb_state), &kb_state, 0, NULL);
 
     // Reset the initial shared data value between master and slave
     memset(&kb_state, 0, sizeof(kb_state));

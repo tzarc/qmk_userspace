@@ -18,7 +18,7 @@
 
 #include <quantum.h>
 #include <qp.h>
-#include <serial.h>
+#include <split_sync.h>
 
 //----------------------------------------------------------
 // Layout
@@ -56,7 +56,7 @@
 //----------------------------------------------------------
 // Runtime data sync -- keyboard
 
-enum { KB_STATE_SYNC = SAFE_KB_SERIAL_TRANSACTION_ID };
+enum { KB_STATE_SYNC = SAFE_KB_SPLIT_TRANSACTION_ID };
 
 extern painter_device_t lcd;
 

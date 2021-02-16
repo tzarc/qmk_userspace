@@ -18,7 +18,6 @@
 #include <string.h>
 #include <backlight.h>
 #include <qp.h>
-#include <serial.h>
 
 #include "tzarc.h"
 #include "qp_rgb565_surface.h"
@@ -36,7 +35,7 @@
 
 #define MEDIA_KEY_DELAY 2
 
-enum { USER_STATE_SYNC = SAFE_USER_SERIAL_TRANSACTION_ID };
+enum { USER_STATE_SYNC = SAFE_USER_SPLIT_TRANSACTION_ID };
 
 painter_device_t surf;
 
@@ -161,12 +160,13 @@ void encoder_update_keymap(uint8_t index, bool clockwise) {
 
 typedef struct user_runtime_config {
     uint32_t layer_state;
+    uint32_t scan_rate;
     led_t    led_state;
 } user_runtime_config;
 
 #pragma pack(pop)
 
-_Static_assert(sizeof(user_runtime_config) == 5, "Invalid data transfer size for user sync data");
+_Static_assert(sizeof(user_runtime_config) == 9, "Invalid data transfer size for user sync data");
 
 user_runtime_config user_state;
 
@@ -178,12 +178,11 @@ void keyboard_post_init_keymap(void) {
         qp_line(surf, 0, i, 7, i, i % 256, 255, 255);
     }
 
-    qp_viewport(lcd, 240 - 8 - 8, 0, 240 - 8 - 1, 319);
+    qp_viewport(lcd, 240 - 8 - 8 - 8, 0, 240 - 8 - 8 - 1, 319);
     qp_pixdata(lcd, qp_rgb565_surface_get_buffer_ptr(surf), qp_rgb565_surface_get_pixel_count(surf));
 
     // Register keyboard state sync split transaction
-    static uint8_t dummy_transaction_status;
-    soft_serial_register_transaction(USER_STATE_SYNC, &dummy_transaction_status, sizeof(user_state), &user_state, sizeof(user_state), &user_state);
+    split_sync_register_transaction(USER_STATE_SYNC, sizeof(user_state), &user_state, 0, NULL);
 
     // Reset the initial shared data value between master and slave
     memset(&user_state, 0, sizeof(user_state));
@@ -191,11 +190,12 @@ void keyboard_post_init_keymap(void) {
 
 void user_state_update(void) {
     if (is_keyboard_master()) {
-        // Keep the LED state in sync
-        user_state.led_state = host_keyboard_led_state();
-
         // Keep the layer state in sync
         user_state.layer_state = layer_state;
+        // Keep the scan rate in sync
+        user_state.scan_rate = get_matrix_scan_rate();
+        // Keep the LED state in sync
+        user_state.led_state = host_keyboard_led_state();
     }
 }
 
@@ -220,7 +220,7 @@ void user_state_sync(void) {
         // Perform the sync if requested
         if (needs_sync) {
             last_sync = timer_read32();
-            if (soft_serial_transaction(USER_STATE_SYNC) != TRANSACTION_END) {
+            if (!split_sync_execute_transaction(USER_STATE_SYNC)) {
                 dprint("Failed to perform data transaction\n");
             }
         }
@@ -286,6 +286,22 @@ void draw_ui_user(void) {
             int        ypos     = 4;
             char       buf[32]  = {0};
             snprintf(buf, sizeof(buf), "layer: %s", layer_name);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_redalert13, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            if (max_xpos < xpos) {
+                max_xpos = xpos;
+            }
+            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_redalert13->glyph_height, 0, 0, 0, true);
+        }
+
+        static uint32_t last_scan_update = 0;
+        if (redraw_required || timer_elapsed32(last_scan_update) > 1000) {
+            last_scan_update = timer_read32();
+
+            static int max_xpos = 0;
+            int        xpos     = 16;
+            int        ypos     = 4 + font_redalert13->glyph_height + 4;
+            char       buf[32]  = {0};
+            snprintf(buf, sizeof(buf), "scans: %d", (int)user_state.scan_rate);
             xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_redalert13, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_xpos < xpos) {
                 max_xpos = xpos;

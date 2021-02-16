@@ -19,7 +19,6 @@
 #include <printf.h>
 #include <backlight.h>
 #include <qp.h>
-#include <serial.h>
 
 #include "graphics/djinn.c"
 #include "graphics/lock-caps.c"
@@ -29,7 +28,7 @@
 
 #define MEDIA_KEY_DELAY 2
 
-enum { USER_STATE_SYNC = SAFE_USER_SERIAL_TRANSACTION_ID };
+enum { USER_STATE_SYNC = SAFE_USER_SPLIT_TRANSACTION_ID };
 
 enum { _QWERTY, _LOWER, _RAISE, _ADJUST };
 #define KC_LWR MO(_LOWER)
@@ -165,8 +164,7 @@ user_runtime_config user_state;
 
 void keyboard_post_init_user(void) {
     // Register keyboard state sync split transaction
-    static uint8_t dummy_transaction_status;
-    soft_serial_register_transaction(USER_STATE_SYNC, &dummy_transaction_status, sizeof(user_state), &user_state, sizeof(user_state), &user_state);
+    split_sync_register_transaction(USER_STATE_SYNC, sizeof(user_state), &user_state, 0, NULL);
 
     // Reset the initial shared data value between master and slave
     memset(&user_state, 0, sizeof(user_state));
@@ -203,7 +201,7 @@ void user_state_sync(void) {
         // Perform the sync if requested
         if (needs_sync) {
             last_sync = timer_read32();
-            if (soft_serial_transaction(USER_STATE_SYNC) != TRANSACTION_END) {
+            if (!split_sync_execute_transaction(USER_STATE_SYNC)) {
                 dprint("Failed to perform data transaction\n");
             }
         }

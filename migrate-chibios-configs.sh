@@ -104,11 +104,25 @@ validate_build() {
     git checkout $source_branch >/dev/null 2>&1
     ./util/chibios_conf_updater.sh >/dev/null 2>&1
     disable_chconf_extras >/dev/null 2>&1
+
+    # Run any pre-build function if it exists
+    local prebuild_cmd="prebuild_$(echo $keyboard | tr '/' '_')"
+    if type "$prebuild_cmd" >/dev/null 2>&1 ; then
+        "$prebuild_cmd"
+    fi
+
     local before="$(build_single "$build_target" before ${extraflags:-})"
 
     git clean -xfd >/dev/null 2>&1
     git checkout -- . >/dev/null 2>&1
     git checkout $branch_under_test >/dev/null 2>&1
+
+    # Run any pre-build function if it exists
+    local prebuild_cmd="prebuild_$(echo $keyboard | tr '/' '_')"
+    if type "$prebuild_cmd" >/dev/null 2>&1 ; then
+        "$prebuild_cmd"
+    fi
+
     local after="$(build_single "$build_target" after ${extraflags:-})"
 
     if [[ "$before" == "$after" ]] ; then
@@ -227,7 +241,13 @@ upgrade_one_keyboard() {
 
     # Fixup the 'BOARD = ...' line in rules.mk
     if [[ -e keyboards/$keyboard/rules.mk ]] ; then
-        sed -i "s@^BOARD\s*=\s*.*@BOARD = $chibios_board@g" keyboards/$keyboard/rules.mk
+        if [[ ! -z "$(grep -E '^BOARD\s*=' keyboards/$keyboard/rules.mk)" ]] ; then
+            # Fixup existing BOARD variable
+            sed -i "s@^BOARD\s*=\s*.*@BOARD = $chibios_board@g" keyboards/$keyboard/rules.mk
+        else
+            # Add new BOARD variable after MCU
+            sed -i "/^MCU\s*=.*/a BOARD = $chibios_board" keyboards/$keyboard/rules.mk
+        fi
     fi
     for build in ${builds[@]} ; do
         if [[ -e keyboards/$build/rules.mk ]] ; then
@@ -266,12 +286,14 @@ upgrade_one_keyboard() {
     popd >/dev/null 2>&1
 }
 
-postmigrate_jm60() {
+prebuild_geminate60() {
     pushd "$qmk_firmware_dir" >/dev/null 2>&1
+    # Add new BOARD variable after MCU
+    sed -i "/^MCU\s*=.*/a BOARD = $chibios_board" keyboards/$keyboard/rules.mk
     popd >/dev/null 2>&1
 }
 
-premigrate_chavdai40() {
+postmigrate_chavdai40() {
     pushd "$qmk_firmware_dir" >/dev/null 2>&1
     popd >/dev/null 2>&1
 }
@@ -287,8 +309,9 @@ upgrade_all_keyboards()  {
 #    done
 #    popd >/dev/null 2>&1
 
-    upgrade_one_keyboard --keyboard handwired/tzarc/djinn --chibios-board GENERIC_STM32_G474XE
-    upgrade_one_keyboard --keyboard handwired/onekey/nucleo64_g431rb --chibios-board GENERIC_STM32_G431XB
+    upgrade_one_keyboard --keyboard geminate60 --chibios-board QMK_PROTON_C
+    upgrade_one_keyboard --keyboard sowbug/68keys --chibios-board STM32_F103_STM32DUINO
+    upgrade_one_keyboard --keyboard sowbug/ansi_tkl --chibios-board STM32_F103_STM32DUINO
     #upgrade_one_keyboard --keyboard chavdai40 --chibios-board ST_NUCLEO32_F042K6 --no-mcuconf chavdai40/rev1 chavdai40/rev2
     #upgrade_one_keyboard --keyboard ergodox_stm32 --chibios-board ST_NUCLEO64_F103RB --no-mcuconf
     #upgrade_one_keyboard --keyboard jm60 --chibios-board ST_NUCLEO64_F103RB --no-mcuconf
