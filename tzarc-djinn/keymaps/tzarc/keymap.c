@@ -32,6 +32,7 @@
 #include "noto16.c"
 #include "noto28.c"
 #include "redalert13.c"
+#include "thintel15.c"
 
 #define MEDIA_KEY_DELAY 2
 
@@ -291,11 +292,11 @@ void draw_ui_user(void) {
             int        ypos     = 4;
             char       buf[32]  = {0};
             snprintf(buf, sizeof(buf), "layer: %s", layer_name);
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_redalert13, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_xpos < xpos) {
                 max_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_redalert13->glyph_height, 0, 0, 0, true);
+            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
         }
 
         static uint32_t last_scan_update = 0;
@@ -304,32 +305,32 @@ void draw_ui_user(void) {
 
             static int max_xpos = 0;
             int        xpos     = 16;
-            int        ypos     = 4 + font_redalert13->glyph_height + 4;
+            int        ypos     = 4 + font_thintel15->glyph_height + 4;
             char       buf[32]  = {0};
             snprintf(buf, sizeof(buf), "scans: %d", (int)user_state.scan_rate);
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_redalert13, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_xpos < xpos) {
                 max_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_redalert13->glyph_height, 0, 0, 0, true);
+            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
 
             xpos = 16;
-            ypos += 4 + font_redalert13->glyph_height;
+            ypos += 4 + font_thintel15->glyph_height;
             snprintf(buf, sizeof(buf), "power: %s", usbpd_str(kb_state.current_setting));
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_redalert13, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_xpos < xpos) {
                 max_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_redalert13->glyph_height, 0, 0, 0, true);
+            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
 
             xpos = 16;
-            ypos += 4 + font_redalert13->glyph_height;
+            ypos += 4 + font_thintel15->glyph_height;
             snprintf(buf, sizeof(buf), "wpm: %d", (int)user_state.wpm);
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_redalert13, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_xpos < xpos) {
                 max_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_redalert13->glyph_height, 0, 0, 0, true);
+            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
         }
     }
 
