@@ -90,8 +90,8 @@ user_slave_data     user_slave;
 
 void keyboard_post_init_keymap(void) {
     // Register keyboard state sync split transaction
-    split_sync_register_transaction(USER_STATE_SYNC, sizeof(user_state), &user_state, 0, NULL);
-    split_sync_register_transaction(USER_SLAVE_SYNC, 0, NULL, sizeof(user_slave), &user_slave);
+    split_sync_register_m2s_transaction(USER_STATE_SYNC, sizeof(user_state), &user_state);
+    split_sync_register_s2m_transaction(USER_SLAVE_SYNC, sizeof(user_slave), &user_slave);
 
     // Reset the initial shared data value between master and slave
     memset(&user_state, 0, sizeof(user_state));

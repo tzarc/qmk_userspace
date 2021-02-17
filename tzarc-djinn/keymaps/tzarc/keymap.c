@@ -37,6 +37,8 @@
 
 enum { USER_STATE_SYNC = SAFE_USER_SPLIT_TRANSACTION_ID };
 
+const char *usbpd_str(usbpd_allowance_t allowance);
+
 painter_device_t surf;
 
 // clang-format off
@@ -161,12 +163,13 @@ void encoder_update_keymap(uint8_t index, bool clockwise) {
 typedef struct user_runtime_config {
     uint32_t layer_state;
     uint32_t scan_rate;
+    uint8_t  wpm;
     led_t    led_state;
 } user_runtime_config;
 
 #pragma pack(pop)
 
-_Static_assert(sizeof(user_runtime_config) == 9, "Invalid data transfer size for user sync data");
+_Static_assert(sizeof(user_runtime_config) == 10, "Invalid data transfer size for user sync data");
 
 user_runtime_config user_state;
 
@@ -196,6 +199,8 @@ void user_state_update(void) {
         user_state.scan_rate = get_matrix_scan_rate();
         // Keep the LED state in sync
         user_state.led_state = host_keyboard_led_state();
+        // Keep the WPM in sync
+        user_state.wpm = (uint8_t)get_current_wpm();
     }
 }
 
@@ -212,8 +217,8 @@ void user_state_sync(void) {
             memcpy(&last_user_state, &user_state, sizeof(user_runtime_config));
         }
 
-        // Send to slave every 500ms regardless of state change
-        if (timer_elapsed32(last_sync) > 500) {
+        // Send to slave every 125ms regardless of state change
+        if (timer_elapsed32(last_sync) > 125) {
             needs_sync = true;
         }
 
@@ -294,7 +299,7 @@ void draw_ui_user(void) {
         }
 
         static uint32_t last_scan_update = 0;
-        if (redraw_required || timer_elapsed32(last_scan_update) > 1000) {
+        if (redraw_required || timer_elapsed32(last_scan_update) > 125) {
             last_scan_update = timer_read32();
 
             static int max_xpos = 0;
@@ -302,6 +307,24 @@ void draw_ui_user(void) {
             int        ypos     = 4 + font_redalert13->glyph_height + 4;
             char       buf[32]  = {0};
             snprintf(buf, sizeof(buf), "scans: %d", (int)user_state.scan_rate);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_redalert13, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            if (max_xpos < xpos) {
+                max_xpos = xpos;
+            }
+            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_redalert13->glyph_height, 0, 0, 0, true);
+
+            xpos = 16;
+            ypos += 4 + font_redalert13->glyph_height;
+            snprintf(buf, sizeof(buf), "power: %s", usbpd_str(kb_state.current_setting));
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_redalert13, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            if (max_xpos < xpos) {
+                max_xpos = xpos;
+            }
+            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_redalert13->glyph_height, 0, 0, 0, true);
+
+            xpos = 16;
+            ypos += 4 + font_redalert13->glyph_height;
+            snprintf(buf, sizeof(buf), "wpm: %d", (int)user_state.wpm);
             xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_redalert13, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_xpos < xpos) {
                 max_xpos = xpos;
