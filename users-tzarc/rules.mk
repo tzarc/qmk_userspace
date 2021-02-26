@@ -7,10 +7,10 @@ SRC += \
 
 DEBOUNCE_TYPE ?= sym_eager_pk
 
+CONSOLE_ENABLE = yes
 BOOTMAGIC_ENABLE ?= lite
 EXTRAKEY_ENABLE ?= yes
 MOUSEKEY_ENABLE ?= yes
-CONSOLE_ENABLE ?= yes
 RAW_ENABLE ?= yes
 UNICODE_ENABLE ?= yes
 
