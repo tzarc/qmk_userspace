@@ -8,7 +8,7 @@ export PATH=/usr/lib/ccache:$PATH
 MAKEFLAGS="-j --output-sync"
 
 pushd "$script_dir/qmk_firmware" >/dev/null 2>&1 \
-    && time remake $MAKEFLAGS all-chibios:default "$@" 2>&1 | tee "$script_dir/build.log" | egrep '\[(ERRORS|WARNINGS|OK)\]' \
+    && time remake $MAKEFLAGS all:default "$@" 2>&1 | tee "$script_dir/build.log" | egrep '\[(ERRORS|WARNINGS|OK)\]' \
     && popd >/dev/null 2>&1
 
 #pushd "$script_dir/qmk_firmware" >/dev/null 2>&1 \
@@ -25,4 +25,4 @@ echo "Skipped builds: $num_skipped"
 echo "Warning builds: $num_warnings"
 echo "Failing builds: $num_failures"
 echo "-------------------------------"
-cat "$script_dir/build.log" | egrep '\[(ERRORS)\]'
+cat "$script_dir/build.log" | egrep '\[(ERRORS)\]

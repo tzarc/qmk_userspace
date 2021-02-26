@@ -88,6 +88,7 @@ void tap_unicode_glyph_nomods(uint32_t glyph) {
 
 __attribute__((weak)) void eeconfig_init_keymap(void) {}
 
+__attribute__((weak)) void keyboard_pre_init_keymap(void) {}
 __attribute__((weak)) void keyboard_post_init_keymap(void) {}
 
 __attribute__((weak)) bool process_record_keymap(uint16_t keycode, keyrecord_t *record) { return true; }
@@ -112,6 +113,8 @@ void eeconfig_init_user(void) {
     tzarc_eeprom_reset();
     eeconfig_init_keymap();
 }
+
+void keyboard_pre_init_user(void) { keyboard_pre_init_keymap(); }
 
 void keyboard_post_init_user(void) {
     tzarc_common_init();

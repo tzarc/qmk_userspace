@@ -309,9 +309,11 @@ upgrade_all_keyboards()  {
 #    done
 #    popd >/dev/null 2>&1
 
-    upgrade_one_keyboard --keyboard geminate60 --chibios-board QMK_PROTON_C
-    upgrade_one_keyboard --keyboard sowbug/68keys --chibios-board STM32_F103_STM32DUINO
-    upgrade_one_keyboard --keyboard sowbug/ansi_tkl --chibios-board STM32_F103_STM32DUINO
+    upgrade_one_keyboard --keyboard daji/seis_cinco --chibios-board GENERIC_STM32_F072XB
+
+    #upgrade_one_keyboard --keyboard geminate60 --chibios-board QMK_PROTON_C
+    #upgrade_one_keyboard --keyboard sowbug/68keys --chibios-board STM32_F103_STM32DUINO
+    #upgrade_one_keyboard --keyboard sowbug/ansi_tkl --chibios-board STM32_F103_STM32DUINO
     #upgrade_one_keyboard --keyboard chavdai40 --chibios-board ST_NUCLEO32_F042K6 --no-mcuconf chavdai40/rev1 chavdai40/rev2
     #upgrade_one_keyboard --keyboard ergodox_stm32 --chibios-board ST_NUCLEO64_F103RB --no-mcuconf
     #upgrade_one_keyboard --keyboard jm60 --chibios-board ST_NUCLEO64_F103RB --no-mcuconf
@@ -366,7 +368,9 @@ leftover_boards() {
 }
 
 print_leftovers() {
-    leftovers=$(leftover_boards)
+    local leftovers=$(leftover_boards)
+    local count=$(echo "$leftovers" | wc -l)
+    if [[ -z "$leftovers" ]] ; then count=0 ; fi
 
     echo -e "\e[1;35m$(echo "$leftovers" | wc -l) boards outstanding:\e[0m"
     for leftover in $leftovers ; do
