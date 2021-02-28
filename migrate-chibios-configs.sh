@@ -309,7 +309,7 @@ upgrade_all_keyboards()  {
 #    done
 #    popd >/dev/null 2>&1
 
-    upgrade_one_keyboard --keyboard daji/seis_cinco --chibios-board GENERIC_STM32_F072XB
+    #upgrade_one_keyboard --keyboard daji/seis_cinco --chibios-board GENERIC_STM32_F072XB
 
     #upgrade_one_keyboard --keyboard geminate60 --chibios-board QMK_PROTON_C
     #upgrade_one_keyboard --keyboard sowbug/68keys --chibios-board STM32_F103_STM32DUINO

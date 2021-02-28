@@ -25,4 +25,4 @@ echo "Skipped builds: $num_skipped"
 echo "Warning builds: $num_warnings"
 echo "Failing builds: $num_failures"
 echo "-------------------------------"
-cat "$script_dir/build.log" | egrep '\[(ERRORS)\]
+cat "$script_dir/build.log" | egrep '\[(ERRORS)\]'
