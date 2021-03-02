@@ -8,7 +8,7 @@ script_dir="$(realpath "$(dirname "$this_script")")"
 qmk_firmware_dir="$(realpath "$script_dir/qmk_firmware/")" # change this once moved to util
 validation_output="$script_dir/validation-output"
 
-source_branch="develop"
+source_branch="master"
 branch_under_test="generated-chibios-conf-migrations"
 
 export PATH=/home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$PATH
@@ -299,15 +299,15 @@ postmigrate_chavdai40() {
 }
 
 upgrade_all_keyboards()  {
-#    pushd "$qmk_firmware_dir" >/dev/null 2>&1
-#    for kb in $(./util/list_keyboards.sh | sort) ; do
-#        local vars=$(make ${kb}:default:dump_vars)
-#        if [[ "$(echo "$vars" | grep '^PLATFORM_KEY=' | cut -d'=' -f2)" == "chibios" ]] ; then
-#            local board=$(echo "$vars" | grep '^BOARD=' | cut -d'=' -f2)
-#            upgrade_one_keyboard --keyboard $kb --chibios-board $board --no-mcuconf --force
-#        fi
-#    done
-#    popd >/dev/null 2>&1
+    pushd "$qmk_firmware_dir" >/dev/null 2>&1
+    for kb in $(./util/list_keyboards.sh | sort) ; do
+        local vars=$(make ${kb}:default:dump_vars)
+        if [[ "$(echo "$vars" | grep '^PLATFORM_KEY=' | cut -d'=' -f2)" == "chibios" ]] ; then
+            local board=$(echo "$vars" | grep '^BOARD=' | cut -d'=' -f2)
+            upgrade_one_keyboard --keyboard $kb --chibios-board $board --no-mcuconf --force
+        fi
+    done
+    popd >/dev/null 2>&1
 
     #upgrade_one_keyboard --keyboard daji/seis_cinco --chibios-board GENERIC_STM32_F072XB
 

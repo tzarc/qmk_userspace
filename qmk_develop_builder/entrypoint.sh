@@ -80,7 +80,7 @@ get_qmk() {
 build_qmk() {
     {
         cd /home/qmk/qmk_firmware
-        env -i HOME="$HOME" PATH="/usr/lib/ccache:/usr/local/bin:/usr/bin:/bin" TERM="linux" PWD="${PWD:-}" remake -j8 -O all:default || true
+        env -i HOME="$HOME" PATH="/usr/lib/ccache:/usr/local/bin:/usr/bin:/bin" TERM="linux" PWD="${PWD:-}" remake -j2 -O all:default || true
     } 2>&1 > /home/qmk/qmk_build_all.log
 }
 
@@ -105,7 +105,9 @@ make_index_html() {
 <meta charset="utf-8"/>
 <style type='text/css'>
 $(ansi2html.sh --bg=dark --palette=linux --css-only 2>/dev/null)
-a { color: #FF0; }
+pre { font-size: 80%; }
+h1, h2, pre { font-family: 'Iosevka Term', 'Iosevka Fixed', Consolas, Menlo, 'Courier New', monospace; }
+a { color: #FF0; font-weight: bold; }
 a:visited { color: #FF0; }
 a:hover { color: #F00; }
 </style>
@@ -132,7 +134,7 @@ $(cat /home/qmk/qmk_get.log | ctlchars2html)
 $(cat /home/qmk/qmk_build_all.log | ctlchars2html)
 </pre>
 </div>
-<div style='float:right'>
+<div style='position:absolute; right:0; top:0; padding: 1em; border-left: 1px solid #666; border-bottom: 1px solid #666' class="f9 b9">
 <pre>
 Prebuilt binaries:
 $(for f in $(ls *.hex *.bin 2>/dev/null) ; do
