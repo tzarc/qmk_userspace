@@ -3,6 +3,9 @@ export ROOTDIR := $(shell pwd)
 export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major:$(PATH)
 #export PATH := /usr/lib/ccache:$(PATH)
 
+export CLANG_TIDY_CHECKS := *,-clang-diagnostic-error,-llvm-include-order,-cppcoreguidelines-avoid-non-const-global-variables,-hicpp-braces-around-statements,-readability-braces-around-statements,-google-readability-braces-around-statements,-llvm-header-guard
+export CLANG_TIDY_HEADER_FILTER := .*
+
 BOARD_DEFS := \
 	iris!tzarc-iris_rev4!keebio/iris/rev4/keymaps/tzarc!tzarc \
 	ctrl!tzarc-ctrl!massdrop/ctrl/keymaps/tzarc!tzarc \
@@ -11,7 +14,8 @@ BOARD_DEFS := \
 	mysterium-dad!tzarc-mysterium-dad!coseyfannitutti/mysterium/keymaps/tzarc-dad!tzarc-dad \
 	chocopad!tzarc-chocopad!keebio/chocopad/keymaps/tzarc!tzarc \
 	cyclone!tzarc-cyclone!handwired/tzarc/cyclone!tzarc \
-	djinn!tzarc-djinn!handwired/tzarc/djinn!tzarc \
+	djinn_rev1!tzarc-djinn!handwired/tzarc/djinn!tzarc!handwired/tzarc/djinn/rev1 \
+	djinn_rev2!tzarc-djinn!handwired/tzarc/djinn!tzarc!handwired/tzarc/djinn/rev2 \
 	onekey_h743!alternates/nucleo144_h743zi!handwired/onekey/nucleo144_h743zi!reset \
 	onekey_l152!alternates/nucleo64_l152re!handwired/onekey/nucleo64_l152re!reset \
 	onekey_g431!alternates/nucleo64_g431rb!handwired/onekey/nucleo64_g431rb!reset \
@@ -45,6 +49,8 @@ all: bin
 arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
 
 nick: cyclone iris luddite mysterium-nick chocopad ctrl
+
+djinn: djinn_rev1 djinn_rev2
 
 # QMK Logo generation
 $(ROOTDIR)/tzarc-djinn/gfx-djinn.c: Makefile $(ROOTDIR)/tzarc-djinn/graphics/djinn.png $(ROOTDIR)/tzarc-djinn/graphics/lock-caps.png $(ROOTDIR)/tzarc-djinn/graphics/lock-scrl.png $(ROOTDIR)/tzarc-djinn/graphics/lock-num.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-caps.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-scrl.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-num.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-caps-OFF.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-scrl-OFF.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-num-OFF.png
@@ -126,15 +132,27 @@ board_name_$1 := $$(word 1,$$(subst !, ,$1))
 board_source_$1 := $$(word 2,$$(subst !, ,$1))
 board_target_$1 := $$(word 3,$$(subst !, ,$1))
 board_keymap_$1 := $$(word 4,$$(subst !, ,$1))
-board_qmk_$1 := $$(shell echo $$(board_target_$1) | sed -e 's@/keymaps/.*@@g')
+board_keyboard_$1 := $$(word 5,$$(subst !, ,$1))
+
+ifeq ($$(board_keyboard_$1),)
+board_keyboard_$1 := $$(board_target_$1)
+endif
+
+board_qmk_$1 := $$(shell echo $$(board_keyboard_$1) | sed -e 's@/keymaps/.*@@g')
 board_file_$1 := $$(shell echo $$(board_qmk_$1) | sed -e 's@/@_@g' -e 's@:@_@g')
 board_files_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f \( -name '*.h' -or -name '*.c' \) -and -not -name '*conf.h' -and -not -name 'board.c' -and -not -name 'board.h' | sort)
 board_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f | sort)
 
 bin_$$(board_name_$1): links #compiledb_$$(board_name_$1)
 	@echo "\e[38;5;14mBuilding: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
-	+bear intercept-build $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false
-	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR)
+	+cd "$(ROOTDIR)/qmk_firmware" \
+		&& bear intercept-build $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false
+	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR)/qmk_firmware/compile_commands.json $$(ROOTDIR)
+
+tidy_$$(board_name_$1): bin_$$(board_name_$1)
+	@echo "\e[38;5;14mRunning clang-tidy on: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
+	cd "$(ROOTDIR)/qmk_firmware" \
+		&& /usr/lib/llvm-11/share/clang/run-clang-tidy.py -extra-arg-before='-target arm-none-eabi' -header-filter='$(CLANG_TIDY_HEADER_FILTER)' -checks='$(CLANG_TIDY_CHECKS)' -p . keyboards drivers quantum tmk_core -j9 > $$(ROOTDIR)/clang-tidy_$$(board_name_$1).log 2>&1
 
 flash_$$(board_name_$1): bin_$$(board_name_$1)
 	@echo "\e[38;5;14mFlashing: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
