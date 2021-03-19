@@ -70,8 +70,7 @@ void eeconfig_init_keymap(void) {
 // Sync
 
 #include <string.h>
-#include <split_sync.h>
-enum { USER_STATE_SYNC = SAFE_USER_SPLIT_TRANSACTION_ID, USER_SLAVE_SYNC };
+#include <transaction_id_define.h>
 
 typedef struct user_runtime_config {
     uint32_t layer_state;
@@ -90,8 +89,8 @@ user_slave_data     user_slave;
 
 void keyboard_post_init_keymap(void) {
     // Register keyboard state sync split transaction
-    split_sync_register_m2s_transaction(USER_STATE_SYNC, sizeof(user_state), &user_state);
-    split_sync_register_s2m_transaction(USER_SLAVE_SYNC, sizeof(user_slave), &user_slave);
+    split_register_m2s_shmem(USER_STATE_SYNC, sizeof(user_state), &user_state);
+    split_register_s2m_shmem(USER_SLAVE_SYNC, sizeof(user_slave), &user_slave);
 
     // Reset the initial shared data value between master and slave
     memset(&user_state, 0, sizeof(user_state));
@@ -135,10 +134,10 @@ void user_state_sync(void) {
         // Perform the sync if requested
         if (needs_sync) {
             last_sync = timer_read32();
-            if (!split_sync_execute_transaction(USER_STATE_SYNC)) {
+            if (!split_sync_shmem(USER_STATE_SYNC)) {
                 dprint("Failed to perform sync data transaction\n");
             }
-            if (!split_sync_execute_transaction(USER_SLAVE_SYNC)) {
+            if (!split_sync_shmem(USER_SLAVE_SYNC)) {
                 dprint("Failed to perform slave data transaction\n");
             }
 

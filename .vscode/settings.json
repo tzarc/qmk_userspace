@@ -19,6 +19,8 @@
     "stdlib.h": "c",
     "string.h": "c",
     "quantum.h": "c",
-    "qp.h": "c"
+    "qp.h": "c",
+    "rgblight.h": "c",
+    "transaction_id_define.h": "c"
   }
 }

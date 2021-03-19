@@ -44,5 +44,3 @@ OPT = 2
 #LTO_ENABLE = no
 #OPT = 0
 #OPT_DEFS += -g
-
-DEFAULT_FOLDER = handwired/tzarc/djinn/rev2

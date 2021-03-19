@@ -36,8 +36,6 @@
 
 #define MEDIA_KEY_DELAY 2
 
-enum { USER_STATE_SYNC = SAFE_USER_SPLIT_TRANSACTION_ID };
-
 const char *usbpd_str(usbpd_allowance_t allowance);
 
 painter_device_t surf;
@@ -174,6 +172,14 @@ _Static_assert(sizeof(user_runtime_config) == 10, "Invalid data transfer size fo
 
 user_runtime_config user_state;
 
+void rpc_test_callback(uint8_t initiator2target_buffer_size, const volatile void *initiator2target_buffer, uint8_t target2initiator_buffer_size, volatile void *target2initiator_buffer) {
+    int n = initiator2target_buffer_size < target2initiator_buffer_size ? initiator2target_buffer_size : target2initiator_buffer_size;
+    for(int i = 0; i < n; ++i) {
+        ((volatile uint8_t*)target2initiator_buffer)[i] = ((const volatile uint8_t*)initiator2target_buffer)[i] ^ 0xFF;
+    }
+}
+
+
 void keyboard_post_init_keymap(void) {
     // Initialise the framebuffer
     surf = qp_rgb565_surface_make_device(8, 320);
@@ -186,7 +192,8 @@ void keyboard_post_init_keymap(void) {
     qp_pixdata(lcd, qp_rgb565_surface_get_buffer_ptr(surf), qp_rgb565_surface_get_pixel_count(surf));
 
     // Register keyboard state sync split transaction
-    split_sync_register_transaction(USER_STATE_SYNC, sizeof(user_state), &user_state, 0, NULL);
+    split_register_shmem(RPC_ID_SYNC_STATE_USER, sizeof(user_state), &user_state, 0, NULL);
+    split_register_rpc(RPC_TEST, rpc_test_callback);
 
     // Reset the initial shared data value between master and slave
     memset(&user_state, 0, sizeof(user_state));
@@ -226,9 +233,18 @@ void user_state_sync(void) {
         // Perform the sync if requested
         if (needs_sync) {
             last_sync = timer_read32();
-            if (!split_sync_execute_transaction(USER_STATE_SYNC)) {
+            if (!split_sync_shmem(RPC_ID_SYNC_STATE_USER)) {
                 dprint("Failed to perform data transaction\n");
             }
+
+            uint8_t sbuf[2] = { 0x01, 0x02 };
+            uint8_t rbuf[4] = { 0x00 };
+            if (!split_invoke_rpc(RPC_TEST, 2, sbuf, 4, rbuf)) {
+                dprint("Failed to perform rpc call\n");
+            }
+
+            int fff = 321987;
+            (void)fff;
         }
     }
 }

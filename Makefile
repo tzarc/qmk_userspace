@@ -1,6 +1,6 @@
 export ROOTDIR := $(shell pwd)
-#export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH)
-export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major:$(PATH)
+export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH)
+#export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major:$(PATH)
 #export PATH := /usr/lib/ccache:$(PATH)
 
 export CLANG_TIDY_CHECKS := *,-clang-diagnostic-error,-llvm-include-order,-cppcoreguidelines-avoid-non-const-global-variables,-hicpp-braces-around-statements,-readability-braces-around-statements,-google-readability-braces-around-statements,-llvm-header-guard
@@ -110,7 +110,7 @@ unlinks: unlink_$$(link_source_$1)
 unlink_$$(link_source_$1):
 	@if [ -L "$(ROOTDIR)/qmk_firmware/$$(link_target_$1)" ] ; then \
 		echo "\e[38;5;14mRemoving symlink: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
-		rm $(ROOTDIR)/qmk_firmware/$$(link_target_$1) ; \
+		rm $(ROOTDIR)/qmk_firmware/$$(link_target_$1) || true; \
 	fi
 
 format: format_$$(link_source_$1)
@@ -186,7 +186,7 @@ board_link_$$(board_name_$1):
 board_unlink_$$(board_name_$1):
 	@if [ -L "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ] ; then \
 		echo "\e[38;5;14mRemoving symlink: $$(board_target_$1)\e[0m" ; \
-		rm "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ; \
+		rm "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" || true; \
 	fi
 
 links: board_link_$$(board_name_$1)

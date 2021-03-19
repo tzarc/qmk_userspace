@@ -34,7 +34,7 @@
       "request": "launch",
       "cwd": "${workspaceRoot}/qmk_firmware",
       "svdFile": "${workspaceRoot}/svd/STM32G474xx.svd",
-      "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_djinn_default.elf",
+      "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_djinn_rev1_tzarc.elf",
       "servertype": "bmp",
       "BMPGDBSerialPort": "COM8",
       "device": "STM32G474",

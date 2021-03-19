@@ -28,8 +28,6 @@
 
 #define MEDIA_KEY_DELAY 2
 
-enum { USER_STATE_SYNC = SAFE_USER_SPLIT_TRANSACTION_ID };
-
 enum { _QWERTY, _LOWER, _RAISE, _ADJUST };
 #define KC_LWR MO(_LOWER)
 #define KC_RSE MO(_RAISE)
@@ -164,7 +162,7 @@ user_runtime_config user_state;
 
 void keyboard_post_init_user(void) {
     // Register keyboard state sync split transaction
-    split_sync_register_transaction(USER_STATE_SYNC, sizeof(user_state), &user_state, 0, NULL);
+    split_register_shmem(USER_STATE_SYNC, sizeof(user_state), &user_state, 0, NULL);
 
     // Reset the initial shared data value between master and slave
     memset(&user_state, 0, sizeof(user_state));
@@ -201,7 +199,7 @@ void user_state_sync(void) {
         // Perform the sync if requested
         if (needs_sync) {
             last_sync = timer_read32();
-            if (!split_sync_execute_transaction(USER_STATE_SYNC)) {
+            if (!split_sync_shmem(USER_STATE_SYNC)) {
                 dprint("Failed to perform data transaction\n");
             }
         }

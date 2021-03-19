@@ -35,4 +35,4 @@
 #define RGB_MATRIX_FRAMEBUFFER_EFFECTS
 
 // Allow for an extra sync command over the split
-#define SPLIT_NUM_TRANSACTIONS_USER 1
+#define SPLIT_TRANSACTION_IDS_USER RPC_ID_SYNC_STATE_USER, RPC_TEST

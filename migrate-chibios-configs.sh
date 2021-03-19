@@ -299,17 +299,17 @@ postmigrate_chavdai40() {
 }
 
 upgrade_all_keyboards()  {
-    pushd "$qmk_firmware_dir" >/dev/null 2>&1
-    for kb in $(./util/list_keyboards.sh | sort) ; do
-        local vars=$(make ${kb}:default:dump_vars)
-        if [[ "$(echo "$vars" | grep '^PLATFORM_KEY=' | cut -d'=' -f2)" == "chibios" ]] ; then
-            local board=$(echo "$vars" | grep '^BOARD=' | cut -d'=' -f2)
-            upgrade_one_keyboard --keyboard $kb --chibios-board $board --no-mcuconf --force
-        fi
-    done
-    popd >/dev/null 2>&1
+#    pushd "$qmk_firmware_dir" >/dev/null 2>&1
+#    for kb in $(./util/list_keyboards.sh | sort) ; do
+#        local vars=$(make ${kb}:default:dump_vars)
+#        if [[ "$(echo "$vars" | grep '^PLATFORM_KEY=' | cut -d'=' -f2)" == "chibios" ]] ; then
+#            local board=$(echo "$vars" | grep '^BOARD=' | cut -d'=' -f2)
+#            upgrade_one_keyboard --keyboard $kb --chibios-board $board --no-mcuconf --force
+#        fi
+#    done
+#    popd >/dev/null 2>&1
 
-    #upgrade_one_keyboard --keyboard daji/seis_cinco --chibios-board GENERIC_STM32_F072XB
+    upgrade_one_keyboard --keyboard boston --chibios-board GENERIC_STM32_F072XB
 
     #upgrade_one_keyboard --keyboard geminate60 --chibios-board QMK_PROTON_C
     #upgrade_one_keyboard --keyboard sowbug/68keys --chibios-board STM32_F103_STM32DUINO
