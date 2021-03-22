@@ -394,12 +394,17 @@ void render_menu(void) {
     if(state.is_in_menu) {
         qp_rect(lcd, 0, 0, 239, 319, 0, 0, 0, true);
 
+        uint8_t hue = rgb_matrix_get_hue();
         menu_entry_t *menu = get_current_menu();
         menu_entry_t *selected = get_selected_menu_item();
 
         int y = 80;
+        qp_rect(lcd, 0, y, 239, y+3, hue, 255, 255, true);
+        y += 8;
         qp_drawtext(lcd, 8, y, font_redalert13, menu->text);
-        y += font_redalert13->glyph_height;
+        y += font_redalert13->glyph_height + 4;
+        qp_rect(lcd, 0, y, 239, y+3, hue, 255, 255, true);
+        y += 8;
         for(int i = 0; i < menu->parent.child_count; ++i) {
             menu_entry_t *child = &menu->parent.children[i];
             uint16_t x;
@@ -416,7 +421,9 @@ void render_menu(void) {
                 child->child.display_handler(buf, sizeof(buf));
                 qp_drawtext(lcd, 8 + x, y, font_redalert13, buf);
             }
-            y += font_redalert13->glyph_height;
+            y += font_redalert13->glyph_height + 4;
+            qp_rect(lcd, 0, y, 239, y, hue, 255, 255, true);
+            y += 5;
         }
     }
     else {
