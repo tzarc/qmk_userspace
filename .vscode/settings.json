@@ -23,6 +23,8 @@
     "rgblight.h": "c",
     "transaction_id_define.h": "c",
     "stdint.h": "c",
-    "process_unicode_common.h": "c"
+    "process_unicode_common.h": "c",
+    "thintel15.h": "c",
+    "noto16.h": "c"
   }
 }

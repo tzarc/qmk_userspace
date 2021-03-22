@@ -353,6 +353,7 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
                 case KC_ESC:
                 case KC_GESC:
                     return menu_handle_input(menu_input_back);
+                case KC_SPACE:
                 case KC_ENTER:
                 case KC_RETURN:
                 case KC_SFTENT:
@@ -380,7 +381,7 @@ bool process_record_menu(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
-#include "redalert13.h"
+#include "thintel15.h"
 
 void render_menu(void) {
     static menu_state_t last_state;
@@ -401,27 +402,27 @@ void render_menu(void) {
         int y = 80;
         qp_rect(lcd, 0, y, 239, y+3, hue, 255, 255, true);
         y += 8;
-        qp_drawtext(lcd, 8, y, font_redalert13, menu->text);
-        y += font_redalert13->glyph_height + 4;
+        qp_drawtext(lcd, 8, y, font_thintel15, menu->text);
+        y += font_thintel15->glyph_height + 4;
         qp_rect(lcd, 0, y, 239, y+3, hue, 255, 255, true);
         y += 8;
         for(int i = 0; i < menu->parent.child_count; ++i) {
             menu_entry_t *child = &menu->parent.children[i];
             uint16_t x;
             if(child == selected) {
-                x = qp_drawtext_recolor(lcd, 8, y, font_redalert13, child->text, HSV_GREEN, HSV_BLACK);
+                x = qp_drawtext_recolor(lcd, 8, y, font_thintel15, child->text, HSV_GREEN, 85, 255, 0);
             } else {
-                x = qp_drawtext_recolor(lcd, 8, y, font_redalert13, child->text, HSV_RED, HSV_BLACK);
+                x = qp_drawtext_recolor(lcd, 8, y, font_thintel15, child->text, HSV_RED, 0, 255, 0);
             }
             if(child->flags & menu_flag_is_parent) {
-                qp_drawtext(lcd, 8 + x, y, font_redalert13, "  >");
+                qp_drawtext(lcd, 8 + x, y, font_thintel15, "  >");
             }
             if(child->flags & menu_flag_is_value) {
                 char buf[32] = {0};
                 child->child.display_handler(buf, sizeof(buf));
-                qp_drawtext(lcd, 8 + x, y, font_redalert13, buf);
+                qp_drawtext(lcd, 8 + x, y, font_thintel15, buf);
             }
-            y += font_redalert13->glyph_height + 4;
+            y += font_thintel15->glyph_height + 4;
             qp_rect(lcd, 0, y, 239, y, hue, 255, 255, true);
             y += 5;
         }
