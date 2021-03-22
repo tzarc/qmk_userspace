@@ -21,6 +21,8 @@
     "quantum.h": "c",
     "qp.h": "c",
     "rgblight.h": "c",
-    "transaction_id_define.h": "c"
+    "transaction_id_define.h": "c",
+    "stdint.h": "c",
+    "process_unicode_common.h": "c"
   }
 }

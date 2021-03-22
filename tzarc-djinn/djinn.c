@@ -161,6 +161,9 @@ void housekeeping_task_kb(void) {
     // Draw the UI
     if (kb_state.lcd_power) {
         draw_ui_user();
+
+        extern void render_menu(void);
+        render_menu();
     }
 }
 
@@ -236,6 +239,17 @@ void encoder_update_kb(uint8_t index, bool clockwise) {
     // Offload to the keymap instead.
     extern void encoder_update_user(uint8_t index, bool clockwise);
     encoder_update_user(index, clockwise);
+}
+
+bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
+    extern bool process_record_menu(uint16_t keycode, keyrecord_t *record);
+
+    // If we've got the menu going... handle that instead.
+    if(!process_record_menu(keycode, record)) {
+        return false;
+    }
+
+    return process_record_user(keycode, record);
 }
 
 void suspend_power_down_kb(void) {

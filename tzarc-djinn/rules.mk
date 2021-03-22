@@ -1,5 +1,8 @@
 MCU = STM32G474
 
+SRC += \
+	menu.c
+
 BOOTMAGIC_ENABLE = lite     # Virtual DIP switch configuration
 MOUSEKEY_ENABLE = no        # Mouse keys
 EXTRAKEY_ENABLE = no        # Audio control and System control
