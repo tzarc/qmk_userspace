@@ -102,9 +102,9 @@ void kb_state_sync(void) {
         // Perform the sync if requested
         if (needs_sync) {
             last_sync = timer_read32();
-            if (!split_sync_shmem(RPC_ID_SYNC_STATE_KB)) {
-                dprint("Failed to perform data transaction\n");
-            }
+            // if (!split_sync_shmem(RPC_ID_SYNC_STATE_KB)) {
+            //     dprint("Failed to perform data transaction\n");
+            // }
         }
     }
 }
@@ -175,7 +175,7 @@ void keyboard_post_init_kb(void) {
     // debug_matrix = true;
 
     // Register keyboard state sync split transaction
-    split_register_shmem(RPC_ID_SYNC_STATE_KB, sizeof(kb_state), &kb_state, 0, NULL);
+    // split_register_shmem(RPC_ID_SYNC_STATE_KB, sizeof(kb_state), &kb_state, 0, NULL);
 
     // Reset the initial shared data value between master and slave
     memset(&kb_state, 0, sizeof(kb_state));

@@ -61,6 +61,7 @@
 #ifdef RGB_MATRIX_ENABLE
 #    define SPLIT_TRANSPORT_MIRROR
 #endif  //  RGB_MATRIX_ENABLE
+#define SPLIT_MODS_ENABLE
 #define SPLIT_PLUG_DETECT_PIN B12
 
 // SPI Configuration

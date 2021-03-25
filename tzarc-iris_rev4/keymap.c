@@ -68,7 +68,7 @@ void eeconfig_init_keymap(void) {
 
 //----------------------------------------------------------
 // Sync
-
+#if 0
 #include <string.h>
 #include <transaction_id_define.h>
 
@@ -153,3 +153,4 @@ void housekeeping_task_keymap(void) {
     // Data sync from master to slave
     user_state_sync();
 }
+#endif // 0
