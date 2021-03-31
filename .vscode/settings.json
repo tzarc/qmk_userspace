@@ -27,6 +27,7 @@
     "thintel15.h": "c",
     "noto16.h": "c",
     "compare": "c",
-    "type_traits": "c"
+    "type_traits": "c",
+    "transactions.h": "c"
   }
 }

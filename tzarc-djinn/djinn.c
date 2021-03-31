@@ -235,9 +235,9 @@ bool is_keyboard_master(void) {
 }
 #endif  // USE_PLUG_DETECT_PIN
 
-void encoder_update_kb(uint8_t index, bool clockwise) {
+void encoder_update_kb(int8_t index, bool clockwise) {
     // Offload to the keymap instead.
-    extern void encoder_update_user(uint8_t index, bool clockwise);
+    extern void encoder_update_user(int8_t index, bool clockwise);
     encoder_update_user(index, clockwise);
 }
 

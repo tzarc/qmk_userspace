@@ -1,5 +1,6 @@
 *.hex
 *.bin
+*.uf2
 .vscode/ipch
 .clang-format
 PR-*.patchbuild.log

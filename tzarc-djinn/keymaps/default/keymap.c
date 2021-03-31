@@ -86,7 +86,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return update_tri_layer_state(state, _LOWER, _RAISE, _ADJUST);
 }
 
-void encoder_update_user(uint8_t index, bool clockwise) {
+void encoder_update_user(int8_t index, bool clockwise) {
     uint8_t temp_mod = get_mods();
     uint8_t temp_osm = get_oneshot_mods();
     bool    is_ctrl  = (temp_mod | temp_osm) & MOD_MASK_CTRL;

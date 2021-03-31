@@ -15,6 +15,7 @@
  */
 
 #include QMK_KEYBOARD_H
+#include <hal.h>
 #include <string.h>
 #include <backlight.h>
 #include <qp.h>
@@ -34,6 +35,24 @@
 #include "redalert13.c"
 #include "thintel15.c"
 
+enum {
+    CHIP_DET = KEYMAP_SAFE_RANGE
+};
+
+typedef union __attribute__((packed)) _chip_details_t {
+    struct {
+        struct {
+            uint16_t xpos;
+            uint16_t ypos;
+        } pos;
+        struct {
+            uint8_t wafer_number;
+            uint8_t lot_number[7];
+        } wafer;
+    };
+    uint32_t raw[3];
+} chip_details_t;
+
 #define MEDIA_KEY_DELAY 2
 
 const char *usbpd_str(usbpd_allowance_t allowance);
@@ -47,7 +66,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         ____________TZARC_7x4_BASE_R2_L__________,                                            ____________TZARC_7x4_BASE_R2_R__________,
         ____________TZARC_7x4_BASE_R3_L__________,                                            ____________TZARC_7x4_BASE_R3_R__________,
         ____________TZARC_7x4_BASE_R4_L__________,                                            ____________TZARC_7x4_BASE_R4_R__________,
-                     KC_LGUI, KC_LOWER,  KC_SPC,  DJINN_MENU,                       DJINN_MENU,   KC_SPC,  KC_RAISE,  KC_LALT,
+                     KC_LGUI, KC_LOWER,  KC_SPC,  DJINN_MENU,                       CHIP_DET,   KC_SPC,  KC_RAISE,  KC_LALT,
                                                            RGB_RMOD,          RGB_MOD,
                                 KC_UP,                                                                 KC_UP,
                        KC_LEFT, _______, KC_RIGHT,                                            KC_LEFT, _______, KC_RIGHT,
@@ -96,7 +115,24 @@ void eeconfig_init_keymap(void) {
     backlight_level(BACKLIGHT_LEVELS);
 }
 
-void encoder_update_keymap(uint8_t index, bool clockwise) {
+bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
+    switch(keycode) {
+        case CHIP_DET:
+            if(record->event.pressed) {
+                chip_details_t *details = (chip_details_t*)(UID_BASE);
+                char buf[64] = {0};
+                char lot[8] = {0};
+                for(int i = 0; i < 7; ++i)
+                    lot[i] = details->wafer.lot_number[i];
+                snprintf(buf, sizeof(buf)-1, "Wafer lot: %s, wafer number: %d, wafer xpos: %d, ypos: %d", lot, (int)details->wafer.wafer_number, (int)details->pos.xpos, (int)details->pos.ypos);
+                send_unicode_string(buf);
+            }
+            return false;
+    }
+    return true;
+}
+
+void encoder_update_keymap(int8_t index, bool clockwise) {
     uint8_t temp_mod = get_mods();
     uint8_t temp_osm = get_oneshot_mods();
     bool    is_ctrl  = (temp_mod | temp_osm) & MOD_MASK_CTRL;
