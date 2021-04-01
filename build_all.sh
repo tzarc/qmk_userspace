@@ -20,12 +20,14 @@ determine_keyboards() {
 	pushd "$qmk_firmware" >/dev/null 2>&1
 	for kb in $(./util/list_keyboards.sh ${NO_CI:-}) ; do
 		kbpath="$kb"
-		if [[ -f "keyboards/$kb/rules.mk" ]] ; then
-			default_folder=$(grep DEFAULT_FOLDER "keyboards/$kb/rules.mk" | cut -d'=' -f2 | xargs echo)
-			if [[ -n "$default_folder" ]] ; then
+		while [[ -f "keyboards/$kbpath/rules.mk" ]] && grep -E '^\s*DEFAULT_FOLDER\s*=' "keyboards/$kbpath/rules.mk" >/dev/null 2>&1 ; do
+			default_folder=$(grep '^\s*DEFAULT_FOLDER\s*=' "keyboards/$kbpath/rules.mk" | cut -d'=' -f2 | xargs echo)
+			if [[ -n "$default_folder" ]] && [[ "$default_folder" != "$kbpath" ]] ; then
 				kbpath="$default_folder"
+			else
+				break
 			fi
-		fi
+		done
 		all_keyboards[$kbpath]=1
 	done
 	popd >/dev/null 2>&1
@@ -34,7 +36,7 @@ determine_keyboards() {
 dump_keyboard_list() {
 	for kb in ${!all_keyboards[@]} ; do
 		echo $kb
-	done | sort | uniq
+	done | grep -v 'handwired/pytest' | sort | uniq
 }
 
 generate_makefile() {
