@@ -56,11 +56,11 @@ all: ${safe}_binary
 ${safe}_binary:
 	@rm -f "$failfile" || true
 	@printf '^^keyboard=${kb}\n^^safe=${safe}\n' >"$buildfile"
-	+@\$(MAKE) -C "$qmk_firmware" -f "$qmk_firmware/build_keyboard.mk" KEYBOARD="$kb" KEYMAP="default" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false \
-		>>"$buildfile" 2>&1 \
+	+@\$(MAKE) -C "$qmk_firmware" -f "$qmk_firmware/build_keyboard.mk" KEYBOARD="$kb" KEYMAP="default" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false \\
+		>>"$buildfile" 2>&1 \\
 		|| cp "$buildfile" "$failfile"
-	@{ grep '\[ERRORS\]' "$buildfile" >/dev/null 2>&1 && printf "Build %-64s \e[1;31m[ERRORS]\e[0m\n" "${kb}:default" ; } \
-		|| { grep '\[WARNINGS\]' "$buildfile" >/dev/null 2>&1 && printf "Build %-64s \e[1;33m[WARNINGS]\e[0m\n" "${kb}:default" ; } \
+	@{ grep '\[ERRORS\]' "$buildfile" >/dev/null 2>&1 && printf "Build %-64s \e[1;31m[ERRORS]\e[0m\n" "${kb}:default" ; } \\
+		|| { grep '\[WARNINGS\]' "$buildfile" >/dev/null 2>&1 && printf "Build %-64s \e[1;33m[WARNINGS]\e[0m\n" "${kb}:default" ; } \\
 		|| printf "Build %-64s \e[1;32m[OK]\e[0m\n" "${kb}:default"
 	@rm -f "$buildfile" || true
 EOF
