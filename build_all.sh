@@ -2,9 +2,9 @@
 
 set -e
 
-this_script=$(readlink -f "${BASH_SOURCE[@]}")
+this_script=$(realpath "${BASH_SOURCE[@]}")
 script_dir=$(dirname "$this_script")
-qmk_firmware="$script_dir/qmk_firmware"
+qmk_firmware=$(realpath "$script_dir/qmk_firmware")
 qmk_builddir="$qmk_firmware/.build"
 temp_makefile="$qmk_builddir/parallel_kb_builds.mk"
 
@@ -16,12 +16,17 @@ MAKEFLAGS="-j$(( $(nproc) * 2 + 1 )) --output-sync --no-print-directory"
 
 declare -A all_keyboards=()
 
+get_default_folder() {
+	local rulesmk="$1"
+	cat "$rulesmk" | sed -e 's@#.*@@g' | grep -E '^\s*DEFAULT_FOLDER\s*=' | cut -d'=' -f2 | xargs echo
+}
+
 determine_keyboards() {
 	pushd "$qmk_firmware" >/dev/null 2>&1
 	for kb in $(./util/list_keyboards.sh ${NO_CI:-}) ; do
 		kbpath="$kb"
-		while [[ -f "keyboards/$kbpath/rules.mk" ]] && grep -E '^\s*DEFAULT_FOLDER\s*=' "keyboards/$kbpath/rules.mk" >/dev/null 2>&1 ; do
-			default_folder=$(grep '^\s*DEFAULT_FOLDER\s*=' "keyboards/$kbpath/rules.mk" | cut -d'=' -f2 | xargs echo)
+		while [[ -f "keyboards/$kbpath/rules.mk" ]] && get_default_folder "keyboards/$kbpath/rules.mk" >/dev/null 2>&1 ; do
+			default_folder=$(get_default_folder "keyboards/$kbpath/rules.mk")
 			if [[ -n "$default_folder" ]] && [[ "$default_folder" != "$kbpath" ]] ; then
 				kbpath="$default_folder"
 			else
