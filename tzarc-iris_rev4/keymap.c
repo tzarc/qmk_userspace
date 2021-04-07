@@ -69,8 +69,8 @@ void eeconfig_init_keymap(void) {
 //----------------------------------------------------------
 // Sync
 #if 0
-#include <string.h>
-#include <transaction_id_define.h>
+#    include <string.h>
+#    include <transaction_id_define.h>
 
 typedef struct user_runtime_config {
     uint32_t layer_state;
@@ -153,4 +153,4 @@ void housekeeping_task_keymap(void) {
     // Data sync from master to slave
     user_state_sync();
 }
-#endif // 0
+#endif  // 0

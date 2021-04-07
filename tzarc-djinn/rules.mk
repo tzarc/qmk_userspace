@@ -13,7 +13,6 @@ NKRO_ENABLE = no            # USB Nkey Rollover
 UNICODE_ENABLE = no         # Unicode
 
 SPLIT_KEYBOARD = yes
-SERIAL_DRIVER = usart
 
 ENCODER_ENABLE = yes
 
@@ -33,7 +32,7 @@ RGB_MATRIX_DRIVER = WS2812
 
 EEPROM_DRIVER = spi
 
-AUDIO_ENABLE = no
+AUDIO_ENABLE = yes
 AUDIO_DRIVER = pwm_software
 AUDIO_PIN = A5
 AUDIO_PIN_ALT = A4

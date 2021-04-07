@@ -193,7 +193,7 @@ void keyboard_post_init_kb(void) {
 #ifdef EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN
     setPinOutput(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN);
     writePinHigh(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN);
-#endif // EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN
+#endif  // EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN
 
     // Turn on the LCD
     setPinOutput(LCD_POWER_ENABLE_PIN);
@@ -228,11 +228,11 @@ void encoder_update_kb(int8_t index, bool clockwise) {
     encoder_update_user(index, clockwise);
 }
 
-bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
-    extern bool process_record_menu(uint16_t keycode, keyrecord_t *record);
+bool process_record_kb(uint16_t keycode, keyrecord_t* record) {
+    extern bool process_record_menu(uint16_t keycode, keyrecord_t * record);
 
     // If we've got the menu going... handle that instead.
-    if(!process_record_menu(keycode, record)) {
+    if (!process_record_menu(keycode, record)) {
         return false;
     }
 

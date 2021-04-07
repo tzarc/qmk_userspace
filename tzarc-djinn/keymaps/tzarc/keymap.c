@@ -35,9 +35,7 @@
 #include "redalert13.c"
 #include "thintel15.c"
 
-enum {
-    CHIP_DET = KEYMAP_SAFE_RANGE
-};
+enum { CHIP_DET = KEYMAP_SAFE_RANGE };
 
 typedef union __attribute__((packed)) _chip_details_t {
     struct {
@@ -116,15 +114,14 @@ void eeconfig_init_keymap(void) {
 }
 
 bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
-    switch(keycode) {
+    switch (keycode) {
         case CHIP_DET:
-            if(record->event.pressed) {
-                chip_details_t *details = (chip_details_t*)(UID_BASE);
-                char buf[64] = {0};
-                char lot[8] = {0};
-                for(int i = 0; i < 7; ++i)
-                    lot[i] = details->wafer.lot_number[i];
-                snprintf(buf, sizeof(buf)-1, "Wafer lot: %s, wafer number: %d, wafer xpos: %d, ypos: %d", lot, (int)details->wafer.wafer_number, (int)details->pos.xpos, (int)details->pos.ypos);
+            if (record->event.pressed) {
+                chip_details_t *details = (chip_details_t *)(UID_BASE);
+                char            buf[64] = {0};
+                char            lot[8]  = {0};
+                for (int i = 0; i < 7; ++i) lot[i] = details->wafer.lot_number[i];
+                snprintf(buf, sizeof(buf) - 1, "Wafer lot: %s, wafer number: %d, wafer xpos: %d, ypos: %d", lot, (int)details->wafer.wafer_number, (int)details->pos.xpos, (int)details->pos.ypos);
                 send_unicode_string(buf);
             }
             return false;
@@ -209,11 +206,10 @@ user_runtime_config user_state;
 
 void rpc_test_callback(uint8_t initiator2target_buffer_size, const volatile void *initiator2target_buffer, uint8_t target2initiator_buffer_size, volatile void *target2initiator_buffer) {
     int n = initiator2target_buffer_size < target2initiator_buffer_size ? initiator2target_buffer_size : target2initiator_buffer_size;
-    for(int i = 0; i < n; ++i) {
-        ((volatile uint8_t*)target2initiator_buffer)[i] = ((const volatile uint8_t*)initiator2target_buffer)[i] ^ 0xFF;
+    for (int i = 0; i < n; ++i) {
+        ((volatile uint8_t *)target2initiator_buffer)[i] = ((const volatile uint8_t *)initiator2target_buffer)[i] ^ 0xFF;
     }
 }
-
 
 void keyboard_post_init_keymap(void) {
     // Initialise the framebuffer
@@ -227,8 +223,8 @@ void keyboard_post_init_keymap(void) {
     qp_pixdata(lcd, qp_rgb565_surface_get_buffer_ptr(surf), qp_rgb565_surface_get_pixel_count(surf));
 
     // Register keyboard state sync split transaction
-    //split_register_shmem(RPC_ID_SYNC_STATE_USER, sizeof(user_state), &user_state, 0, NULL);
-    //split_register_rpc(RPC_TEST, rpc_test_callback);
+    // split_register_shmem(RPC_ID_SYNC_STATE_USER, sizeof(user_state), &user_state, 0, NULL);
+    // split_register_rpc(RPC_TEST, rpc_test_callback);
 
     // Reset the initial shared data value between master and slave
     memset(&user_state, 0, sizeof(user_state));
@@ -268,7 +264,7 @@ void user_state_sync(void) {
         // Perform the sync if requested
         if (needs_sync) {
             last_sync = timer_read32();
-            #if 0
+#if 0
             if (!split_sync_shmem(RPC_ID_SYNC_STATE_USER)) {
                 dprint("Failed to perform data transaction\n");
             }
@@ -281,7 +277,7 @@ void user_state_sync(void) {
 
             int fff = 321987;
             (void)fff;
-            #endif // 0
+#endif  // 0
         }
     }
 }

@@ -18,10 +18,18 @@
 
 #define HAL_USE_GPT TRUE
 #define HAL_USE_PWM TRUE
-#define HAL_USE_SERIAL TRUE
 #define HAL_USE_SPI TRUE
 
 #define SERIAL_BUFFERS_SIZE 256
+
+#ifdef SERIAL_DRIVER_USART
+#define HAL_USE_SERIAL TRUE
+#endif  // SERIAL_DRIVER_USART
+
+#ifdef SERIAL_DRIVER_USART_DUPLEX
+#define HAL_USE_UART TRUE
+#define UART_USE_WAIT TRUE
+#endif  // SERIAL_DRIVER_USART_DUPLEX
 
 #include_next <halconf.h>
 

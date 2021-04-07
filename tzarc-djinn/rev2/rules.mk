@@ -1,1 +1,1 @@
-# Unused; required for build target detection
+SERIAL_DRIVER = usart
