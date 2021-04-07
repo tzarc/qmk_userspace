@@ -21,8 +21,19 @@
 #define SERIAL_USART_TX_PAL_MODE 7
 #define SOFT_SERIAL_PIN B10
 //#define SOFT_SERIAL_PIN_ALT B11
-#define SERIAL_USART_SPEED 640000
+#define SERIAL_USART_SPEED 1811200
 #define SPLIT_HAND_PIN B9
+
+// RGB configuration
+#define RGB_POWER_ENABLE_PIN B0
+#define RGB_CURR_1500mA_OK_PIN C5
+#define RGB_CURR_3000mA_OK_PIN C4
+#define RGBLED_NUM 86
+#define RGBLED_SPLIT \
+    { 43, 43 }
+
+// External flash config
+#define EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN A8
 
 // Fault indicators
 #define BOARD_POWER_FAULT_PIN C9

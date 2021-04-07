@@ -47,5 +47,3 @@ OPT = 2
 #LTO_ENABLE = no
 #OPT = 0
 #OPT_DEFS += -g
-
-FIRMWARE_FORMAT = uf2

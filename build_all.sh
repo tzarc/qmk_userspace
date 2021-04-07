@@ -2,9 +2,11 @@
 
 set -e
 
-this_script=$(realpath "${BASH_SOURCE[@]}")
+abs_path() { python -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "$1" ; }
+
+this_script=$(abs_path "${BASH_SOURCE[@]}")
 script_dir=$(dirname "$this_script")
-qmk_firmware=$(realpath "$script_dir/qmk_firmware")
+qmk_firmware=$(abs_path "$script_dir/qmk_firmware")
 qmk_builddir="$qmk_firmware/.build"
 temp_makefile="$qmk_builddir/parallel_kb_builds.mk"
 

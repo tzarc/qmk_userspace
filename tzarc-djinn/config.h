@@ -18,6 +18,8 @@
 
 #include "config_common.h"
 
+#define DEBUG_EEPROM_OUTPUT
+
 // USB Device parameters
 #define VENDOR_ID 0x1209
 #define PRODUCT_ID 0x4919
@@ -50,9 +52,6 @@
 
 // Peripheral power control pins
 #define LCD_POWER_ENABLE_PIN A6
-#define RGB_POWER_ENABLE_PIN B1
-#define RGB_CURR_1500mA_OK_PIN B0
-#define RGB_CURR_3000mA_OK_PIN C5
 
 // Split configuration
 #define SERIAL_USE_MULTI_TRANSACTION
@@ -98,9 +97,6 @@
 // RGB configuration
 #define WS2812_EXTERNAL_PULLUP
 #define RGB_DI_PIN B2
-#define RGBLED_NUM 84
-#define RGBLED_SPLIT \
-    { 42, 42 }
 #ifdef RGB_MATRIX_ENABLE
 #    define DRIVER_LED_TOTAL RGBLED_NUM
 #    define RGB_MATRIX_SPLIT RGBLED_SPLIT

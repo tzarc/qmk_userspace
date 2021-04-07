@@ -22,3 +22,11 @@
 #define SOFT_SERIAL_PIN B9
 #define SERIAL_USART_SPEED 640000
 #define SPLIT_HAND_PIN B11
+
+// RGB configuration
+#define RGB_POWER_ENABLE_PIN B1
+#define RGB_CURR_1500mA_OK_PIN B0
+#define RGB_CURR_3000mA_OK_PIN C5
+#define RGBLED_NUM 84
+#define RGBLED_SPLIT \
+    { 42, 42 }
