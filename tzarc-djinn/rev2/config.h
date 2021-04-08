@@ -46,3 +46,6 @@
 // Fault indicators
 #define BOARD_POWER_FAULT_PIN C9
 #define RGB_POWER_FAULT_PIN C4
+
+// Limit the backlight brightness
+#define BACKLIGHT_LIMIT_VAL 144

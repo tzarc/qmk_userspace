@@ -20,7 +20,6 @@ fi
 declare -a prs_to_apply
 prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(11930) # Split data sync
-prs_to_apply+=(9842) # Full-duplex split
 
 declare -a cherry_picks
 #cherry_picks+=(749aca03c90c9316189b58e3236bea9242f3990f) # RGB_MATRIX slave scan
@@ -41,12 +40,14 @@ hard_reset() {
     pcmd git clean -xfd
     pcmd git checkout -- .
     pcmd git reset --hard
+    pcmd git clean -xfd
     pcmd git remote set-url origin git@github.com:tzarc/$repo_name.git
     pcmd git remote set-url origin --push git@github.com:tzarc/$repo_name.git
     pcmd git remote set-url upstream https://github.com/$repo_upstream/$repo_name.git
     pcmd git remote set-url upstream --push git@github.com:tzarc/$repo_name.git
     pcmd git fetch --all --tags --prune
     pcmd git fetch --unshallow upstream || true
+    pcmd git clean -xfd
     pcmd git checkout -f $repo_branch
     pcmd git reset --hard upstream/$repo_branch
     pcmd git push origin $repo_branch --force-with-lease
