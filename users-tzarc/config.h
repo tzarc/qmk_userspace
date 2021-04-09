@@ -21,6 +21,9 @@
 // 1000Hz poll rate
 #define USB_POLLING_INTERVAL_MS 1
 
+// We don't ever have more than 8 layers.
+#define LAYER_STATE_8BIT
+
 // Handle per-key tapping timing
 #ifdef TAPPING_TERM
 #    undef TAPPING_TERM

@@ -17,12 +17,10 @@ VPATH += $(USER_PATH)/graphics/src
 
 ifeq ($(strip $(PLATFORM_KEY)),chibios)
 	# Uses defaults above
-	UNICODE_ENABLE = yes
 else ifeq ($(strip $(PLATFORM_KEY)),arm_atsam)
 	# This shit's broken, surprise surprise.
 	RAW_ENABLE = no
 else ifeq ($(strip $(PLATFORM_KEY)),avr)
-	UNICODE_ENABLE = no
 	ifeq ($(strip $(PROTOCOL)),LUFA)
 		# Uses defaults above
 	else ifeq ($(strip $(PROTOCOL)),VUSB)

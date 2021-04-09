@@ -31,7 +31,7 @@ jobs:
     - name: Build
       run: |
         cd "qmk_firmware" && PATH="$(pwd)/qmk_firmware/bin:$PATH" make git-submodule && cd ..
-        PATH="$(pwd)/qmk_firmware/bin:$PATH" remake -j1 -O djinn mysterium-nick iris
+        PATH="$(pwd)/qmk_firmware/bin:$PATH" remake -j1 -O djinn mysterium-nick iris ctrl cyclone chocopad
 
     - name: 'Upload binaries'
       uses: actions/upload-artifact@v2

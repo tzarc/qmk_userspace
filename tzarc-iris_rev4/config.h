@@ -18,7 +18,6 @@
 
 #define USE_I2C
 #define EE_HANDS
-#define LAYER_STATE_8BIT
 
 #undef RGBLED_NUM
 #define RGBLED_NUM 12
