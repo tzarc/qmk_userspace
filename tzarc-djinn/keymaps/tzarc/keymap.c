@@ -192,15 +192,12 @@ void encoder_update_keymap(int8_t index, bool clockwise) {
 #pragma pack(1)
 
 typedef struct user_runtime_config {
-    uint32_t layer_state;
     uint32_t scan_rate;
-    uint8_t  wpm;
-    led_t    led_state;
 } user_runtime_config;
 
 #pragma pack(pop)
 
-_Static_assert(sizeof(user_runtime_config) == 10, "Invalid data transfer size for user sync data");
+_Static_assert(sizeof(user_runtime_config) == 4, "Invalid data transfer size for user sync data");
 
 user_runtime_config user_state;
 
@@ -232,14 +229,8 @@ void keyboard_post_init_keymap(void) {
 
 void user_state_update(void) {
     if (is_keyboard_master()) {
-        // Keep the layer state in sync
-        user_state.layer_state = layer_state;
         // Keep the scan rate in sync
         user_state.scan_rate = get_matrix_scan_rate();
-        // Keep the LED state in sync
-        user_state.led_state = host_keyboard_led_state();
-        // Keep the WPM in sync
-        user_state.wpm = (uint8_t)get_current_wpm();
     }
 }
 
@@ -317,11 +308,11 @@ void draw_ui_user(void) {
     // Show layer info on the left side
     if (is_keyboard_left()) {
         static uint32_t last_layer_state = 0;
-        if (redraw_required || last_layer_state != user_state.layer_state) {
-            last_layer_state = user_state.layer_state;
+        if (redraw_required || last_layer_state != layer_state) {
+            last_layer_state = layer_state;
 
             const char *layer_name = "unknown";
-            switch (get_highest_layer(user_state.layer_state)) {
+            switch (get_highest_layer(layer_state)) {
                 case LAYER_BASE:
                     layer_name = "qwerty";
                     break;
@@ -374,7 +365,7 @@ void draw_ui_user(void) {
 
             xpos = 16;
             ypos += 4 + font_thintel15->glyph_height;
-            snprintf(buf, sizeof(buf), "wpm: %d", (int)user_state.wpm);
+            snprintf(buf, sizeof(buf), "wpm: %d", (int)get_current_wpm());
             xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_xpos < xpos) {
                 max_xpos = xpos;
@@ -386,8 +377,8 @@ void draw_ui_user(void) {
     // Show LED lock indicators on the right side
     if (!is_keyboard_left()) {
         static led_t last_led_state = {0};
-        if (redraw_required || last_led_state.raw != user_state.led_state.raw) {
-            last_led_state.raw = user_state.led_state.raw;
+        if (redraw_required || last_led_state.raw != host_keyboard_led_state().raw) {
+            last_led_state.raw = host_keyboard_led_state().raw;
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 3), 0, last_led_state.caps_lock ? gfx_lock_caps_ON : gfx_lock_caps_OFF, curr_hue, 255, last_led_state.caps_lock ? 255 : 32);
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 2), 0, last_led_state.num_lock ? gfx_lock_num_ON : gfx_lock_num_OFF, curr_hue, 255, last_led_state.num_lock ? 255 : 32);
             qp_drawimage_recolor(lcd, 239 - 12 - (32 * 1), 0, last_led_state.scroll_lock ? gfx_lock_scrl_ON : gfx_lock_scrl_OFF, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32);

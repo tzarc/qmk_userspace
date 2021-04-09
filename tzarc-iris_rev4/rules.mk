@@ -4,7 +4,6 @@ BACKLIGHT_ENABLE = yes
 ENCODER_ENABLE = no
 
 LTO_ENABLE = yes
+OPT = s
 
 SPACE_CADET_ENABLE = no
-
-OPT = s

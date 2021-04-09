@@ -1,0 +1,43 @@
+name: Build Binaries
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    container: qmkfm/base_container
+
+    if: github.repository == 'tzarc/qmk_build'
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Install dependencies
+      run: |
+        pwd
+        sed -i 's#git@github.com:#https://github.com/#g' .gitmodules
+        git submodule update --init --recursive
+        cd "qmk_firmware" && git checkout generated-workarea && cd ..
+        python3 -m pip install -U scan-build pillow qmk milc
+        python3 -m pip install -r "qmk_firmware/requirements.txt"
+        apt-get update && apt-get install -y bear remake nodejs npm
+
+    - name: Build
+      run: |
+        cd "qmk_firmware" && PATH="$(pwd)/qmk_firmware/bin:$PATH" make git-submodule && cd ..
+        PATH="$(pwd)/qmk_firmware/bin:$PATH" remake -j1 -O djinn mysterium-nick iris
+
+    - name: 'Upload binaries'
+      uses: actions/upload-artifact@v2
+      with:
+        name: Artifacts
+        path: |
+          qmk_firmware/*.bin
+          qmk_firmware/*.hex
+          qmk_firmware/*.uf2

@@ -28,6 +28,7 @@
     "noto16.h": "c",
     "compare": "c",
     "type_traits": "c",
-    "transactions.h": "c"
+    "transactions.h": "c",
+    "keycode.h": "c"
   }
 }
