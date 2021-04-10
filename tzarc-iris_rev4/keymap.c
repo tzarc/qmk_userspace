@@ -75,11 +75,9 @@ void eeconfig_init_keymap(void) {
 uint32_t counter = 0;
 
 void slave_counter_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
-    if (initiator2target_buffer_size == sizeof(uint32_t) && target2initiator_buffer_size == sizeof(uint32_t)) {
-        const uint32_t* recv = (const uint32_t*)initiator2target_buffer;
-        uint32_t*       send = (uint32_t*)target2initiator_buffer;
-        *send                = *recv + 1;
-    }
+    const uint32_t* recv = (const uint32_t*)initiator2target_buffer;
+    uint32_t*       send = (uint32_t*)target2initiator_buffer;
+    *send                = *recv + 1;
 }
 
 void keyboard_post_init_keymap(void) {
