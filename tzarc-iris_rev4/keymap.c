@@ -72,24 +72,17 @@ void eeconfig_init_keymap(void) {
 #include <string.h>
 #include <transactions.h>
 
-typedef struct user_slave_data {
-    uint32_t counter;
-} user_slave_data;
-_Static_assert(sizeof(user_slave_data) == 4, "Invalid data transfer size for slave sync data");
+uint32_t counter = 0;
 
 void slave_counter_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
-    // if (initiator2target_buffer_size == sizeof(user_slave_data) && target2initiator_buffer_size == sizeof(user_slave_data)) {
-    const user_slave_data* recv = (const user_slave_data*)initiator2target_buffer;
-    user_slave_data*       send = (user_slave_data*)target2initiator_buffer;
-    send->counter               = recv->counter + 1;
-    //}
+    if (initiator2target_buffer_size == sizeof(uint32_t) && target2initiator_buffer_size == sizeof(uint32_t)) {
+        const uint32_t* recv = (const uint32_t*)initiator2target_buffer;
+        uint32_t*       send = (uint32_t*)target2initiator_buffer;
+        *send                = *recv + 1;
+    }
 }
 
-user_slave_data user_slave = {.counter = 0};
-
 void keyboard_post_init_keymap(void) {
-    setPinOutput(BACKLIGHT_PIN);
-    writePin(BACKLIGHT_PIN, true);
     // Register keyboard state sync split transaction
     transaction_register_rpc(RPC_ID_SLAVE_COUNTER, slave_counter_sync);
 }
@@ -100,11 +93,8 @@ void user_state_sync(void) {
         static uint32_t last_sync = 0;
         if (timer_elapsed32(last_sync) > 2500) {
             last_sync = timer_read32();
-            dprintf("Sync'ing slave\n");
-            if (!transaction_rpc_exec(RPC_ID_SLAVE_COUNTER, sizeof(user_slave_data), &user_slave, sizeof(user_slave_data), &user_slave)) {
-                dprint("Failed to perform sync data transaction\n");
-            }
-            dprintf("Slave counter: %d\n", (int)user_slave.counter);
+            transaction_rpc_exec(RPC_ID_SLAVE_COUNTER, sizeof(counter), &counter, sizeof(counter), &counter);
+            dprintf("Slave counter: %d\n", (int)counter);
         }
     }
 }
