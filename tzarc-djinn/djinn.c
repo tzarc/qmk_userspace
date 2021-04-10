@@ -101,11 +101,18 @@ void kb_state_sync(void) {
 
         // Perform the sync if requested
         if (needs_sync) {
-            last_sync = timer_read32();
-            // if (!split_sync_shmem(RPC_ID_SYNC_STATE_KB)) {
-            //     dprint("Failed to perform data transaction\n");
-            // }
+            if (transaction_rpc_send(RPC_ID_SYNC_STATE_KB, sizeof(kb_runtime_config), &kb_state)) {
+                last_sync = timer_read32();
+            } else {
+                dprint("Failed to perform data transaction\n");
+            }
         }
+    }
+}
+
+void kb_state_sync_slave(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
+    if (initiator2target_buffer_size == sizeof(kb_runtime_config)) {
+        memcpy(&kb_state, initiator2target_buffer, sizeof(kb_runtime_config));
     }
 }
 
@@ -161,9 +168,6 @@ void housekeeping_task_kb(void) {
     // Draw the UI
     if (kb_state.lcd_power) {
         draw_ui_user();
-
-        extern void render_menu(void);
-        render_menu();
     }
 }
 
@@ -175,7 +179,7 @@ void keyboard_post_init_kb(void) {
     // debug_matrix = true;
 
     // Register keyboard state sync split transaction
-    // split_register_shmem(RPC_ID_SYNC_STATE_KB, sizeof(kb_state), &kb_state, 0, NULL);
+    transaction_register_rpc(RPC_ID_SYNC_STATE_KB, kb_state_sync_slave);
 
     // Reset the initial shared data value between master and slave
     memset(&kb_state, 0, sizeof(kb_state));
@@ -226,17 +230,6 @@ void encoder_update_kb(int8_t index, bool clockwise) {
     // Offload to the keymap instead.
     extern void encoder_update_user(int8_t index, bool clockwise);
     encoder_update_user(index, clockwise);
-}
-
-bool process_record_kb(uint16_t keycode, keyrecord_t* record) {
-    extern bool process_record_menu(uint16_t keycode, keyrecord_t * record);
-
-    // If we've got the menu going... handle that instead.
-    if (!process_record_menu(keycode, record)) {
-        return false;
-    }
-
-    return process_record_user(keycode, record);
 }
 
 void suspend_power_down_kb(void) {

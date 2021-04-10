@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <printf.h>
 
 #include <quantum.h>
 #include <qp.h>
@@ -102,7 +103,7 @@ static bool menu_handler_rgbenabled(menu_input_t input) {
     }
 }
 
-void display_handler_rgbenabled(char *text_buffer, size_t buffer_len) { snprintf(text_buffer, buffer_len - 1, "%s", rgb_matrix_is_enabled() ? "on" : "off"); }
+void display_handler_rgbenabled(char *text_buffer, size_t buffer_len) { snprintf_(text_buffer, buffer_len - 1, "%s", rgb_matrix_is_enabled() ? "on" : "off"); }
 
 static bool menu_handler_rgbmode(menu_input_t input) {
     switch (input) {
@@ -117,7 +118,7 @@ static bool menu_handler_rgbmode(menu_input_t input) {
     }
 }
 
-void display_handler_rgbmode(char *text_buffer, size_t buffer_len) { snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_mode()); }
+void display_handler_rgbmode(char *text_buffer, size_t buffer_len) { snprintf_(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_mode()); }
 
 static bool menu_handler_rgbhue(menu_input_t input) {
     switch (input) {
@@ -132,7 +133,7 @@ static bool menu_handler_rgbhue(menu_input_t input) {
     }
 }
 
-void display_handler_rgbhue(char *text_buffer, size_t buffer_len) { snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_hue()); }
+void display_handler_rgbhue(char *text_buffer, size_t buffer_len) { snprintf_(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_hue()); }
 
 static bool menu_handler_rgbsat(menu_input_t input) {
     switch (input) {
@@ -147,7 +148,7 @@ static bool menu_handler_rgbsat(menu_input_t input) {
     }
 }
 
-void display_handler_rgbsat(char *text_buffer, size_t buffer_len) { snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_sat()); }
+void display_handler_rgbsat(char *text_buffer, size_t buffer_len) { snprintf_(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_sat()); }
 
 static bool menu_handler_rgbval(menu_input_t input) {
     switch (input) {
@@ -162,7 +163,7 @@ static bool menu_handler_rgbval(menu_input_t input) {
     }
 }
 
-void display_handler_rgbval(char *text_buffer, size_t buffer_len) { snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_val()); }
+void display_handler_rgbval(char *text_buffer, size_t buffer_len) { snprintf_(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_val()); }
 
 static bool menu_handler_rgbspeed(menu_input_t input) {
     switch (input) {
@@ -177,7 +178,7 @@ static bool menu_handler_rgbspeed(menu_input_t input) {
     }
 }
 
-void display_handler_rgbspeed(char *text_buffer, size_t buffer_len) { snprintf(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_speed()); }
+void display_handler_rgbspeed(char *text_buffer, size_t buffer_len) { snprintf_(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_speed()); }
 
 menu_entry_t rgb_entries[] = {
     {

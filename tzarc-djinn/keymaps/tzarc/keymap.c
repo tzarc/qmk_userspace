@@ -19,6 +19,8 @@
 #include <string.h>
 #include <backlight.h>
 #include <qp.h>
+#include <printf.h>
+#include <transactions.h>
 
 #include "tzarc.h"
 #include "qp_rgb565_surface.h"
@@ -35,22 +37,6 @@
 #include "redalert13.c"
 #include "thintel15.c"
 
-enum { CHIP_DET = KEYMAP_SAFE_RANGE };
-
-typedef union __attribute__((packed)) _chip_details_t {
-    struct {
-        struct {
-            uint16_t xpos;
-            uint16_t ypos;
-        } pos;
-        struct {
-            uint8_t wafer_number;
-            uint8_t lot_number[7];
-        } wafer;
-    };
-    uint32_t raw[3];
-} chip_details_t;
-
 #define MEDIA_KEY_DELAY 2
 
 const char *usbpd_str(usbpd_allowance_t allowance);
@@ -64,7 +50,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         ____________TZARC_7x4_BASE_R2_L__________,                                            ____________TZARC_7x4_BASE_R2_R__________,
         ____________TZARC_7x4_BASE_R3_L__________,                                            ____________TZARC_7x4_BASE_R3_R__________,
         ____________TZARC_7x4_BASE_R4_L__________,                                            ____________TZARC_7x4_BASE_R4_R__________,
-                     KC_LGUI, KC_LOWER,  KC_SPC,  DJINN_MENU,                       CHIP_DET,   KC_SPC,  KC_RAISE,  KC_LALT,
+                     KC_LGUI, KC_LOWER,  KC_SPC,  KC_NO,                                KC_NO,   KC_SPC,  KC_RAISE,  KC_LALT,
                                                            RGB_RMOD,          RGB_MOD,
                                 KC_UP,                                                                 KC_UP,
                        KC_LEFT, _______, KC_RIGHT,                                            KC_LEFT, _______, KC_RIGHT,
@@ -111,22 +97,6 @@ void eeconfig_init_keymap(void) {
     rgblight_sethsv(128, 255, 255);
     backlight_enable();
     backlight_level(BACKLIGHT_LEVELS);
-}
-
-bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        case CHIP_DET:
-            if (record->event.pressed) {
-                chip_details_t *details = (chip_details_t *)(UID_BASE);
-                char            buf[64] = {0};
-                char            lot[8]  = {0};
-                for (int i = 0; i < 7; ++i) lot[i] = details->wafer.lot_number[i];
-                snprintf(buf, sizeof(buf) - 1, "Wafer lot: %s, wafer number: %d, wafer xpos: %d, ypos: %d", lot, (int)details->wafer.wafer_number, (int)details->pos.xpos, (int)details->pos.ypos);
-                send_unicode_string(buf);
-            }
-            return false;
-    }
-    return true;
 }
 
 void encoder_update_keymap(int8_t index, bool clockwise) {
@@ -201,10 +171,9 @@ _Static_assert(sizeof(user_runtime_config) == 4, "Invalid data transfer size for
 
 user_runtime_config user_state;
 
-void rpc_test_callback(uint8_t initiator2target_buffer_size, const volatile void *initiator2target_buffer, uint8_t target2initiator_buffer_size, volatile void *target2initiator_buffer) {
-    int n = initiator2target_buffer_size < target2initiator_buffer_size ? initiator2target_buffer_size : target2initiator_buffer_size;
-    for (int i = 0; i < n; ++i) {
-        ((volatile uint8_t *)target2initiator_buffer)[i] = ((const volatile uint8_t *)initiator2target_buffer)[i] ^ 0xFF;
+void rpc_user_sync_callback(uint8_t initiator2target_buffer_size, const void *initiator2target_buffer, uint8_t target2initiator_buffer_size, void *target2initiator_buffer) {
+    if (initiator2target_buffer_size == sizeof(user_state)) {
+        memcpy(&user_state, initiator2target_buffer, sizeof(user_runtime_config));
     }
 }
 
@@ -220,8 +189,7 @@ void keyboard_post_init_keymap(void) {
     qp_pixdata(lcd, qp_rgb565_surface_get_buffer_ptr(surf), qp_rgb565_surface_get_pixel_count(surf));
 
     // Register keyboard state sync split transaction
-    // split_register_shmem(RPC_ID_SYNC_STATE_USER, sizeof(user_state), &user_state, 0, NULL);
-    // split_register_rpc(RPC_TEST, rpc_test_callback);
+    transaction_register_rpc(RPC_ID_SYNC_STATE_USER, rpc_user_sync_callback);
 
     // Reset the initial shared data value between master and slave
     memset(&user_state, 0, sizeof(user_state));
@@ -254,21 +222,11 @@ void user_state_sync(void) {
 
         // Perform the sync if requested
         if (needs_sync) {
-            last_sync = timer_read32();
-#if 0
-            if (!split_sync_shmem(RPC_ID_SYNC_STATE_USER)) {
-                dprint("Failed to perform data transaction\n");
+            if (transaction_rpc_send(RPC_ID_SYNC_STATE_USER, sizeof(user_runtime_config), &user_state)) {
+                last_sync = timer_read32();
+            } else {
+                print("Failed to perform rpc call\n");
             }
-
-            uint8_t sbuf[2] = { 0x01, 0x02 };
-            uint8_t rbuf[4] = { 0x00 };
-            if (!split_invoke_rpc(RPC_TEST, 2, sbuf, 4, rbuf)) {
-                dprint("Failed to perform rpc call\n");
-            }
-
-            int fff = 321987;
-            (void)fff;
-#endif  // 0
         }
     }
 }
@@ -331,7 +289,7 @@ void draw_ui_user(void) {
             int        xpos     = 16;
             int        ypos     = 4;
             char       buf[32]  = {0};
-            snprintf(buf, sizeof(buf), "layer: %s", layer_name);
+            snprintf_(buf, sizeof(buf), "layer: %s", layer_name);
             xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_xpos < xpos) {
                 max_xpos = xpos;
@@ -347,7 +305,7 @@ void draw_ui_user(void) {
             int        xpos     = 16;
             int        ypos     = 4 + font_thintel15->glyph_height + 4;
             char       buf[32]  = {0};
-            snprintf(buf, sizeof(buf), "scans: %d", (int)user_state.scan_rate);
+            snprintf_(buf, sizeof(buf), "scans: %d", (int)user_state.scan_rate);
             xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_xpos < xpos) {
                 max_xpos = xpos;
@@ -356,7 +314,7 @@ void draw_ui_user(void) {
 
             xpos = 16;
             ypos += 4 + font_thintel15->glyph_height;
-            snprintf(buf, sizeof(buf), "power: %s", usbpd_str(kb_state.current_setting));
+            snprintf_(buf, sizeof(buf), "power: %s", usbpd_str(kb_state.current_setting));
             xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_xpos < xpos) {
                 max_xpos = xpos;
@@ -365,7 +323,7 @@ void draw_ui_user(void) {
 
             xpos = 16;
             ypos += 4 + font_thintel15->glyph_height;
-            snprintf(buf, sizeof(buf), "wpm: %d", (int)get_current_wpm());
+            snprintf_(buf, sizeof(buf), "wpm: %d", (int)get_current_wpm());
             xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_xpos < xpos) {
                 max_xpos = xpos;

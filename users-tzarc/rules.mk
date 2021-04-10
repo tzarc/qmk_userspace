@@ -5,8 +5,7 @@ SRC += \
 	tzarc_wow.c \
 	tzarc_diablo3.c
 
-DEBUG_MATRIX_SCAN_RATE_ENABLE = yes
-CONSOLE_ENABLE = yes
+DEBUG_MATRIX_SCAN_RATE_ENABLE ?= yes
 BOOTMAGIC_ENABLE ?= lite
 EXTRAKEY_ENABLE ?= yes
 MOUSEKEY_ENABLE ?= yes

@@ -68,89 +68,48 @@ void eeconfig_init_keymap(void) {
 
 //----------------------------------------------------------
 // Sync
-#if 0
-#    include <string.h>
-#    include <transaction_id_define.h>
-
-typedef struct user_runtime_config {
-    uint32_t layer_state;
-    led_t    led_state;
-} user_runtime_config;
+#include <print.h>
+#include <string.h>
+#include <transactions.h>
 
 typedef struct user_slave_data {
     uint32_t counter;
 } user_slave_data;
-
-_Static_assert(sizeof(user_runtime_config) == 5, "Invalid data transfer size for user sync data");
 _Static_assert(sizeof(user_slave_data) == 4, "Invalid data transfer size for slave sync data");
 
-user_runtime_config user_state;
-user_slave_data     user_slave;
-
-void keyboard_post_init_keymap(void) {
-    // Register keyboard state sync split transaction
-    split_register_m2s_shmem(USER_STATE_SYNC, sizeof(user_state), &user_state);
-    split_register_s2m_shmem(USER_SLAVE_SYNC, sizeof(user_slave), &user_slave);
-
-    // Reset the initial shared data value between master and slave
-    memset(&user_state, 0, sizeof(user_state));
-    memset(&user_slave, 0, sizeof(user_slave));
+void slave_counter_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
+    // if (initiator2target_buffer_size == sizeof(user_slave_data) && target2initiator_buffer_size == sizeof(user_slave_data)) {
+    const user_slave_data* recv = (const user_slave_data*)initiator2target_buffer;
+    user_slave_data*       send = (user_slave_data*)target2initiator_buffer;
+    send->counter               = recv->counter + 1;
+    //}
 }
 
-void user_state_update(void) {
-    if (is_keyboard_master()) {
-        // Keep the LED state in sync
-        user_state.led_state = host_keyboard_led_state();
+user_slave_data user_slave = {.counter = 0};
 
-        // Keep the layer state in sync
-        user_state.layer_state = layer_state;
-    } else {
-        static uint32_t last_increment = 0;
-        if (timer_elapsed32(last_increment) > 500) {
-            last_increment = timer_read32();
-            user_slave.counter++;
-        }
-    }
+void keyboard_post_init_keymap(void) {
+    setPinOutput(BACKLIGHT_PIN);
+    writePin(BACKLIGHT_PIN, true);
+    // Register keyboard state sync split transaction
+    transaction_register_rpc(RPC_ID_SLAVE_COUNTER, slave_counter_sync);
 }
 
 void user_state_sync(void) {
     if (is_keyboard_master()) {
-        // Keep track of the last state, so that we can tell if we need to propagate to slave
-        static user_runtime_config last_user_state;
-        static uint32_t            last_sync;
-        bool                       needs_sync = false;
-
-        // Check if the state values are different
-        if (memcmp(&user_state, &last_user_state, sizeof(user_runtime_config))) {
-            needs_sync = true;
-            memcpy(&last_user_state, &user_state, sizeof(user_runtime_config));
-        }
-
-        // Send to slave every 500ms regardless of state change
-        if (timer_elapsed32(last_sync) > 500) {
-            needs_sync = true;
-        }
-
-        // Perform the sync if requested
-        if (needs_sync) {
+        // Send to slave every 500ms
+        static uint32_t last_sync = 0;
+        if (timer_elapsed32(last_sync) > 2500) {
             last_sync = timer_read32();
-            if (!split_sync_shmem(USER_STATE_SYNC)) {
+            dprintf("Sync'ing slave\n");
+            if (!transaction_rpc_exec(RPC_ID_SLAVE_COUNTER, sizeof(user_slave_data), &user_slave, sizeof(user_slave_data), &user_slave)) {
                 dprint("Failed to perform sync data transaction\n");
             }
-            if (!split_sync_shmem(USER_SLAVE_SYNC)) {
-                dprint("Failed to perform slave data transaction\n");
-            }
-
             dprintf("Slave counter: %d\n", (int)user_slave.counter);
         }
     }
 }
 
 void housekeeping_task_keymap(void) {
-    // Update kb_state so we can send to slave
-    user_state_update();
-
     // Data sync from master to slave
     user_state_sync();
 }
-#endif  // 0

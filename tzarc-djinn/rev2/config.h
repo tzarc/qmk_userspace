@@ -21,7 +21,7 @@
 #    define SERIAL_USART_DRIVER SD3
 #    define SERIAL_USART_TX_PAL_MODE 7
 #    define SOFT_SERIAL_PIN B10
-#    define SERIAL_USART_SPEED 1200000
+#    define SERIAL_USART_SPEED 1000000
 #    define SPLIT_HAND_PIN B9
 #endif  // SERIAL_DRIVER_USART
 
@@ -42,9 +42,9 @@
 
 // External flash config
 #define EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN A8
-#define EXTERNAL_FLASH_SPI_CLOCK_DIVISOR 8 // (160MHz/8) => 20MHz
-#define EXTERNAL_FLASH_BYTE_COUNT (4*1024*1024) // 32Mb/4MB capacity
-#define EXTERNAL_FLASH_PAGE_SIZE (4*1024) // 4kB pages
+#define EXTERNAL_FLASH_SPI_CLOCK_DIVISOR 8           // (160MHz/8) => 20MHz
+#define EXTERNAL_FLASH_BYTE_COUNT (4 * 1024 * 1024)  // 32Mb/4MB capacity
+#define EXTERNAL_FLASH_PAGE_SIZE (4 * 1024)          // 4kB pages
 
 // Fault indicators
 #define BOARD_POWER_FAULT_PIN C9

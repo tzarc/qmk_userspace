@@ -29,6 +29,9 @@
     "compare": "c",
     "type_traits": "c",
     "transactions.h": "c",
-    "keycode.h": "c"
+    "keycode.h": "c",
+    "print.h": "c",
+    "i2c_master.h": "c",
+    "stdbool.h": "c"
   }
 }

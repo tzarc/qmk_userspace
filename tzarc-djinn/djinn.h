@@ -18,9 +18,6 @@
 
 #include <quantum.h>
 #include <qp.h>
-//#include <transaction_id_define.h>
-
-enum { DJINN_MENU = SAFE_RANGE, USER_SAFE_RANGE };
 
 //----------------------------------------------------------
 // Layout

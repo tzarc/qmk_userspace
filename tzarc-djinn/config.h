@@ -74,9 +74,9 @@
 
 // EEPROM configuration
 #define EXTERNAL_EEPROM_SPI_SLAVE_SELECT_PIN B5
-#define EXTERNAL_EEPROM_SPI_CLOCK_DIVISOR 8 // (160MHz/8) => 20MHz
+#define EXTERNAL_EEPROM_SPI_CLOCK_DIVISOR 8  // (160MHz/8) => 20MHz
 #define EXTERNAL_EEPROM_BYTE_COUNT 8192
-#define EXTERNAL_EEPROM_PAGE_SIZE 64 // it's FRAM, so it doesn't actually matter, this just sets the RAM buffer
+#define EXTERNAL_EEPROM_PAGE_SIZE 64  // it's FRAM, so it doesn't actually matter, this just sets the RAM buffer
 
 // LCD Configuration
 #define ILI9341_PIXDATA_BUFSIZE 240
