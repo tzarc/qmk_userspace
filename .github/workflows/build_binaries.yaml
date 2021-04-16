@@ -17,11 +17,11 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        submodules: recursive
 
     - name: Install dependencies
       run: |
         sed -i 's#git@github.com:#https://github.com/#g' .gitmodules
+        git submodule update --init --recursive
         cd "qmk_firmware" && git checkout generated-workarea && cd ..
         python3 -m pip install -U scan-build
         python3 -m pip install -r "qmk_firmware/requirements.txt"
@@ -30,7 +30,7 @@ jobs:
     - name: Build
       run: |
         cd "qmk_firmware" && PATH="$(pwd)/qmk_firmware/bin:$PATH" make git-submodule && cd ..
-        PATH="$(pwd)/qmk_firmware/bin:$PATH" remake -j1 -O djinn mysterium-nick iris ctrl cyclone chocopad
+        PATH="$(pwd)/qmk_firmware/bin:$PATH" remake -j1 -O nick
 
     - name: 'Upload binaries'
       uses: actions/upload-artifact@v2

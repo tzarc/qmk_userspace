@@ -1,1 +1,4 @@
 BOOTLOADER = qmk-dfu
+MOUSEKEY_ENABLE = no
+LTO_ENABLE = yes
+OPT = s
