@@ -48,7 +48,7 @@ all: bin
 
 arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
 
-nick: cyclone iris luddite mysterium-nick chocopad ctrl
+nick: cyclone iris luddite mysterium-nick chocopad ctrl djinn
 
 djinn: djinn_rev1 djinn_rev2
 
