@@ -20,7 +20,6 @@
 
 void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
 
-#ifdef USE_PLUG_DETECT_PIN
 bool is_keyboard_master(void) {
     static bool determined = false;
     static bool is_master;
@@ -36,7 +35,6 @@ bool is_keyboard_master(void) {
 
     return is_master;
 }
-#endif  // USE_PLUG_DETECT_PIN
 
 #ifdef RGB_MATRIX_ENABLE
 // clang-format off

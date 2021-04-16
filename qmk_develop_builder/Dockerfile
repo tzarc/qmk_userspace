@@ -21,9 +21,10 @@ USER 0:0
 WORKDIR /home/qmk
 
 COPY entrypoint.sh /home/qmk/entrypoint.sh
+COPY build_all.sh /home/qmk/build_all.sh
 
-RUN chmod 755 /home/qmk/entrypoint.sh \
-    && chown qmk:qmk /home/qmk/entrypoint.sh
+RUN chmod 755 /home/qmk/*.sh \
+    && chown qmk:qmk /home/qmk/*.sh
 
 USER 10000:10000
 WORKDIR /home/qmk

@@ -17,7 +17,6 @@
 #pragma once
 
 // Debugging
-//#define DEBUG_MATRIX_SCAN_RATE
 #define DEBUG_EEPROM_OUTPUT
 
 // 1000Hz poll rate

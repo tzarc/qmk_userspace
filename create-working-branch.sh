@@ -183,6 +183,7 @@ exit 0
 pushd "$script_dir/qmk_firmware"
 pcmd git branch -D djinn || true
 pcmd git checkout -b djinn "$target_branch"
+pcmd git reset --hard "$target_branch"
 pcmd make git-submodule
 [[ -d keyboards/tzarc ]] || mkdir -p keyboards/tzarc
 pcmd rsync -avvP "$script_dir/tzarc-djinn/"* keyboards/tzarc/djinn
@@ -190,6 +191,7 @@ pcmd rm -rf keyboards/tzarc/djinn/keymaps/tzarc
 pcmd git add keyboards/tzarc/djinn
 pcmd git commit -m "Import Djinn code."
 pcmd git push origin djinn --set-upstream --force-with-lease
+pcmd git st
 popd
 
 pushd "$script_dir/qmk_firmware"

@@ -70,3 +70,5 @@ typedef struct kb_runtime_config {
 _Static_assert(sizeof(kb_runtime_config) == 1, "Invalid data transfer size for keyboard sync data");
 
 extern kb_runtime_config kb_state;
+
+const char *usbpd_str(usbpd_allowance_t allowance);

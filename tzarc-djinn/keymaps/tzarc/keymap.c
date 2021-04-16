@@ -25,21 +25,16 @@
 #include "tzarc.h"
 #include "qp_rgb565_surface.h"
 
-#include "graphics/djinn.c"
-#include "lock-caps-ON.c"
-#include "lock-scrl-ON.c"
-#include "lock-num-ON.c"
-#include "lock-caps-OFF.c"
-#include "lock-scrl-OFF.c"
-#include "lock-num-OFF.c"
-#include "noto16.c"
-#include "noto28.c"
-#include "redalert13.c"
-#include "thintel15.c"
+#include "graphics/src/djinn.c"
+#include "graphics/src/lock-caps-ON.c"
+#include "graphics/src/lock-scrl-ON.c"
+#include "graphics/src/lock-num-ON.c"
+#include "graphics/src/lock-caps-OFF.c"
+#include "graphics/src/lock-scrl-OFF.c"
+#include "graphics/src/lock-num-OFF.c"
+#include "graphics/src/thintel15.c"
 
 #define MEDIA_KEY_DELAY 2
-
-const char *usbpd_str(usbpd_allowance_t allowance);
 
 painter_device_t surf;
 

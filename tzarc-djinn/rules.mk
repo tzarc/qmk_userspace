@@ -2,12 +2,13 @@ MCU = STM32G474
 
 BOOTMAGIC_ENABLE = lite     # Virtual DIP switch configuration
 MOUSEKEY_ENABLE = no        # Mouse keys
-EXTRAKEY_ENABLE = no        # Audio control and System control
+EXTRAKEY_ENABLE = yes       # Audio control and System control
 CONSOLE_ENABLE = no         # Console for debug
 COMMAND_ENABLE = no         # Commands for debug and configuration
 SLEEP_LED_ENABLE = no       # Breathing sleep LED during USB suspend
 NKRO_ENABLE = no            # USB Nkey Rollover
 UNICODE_ENABLE = no         # Unicode
+WPM_ENABLE = yes
 
 SPLIT_KEYBOARD = yes
 
@@ -43,3 +44,5 @@ OPT = 2
 #LTO_ENABLE = no
 #OPT = 0
 #OPT_DEFS += -g
+
+DEFAULT_FOLDER = tzarc/djinn/rev2

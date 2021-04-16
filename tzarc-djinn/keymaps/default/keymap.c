@@ -20,12 +20,6 @@
 #include <backlight.h>
 #include <qp.h>
 
-#include "graphics/djinn.c"
-#include "graphics/lock-caps.c"
-#include "graphics/lock-scrl.c"
-#include "graphics/lock-num.c"
-#include "graphics/redalert13.c"
-
 #define MEDIA_KEY_DELAY 2
 
 enum { _QWERTY, _LOWER, _RAISE, _ADJUST };
@@ -144,78 +138,16 @@ void encoder_update_user(int8_t index, bool clockwise) {
 }
 
 //----------------------------------------------------------
-// Sync
-
-#pragma pack(push)
-#pragma pack(1)
-
-typedef struct user_runtime_config {
-    uint32_t layer_state;
-    led_t    led_state;
-} user_runtime_config;
-
-#pragma pack(pop)
-
-_Static_assert(sizeof(user_runtime_config) == 5, "Invalid data transfer size for user sync data");
-
-user_runtime_config user_state;
-
-void keyboard_post_init_user(void) {
-    // Register keyboard state sync split transaction
-    split_register_shmem(USER_STATE_SYNC, sizeof(user_state), &user_state, 0, NULL);
-
-    // Reset the initial shared data value between master and slave
-    memset(&user_state, 0, sizeof(user_state));
-}
-
-void user_state_update(void) {
-    if (is_keyboard_master()) {
-        // Keep the LED state in sync
-        user_state.led_state = host_keyboard_led_state();
-
-        // Keep the layer state in sync
-        user_state.layer_state = layer_state;
-    }
-}
-
-void user_state_sync(void) {
-    if (is_keyboard_master()) {
-        // Keep track of the last state, so that we can tell if we need to propagate to slave
-        static user_runtime_config last_user_state;
-        static uint32_t            last_sync;
-        bool                       needs_sync = false;
-
-        // Check if the state values are different
-        if (memcmp(&user_state, &last_user_state, sizeof(user_runtime_config))) {
-            needs_sync = true;
-            memcpy(&last_user_state, &user_state, sizeof(user_runtime_config));
-        }
-
-        // Send to slave every 500ms regardless of state change
-        if (timer_elapsed32(last_sync) > 500) {
-            needs_sync = true;
-        }
-
-        // Perform the sync if requested
-        if (needs_sync) {
-            last_sync = timer_read32();
-            if (!split_sync_shmem(USER_STATE_SYNC)) {
-                dprint("Failed to perform data transaction\n");
-            }
-        }
-    }
-}
-
-void housekeeping_task_user(void) {
-    // Update kb_state so we can send to slave
-    user_state_update();
-
-    // Data sync from master to slave
-    user_state_sync();
-}
-
-//----------------------------------------------------------
 // Display
+
+#include "graphics/src/djinn.c"
+#include "graphics/src/lock-caps-ON.c"
+#include "graphics/src/lock-scrl-ON.c"
+#include "graphics/src/lock-num-ON.c"
+#include "graphics/src/lock-caps-OFF.c"
+#include "graphics/src/lock-scrl-OFF.c"
+#include "graphics/src/lock-num-OFF.c"
+#include "graphics/src/thintel15.c"
 
 void draw_ui_user(void) {
     bool            redraw_required = false;
@@ -236,11 +168,11 @@ void draw_ui_user(void) {
     // Show layer info on the left side
     if (is_keyboard_left()) {
         static uint32_t last_layer_state = 0;
-        if (redraw_required || last_layer_state != user_state.layer_state) {
-            last_layer_state = user_state.layer_state;
+        if (redraw_required || last_layer_state != layer_state) {
+            last_layer_state = layer_state;
 
             const char *layer_name = "unknown";
-            switch (get_highest_layer(user_state.layer_state)) {
+            switch (get_highest_layer(layer_state)) {
                 case _QWERTY:
                     layer_name = "qwerty";
                     break;
@@ -257,25 +189,51 @@ void draw_ui_user(void) {
 
             static int max_xpos = 0;
             int        xpos     = 16;
-            int        ypos     = 8;
+            int        ypos     = 4;
             char       buf[32]  = {0};
-            snprintf(buf, sizeof(buf), "layer: %s", layer_name);
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_redalert13, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            snprintf_(buf, sizeof(buf), "layer: %s", layer_name);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_xpos < xpos) {
                 max_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_redalert13->glyph_height, 0, 0, 0, true);
+            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
+        }
+
+        static uint32_t last_screen_update = 0;
+        if (redraw_required || timer_elapsed32(last_screen_update) > 125) {
+            last_screen_update = timer_read32();
+
+            static int max_xpos = 0;
+            int        xpos     = 16;
+            int        ypos     = 4;
+            char       buf[32]  = {0};
+            ypos += 4 + font_thintel15->glyph_height;
+            snprintf_(buf, sizeof(buf), "power: %s", usbpd_str(kb_state.current_setting));
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            if (max_xpos < xpos) {
+                max_xpos = xpos;
+            }
+            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
+
+            xpos = 16;
+            ypos += 4 + font_thintel15->glyph_height;
+            snprintf_(buf, sizeof(buf), "wpm: %d", (int)get_current_wpm());
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            if (max_xpos < xpos) {
+                max_xpos = xpos;
+            }
+            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
         }
     }
 
     // Show LED lock indicators on the right side
     if (!is_keyboard_left()) {
         static led_t last_led_state = {0};
-        if (redraw_required || last_led_state.raw != user_state.led_state.raw) {
-            last_led_state.raw = user_state.led_state.raw;
-            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 3), 0, gfx_lock_caps, curr_hue, 255, last_led_state.caps_lock ? 255 : 32);
-            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 2), 0, gfx_lock_num, curr_hue, 255, last_led_state.num_lock ? 255 : 32);
-            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 1), 0, gfx_lock_scrl, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32);
+        if (redraw_required || last_led_state.raw != host_keyboard_led_state().raw) {
+            last_led_state.raw = host_keyboard_led_state().raw;
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 3), 0, last_led_state.caps_lock ? gfx_lock_caps_ON : gfx_lock_caps_OFF, curr_hue, 255, last_led_state.caps_lock ? 255 : 32);
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 2), 0, last_led_state.num_lock ? gfx_lock_num_ON : gfx_lock_num_OFF, curr_hue, 255, last_led_state.num_lock ? 255 : 32);
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 1), 0, last_led_state.scroll_lock ? gfx_lock_scrl_ON : gfx_lock_scrl_OFF, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32);
         }
     }
 }

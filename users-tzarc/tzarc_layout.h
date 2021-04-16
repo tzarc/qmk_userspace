@@ -131,7 +131,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 #define ____________TZARC_6x4_RAISE_R2_R_________ KC_NOMODE,    KC_WIDE,      KC_SCRIPT,    KC_BLOCKS,    KC_REGIONAL,  KC_AUSSIE
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | H           | J           | K           | L           | ;           | '           |
-#define ____________TZARC_6x4_RAISE_R3_R_________ KC_EQL,       _______,      _______,      _______,      _______,      _______
+#define ____________TZARC_6x4_RAISE_R3_R_________ KC_EQL,       _______,      _______,      _______,      _______,      KC_ZALGO
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | N           | M           | ,           | .           | /           | Enter       |
 #define ____________TZARC_6x4_RAISE_R4_R_________ KC_PLUS,      _______,      _______,      _______,      _______,      _______

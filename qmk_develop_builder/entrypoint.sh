@@ -73,14 +73,13 @@ get_qmk() {
         git fetch --all --tags --prune
         git reset --hard origin/develop
         make git-submodule
-        rm -rf .build/* || true
     } 2>&1 > /home/qmk/qmk_get.log
 }
 
 build_qmk() {
     {
         cd /home/qmk/qmk_firmware
-        env -i HOME="$HOME" PATH="/usr/lib/ccache:/usr/local/bin:/usr/bin:/bin" TERM="linux" PWD="${PWD:-}" remake -j2 -O all:default || true
+        env -i HOME="$HOME" PATH="/usr/lib/ccache:/usr/local/bin:/usr/bin:/bin" TERM="linux" PWD="${PWD:-}" /home/qmk/build_all.sh || true
     } 2>&1 > /home/qmk/qmk_build_all.log
 }
 
@@ -148,8 +147,8 @@ EOF
 }
 
 upload_binaries() {
-    cd /home/qmk/qmk_firmware
-    aws s3 cp . s3://${AWS_BUCKET}/ --recursive --exclude '*' --include '*.bin' --include '*.hex' --exclude '*/*'
+    sleep 3600
+    aws s3 cp /home/qmk/qmk_firmware/.build/ s3://${AWS_BUCKET}/ --recursive --exclude '*' --include '*.bin' --include '*.uf2' --include '*.hex' --exclude '*/*'
     aws s3 cp /home/qmk/index.html s3://${AWS_BUCKET}/
     aws s3 ls s3://${AWS_BUCKET}/
 }
