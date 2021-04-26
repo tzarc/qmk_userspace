@@ -23,7 +23,7 @@ BOARD_DEFS := \
 	onekey_l082!alternates/nucleo32_l082kz!handwired/onekey/nucleo32_l082!reset \
 	split_l082!alternates/nucleo32_l082kz_split!handwired/splittest/nucleo32_l082!default \
 	test_proton_c!alternates/proton_c_test!handwired/onekey/proton_c_test!reset \
-	split_proton_c!alternates/proton_c_split!handwired/splittest/proton_c_split!default \
+	split_proton_c!alternates/proton_c_split!handwired/splittest/proton_c_split!default!handwired/splittest/proton_c_split/a9 \
 	split_g431!alternates/g431_split!handwired/splittest/g431_split!default \
 	split_f072!alternates/f072_split!handwired/splittest/f072_split!default \
 	split_f401!alternates/f401_split!handwired/splittest/f401_split!default \

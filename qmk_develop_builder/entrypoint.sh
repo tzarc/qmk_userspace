@@ -79,6 +79,7 @@ get_qmk() {
 build_qmk() {
     {
         cd /home/qmk/qmk_firmware
+        rm -rf /home/qmk/qmk_firmware/.build/*
         env -i HOME="$HOME" PATH="/usr/lib/ccache:/usr/local/bin:/usr/bin:/bin" TERM="linux" PWD="${PWD:-}" /home/qmk/build_all.sh || true
     } 2>&1 > /home/qmk/qmk_build_all.log
 }
@@ -136,7 +137,7 @@ $(cat /home/qmk/qmk_build_all.log | ctlchars2html)
 <div style='position:absolute; right:0; top:0; padding: 1em; border-left: 1px solid #666; border-bottom: 1px solid #666' class="f9 b9">
 <pre>
 Prebuilt binaries:
-$(for f in $(ls *.hex *.bin 2>/dev/null) ; do
+$(cd /home/qmk/qmk_firmware/.build/ >/dev/null 2>&1; for f in $(ls *.hex *.bin *.uf2 2>/dev/null) ; do
     echo "<a href='$f'>$f</a>"
 done)
 </pre>
@@ -147,7 +148,6 @@ EOF
 }
 
 upload_binaries() {
-    sleep 3600
     aws s3 cp /home/qmk/qmk_firmware/.build/ s3://${AWS_BUCKET}/ --recursive --exclude '*' --include '*.bin' --include '*.uf2' --include '*.hex' --exclude '*/*'
     aws s3 cp /home/qmk/index.html s3://${AWS_BUCKET}/
     aws s3 ls s3://${AWS_BUCKET}/

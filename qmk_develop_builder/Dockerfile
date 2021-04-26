@@ -4,7 +4,8 @@ RUN apt-get update \
     && apt-get install -y awscli remake curl gawk ccache
 
 RUN groupadd -f qmk -g 10000 \
-    && useradd -d /home/qmk -g qmk -m -N -u 10000 qmk
+    && useradd -d /home/qmk -g qmk -m -N -u 10000 qmk \
+    && python3 -m pip install -U qmk milc
 
 RUN mkdir -p /usr/local/bin \
     && curl -L https://github.com/pixelb/scripts/raw/master/scripts/ansi2html.sh > /usr/local/bin/ansi2html.sh \

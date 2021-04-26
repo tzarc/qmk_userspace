@@ -133,6 +133,7 @@ void housekeeping_task_kb(void) {
                 writePinLow(RGB_CURR_1500mA_OK_PIN);
                 writePinLow(RGB_CURR_3000mA_OK_PIN);
                 break;
+#ifdef DJINN_SUPPORTS_3A_FUSE
             case USBPD_1500MA:
                 writePinHigh(RGB_CURR_1500mA_OK_PIN);
                 writePinLow(RGB_CURR_3000mA_OK_PIN);
@@ -141,6 +142,13 @@ void housekeeping_task_kb(void) {
                 writePinHigh(RGB_CURR_1500mA_OK_PIN);
                 writePinHigh(RGB_CURR_3000mA_OK_PIN);
                 break;
+#else
+            case USBPD_1500MA:
+            case USBPD_3000MA:
+                writePinHigh(RGB_CURR_1500mA_OK_PIN);
+                writePinLow(RGB_CURR_3000mA_OK_PIN);
+                break;
+#endif
         }
 
         // Toggle rgblight on and off, if it's already on, to force a brightness update on all LEDs
@@ -262,14 +270,21 @@ RGB rgb_to_hsv_hook_func(HSV hsv) {
     switch (kb_state.current_setting) {
         default:
         case USBPD_500MA:
-            scale = 0.3f;
+            scale = 0.35f;
             break;
+#ifdef DJINN_SUPPORTS_3A_FUSE
         case USBPD_1500MA:
-            scale = 0.65f;
+            scale = 0.75f;
             break;
         case USBPD_3000MA:
             scale = 1.0f;
             break;
+#else
+        case USBPD_1500MA:
+        case USBPD_3000MA:
+            scale = 0.75f;
+            break;
+#endif
     }
 
     hsv.v = (uint8_t)(hsv.v * scale);
