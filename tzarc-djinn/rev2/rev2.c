@@ -18,7 +18,10 @@
 #include <quantum.h>
 #include "rev2.h"
 
-void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
+// Delays can be shorter than 30us.
+void matrix_io_delay(void) {
+    for (int i = 0; i < 10; ++i) __asm__ volatile("nop\nnop\nnop\n");
+}
 
 bool is_keyboard_master(void) {
     static bool determined = false;

@@ -485,8 +485,13 @@ void matrix_scan_user(void) {
 }
 
 layer_state_t layer_state_set_user(layer_state_t state) {
+    static layer_state_t last_state = ~(layer_state_t)0;
     // Default handler for lower/raise/adjust
     state = update_tri_layer_state(state, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST);
+    if (last_state != state) {
+        dprintf("Layer state change: %08lX -> %08lX --- %032lb -> %032lb\n", (uint32_t)last_state, (uint32_t)state, (uint32_t)last_state, (uint32_t)state);
+        last_state = state;
+    }
     return layer_state_set_keymap(state);
 }
 

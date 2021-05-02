@@ -22,6 +22,8 @@ prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(11930) # Split data sync
 prs_to_apply+=(12529) # Fix CLI pathing
 prs_to_apply+=(12497) # Build all script
+prs_to_apply+=(12440) # Debounce 8bit overflow fixes
+prs_to_apply+=(12689) # asym_eager_defer_pk
 
 declare -a cherry_picks
 #cherry_picks+=(749aca03c90c9316189b58e3236bea9242f3990f) # RGB_MATRIX slave scan

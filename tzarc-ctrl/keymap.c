@@ -23,6 +23,6 @@
 #include "layouts/community/tkl_ansi/tzarc/keymap.c"
 
 void keyboard_post_init_keymap(void) {
-    rgb_matrix_mode(RGB_MATRIX_SOLID_MULTISPLASH);
+    rgb_matrix_mode(RGB_MATRIX_PIXEL_FRACTAL);
     rgb_matrix_sethsv(104, 255, 255);
 }

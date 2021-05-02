@@ -11,7 +11,18 @@ qmk_builddir="$qmk_firmware/.build"
 temp_makefile="$qmk_builddir/parallel_kb_builds.mk"
 
 unset NO_CI
-[[ "$1" == "noci" ]] && NO_CI="noci"
+unset SPLIT_ONLY
+while [[ ! -z "$1" ]] ; do
+	case "$1" in
+		noci)
+			NO_CI="noci"
+			;;
+		split)
+			SPLIT_ONLY=1
+			;;
+	esac
+	shift
+done
 
 export PATH=/usr/lib/ccache:$PATH
 MAKEFLAGS="-j$(( $(nproc) * 2 + 1 )) --output-sync --no-print-directory"
@@ -46,10 +57,24 @@ dump_keyboard_list() {
 	done | grep -v 'handwired/pytest' | sort | uniq
 }
 
+split_keyboards_only() {
+	for kb in $(dump_keyboard_list) ; do
+		if [[ ! -z "$(grep SPLIT_KEYBOARD keyboards/$kb/rules.mk keyboards/$kb/../rules.mk keyboards/$kb/../../rules.mk keyboards/$kb/../../../rules.mk keyboards/$kb/../../../../rules.mk 2>/dev/null)" ]] ; then
+			echo $kb
+		fi
+	done | grep -v 'handwired/pytest' | sort | uniq
+}
+
 generate_makefile() {
 	pushd "$qmk_firmware" >/dev/null 2>&1
 	truncate -s 0 "$temp_makefile"
-	for kb in $(dump_keyboard_list) ; do
+	local kblist
+	if [[ "$SPLIT_ONLY" == "1" ]] ; then
+		kblist=$(split_keyboards_only)
+	else
+		kblist=$(dump_keyboard_list)
+	fi
+	for kb in ${kblist} ; do
 		safe=$(echo $kb | sed -e 's@/@_@g')
 		buildfile="$qmk_builddir/build.log.${safe}"
 		failfile="$qmk_builddir/failed.log.${safe}"

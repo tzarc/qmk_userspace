@@ -16,7 +16,7 @@
 
 #pragma once
 
-#define USE_I2C
+//#define USE_I2C
 #define EE_HANDS
 
 #undef RGBLED_NUM
@@ -27,18 +27,16 @@
 
 #ifdef RGBLIGHT_ENABLE
 #    undef RGBLIGHT_ANIMATIONS
-#    if defined(__AVR__) && !defined(__AVR_AT90USB1286__)
-#        define RGBLIGHT_SLEEP
-#        define RGBLIGHT_EFFECT_BREATHING
-#        define RGBLIGHT_EFFECT_SNAKE
-#        define RGBLIGHT_EFFECT_KNIGHT
-#    else
-#        define RGBLIGHT_ANIMATIONS
-#    endif
+#    define RGBLIGHT_SLEEP
+#    define RGBLIGHT_EFFECT_BREATHING
+#    define RGBLIGHT_EFFECT_SNAKE
+#    define RGBLIGHT_EFFECT_KNIGHT
 #endif  // RGBLIGHT_ENABLE
 
 #define NO_ACTION_MACRO
 #define NO_ACTION_FUNCTION
 
 // Allow for an extra sync command over the split
+#define SPLIT_TRANSPORT_MIRROR
+#define SPLIT_LAYER_STATE_ENABLE
 #define SPLIT_TRANSACTION_IDS_USER RPC_ID_SLAVE_COUNTER
