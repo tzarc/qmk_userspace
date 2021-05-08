@@ -188,6 +188,9 @@ void keyboard_post_init_keymap(void) {
 
     // Reset the initial shared data value between master and slave
     memset(&user_state, 0, sizeof(user_state));
+
+    extern void keyboard_post_init_user_gifrender(void);
+    keyboard_post_init_user_gifrender();
 }
 
 void user_state_update(void) {
@@ -237,6 +240,9 @@ void housekeeping_task_keymap(void) {
     void test_lua(void);
     test_lua();
 #endif  // LUA_ENABLE
+
+    extern void housekeeping_task_user_gifrender(void);
+    housekeeping_task_user_gifrender();
 }
 
 //----------------------------------------------------------

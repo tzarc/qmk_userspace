@@ -33,6 +33,7 @@
     "print.h": "c",
     "i2c_master.h": "c",
     "stdbool.h": "c",
-    "matrix.h": "c"
+    "matrix.h": "c",
+    "gif.h": "c"
   }
 }
