@@ -46,6 +46,3 @@ OPT = 2
 #OPT_DEFS += -g
 
 DEFAULT_FOLDER = tzarc/djinn/rev2
-
-SRC += gif-test/gif-test.c \
-       gif-test/gif.c
