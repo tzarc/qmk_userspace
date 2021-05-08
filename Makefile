@@ -13,6 +13,7 @@ BOARD_DEFS := \
 	mysterium-nick!tzarc-mysterium!coseyfannitutti/mysterium/keymaps/tzarc!tzarc \
 	mysterium-dad!tzarc-mysterium-dad!coseyfannitutti/mysterium/keymaps/tzarc-dad!tzarc-dad \
 	chocopad!tzarc-chocopad!keebio/chocopad/keymaps/tzarc!tzarc \
+	bm16s!tzarc-bm16s!bm16s/keymaps/tzarc!tzarc \
 	cyclone!tzarc-cyclone!handwired/tzarc/cyclone!tzarc \
 	djinn_rev1!tzarc-djinn!handwired/tzarc/djinn!tzarc!handwired/tzarc/djinn/rev1 \
 	djinn_rev2!tzarc-djinn!handwired/tzarc/djinn!tzarc!handwired/tzarc/djinn/rev2 \
