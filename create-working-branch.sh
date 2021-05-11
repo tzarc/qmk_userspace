@@ -21,7 +21,6 @@ declare -a prs_to_apply
 prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(11930) # Split data sync
 prs_to_apply+=(12529) # Fix CLI pathing
-prs_to_apply+=(12497) # Build all script
 prs_to_apply+=(12440) # Debounce 8bit overflow fixes
 prs_to_apply+=(12689) # asym_eager_defer_pk
 
