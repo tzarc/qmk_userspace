@@ -12,16 +12,19 @@ unset upgrade_chibios_confs
 
 target_branch="generated-workarea"
 target_qmk="develop"
+target_chibios="stable_20.3.x"
+target_chibios_contrib="chibios-20.3.x"
 if [ ! -z ${upgrade_chibios:-} ] ; then
 target_branch="generated-chibios-master-upgrade"
 target_qmk="develop"
+target_chibios="master"
+target_chibios_contrib="chibios-20.3.x"
 fi
 
 declare -a prs_to_apply
 prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(11930) # Split data sync
-prs_to_apply+=(12529) # Fix CLI pathing
-prs_to_apply+=(12440) # Debounce 8bit overflow fixes
+prs_to_apply+=(12240) # Debounce 8bit overflow fixes
 prs_to_apply+=(12689) # asym_eager_defer_pk
 
 declare -a cherry_picks
@@ -61,12 +64,12 @@ hard_reset() {
 
 upgrade-chibios() {
     pushd "$script_dir/qmk_firmware/lib/chibios"
-    hard_reset ChibiOS ChibiOS stable_20.3.x
+    hard_reset ChibiOS ChibiOS $target_chibios
     pcmd git push origin $target_branch --set-upstream --force-with-lease
     popd
 
     pushd "$script_dir/qmk_firmware/lib/chibios-contrib"
-    hard_reset ChibiOS ChibiOS-Contrib chibios-20.3.x
+    hard_reset ChibiOS ChibiOS-Contrib $target_chibios_contrib
     pcmd git push origin $target_branch --set-upstream --force-with-lease
     popd
 
