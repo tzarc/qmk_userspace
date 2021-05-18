@@ -22,6 +22,9 @@
 
 #define SERIAL_BUFFERS_SIZE 256
 
+// This enables interrupt-driven moe
+#define PAL_USE_WAIT TRUE
+
 #ifdef SERIAL_DRIVER_USART
 #define HAL_USE_SERIAL TRUE
 #endif  // SERIAL_DRIVER_USART

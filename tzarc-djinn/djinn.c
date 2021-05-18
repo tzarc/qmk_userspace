@@ -165,6 +165,19 @@ void housekeeping_task_kb(void) {
         qp_power(lcd, lcd_on);
     }
 
+    // Enable/disable RGB
+    if (lcd_on) {
+        writePinHigh(RGB_POWER_ENABLE_PIN);
+        if (rgblight_is_enabled() != lcd_on) {
+            rgblight_enable_noeeprom();
+        }
+    } else {
+        if (rgblight_is_enabled() != lcd_on) {
+            rgblight_disable_noeeprom();
+        }
+        writePinLow(RGB_POWER_ENABLE_PIN);
+    }
+
     // Match the backlight to the LCD state
     if (is_keyboard_master() && is_backlight_enabled() != lcd_on) {
         if (lcd_on)
@@ -176,6 +189,36 @@ void housekeeping_task_kb(void) {
     // Draw the UI
     if (kb_state.lcd_power) {
         draw_ui_user();
+    }
+
+    // Go into low-scan interrupt-based mode if we haven't had any matrix activity in the last second
+    if (last_input_activity_elapsed() > 3000) {
+        // ROW2COL
+        const pin_t row_pins[] = MATRIX_ROW_PINS;
+        const pin_t col_pins[] = MATRIX_COL_PINS;
+
+        // Set up row/col pins and attach callback
+        for (int i = 0; i < sizeof(row_pins) / sizeof(pin_t); ++i) {
+            setPinOutput(row_pins[i]);
+            writePinLow(row_pins[i]);
+        }
+        for (int i = 0; i < sizeof(col_pins) / sizeof(pin_t); ++i) {
+            setPinInputHigh(col_pins[i]);
+            palEnableLineEvent(col_pins[i], PAL_EVENT_MODE_BOTH_EDGES);
+        }
+
+        // Wait for an interrupt
+        __WFI();
+
+        // Now that the interrupt has woken us up, reset all the row/col pins back to defaults
+        for (int i = 0; i < sizeof(col_pins) / sizeof(pin_t); ++i) {
+            palDisableLineEvent(col_pins[i]);
+            setPinInputHigh(col_pins[i]);
+        }
+        for (int i = 0; i < sizeof(row_pins) / sizeof(pin_t); ++i) {
+            writePinHigh(row_pins[i]);
+            setPinInputHigh(row_pins[i]);
+        }
     }
 }
 
