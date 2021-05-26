@@ -172,6 +172,13 @@ void rpc_user_sync_callback(uint8_t initiator2target_buffer_size, const void *in
     }
 }
 
+static uint32_t counter = 0;
+
+void slave_counter_sync_callback(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
+    uint32_t*       send = (uint32_t*)target2initiator_buffer;
+    *send                = ++counter;
+}
+
 void keyboard_post_init_keymap(void) {
     // Initialise the framebuffer
     surf = qp_rgb565_surface_make_device(8, 320);
@@ -185,6 +192,7 @@ void keyboard_post_init_keymap(void) {
 
     // Register keyboard state sync split transaction
     transaction_register_rpc(RPC_ID_SYNC_STATE_USER, rpc_user_sync_callback);
+    transaction_register_rpc(RPC_ID_GET_COUNTER, slave_counter_sync_callback);
 
     // Reset the initial shared data value between master and slave
     memset(&user_state, 0, sizeof(user_state));
@@ -220,7 +228,14 @@ void user_state_sync(void) {
             if (transaction_rpc_send(RPC_ID_SYNC_STATE_USER, sizeof(user_runtime_config), &user_state)) {
                 last_sync = timer_read32();
             } else {
-                print("Failed to perform rpc call\n");
+                dprint("Failed to perform rpc call\n");
+            }
+
+            uint32_t counter;
+            if(transaction_rpc_recv(RPC_ID_GET_COUNTER, sizeof(counter), &counter)) {
+                dprintf("Slave counter: %d\n", (int)counter);
+            } else {
+                dprint("Failed to perform rpc call\n");
             }
         }
     }

@@ -4,3 +4,5 @@ SRC += qp_rgb565_surface.c
 
 LUA_ENABLE = yes
 UNICODE_ENABLE = yes
+
+CONSOLE_ENABLE = yes

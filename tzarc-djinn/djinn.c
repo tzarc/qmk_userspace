@@ -167,15 +167,19 @@ void housekeeping_task_kb(void) {
 
     // Enable/disable RGB
     if (lcd_on) {
-        writePinHigh(RGB_POWER_ENABLE_PIN);
+        // Enable EEPROM so that we've got some colour data already being transmitted, by the time we turn on the RGB_PWR line
         if (rgblight_is_enabled() != lcd_on) {
             rgblight_enable_noeeprom();
         }
+        // Turn on RGB_PWR
+        writePinHigh(RGB_POWER_ENABLE_PIN);
     } else {
+        // Turn off RGB_PWR
+        writePinLow(RGB_POWER_ENABLE_PIN);
+        // Disable the PWM output for the RGB
         if (rgblight_is_enabled() != lcd_on) {
             rgblight_disable_noeeprom();
         }
-        writePinLow(RGB_POWER_ENABLE_PIN);
     }
 
     // Match the backlight to the LCD state
