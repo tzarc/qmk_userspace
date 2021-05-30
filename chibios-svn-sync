@@ -1,0 +1,3 @@
+for branch in trunk stable_20.3.x ; do git branch -f svn-mirror/$branch svn/$branch && git push origin svn-mirror/$branch ; done
+
+for tagname in ver20.3.1 ver20.3.2 ver20.3.3 ; do git tag -a -m "Tagging $tagname" svn-mirror/$tagname svn/tags/$tagname || true ; git push origin svn-mirror/$tagname || true ; done

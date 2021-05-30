@@ -12,12 +12,12 @@ unset upgrade_chibios_confs
 
 target_branch="generated-workarea"
 target_qmk="develop"
-target_chibios="stable_20.3.x"
+target_chibios="svn-mirror/stable_20.3.x"
 target_chibios_contrib="chibios-20.3.x"
 if [ ! -z ${upgrade_chibios:-} ] ; then
 target_branch="generated-chibios-master-upgrade"
 target_qmk="develop"
-target_chibios="master"
+target_chibios="svn-mirror/trunk"
 target_chibios_contrib="chibios-20.3.x"
 fi
 
@@ -26,7 +26,6 @@ prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(11930) # Split data sync
 prs_to_apply+=(12240) # Debounce 8bit overflow fixes
 prs_to_apply+=(12689) # asym_eager_defer_pk
-prs_to_apply+=(12933) # housekeeping fixes
 
 declare -a cherry_picks
 #cherry_picks+=(749aca03c90c9316189b58e3236bea9242f3990f) # RGB_MATRIX slave scan
@@ -56,11 +55,11 @@ hard_reset() {
     pcmd git fetch --unshallow upstream || true
     pcmd git clean -xfd
     pcmd git checkout -f $repo_branch
-    pcmd git reset --hard upstream/$repo_branch
+    pcmd git reset --hard upstream/$repo_branch || pcmd git reset --hard origin/$repo_branch
     pcmd git push origin $repo_branch --force-with-lease
     pcmd git branch -D $target_branch || true
     pcmd git checkout -b $target_branch
-    pcmd git reset --hard upstream/$repo_branch
+    pcmd git reset --hard upstream/$repo_branch || pcmd git reset --hard origin/$repo_branch
 }
 
 upgrade-chibios() {
@@ -143,9 +142,7 @@ pcmd git commit -am "Retarget '$target_branch' to point to personal ChibiOS repo
 popd
 
 pushd "$script_dir"
-if [ ! -z ${upgrade_chibios:-} ] ; then
-    upgrade-chibios
-fi
+upgrade-chibios
 popd
 
 pushd "$script_dir/qmk_firmware"

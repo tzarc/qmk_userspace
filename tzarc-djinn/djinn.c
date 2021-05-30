@@ -281,12 +281,6 @@ void keyboard_post_init_kb(void) {
 //----------------------------------------------------------
 // QMK overrides
 
-void encoder_update_kb(int8_t index, bool clockwise) {
-    // Offload to the keymap instead.
-    extern void encoder_update_user(int8_t index, bool clockwise);
-    encoder_update_user(index, clockwise);
-}
-
 void suspend_power_down_kb(void) {
     suspend_power_down_user();
 

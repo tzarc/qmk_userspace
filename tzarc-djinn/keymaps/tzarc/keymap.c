@@ -94,7 +94,7 @@ void eeconfig_init_keymap(void) {
     backlight_level(BACKLIGHT_LEVELS);
 }
 
-void encoder_update_keymap(int8_t index, bool clockwise) {
+bool encoder_update_keymap(uint8_t index, bool clockwise) {
     uint8_t temp_mod = get_mods();
     uint8_t temp_osm = get_oneshot_mods();
     bool    is_ctrl  = (temp_mod | temp_osm) & MOD_MASK_CTRL;
@@ -149,6 +149,7 @@ void encoder_update_keymap(int8_t index, bool clockwise) {
             unregister_code(mapped_code);
         }
     }
+    return false;
 }
 
 //----------------------------------------------------------
@@ -174,9 +175,9 @@ void rpc_user_sync_callback(uint8_t initiator2target_buffer_size, const void *in
 
 static uint32_t counter = 0;
 
-void slave_counter_sync_callback(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
-    uint32_t*       send = (uint32_t*)target2initiator_buffer;
-    *send                = ++counter;
+void slave_counter_sync_callback(uint8_t initiator2target_buffer_size, const void *initiator2target_buffer, uint8_t target2initiator_buffer_size, void *target2initiator_buffer) {
+    uint32_t *send = (uint32_t *)target2initiator_buffer;
+    *send          = ++counter;
 }
 
 void keyboard_post_init_keymap(void) {
@@ -232,7 +233,7 @@ void user_state_sync(void) {
             }
 
             uint32_t counter;
-            if(transaction_rpc_recv(RPC_ID_GET_COUNTER, sizeof(counter), &counter)) {
+            if (transaction_rpc_recv(RPC_ID_GET_COUNTER, sizeof(counter), &counter)) {
                 dprintf("Slave counter: %d\n", (int)counter);
             } else {
                 dprint("Failed to perform rpc call\n");

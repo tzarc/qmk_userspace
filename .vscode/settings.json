@@ -34,6 +34,7 @@
     "i2c_master.h": "c",
     "stdbool.h": "c",
     "matrix.h": "c",
-    "hal.h": "c"
+    "hal.h": "c",
+    "ch.h": "c"
   }
 }

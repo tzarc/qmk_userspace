@@ -97,7 +97,7 @@ __attribute__((weak)) void matrix_scan_keymap(void) {}
 
 __attribute__((weak)) layer_state_t layer_state_set_keymap(layer_state_t state) { return state; }
 
-__attribute__((weak)) void encoder_update_keymap(uint8_t index, bool clockwise) {}
+__attribute__((weak)) bool encoder_update_keymap(uint8_t index, bool clockwise) { return true; }
 
 __attribute__((weak)) void housekeeping_task_keymap(void) {}
 
@@ -495,5 +495,5 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return layer_state_set_keymap(state);
 }
 
-void encoder_update_user(uint8_t index, bool clockwise) { encoder_update_keymap(index, clockwise); }
+bool encoder_update_user(uint8_t index, bool clockwise) { return encoder_update_keymap(index, clockwise); }
 void housekeeping_task_user(void) { housekeeping_task_keymap(); }
