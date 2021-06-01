@@ -26,7 +26,8 @@ prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(11930) # Split data sync
 prs_to_apply+=(12240) # Debounce 8bit overflow fixes
 prs_to_apply+=(12689) # asym_eager_defer_pk
-prs_to_apply+=(13062) # weak row/col reads
+prs_to_apply+=(13064) # memcmp matrix changed
+prs_to_apply+=(13066) # multibuild keymap
 
 declare -a cherry_picks
 #cherry_picks+=(749aca03c90c9316189b58e3236bea9242f3990f) # RGB_MATRIX slave scan

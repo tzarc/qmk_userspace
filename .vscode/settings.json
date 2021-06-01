@@ -35,6 +35,7 @@
     "stdbool.h": "c",
     "matrix.h": "c",
     "hal.h": "c",
-    "ch.h": "c"
+    "ch.h": "c",
+    "split_util.h": "c"
   }
 }
