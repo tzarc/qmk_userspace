@@ -283,15 +283,17 @@ void keyboard_post_init_kb(void) {
 
 bool matrix_read_cols_on_row(matrix_row_t current_matrix[], uint8_t current_row) {
     static pin_t row_pins[MATRIX_ROWS] = MATRIX_ROW_PINS;
-    setPinOutput(row_pins[current_row]);
-    writePinLow(row_pins[current_row]);
+    ATOMIC_BLOCK_FORCEON {
+        setPinOutput(row_pins[current_row]);
+        writePinLow(row_pins[current_row]);
+    }
     matrix_io_delay();
 
     uint16_t     port_c = palReadPort(GPIOC);
     uint16_t     port_a = palReadPort(GPIOA);
     matrix_row_t entry  = ~(port_c & 0x0F) | ((port_a & 0x07) << 4);
 
-    setPinInputHigh(row_pins[current_row]);
+    ATOMIC_BLOCK_FORCEON { setPinInputHigh(row_pins[current_row]); }
     matrix_io_delay();
 
     bool ret                    = current_matrix[current_row] != entry;

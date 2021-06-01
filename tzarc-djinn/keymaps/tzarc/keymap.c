@@ -234,7 +234,7 @@ void user_state_sync(void) {
 
             uint32_t counter;
             if (transaction_rpc_recv(RPC_ID_GET_COUNTER, sizeof(counter), &counter)) {
-                dprintf("Slave counter: %d\n", (int)counter);
+                // dprintf("Slave counter: %d\n", (int)counter);
             } else {
                 dprint("Failed to perform rpc call\n");
             }
