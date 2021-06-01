@@ -292,15 +292,14 @@ void matrix_read_cols_on_row(matrix_row_t current_matrix[], uint8_t current_row)
     // Read the ports in one go
     current_matrix[current_row] = ~(palReadPort(GPIOC) & 0x0F) | ((palReadPort(GPIOA) & 0x07) << 4);  // C0, C1, C2, C3, A0, A1, A2
 
-    // Wait for readback of each port to go high -- unselecting the row would have been completed
+    // Unselect the row pin
     setPinInputHigh(row_pins[current_row]);
 
+    // Wait for readback of each port to go high -- unselecting the row would have been completed
     rtcnt_t start = chSysGetRealtimeCounterX();
-    rtcnt_t end   = start + 300;
+    rtcnt_t end   = start + 500;
     while (chSysIsCounterWithinX(chSysGetRealtimeCounterX(), start, end))
         if ((palReadPort(GPIOC) & 0x0F) == 0x0F) break;
-    start = chSysGetRealtimeCounterX();
-    end   = start + 300;
     while (chSysIsCounterWithinX(chSysGetRealtimeCounterX(), start, end))
         if ((palReadPort(GPIOA) & 0x07) == 0x07) break;
 }
