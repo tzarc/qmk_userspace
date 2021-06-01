@@ -31,6 +31,7 @@
 #    define SERIAL_USART_PIN_SWAP
 #    define SERIAL_USART_TX_PIN B10
 #    define SERIAL_USART_RX_PIN B11
+#    define SERIAL_USART_SPEED 1000000
 #endif  // SERIAL_DRIVER_USART_DUPLEX
 
 // RGB configuration
