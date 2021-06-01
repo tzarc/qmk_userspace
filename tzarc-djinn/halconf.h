@@ -25,14 +25,14 @@
 // This enables interrupt-driven moe
 #define PAL_USE_WAIT TRUE
 
-#ifdef SERIAL_DRIVER_USART
+#if defined(SERIAL_DRIVER_USART) || defined(SERIAL_DRIVER_USART_DUPLEX_ALT)
 #define HAL_USE_SERIAL TRUE
-#endif  // SERIAL_DRIVER_USART
+#endif  // defined(SERIAL_DRIVER_USART) || defined(SERIAL_DRIVER_USART_DUPLEX_ALT)
 
-#ifdef SERIAL_DRIVER_USART_DUPLEX
+#if defined(SERIAL_DRIVER_USART_DUPLEX)
 #define HAL_USE_UART TRUE
 #define UART_USE_WAIT TRUE
-#endif  // SERIAL_DRIVER_USART_DUPLEX
+#endif  // defined(SERIAL_DRIVER_USART_DUPLEX)
 
 #include_next <halconf.h>
 
