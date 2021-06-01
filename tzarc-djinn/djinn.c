@@ -283,36 +283,21 @@ void keyboard_post_init_kb(void) {
 
 void matrix_read_cols_on_row(matrix_row_t current_matrix[], uint8_t current_row) {
     static pin_t row_pins[MATRIX_ROWS] = MATRIX_ROW_PINS;
-    ATOMIC_BLOCK_FORCEON {
-        setPinOutput(row_pins[current_row]);
-        writePinLow(row_pins[current_row]);
-    }
+
+    // Setup the output row pin
+    setPinOutput(row_pins[current_row]);
+    writePinLow(row_pins[current_row]);
     matrix_io_delay();
 
-    current_matrix[current_row]  = ~(palReadPort(GPIOC) & 0x0F) | ((palReadPort(GPIOA) & 0x07) << 4); // C0, C1, C2, C3, A0, A1, A2
+    // Read the ports in one go
+    current_matrix[current_row] = ~(palReadPort(GPIOC) & 0x0F) | ((palReadPort(GPIOA) & 0x07) << 4);  // C0, C1, C2, C3, A0, A1, A2
 
-    ATOMIC_BLOCK_FORCEON { setPinInputHigh(row_pins[current_row]); }
-    matrix_io_delay();
-}
-
-void suspend_power_down_kb(void) {
-    suspend_power_down_user();
-
-    // djinn_lcd_off();
-    // qp_power(lcd, false);
-    // writePinLow(LCD_POWER_ENABLE_PIN);
-}
-
-void suspend_wakeup_init_kb(void) {
-    // writePinHigh(LCD_POWER_ENABLE_PIN);
-    // wait_ms(50);
-    // djinn_lcd_on();
-    // qp_init(lcd, QP_ROTATION_0);
-    // qp_power(lcd, true);
-    // qp_clear(lcd);
-    // qp_rect(lcd, 0, 0, 239, 319, 0, 0, 0, true);
-
-    suspend_wakeup_init_user();
+    // Wait for readback of each port to go high -- unselecting the row would have been completed
+    setPinInputHigh(row_pins[current_row]);
+    while ((palReadPort(GPIOC) & 0x0F) != 0x0F)
+        ;
+    while ((palReadPort(GPIOA) & 0x07) != 0x07)
+        ;
 }
 
 #if defined(RGB_MATRIX_ENABLE)
