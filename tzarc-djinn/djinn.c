@@ -207,26 +207,27 @@ void housekeeping_task_kb(void) {
         const pin_t col_pins[] = MATRIX_COL_PINS;
 
         // Set up row/col pins and attach callback
-        for (int i = 0; i < sizeof(row_pins) / sizeof(pin_t); ++i) {
-            setPinOutput(row_pins[i]);
-            writePinLow(row_pins[i]);
-        }
         for (int i = 0; i < sizeof(col_pins) / sizeof(pin_t); ++i) {
-            setPinInputHigh(col_pins[i]);
-            palEnableLineEvent(col_pins[i], PAL_EVENT_MODE_BOTH_EDGES);
+            setPinOutput(col_pins[i]);
+            writePinLow(col_pins[i]);
+        }
+        for (int i = 0; i < sizeof(row_pins) / sizeof(pin_t); ++i) {
+            setPinInputHigh(row_pins[i]);
+            palEnableLineEvent(row_pins[i], PAL_EVENT_MODE_BOTH_EDGES);
         }
 
         // Wait for an interrupt
         __WFI();
 
         // Now that the interrupt has woken us up, reset all the row/col pins back to defaults
-        for (int i = 0; i < sizeof(col_pins) / sizeof(pin_t); ++i) {
-            palDisableLineEvent(col_pins[i]);
-            setPinInputHigh(col_pins[i]);
-        }
         for (int i = 0; i < sizeof(row_pins) / sizeof(pin_t); ++i) {
+            palDisableLineEvent(row_pins[i]);
             writePinHigh(row_pins[i]);
             setPinInputHigh(row_pins[i]);
+        }
+        for (int i = 0; i < sizeof(col_pins) / sizeof(pin_t); ++i) {
+            writePinHigh(col_pins[i]);
+            setPinInputHigh(col_pins[i]);
         }
     }
 }
@@ -286,6 +287,14 @@ void keyboard_post_init_kb(void) {
 //----------------------------------------------------------
 // QMK overrides
 
+// Read the ports in one go
+#define GPIOB_BITMASK (1 << 13 | 1 << 14 | 1 << 15)  // B13, B14, B15
+#define GPIOB_OFFSET 13
+#define GPIOB_COUNT 3
+#define GPIOC_BITMASK (1 << 6 | 1 << 7 | 1 << 8)  // C6, C7, C8
+#define GPIOC_OFFSET 6
+
+// Pin definitions
 static const pin_t row_pins[MATRIX_ROWS] = MATRIX_ROW_PINS;
 static const pin_t col_pins[MATRIX_COLS] = MATRIX_COL_PINS;
 
@@ -295,33 +304,28 @@ void matrix_init_pins(void) {
 }
 
 void matrix_read_rows_on_col(matrix_row_t current_matrix[], uint8_t current_col) {
-    // Setup the output row pin
+    // Setup the output column pin
     setPinOutput(col_pins[current_col]);
     writePinLow(col_pins[current_col]);
     matrix_io_delay();
 
-// Read the ports in one go
-#define GPIOB_BITMASK (1 << 13 | 1 << 14 | 1 << 15)
-#define GPIOB_OFFSET 13
-#define GPIOC_BITMASK (1 << 6 | 1 << 7 | 1 << 8)
-#define GPIOC_OFFSET 6
-    uint32_t readback = ~(((palReadPort(GPIOB) & GPIOB_BITMASK) >> GPIOB_OFFSET) |         // B13, B14, B15
-                          (((palReadPort(GPIOC) & GPIOC_BITMASK) >> GPIOC_OFFSET) << 3));  // C6, C7, C8
+    // Read the row ports
+    uint32_t gpio_b = palReadPort(GPIOB);
+    uint32_t gpio_c = palReadPort(GPIOC);
 
     // Unselect the row pin
     setPinInputHigh(col_pins[current_col]);
 
-// Helper for setting a bit inside the matrix array
-#define set_bit(row, val)                                 \
-    do {                                                  \
-        if (val)                                          \
-            current_matrix[row] |= (1ul << current_col);  \
-        else                                              \
-            current_matrix[row] &= ~(1ul << current_col); \
-    } while (0)
+    // Consutrct the packed bitmask for the pins
+    uint32_t readback = ~(((gpio_b & GPIOB_BITMASK) >> GPIOB_OFFSET) | (((gpio_c & GPIOC_BITMASK) >> GPIOC_OFFSET) << GPIOB_COUNT));
 
     // Inject values into the matrix
-    for (int i = 0; i < MATRIX_ROWS; ++i) set_bit(i, readback & (1 << i));
+    for (int i = 0; i < MATRIX_ROWS; ++i) {
+        if (readback & (1 << i))
+            current_matrix[i] |= (1ul << current_col);
+        else
+            current_matrix[i] &= ~(1ul << current_col);
+    }
 
     // Wait for readback of each port to go high -- unselecting the row would have been completed
     rtcnt_t start = chSysGetRealtimeCounterX();
