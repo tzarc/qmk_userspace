@@ -300,9 +300,13 @@ void matrix_read_rows_on_col(matrix_row_t current_matrix[], uint8_t current_col)
     writePinLow(col_pins[current_col]);
     matrix_io_delay();
 
-    // Read the ports in one go
-    uint32_t readback = ~(((palReadPort(GPIOB) & (1 << 13 | 1 << 14 | 1 << 15)) >> 13) |     // B13, B14, B15
-                          (((palReadPort(GPIOC) & (1 << 6 | 1 << 7 | 1 << 8)) >> 6) << 3));  // C6, C7, C8
+// Read the ports in one go
+#define GPIOB_BITMASK (1 << 13 | 1 << 14 | 1 << 15)
+#define GPIOB_OFFSET 13
+#define GPIOC_BITMASK (1 << 6 | 1 << 7 | 1 << 8)
+#define GPIOC_OFFSET 6
+    uint32_t readback = ~(((palReadPort(GPIOB) & GPIOB_BITMASK) >> GPIOB_OFFSET) |         // B13, B14, B15
+                          (((palReadPort(GPIOC) & GPIOC_BITMASK) >> GPIOC_OFFSET) << 3));  // C6, C7, C8
 
     // Unselect the row pin
     setPinInputHigh(col_pins[current_col]);
@@ -323,9 +327,9 @@ void matrix_read_rows_on_col(matrix_row_t current_matrix[], uint8_t current_col)
     rtcnt_t start = chSysGetRealtimeCounterX();
     rtcnt_t end   = start + 500;
     while (chSysIsCounterWithinX(chSysGetRealtimeCounterX(), start, end))
-        if ((palReadPort(GPIOC) & 0x0F) == 0x0F) break;
+        if ((palReadPort(GPIOB) & GPIOB_BITMASK) == GPIOB_BITMASK) break;
     while (chSysIsCounterWithinX(chSysGetRealtimeCounterX(), start, end))
-        if ((palReadPort(GPIOA) & 0x07) == 0x07) break;
+        if ((palReadPort(GPIOC) & GPIOC_BITMASK) == GPIOC_BITMASK) break;
 }
 
 #if defined(RGB_MATRIX_ENABLE)
