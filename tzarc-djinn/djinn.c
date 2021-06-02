@@ -116,6 +116,11 @@ void kb_state_sync_slave(uint8_t initiator2target_buffer_size, const void* initi
     }
 }
 
+#define MATRIX_ROW_PINS \
+    { B13, B14, B15, C6, C7, C8 }
+#define MATRIX_COL_PINS \
+    { C0, C1, C2, C3, A0, A1, A2 }
+
 void housekeeping_task_kb(void) {
     // Update kb_state so we can send to slave
     kb_state_update();
@@ -195,8 +200,8 @@ void housekeeping_task_kb(void) {
         draw_ui_user();
     }
 
-    // Go into low-scan interrupt-based mode if we haven't had any matrix activity in the last second
-    if (last_input_activity_elapsed() > 3000) {
+    // Go into low-scan interrupt-based mode if we haven't had any matrix activity in the last 5 seconds
+    if (last_input_activity_elapsed() > 5000) {
         // ROW2COL
         const pin_t row_pins[] = MATRIX_ROW_PINS;
         const pin_t col_pins[] = MATRIX_COL_PINS;
@@ -281,19 +286,38 @@ void keyboard_post_init_kb(void) {
 //----------------------------------------------------------
 // QMK overrides
 
-void matrix_read_cols_on_row(matrix_row_t current_matrix[], uint8_t current_row) {
-    static pin_t row_pins[MATRIX_ROWS] = MATRIX_ROW_PINS;
+static const pin_t row_pins[MATRIX_ROWS] = MATRIX_ROW_PINS;
+static const pin_t col_pins[MATRIX_COLS] = MATRIX_COL_PINS;
 
+void matrix_init_pins(void) {
+    for (int i = 0; i < MATRIX_ROWS; ++i) setPinInputHigh(row_pins[i]);
+    for (int i = 0; i < MATRIX_COLS; ++i) setPinInputHigh(col_pins[i]);
+}
+
+void matrix_read_rows_on_col(matrix_row_t current_matrix[], uint8_t current_col) {
     // Setup the output row pin
-    setPinOutput(row_pins[current_row]);
-    writePinLow(row_pins[current_row]);
+    setPinOutput(col_pins[current_col]);
+    writePinLow(col_pins[current_col]);
     matrix_io_delay();
 
     // Read the ports in one go
-    current_matrix[current_row] = ~(palReadPort(GPIOC) & 0x0F) | ((palReadPort(GPIOA) & 0x07) << 4);  // C0, C1, C2, C3, A0, A1, A2
+    uint32_t readback = ~(((palReadPort(GPIOB) & (1 << 13 | 1 << 14 | 1 << 15)) >> 13) |     // B13, B14, B15
+                          (((palReadPort(GPIOC) & (1 << 6 | 1 << 7 | 1 << 8)) >> 6) << 3));  // C6, C7, C8
 
     // Unselect the row pin
-    setPinInputHigh(row_pins[current_row]);
+    setPinInputHigh(col_pins[current_col]);
+
+// Helper for setting a bit inside the matrix array
+#define set_bit(row, val)                                 \
+    do {                                                  \
+        if (val)                                          \
+            current_matrix[row] |= (1ul << current_col);  \
+        else                                              \
+            current_matrix[row] &= ~(1ul << current_col); \
+    } while (0)
+
+    // Inject values into the matrix
+    for (int i = 0; i < MATRIX_ROWS; ++i) set_bit(i, readback & (1 << i));
 
     // Wait for readback of each port to go high -- unselecting the row would have been completed
     rtcnt_t start = chSysGetRealtimeCounterX();

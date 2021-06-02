@@ -21,6 +21,10 @@ RUN git clone -b develop https://github.com/qmk/qmk_firmware /home/qmk/qmk_firmw
 USER 0:0
 WORKDIR /home/qmk
 
+RUN python3 -m pip install -U pip \
+    && python3 -m pip install -U wheel \
+    && python3 -m pip install -U qmk milc
+
 COPY entrypoint.sh /home/qmk/entrypoint.sh
 COPY build_all.sh /home/qmk/build_all.sh
 

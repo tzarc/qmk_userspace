@@ -28,6 +28,7 @@ prs_to_apply+=(12240) # Debounce 8bit overflow fixes
 prs_to_apply+=(12689) # asym_eager_defer_pk
 prs_to_apply+=(13064) # memcmp matrix changed
 prs_to_apply+=(13066) # multibuild keymap
+prs_to_apply+=(13081) # unified half- and full-duplex serial
 
 declare -a cherry_picks
 #cherry_picks+=(749aca03c90c9316189b58e3236bea9242f3990f) # RGB_MATRIX slave scan

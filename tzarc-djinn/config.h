@@ -30,10 +30,6 @@
 // Matrix
 #define MATRIX_ROWS 12
 #define MATRIX_COLS 7
-#define MATRIX_ROW_PINS \
-    { B13, B14, B15, C6, C7, C8 }
-#define MATRIX_COL_PINS \
-    { C0, C1, C2, C3, A0, A1, A2 }
 #define DIODE_DIRECTION ROW2COL
 
 // Encoders
