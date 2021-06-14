@@ -28,8 +28,10 @@ void keyboard_post_init_kb(void) {
 }
 
 void matrix_init_pins(void) {
+#ifdef SPI_MATRIX_LATCH_PIN
     setPinOutput(SPI_MATRIX_LATCH_PIN);
     writePinLow(SPI_MATRIX_LATCH_PIN);
+#endif  // SPI_MATRIX_LATCH_PIN
     setPinOutput(SPI_MATRIX_CHIP_SELECT_PIN);
     writePinHigh(SPI_MATRIX_CHIP_SELECT_PIN);
     spi_init();
@@ -37,13 +39,17 @@ void matrix_init_pins(void) {
 
 void matrix_read_cols_on_row(matrix_row_t current_matrix[], uint8_t current_row) {
     if (current_row == 0) {
+#ifdef SPI_MATRIX_LATCH_PIN
         writePinHigh(SPI_MATRIX_LATCH_PIN);
+#endif  // SPI_MATRIX_LATCH_PIN
 
         // Read from SPI the matrix
         spi_start(SPI_MATRIX_CHIP_SELECT_PIN, false, 0, 4);
         spi_receive(current_matrix, SPI_MATRIX_NUMBER_REGISTERS);
         spi_stop();
 
+#ifdef SPI_MATRIX_LATCH_PIN
         writePinLow(SPI_MATRIX_LATCH_PIN);
+#endif  // SPI_MATRIX_LATCH_PIN
     }
 }
