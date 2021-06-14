@@ -45,7 +45,7 @@ void matrix_read_cols_on_row(matrix_row_t current_matrix[], uint8_t current_row)
 
         // Read from SPI the matrix
         spi_start(SPI_MATRIX_CHIP_SELECT_PIN, false, 0, 4);
-        spi_receive(current_matrix, SPI_MATRIX_NUMBER_REGISTERS);
+        spi_receive(current_matrix, MATRIX_ROWS);
         spi_stop();
 
 #ifdef SPI_MATRIX_LATCH_PIN
