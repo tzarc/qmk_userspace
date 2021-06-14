@@ -36,6 +36,7 @@
     "matrix.h": "c",
     "hal.h": "c",
     "ch.h": "c",
-    "split_util.h": "c"
+    "split_util.h": "c",
+    "spi_master.h": "c"
   }
 }

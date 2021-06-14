@@ -24,10 +24,7 @@ fi
 declare -a prs_to_apply
 prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(11930) # Split data sync
-prs_to_apply+=(12240) # Debounce 8bit overflow fixes
 prs_to_apply+=(12689) # asym_eager_defer_pk
-prs_to_apply+=(13064) # memcmp matrix changed
-prs_to_apply+=(13066) # multibuild keymap
 prs_to_apply+=(13081) # unified half- and full-duplex serial
 
 declare -a cherry_picks
@@ -67,6 +64,7 @@ hard_reset() {
 
 upgrade-chibios() {
     pushd "$script_dir/qmk_firmware/lib/chibios"
+    git tag -d ver20.3.1
     hard_reset ChibiOS ChibiOS $target_chibios
     pcmd git push origin $target_branch --set-upstream --force-with-lease
     popd

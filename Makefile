@@ -34,6 +34,7 @@ BOARD_DEFS := \
 	spi_eeprom_f103!alternates/spi_eeprom_test/f103_test!handwired/onekey/spi_eeprom_test_f103!eep_rst \
 	spi_eeprom_f401!alternates/spi_eeprom_test/f401_test!handwired/onekey/spi_eeprom_test_f401!eep_rst \
 	l151x8xxA!alternates/l151x8xxA!l151x8xxA!reset \
+	f072_shiftreg!alternates/f072_shiftreg!f072_shiftreg!default \
 
 EXTRA_LINK_DEFS := \
 	layout-tkl_ansi-tzarc!layouts/community/tkl_ansi/tzarc \

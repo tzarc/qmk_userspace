@@ -75,9 +75,8 @@ void eeconfig_init_keymap(void) {
 uint32_t counter = 0;
 
 void slave_counter_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
-    const uint32_t* recv = (const uint32_t*)initiator2target_buffer;
-    uint32_t*       send = (uint32_t*)target2initiator_buffer;
-    *send                = *recv + 1;
+    uint32_t* send = (uint32_t*)target2initiator_buffer;
+    *send          = timer_read32() / 1000;
 }
 
 void keyboard_post_init_keymap(void) {
@@ -89,10 +88,10 @@ void user_state_sync(void) {
     if (is_keyboard_master()) {
         // Send to slave every 500ms
         static uint32_t last_sync = 0;
-        if (timer_elapsed32(last_sync) > 2500) {
+        if (timer_elapsed32(last_sync) > 500) {
             last_sync = timer_read32();
-            transaction_rpc_exec(RPC_ID_SLAVE_COUNTER, sizeof(counter), &counter, sizeof(counter), &counter);
-            dprintf("Slave counter: %d\n", (int)counter);
+            transaction_rpc_recv(RPC_ID_SLAVE_COUNTER, sizeof(counter), &counter);
+            dprintf("Slave timer: %d\n", (int)counter);
         }
     }
 }

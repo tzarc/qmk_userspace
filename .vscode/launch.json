@@ -44,14 +44,14 @@
       }
     },
     {
-      "name": "Black Magic Probe (Satisfaction75, cortex-debug)",
+      "name": "Black Magic Probe (f072_shiftreg, cortex-debug)",
       "type": "cortex-debug",
       "request": "launch",
       "cwd": "${workspaceRoot}/qmk_firmware",
       "svdFile": "${workspaceRoot}/svd/STM32F072x.svd",
-      "executable": "${workspaceRoot}\\qmk_firmware\\.build\\cannonkeys_satisfaction75_rev1_default.elf",
+      "executable": "${workspaceRoot}\\qmk_firmware\\.build\\f072_shiftreg_default.elf",
       "servertype": "bmp",
-      "BMPGDBSerialPort": "COM4",
+      "BMPGDBSerialPort": "COM9",
       "device": "STM32F072x",
       "v1": false,
       "windows": {
