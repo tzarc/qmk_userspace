@@ -1,7 +1,7 @@
 #!/bin/bash
 
-branches="trunk stable_20.3.x"
-tags="ver20.3.1 ver20.3.2 ver20.3.3"
+branches="trunk stable_20.3.x stable_21.6.x"
+tags="ver20.3.1 ver20.3.2 ver20.3.3 ver21.6.0"
 
 for branch in $branches ; do
     git branch -D svn-mirror/$branch
@@ -16,10 +16,10 @@ git svn fetch
 
 for branch in $branches ; do
     git branch -f svn-mirror/$branch svn/$branch \
-        && git push origin svn-mirror/$branch --force
+        && git push origin svn-mirror/$branch
 done
 
 for tagname in $tags ; do
     GIT_COMMITTER_DATE="$(git log -n1 --pretty=format:'%ad' svn/tags/$tagname)" git tag -f -a -m "Tagging $tagname" svn-mirror/$tagname svn/tags/$tagname
-    git push origin svn-mirror/$tagname --force
+    git push origin svn-mirror/$tagname
 done
