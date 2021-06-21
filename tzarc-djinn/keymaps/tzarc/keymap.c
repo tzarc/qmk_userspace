@@ -39,6 +39,7 @@
 painter_device_t surf;
 
 // clang-format off
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [LAYER_BASE] = LAYOUT_all_wrapper(
         ____________TZARC_7x4_BASE_R1_L__________,                                            ____________TZARC_7x4_BASE_R1_R__________,
@@ -85,6 +86,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                 _______,                                                             _______
     )
 };
+
+#ifdef ENCODER_MAP_ENABLE
+const uint16_t encoder_map[][NUM_ENCODERS][2] = {
+  [LAYER_BASE] = { ENCODER_CW_CCW(KC_A, KC_B), ENCODER_CW_CCW(KC_C, KC_D) },
+  [LAYER_LOWER] = { ENCODER_CW_CCW(KC_TRNS, KC_TRNS), ENCODER_CW_CCW(KC_TRNS, KC_TRNS) },
+  [LAYER_RAISE] = { ENCODER_CW_CCW(KC_TRNS, KC_TRNS), ENCODER_CW_CCW(KC_TRNS, KC_TRNS) },
+  [LAYER_ADJUST] = { ENCODER_CW_CCW(KC_TRNS, KC_TRNS), ENCODER_CW_CCW(KC_TRNS, KC_TRNS) },
+};
+#endif // ENCODER_MAP_ENABLE
+
 // clang-format on
 
 void eeconfig_init_keymap(void) {

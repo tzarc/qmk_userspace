@@ -307,7 +307,10 @@ void matrix_read_rows_on_col(matrix_row_t current_matrix[], uint8_t current_col)
     // Setup the output column pin
     setPinOutput(col_pins[current_col]);
     writePinLow(col_pins[current_col]);
-    matrix_io_delay();
+    rtcnt_t start = chSysGetRealtimeCounterX();
+    rtcnt_t end   = start + 500;
+    while (chSysIsCounterWithinX(chSysGetRealtimeCounterX(), start, end))
+        if (readPin(col_pins[current_col]) == 0) break;
 
     // Read the row ports
     uint32_t gpio_b = palReadPort(GPIOB);
@@ -328,8 +331,8 @@ void matrix_read_rows_on_col(matrix_row_t current_matrix[], uint8_t current_col)
     }
 
     // Wait for readback of each port to go high -- unselecting the row would have been completed
-    rtcnt_t start = chSysGetRealtimeCounterX();
-    rtcnt_t end   = start + 500;
+    start = chSysGetRealtimeCounterX();
+    end   = start + 500;
     while (chSysIsCounterWithinX(chSysGetRealtimeCounterX(), start, end))
         if ((palReadPort(GPIOB) & GPIOB_BITMASK) == GPIOB_BITMASK) break;
     while (chSysIsCounterWithinX(chSysGetRealtimeCounterX(), start, end))
