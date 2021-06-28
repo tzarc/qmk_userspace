@@ -35,6 +35,7 @@ BOARD_DEFS := \
 	spi_eeprom_f401!alternates/spi_eeprom_test/f401_test!handwired/onekey/spi_eeprom_test_f401!eep_rst \
 	l151x8xxA!alternates/l151x8xxA!l151x8xxA!reset \
 	f072_shiftreg!alternates/f072_shiftreg!f072_shiftreg!default \
+	l412_shiftreg!alternates/l412_shiftreg!l412_shiftreg!default \
 
 EXTRA_LINK_DEFS := \
 	layout-tkl_ansi-tzarc!layouts/community/tkl_ansi/tzarc \
@@ -50,7 +51,7 @@ all: bin
 
 arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
 
-nick: cyclone iris luddite mysterium-nick chocopad ctrl djinn
+nick: cyclone iris luddite mysterium-nick chocopad ctrl djinn bm16s
 
 djinn: djinn_rev1 djinn_rev2
 

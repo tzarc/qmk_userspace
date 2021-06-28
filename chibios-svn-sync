@@ -16,10 +16,12 @@ git svn fetch
 
 for branch in $branches ; do
     git branch -f svn-mirror/$branch svn/$branch \
-        && git push origin svn-mirror/$branch
+        && git push origin svn-mirror/$branch \
+        && git push qmk svn-mirror/$branch
 done
 
 for tagname in $tags ; do
     GIT_COMMITTER_DATE="$(git log -n1 --pretty=format:'%ad' svn/tags/$tagname)" git tag -f -a -m "Tagging $tagname" svn-mirror/$tagname svn/tags/$tagname
     git push origin svn-mirror/$tagname
+    git push qmk svn-mirror/$tagname
 done

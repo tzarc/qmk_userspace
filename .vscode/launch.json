@@ -36,7 +36,7 @@
       "svdFile": "${workspaceRoot}/svd/STM32G474xx.svd",
       "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_djinn_rev1_tzarc.elf",
       "servertype": "bmp",
-      "BMPGDBSerialPort": "COM8",
+      "BMPGDBSerialPort": "COM3",
       "device": "STM32G474",
       "v1": false,
       "windows": {
@@ -44,15 +44,15 @@
       }
     },
     {
-      "name": "Black Magic Probe (f072_shiftreg, cortex-debug)",
+      "name": "Black Magic Probe (m65s, cortex-debug)",
       "type": "cortex-debug",
       "request": "launch",
       "cwd": "${workspaceRoot}/qmk_firmware",
-      "svdFile": "${workspaceRoot}/svd/STM32F072x.svd",
-      "executable": "${workspaceRoot}\\qmk_firmware\\.build\\f072_shiftreg_default.elf",
+      "svdFile": "${workspaceRoot}/svd/STM32F411.svd",
+      "executable": "${workspaceRoot}\\qmk_firmware\\.build\\mode_m65s_default.elf",
       "servertype": "bmp",
       "BMPGDBSerialPort": "COM9",
-      "device": "STM32F072x",
+      "device": "STM32F411",
       "v1": false,
       "windows": {
         "armToolchainPath": "E:\\QMK_MSYS\\mingw64\\bin"

@@ -87,81 +87,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     )
 };
 
-#ifdef ENCODER_MAP_ENABLE
-const uint16_t encoder_map[][NUM_ENCODERS][2] = {
-  [LAYER_BASE] = { ENCODER_CW_CCW(KC_A, KC_B), ENCODER_CW_CCW(KC_C, KC_D) },
-  [LAYER_LOWER] = { ENCODER_CW_CCW(KC_TRNS, KC_TRNS), ENCODER_CW_CCW(KC_TRNS, KC_TRNS) },
-  [LAYER_RAISE] = { ENCODER_CW_CCW(KC_TRNS, KC_TRNS), ENCODER_CW_CCW(KC_TRNS, KC_TRNS) },
-  [LAYER_ADJUST] = { ENCODER_CW_CCW(KC_TRNS, KC_TRNS), ENCODER_CW_CCW(KC_TRNS, KC_TRNS) },
+const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
+    [LAYER_BASE] =   { ENCODER_CCW_CW(KC_MS_WH_UP, KC_MS_WH_DOWN), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)  },
+    [LAYER_LOWER] =  { ENCODER_CCW_CW(RGB_HUD, RGB_HUI),           ENCODER_CCW_CW(RGB_SAD, RGB_SAI)  },
+    [LAYER_RAISE] =  { ENCODER_CCW_CW(RGB_VAD, RGB_VAI),           ENCODER_CCW_CW(RGB_SPD, RGB_SPI)  },
+    [LAYER_ADJUST] = { ENCODER_CCW_CW(RGB_RMOD, RGB_MOD),          ENCODER_CCW_CW(KC_LEFT, KC_RIGHT) },
 };
-#endif // ENCODER_MAP_ENABLE
 
 // clang-format on
-
-void eeconfig_init_keymap(void) {
-    rgblight_mode(RGBLIGHT_MODE_STATIC_LIGHT);
-    rgblight_sethsv(128, 255, 255);
-    backlight_enable();
-    backlight_level(BACKLIGHT_LEVELS);
-}
-
-bool encoder_update_keymap(uint8_t index, bool clockwise) {
-    uint8_t temp_mod = get_mods();
-    uint8_t temp_osm = get_oneshot_mods();
-    bool    is_ctrl  = (temp_mod | temp_osm) & MOD_MASK_CTRL;
-    bool    is_shift = (temp_mod | temp_osm) & MOD_MASK_SHIFT;
-
-    if (is_shift) {
-        if (index == 0) { /* First encoder */
-            if (clockwise) {
-                tap_code16(KC_MS_WH_DOWN);
-            } else {
-                tap_code16(KC_MS_WH_UP);
-            }
-        } else if (index == 1) { /* Second encoder */
-            if (clockwise) {
-                rgblight_decrease_sat();
-            } else {
-                rgblight_increase_sat();
-            }
-        }
-    } else if (is_ctrl) {
-        if (index == 0) { /* First encoder */
-            if (clockwise) {
-                rgblight_increase_val();
-            } else {
-                rgblight_decrease_val();
-            }
-        } else if (index == 1) { /* Second encoder */
-            if (clockwise) {
-                rgblight_increase_speed();
-            } else {
-                rgblight_decrease_speed();
-            }
-        }
-    } else {
-        if (index == 0) { /* First encoder */
-            if (clockwise) {
-                rgblight_increase_hue();
-            } else {
-                rgblight_decrease_hue();
-            }
-        } else if (index == 1) { /* Second encoder */
-            uint16_t held_keycode_timer = timer_read();
-            uint16_t mapped_code        = 0;
-            if (clockwise) {
-                mapped_code = KC_VOLD;
-            } else {
-                mapped_code = KC_VOLU;
-            }
-            register_code(mapped_code);
-            while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY)
-                ; /* no-op */
-            unregister_code(mapped_code);
-        }
-    }
-    return false;
-}
 
 //----------------------------------------------------------
 // Sync
