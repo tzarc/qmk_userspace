@@ -153,11 +153,14 @@ upload_binaries() {
     aws s3 ls s3://${AWS_BUCKET}/
 }
 
+python3 -m pip install -U qmk milc
+
 get_qmk
 
 if [[ -z "${RUN_SHELL:-}" ]] ; then
 
     cd /home/qmk/qmk_firmware
+
     build_qmk
     make_index_html
 

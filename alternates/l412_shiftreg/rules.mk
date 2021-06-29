@@ -1,5 +1,4 @@
-MCU = STM32L433
-MCU_LDSCRIPT = STM32L412xB
+MCU = STM32L412
 
 # Options to pass to dfu-util when flashing
 DFU_ARGS = -d 0483:df11 -a 0 -s 0x08000000:leave
