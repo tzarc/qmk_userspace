@@ -1,12 +1,5 @@
-MCU = cortex-m4
-ARMV = 7
-MCU_FAMILY = STM32
-MCU_SERIES = STM32L4xx
-PLATFORM_NAME = platform_l432
+MCU = STM32L433
 MCU_LDSCRIPT = STM32L412xB
-MCU_STARTUP = stm32l4xx
-BOARD = ST_NUCLEO32_L432KC
-USE_FPU = YES
 
 # Options to pass to dfu-util when flashing
 DFU_ARGS = -d 0483:df11 -a 0 -s 0x08000000:leave
