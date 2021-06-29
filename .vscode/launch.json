@@ -58,5 +58,20 @@
         "armToolchainPath": "E:\\QMK_MSYS\\mingw64\\bin"
       }
     },
+    {
+      "name": "Black Magic Probe (L412, cortex-debug)",
+      "type": "cortex-debug",
+      "request": "launch",
+      "cwd": "${workspaceRoot}/qmk_firmware",
+      "svdFile": "${workspaceRoot}/svd/STM32L4x2.svd",
+      "executable": "${workspaceRoot}\\qmk_firmware\\.build\\l412_shiftreg_default.elf",
+      "servertype": "bmp",
+      "BMPGDBSerialPort": "COM3",
+      "device": "STM32L4x2",
+      "v1": false,
+      "windows": {
+        "armToolchainPath": "E:\\QMK_MSYS\\mingw64\\bin"
+      }
+    },
   ]
 }

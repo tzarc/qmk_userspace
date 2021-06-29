@@ -36,4 +36,6 @@ FAUXCLICKY_ENABLE = no      # Use buzzer to emulate clicky switches
 
 SRC += spi_master.c
 
-#OPT_DEFS += -g -fno-lto
+#LTO_ENABLE = no
+#OPT = 0
+#OPT_DEFS += -g
