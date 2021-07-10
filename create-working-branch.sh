@@ -23,9 +23,8 @@ fi
 
 declare -a prs_to_apply
 prs_to_apply+=(10174) # Quantum Painter
-prs_to_apply+=(12689) # asym_eager_defer_pk
-prs_to_apply+=(13081) # unified half- and full-duplex serial
 prs_to_apply+=(13286) # encoder mapping
+prs_to_apply+=(13330) # Unify matrix for split common and regular matrix
 
 declare -a cherry_picks
 #cherry_picks+=(749aca03c90c9316189b58e3236bea9242f3990f) # RGB_MATRIX slave scan

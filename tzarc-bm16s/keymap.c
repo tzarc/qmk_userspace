@@ -38,5 +38,5 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 void keyboard_post_init_keymap(void) {
     debug_keyboard = true;
-    debug_matrix = true;
+    debug_matrix   = true;
 }
