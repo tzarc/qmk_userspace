@@ -9,6 +9,7 @@ export CLANG_TIDY_HEADER_FILTER := .*
 BOARD_DEFS := \
 	iris!tzarc-iris_rev4!keebio/iris/rev4/keymaps/tzarc!tzarc \
 	ctrl!tzarc-ctrl!massdrop/ctrl/keymaps/tzarc!tzarc \
+	sat75!tzarc-sat75!cannonkeys/satisfaction75/rev1/keymaps/tzarc!tzarc \
 	luddite!tzarc-luddite!40percentclub/luddite/keymaps/tzarc!tzarc \
 	mysterium-nick!tzarc-mysterium!coseyfannitutti/mysterium/keymaps/tzarc!tzarc \
 	mysterium-dad!tzarc-mysterium-dad!coseyfannitutti/mysterium/keymaps/tzarc-dad!tzarc-dad \

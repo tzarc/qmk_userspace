@@ -38,6 +38,8 @@
     "ch.h": "c",
     "split_util.h": "c",
     "spi_master.h": "c",
-    "keymap.h": "c"
+    "keymap.h": "c",
+    "raw_hid.h": "c",
+    "keyboard.h": "c"
   }
 }
