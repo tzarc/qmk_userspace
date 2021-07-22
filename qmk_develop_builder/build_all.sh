@@ -11,5 +11,8 @@ qmk_builddir="$qmk_firmware/.build"
 
 export PATH=/usr/lib/ccache:$PATH
 
+FILTER=""
+
 [[ -d "$qmk_builddir" ]] || mkdir -p "$qmk_builddir"
-time qmk multibuild -j$(( $(nproc) * 2 + 1 )) | tee "$qmk_builddir/build.log"
+time qmk multibuild -j$(( $(nproc) * 2 + 1 )) $FILTER | tee "$qmk_builddir/build.log"
+time qmk multibuild -j$(( $(nproc) * 2 + 1 )) -km via $FILTER | tee -a "$qmk_builddir/build.log"

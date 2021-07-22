@@ -9,6 +9,7 @@ unset AWS_KEY
 unset AWS_SECRET
 unset AWS_BUCKET
 unset RUN_SHELL
+unset DISCORD_WEBHOOK
 while [[ -n "${1:-}" ]] ; do
     case "$1" in
         --key)
@@ -24,7 +25,11 @@ while [[ -n "${1:-}" ]] ; do
             AWS_BUCKET=$1;
             ;;
         --shell)
-            RUN_SHELL=1
+            RUN_SHELL=1;
+            ;;
+        --discord)
+            shift;
+            DISCORD_WEBHOOK=$1;
             ;;
         *)
             echo "Unknown arg '$1'." >&2
@@ -70,8 +75,8 @@ ctlchars2html() {
 get_qmk() {
     {
         cd /home/qmk/qmk_firmware
-        git fetch --all --tags --prune
-        git reset --hard origin/develop
+        git checkout develop
+        git pull --ff-only
         make git-submodule
     } 2>&1 > /home/qmk/qmk_get.log
 }
@@ -80,7 +85,7 @@ build_qmk() {
     {
         cd /home/qmk/qmk_firmware
         rm -rf /home/qmk/qmk_firmware/.build/*
-        env -i HOME="$HOME" PATH="/usr/lib/ccache:/usr/local/bin:/usr/bin:/bin" TERM="linux" PWD="${PWD:-}" /home/qmk/build_all.sh || true
+        env -i HOME="$HOME" PATH="/usr/lib/ccache:/usr/local/bin:/usr/bin:/bin" TERM="linux" PWD="${PWD:-}" /home/qmk/build_all.sh | sort || true
     } 2>&1 > /home/qmk/qmk_build_all.log
 }
 
@@ -94,6 +99,36 @@ summary() {
     echo "Warning builds: $num_warnings"
     echo "Failing builds: $num_failures"
     cat /home/qmk/qmk_build_all.log | grep -E '\[(ERRORS)\]'
+}
+
+discord_text() {
+    {
+        local num_successes=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(OK)\]' | wc -l)
+        local num_warnings=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(WARNINGS)\]' | wc -l)
+        local num_failures=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(ERRORS)\]' | wc -l)
+        echo "qmk_firmware, develop @ \`$(cd /home/qmk/qmk_firmware && git log -n1 --format=format:%H)\`"
+        echo "Prebuilt firmware at https://qmk.tzarc.io/"
+        echo "Successful: **${num_successes}**, warnings: **${num_warnings}**, errors: **${num_failures}**"
+        echo '```'
+        local ERRORS=$(cat /home/qmk/qmk_build_all.log | grep -P '^Build ' | grep '\[ERRORS\]' | sort | awk '{printf "  %s\n",$2}')
+        if [[ ! -z "$ERRORS" ]] ; then
+            echo 'Failing builds:'
+            echo "$ERRORS"
+        else
+            echo "  No failing builds."
+        fi
+        echo '```'
+    } | sed -e 's@"@\"@g' -e 's@\n@\\n@g'
+}
+
+send_discord() {
+    if [[ ! -z "${DISCORD_WEBHOOK:-}" ]] ; then
+        local discord_output="$(discord_text)"
+        curl \
+            -H "Content-Type: application/json" \
+            -d "{\"username\": \"QMK Develop Builder\", \"content\": \"${discord_output//$'\n'/\\n}\"}" \
+            "${DISCORD_WEBHOOK}"
+    fi
 }
 
 make_index_html() {
@@ -137,7 +172,7 @@ $(cat /home/qmk/qmk_build_all.log | ctlchars2html)
 <div style='position:absolute; right:0; top:0; padding: 1em; border-left: 1px solid #666; border-bottom: 1px solid #666' class="f9 b9">
 <pre>
 Prebuilt binaries:
-$(cd /home/qmk/qmk_firmware/.build/ >/dev/null 2>&1; for f in $(ls *.hex *.bin *.uf2 2>/dev/null) ; do
+$(cd /home/qmk/qmk_firmware/ >/dev/null 2>&1; for f in $(ls *.hex *.bin *.uf2 2>/dev/null) ; do
     echo "<a href='$f'>$f</a>"
 done)
 </pre>
@@ -148,7 +183,7 @@ EOF
 }
 
 upload_binaries() {
-    aws s3 cp /home/qmk/qmk_firmware/.build/ s3://${AWS_BUCKET}/ --recursive --exclude '*' --include '*.bin' --include '*.uf2' --include '*.hex' --exclude '*/*'
+    aws s3 cp /home/qmk/qmk_firmware/ s3://${AWS_BUCKET}/ --recursive --exclude '*' --include '*.bin' --include '*.uf2' --include '*.hex' --exclude '*/*'
     aws s3 cp /home/qmk/index.html s3://${AWS_BUCKET}/
     aws s3 ls s3://${AWS_BUCKET}/
 }
@@ -168,6 +203,8 @@ if [[ -z "${RUN_SHELL:-}" ]] ; then
     clear_s3_bucket
     upload_binaries
     rm -f "$HOME/.aws/credentials" || true
+
+    send_discord
 
 else
 

@@ -349,6 +349,7 @@ bool       lua_test_executed = false;
 
 static int dprint_wrapper(lua_State *L) {
     const char *arg = luaL_checkstring(L, 1);  // first arg is what we want to print
+    (void)arg;
     dprintf("%s\n", arg);
     return 0;
 }
