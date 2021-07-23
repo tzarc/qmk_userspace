@@ -5,54 +5,19 @@ set -eEuo pipefail
 # Allow for other user accounts to delete the generated files, if we're mounting into the docker container somewhere...
 umask 000
 
-unset AWS_KEY
-unset AWS_SECRET
-unset AWS_BUCKET
-unset RUN_SHELL
-unset DISCORD_WEBHOOK
-while [[ -n "${1:-}" ]] ; do
-    case "$1" in
-        --key)
-            shift;
-            AWS_KEY=$1;
-            ;;
-        --secret)
-            shift;
-            AWS_SECRET=$1;
-            ;;
-        --bucket)
-            shift;
-            AWS_BUCKET=$1;
-            ;;
-        --shell)
-            RUN_SHELL=1;
-            ;;
-        --discord)
-            shift;
-            DISCORD_WEBHOOK=$1;
-            ;;
-        *)
-            echo "Unknown arg '$1'." >&2
-            exit 1
-            ;;
-    esac
-    shift
-done
+########################################################################################################################################################################################################
+# If we have an AWS bucket, then ensure we have credentials
+if [[ ! -z "${AWS_BUCKET-}" ]] ; then
 
-if [[ -z "${AWS_KEY-}" ]] ; then
-    echo "Missing '--key <AWS_KEY>' argument" >&2
-    exit 1
-fi
+    if [[ -z "${AWS_KEY-}" ]] ; then
+        echo "Missing '--key <AWS_KEY>' argument" >&2
+        exit 1
+    fi
 
-if [[ -z "${AWS_SECRET-}" ]] ; then
-    echo "Missing '--secret <AWS_SECRET>' argument" >&2
-    exit 1
-fi
-
-if [[ -z "${AWS_BUCKET-}" ]] ; then
-    echo "Missing '--bucket <AWS_BUCKET>' argument" >&2
-    exit 1
-fi
+    if [[ -z "${AWS_SECRET-}" ]] ; then
+        echo "Missing '--secret <AWS_SECRET>' argument" >&2
+        exit 1
+    fi
 
 save_aws_creds() {
     [[ -d "$HOME/.aws" ]] || mkdir -p "$HOME/.aws"
@@ -68,38 +33,18 @@ clear_s3_bucket() {
     aws s3 ls s3://${AWS_BUCKET}/
 }
 
-ctlchars2html() {
-    cat - | ansi2html.sh --bg=dark --palette=linux --body-only 2>/dev/null
+upload_binaries() {
+    aws s3 cp /home/qmk/qmk_firmware/ s3://${AWS_BUCKET}/ --recursive --exclude '*' --include '*.bin' --include '*.uf2' --include '*.hex' --exclude '*/*'
+    aws s3 cp /home/qmk/index.html s3://${AWS_BUCKET}/
+    aws s3 ls s3://${AWS_BUCKET}/
 }
 
-get_qmk() {
-    {
-        cd /home/qmk/qmk_firmware
-        git checkout develop
-        git pull --ff-only
-        make git-submodule
-    } 2>&1 > /home/qmk/qmk_get.log
-}
+fi
 
-build_qmk() {
-    {
-        cd /home/qmk/qmk_firmware
-        rm -rf /home/qmk/qmk_firmware/.build/*
-        env -i HOME="$HOME" PATH="/usr/lib/ccache:/usr/local/bin:/usr/bin:/bin" TERM="linux" PWD="${PWD:-}" /home/qmk/build_all.sh | sort || true
-    } 2>&1 > /home/qmk/qmk_build_all.log
-}
+########################################################################################################################################################################################################
+# If we have a Discord hook, sort out the discord functions
 
-summary() {
-    num_successes=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(OK)\]' | wc -l)
-    num_skipped=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(SKIPPED)\]' | wc -l)
-    num_warnings=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(WARNINGS)\]' | wc -l)
-    num_failures=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(ERRORS)\]' | wc -l)
-    echo "Successful builds: $num_successes"
-    echo "Skipped builds: $num_skipped"
-    echo "Warning builds: $num_warnings"
-    echo "Failing builds: $num_failures"
-    cat /home/qmk/qmk_build_all.log | grep -E '\[(ERRORS)\]'
-}
+if [[ ! -z "${DISCORD_WEBHOOK-}" ]] ; then
 
 discord_text() {
     {
@@ -122,13 +67,49 @@ discord_text() {
 }
 
 send_discord() {
-    if [[ ! -z "${DISCORD_WEBHOOK:-}" ]] ; then
         local discord_output="$(discord_text)"
         curl \
             -H "Content-Type: application/json" \
             -d "{\"username\": \"QMK Develop Builder\", \"content\": \"${discord_output//$'\n'/\\n}\"}" \
             "${DISCORD_WEBHOOK}"
-    fi
+}
+
+fi
+
+########################################################################################################################################################################################################
+# Helpers
+
+ctlchars2html() {
+    cat - | ansi2html.sh --bg=dark --palette=linux --body-only 2>/dev/null
+}
+
+get_qmk() {
+    {
+        cd /home/qmk/qmk_firmware
+        git checkout develop
+        git pull --ff-only
+        make git-submodule
+    } 2>&1 > /home/qmk/qmk_get.log
+}
+
+build_qmk() {
+    {
+        cd /home/qmk/qmk_firmware
+        rm -rf /home/qmk/qmk_firmware/.build/*
+        env -i HOME="$HOME" PATH="/home/qmk/.local/bin:/usr/local/bin:/usr/bin:/bin" TERM="linux" PWD="${PWD:-}" /home/qmk/build_all.sh | sort || true
+    } 2>&1 > /home/qmk/qmk_build_all.log
+}
+
+summary() {
+    num_successes=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(OK)\]' | wc -l)
+    num_skipped=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(SKIPPED)\]' | wc -l)
+    num_warnings=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(WARNINGS)\]' | wc -l)
+    num_failures=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(ERRORS)\]' | wc -l)
+    echo "Successful builds: $num_successes"
+    echo "Skipped builds: $num_skipped"
+    echo "Warning builds: $num_warnings"
+    echo "Failing builds: $num_failures"
+    cat /home/qmk/qmk_build_all.log | grep -E '\[(ERRORS)\]'
 }
 
 make_index_html() {
@@ -182,29 +163,36 @@ EOF
     } 2>&1 > /home/qmk/index.html
 }
 
-upload_binaries() {
-    aws s3 cp /home/qmk/qmk_firmware/ s3://${AWS_BUCKET}/ --recursive --exclude '*' --include '*.bin' --include '*.uf2' --include '*.hex' --exclude '*/*'
-    aws s3 cp /home/qmk/index.html s3://${AWS_BUCKET}/
-    aws s3 ls s3://${AWS_BUCKET}/
-}
+python3 -m pip install -U qmk milc >/dev/null 2>&1
 
-python3 -m pip install -U qmk milc
-
-get_qmk
+get_qmk >/dev/null 2>&1
 
 if [[ -z "${RUN_SHELL:-}" ]] ; then
 
     cd /home/qmk/qmk_firmware
 
+    hash_file="/home/qmk/.repo-hash"
+    old_hash=$(cat "$hash_file" || true)
+    new_hash=$(git log -n1 --format=format:%H)
+
+    if [[ "$old_hash" == "$new_hash" ]] ; then
+        exit 0
+    fi
+
+    echo $new_hash > "$hash_file"
     build_qmk
     make_index_html
 
-    save_aws_creds
-    clear_s3_bucket
-    upload_binaries
-    rm -f "$HOME/.aws/credentials" || true
+    if [[ ! -z "${AWS_BUCKET-}" ]] ; then
+        save_aws_creds
+        clear_s3_bucket
+        upload_binaries
+        rm -f "$HOME/.aws/credentials" || true
+    fi
 
-    send_discord
+    if [[ ! -z "${DISCORD_WEBHOOK:-}" ]] ; then
+        send_discord
+    fi
 
 else
 

@@ -1,7 +1,7 @@
 FROM qmkfm/base_container
 
 RUN apt-get update \
-    && apt-get install -y awscli remake curl gawk ccache
+    && apt-get install -y awscli remake curl gawk ccache busybox
 
 RUN groupadd -f qmk -g 10000 \
     && useradd -d /home/qmk -g qmk -m -N -u 10000 qmk
@@ -32,3 +32,5 @@ RUN chmod 755 /home/qmk/*.sh \
 
 USER 10000:10000
 WORKDIR /home/qmk
+
+ENTRYPOINT ["/home/qmk/entrypoint.sh"]
