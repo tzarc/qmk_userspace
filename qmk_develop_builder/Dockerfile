@@ -1,7 +1,9 @@
 FROM qmkfm/base_container
 
+ENV PATH="/home/qmk/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
 RUN apt-get update \
-    && apt-get install -y awscli remake curl gawk ccache busybox
+    && apt-get install -y awscli curl gawk nano
 
 RUN groupadd -f qmk -g 10000 \
     && useradd -d /home/qmk -g qmk -m -N -u 10000 qmk
@@ -15,14 +17,14 @@ WORKDIR /home/qmk
 
 RUN python3 -m pip install -U pip wheel \
     && python3 -m pip install -U qmk milc \
-    && git clone -b develop https://github.com/qmk/qmk_firmware /home/qmk/qmk_firmware \
+    && git clone --depth=5 -b develop https://github.com/qmk/qmk_firmware /home/qmk/qmk_firmware \
     && cd /home/qmk/qmk_firmware \
     && git checkout develop \
-    && git pull --ff-only \
+    && git pull --depth=5 --ff-only \
     && make git-submodule
 
 COPY entrypoint.sh /home/qmk/entrypoint.sh
-COPY build_all.sh /home/qmk/build_all.sh
+COPY run_ci_build.sh /home/qmk/run_ci_build.sh
 
 USER 0:0
 WORKDIR /home/qmk

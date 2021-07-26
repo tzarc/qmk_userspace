@@ -35,6 +35,7 @@ clear_s3_bucket() {
 
 upload_binaries() {
     aws s3 cp /home/qmk/qmk_firmware/ s3://${AWS_BUCKET}/ --recursive --exclude '*' --include '*.bin' --include '*.uf2' --include '*.hex' --exclude '*/*'
+    aws s3 cp /home/qmk/qmk_firmware/.build/ s3://${AWS_BUCKET}/ --recursive --exclude '*' --include 'failed.*.html' --exclude '*/*'
     aws s3 cp /home/qmk/index.html s3://${AWS_BUCKET}/
     aws s3 ls s3://${AWS_BUCKET}/
 }
@@ -95,8 +96,7 @@ get_qmk() {
 build_qmk() {
     {
         cd /home/qmk/qmk_firmware
-        rm -rf /home/qmk/qmk_firmware/.build/*
-        env -i HOME="$HOME" PATH="/home/qmk/.local/bin:/usr/local/bin:/usr/bin:/bin" TERM="linux" PWD="${PWD:-}" /home/qmk/build_all.sh | sort || true
+        env -i HOME="$HOME" PATH="/home/qmk/.local/bin:/usr/local/bin:/usr/bin:/bin" TERM="linux" PWD="${PWD:-}" /home/qmk/run_ci_build.sh | sort || true
     } 2>&1 > /home/qmk/qmk_build_all.log
 }
 
@@ -110,6 +110,16 @@ summary() {
     echo "Warning builds: $num_warnings"
     echo "Failing builds: $num_failures"
     cat /home/qmk/qmk_build_all.log | grep -E '\[(ERRORS)\]'
+}
+
+failure_links() {
+    echo "<h3>Failure logs:</h3>"
+
+    { ls -1 /home/qmk/qmk_firmware/.build/failed* 2>/dev/null || true ; } | sort | while read failure ; do
+        local bn=$(basename $failure)
+        cat $failure | ctlchars2html > /home/qmk/qmk_firmware/.build/$bn.html
+        echo "<a href=\"$bn.html\">$bn</a>"
+    done
 }
 
 make_index_html() {
@@ -142,6 +152,8 @@ $(git log -n5 --color=always | ctlchars2html)
 $(summary | ctlchars2html)
 </pre>
 <hr/>
+$(failure_links)
+<hr/>
 <pre>
 $(cat /home/qmk/qmk_get.log | ctlchars2html)
 </pre>
@@ -167,7 +179,7 @@ python3 -m pip install -U qmk milc >/dev/null 2>&1
 
 get_qmk >/dev/null 2>&1
 
-if [[ -z "${RUN_SHELL:-}" ]] ; then
+if [[ "${1:-}" != "--shell" ]] ; then
 
     cd /home/qmk/qmk_firmware
 
