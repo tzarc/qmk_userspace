@@ -24,6 +24,8 @@ fi
 declare -a prs_to_apply
 prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(13286) # encoder mapping
+prs_to_apply+=(13523) # Split one-hand
+prs_to_apply+=(13896) # ChibiOS-Contrib update
 
 declare -a cherry_picks
 #cherry_picks+=(749aca03c90c9316189b58e3236bea9242f3990f) # RGB_MATRIX slave scan
@@ -46,9 +48,9 @@ hard_reset() {
     pcmd git reset --hard
     pcmd git clean -xfd
     pcmd git remote set-url origin git@github.com:tzarc/$repo_name.git
-    pcmd git remote set-url origin --push git@github.com:tzarc/$repo_name.git
-    pcmd git remote set-url upstream https://github.com/$repo_upstream/$repo_name.git
-    pcmd git remote set-url upstream --push git@github.com:tzarc/$repo_name.git
+    pcmd git remote set-url origin git@github.com:tzarc/$repo_name.git --push
+    pcmd git remote set-url upstream git@github.com:$repo_upstream/$repo_name.git
+    pcmd git remote set-url upstream git@github.com:$repo_upstream/$repo_name.git --push
     pcmd git fetch --all --tags --prune
     pcmd git fetch --unshallow upstream || true
     pcmd git clean -xfd
@@ -153,6 +155,7 @@ for pr in ${prs_to_apply[@]} ; do
         echo "Error during merge, please fix and hit ENTER:"
         read DUMMY
     fi
+    pcmd make git-submodule
     set -e
     pcmd git commit --amend -m "Merge qmk_firmware upstream PR ${pr}"
 done
@@ -162,6 +165,7 @@ pushd "$script_dir/qmk_firmware"
 for hash in ${cherry_picks[@]} ; do
     echo -e "\e[38;5;203mCherry-picking $hash\e[0m"
     pcmd git cherry-pick $hash
+    pcmd make git-submodule
 done
 popd
 

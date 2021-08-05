@@ -31,6 +31,31 @@ EOF
 clear_s3_bucket() {
     aws s3 rm --recursive s3://${AWS_BUCKET}/
     aws s3 ls s3://${AWS_BUCKET}/
+
+        cd /home/qmk/qmk_firmware
+    cat << EOF > /home/qmk/in_progress.html
+<!DOCTYPE html>
+<html lang='en'><head>
+<meta charset="utf-8"/>
+<style type='text/css'>
+$(ansi2html.sh --bg=dark --palette=linux --css-only 2>/dev/null)
+pre { font-size: 80%; }
+h1, h2, pre { font-family: 'Iosevka Term', 'Iosevka Fixed', Consolas, Menlo, 'Courier New', monospace; }
+a { color: #FF0; font-weight: bold; }
+a:visited { color: #FF0; }
+a:hover { color: #F00; }
+</style>
+<title>qmk_firmware develop @ $(git log -n1 --format=format:%H)</title>
+</head><body class='f9 b9'>
+<div style='float:left'>
+<h3>qmk_firmware develop @ $(git log -n1 --format=format:%H)</h3>
+Upload in progress.
+</div>
+</body>
+</html>
+EOF
+
+    aws s3 cp /home/qmk/in_progress.html s3://${AWS_BUCKET}/index.html
 }
 
 upload_binaries() {
@@ -117,8 +142,27 @@ failure_links() {
 
     { ls -1 /home/qmk/qmk_firmware/.build/failed* 2>/dev/null || true ; } | sort | while read failure ; do
         local bn=$(basename $failure)
-        cat $failure | ctlchars2html > /home/qmk/qmk_firmware/.build/$bn.html
         echo "<a href=\"$bn.html\">$bn</a>"
+        cat << EOF > /home/qmk/qmk_firmware/.build/$bn.html
+<!DOCTYPE html>
+<html lang='en'><head>
+<meta charset="utf-8"/>
+<style type='text/css'>
+$(ansi2html.sh --bg=dark --palette=linux --css-only 2>/dev/null)
+pre { font-size: 80%; }
+h1, h2, pre { font-family: 'Iosevka Term', 'Iosevka Fixed', Consolas, Menlo, 'Courier New', monospace; }
+a { color: #FF0; font-weight: bold; }
+a:visited { color: #FF0; }
+a:hover { color: #F00; }
+</style>
+<title>qmk_firmware develop @ $(git log -n1 --format=format:%H)</title>
+</head><body class='f9 b9'>
+<div style='float:left'>
+$(cat $failure | ctlchars2html)
+</div>
+</body>
+</html>
+EOF
     done
 }
 
@@ -132,7 +176,7 @@ make_index_html() {
 <style type='text/css'>
 $(ansi2html.sh --bg=dark --palette=linux --css-only 2>/dev/null)
 pre { font-size: 80%; }
-h1, h2, pre { font-family: 'Iosevka Term', 'Iosevka Fixed', Consolas, Menlo, 'Courier New', monospace; }
+h1, h2, h3, pre { font-family: 'Iosevka Term', 'Iosevka Fixed', Consolas, Menlo, 'Courier New', monospace; }
 a { color: #FF0; font-weight: bold; }
 a:visited { color: #FF0; }
 a:hover { color: #F00; }

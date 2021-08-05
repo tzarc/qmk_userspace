@@ -82,6 +82,8 @@ void kb_state_update(void) {
 }
 
 void kb_state_sync(void) {
+    if (!is_transport_connected()) return;
+
     if (is_keyboard_master()) {
         // Keep track of the last state, so that we can tell if we need to propagate to slave
         static kb_runtime_config last_kb_state;
