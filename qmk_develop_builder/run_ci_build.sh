@@ -13,8 +13,8 @@ FILTER=""
 
 [[ -d "$qmk_builddir" ]] || mkdir -p "$qmk_builddir"
 qmk clean -a
-qmk multibuild -j$(( $(nproc) * 2 + 1 )) $FILTER | tee "$script_dir/build.log"
-qmk multibuild -j$(( $(nproc) * 2 + 1 )) -km via $FILTER | tee -a "$script_dir/build.log"
+MAKEFLAGS="-O --no-print-directory" qmk multibuild -j$(( $(nproc) + 1 )) $FILTER | tee "$script_dir/build.log"
+MAKEFLAGS="-O --no-print-directory" qmk multibuild -j$(( $(nproc) + 1 )) -km via $FILTER | tee -a "$script_dir/build.log"
 
 exit 0
 

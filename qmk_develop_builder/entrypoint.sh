@@ -137,32 +137,13 @@ summary() {
     cat /home/qmk/qmk_build_all.log | grep -E '\[(ERRORS)\]'
 }
 
-failure_links() {
+failure_output() {
     echo "<h3>Failure logs:</h3>"
 
     { ls -1 /home/qmk/qmk_firmware/.build/failed* 2>/dev/null || true ; } | sort | while read failure ; do
-        local bn=$(basename $failure)
-        echo "<a href=\"$bn.html\">$bn</a>"
-        cat << EOF > /home/qmk/qmk_firmware/.build/$bn.html
-<!DOCTYPE html>
-<html lang='en'><head>
-<meta charset="utf-8"/>
-<style type='text/css'>
-$(ansi2html.sh --bg=dark --palette=linux --css-only 2>/dev/null)
-pre { font-size: 80%; }
-h1, h2, pre { font-family: 'Iosevka Term', 'Iosevka Fixed', Consolas, Menlo, 'Courier New', monospace; }
-a { color: #FF0; font-weight: bold; }
-a:visited { color: #FF0; }
-a:hover { color: #F00; }
-</style>
-<title>qmk_firmware develop @ $(git log -n1 --format=format:%H)</title>
-</head><body class='f9 b9'>
-<div style='float:left'>
-$(cat $failure | ctlchars2html)
-</div>
-</body>
-</html>
-EOF
+        echo "<hr/><pre>"
+        cat $failure | ctlchars2html
+        echo "</pre>"
     done
 }
 
@@ -196,7 +177,7 @@ $(git log -n5 --color=always | ctlchars2html)
 $(summary | ctlchars2html)
 </pre>
 <hr/>
-$(failure_links)
+$(failure_output)
 <hr/>
 <pre>
 $(cat /home/qmk/qmk_get.log | ctlchars2html)
