@@ -19,6 +19,7 @@
 
 #include "djinn.h"
 #include "serial.h"
+#include "split_util.h"
 
 #include "qp_ili9341.h"
 

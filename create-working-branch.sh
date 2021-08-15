@@ -25,7 +25,7 @@ declare -a prs_to_apply
 prs_to_apply+=(10174) # Quantum Painter
 prs_to_apply+=(13286) # encoder mapping
 prs_to_apply+=(13523) # Split one-hand
-prs_to_apply+=(13896) # ChibiOS-Contrib update
+prs_to_apply+=(12670) # Pixel anims
 
 declare -a cherry_picks
 #cherry_picks+=(749aca03c90c9316189b58e3236bea9242f3990f) # RGB_MATRIX slave scan

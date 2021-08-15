@@ -21,6 +21,7 @@
 #include <qp.h>
 #include <printf.h>
 #include <transactions.h>
+#include <split_util.h>
 
 #include "tzarc.h"
 #include "qp_rgb565_surface.h"
@@ -118,6 +119,49 @@ const uint8_t PROGMEM encoder_hand_swap_config[NUM_ENCODERS] = { 1, 0 };
 #endif
 
 // clang-format on
+
+//----------------------------------------------------------
+// RGB Matrix naming
+#if defined(RGB_MATRIX_ENABLE)
+#    include <rgb_matrix.h>
+
+#    if defined(RGB_MATRIX_EFFECT)
+#        undef RGB_MATRIX_EFFECT
+#    endif  // defined(RGB_MATRIX_EFFECT)
+
+#    define RGB_MATRIX_EFFECT(x) RGB_MATRIX_EFFECT_##x,
+enum {
+    RGB_MATRIX_EFFECT_NONE,
+#    include "rgb_matrix_effects.inc"
+#    undef RGB_MATRIX_EFFECT
+#    ifdef RGB_MATRIX_CUSTOM_KB
+#        include "rgb_matrix_kb.inc"
+#    endif
+#    ifdef RGB_MATRIX_CUSTOM_USER
+#        include "rgb_matrix_user.inc"
+#    endif
+};
+
+#    define RGB_MATRIX_EFFECT(x)    \
+        case RGB_MATRIX_EFFECT_##x: \
+            return #x;
+const char *rgb_matrix_name(uint8_t effect) {
+    switch (effect) {
+        case RGB_MATRIX_EFFECT_NONE:
+            return "NONE";
+#    include "rgb_matrix_effects.inc"
+#    undef RGB_MATRIX_EFFECT
+#    ifdef RGB_MATRIX_CUSTOM_KB
+#        include "rgb_matrix_kb.inc"
+#    endif
+#    ifdef RGB_MATRIX_CUSTOM_USER
+#        include "rgb_matrix_user.inc"
+#    endif
+        default:
+            return "UNKNOWN";
+    }
+}
+#endif  // defined(RGB_MATRIX_ENABLE)
 
 //----------------------------------------------------------
 // Sync
@@ -236,6 +280,27 @@ void draw_ui_user(void) {
         redraw_required = true;
     }
 
+    static uint32_t last_layer_state = 0;
+    if (last_layer_state != layer_state) {
+        last_layer_state = layer_state;
+        redraw_required  = true;
+    }
+
+    static uint32_t last_scan_update = 0;
+    if (timer_elapsed32(last_scan_update) > 125) {
+        last_scan_update = timer_read32();
+        redraw_required  = true;
+    }
+
+#if defined(RGB_MATRIX_ENABLE)
+    static uint16_t last_effect = 0xFFFF;
+    uint8_t         curr_effect = rgb_matrix_config.mode;
+    if (last_effect != curr_effect) {
+        last_effect     = curr_effect;
+        redraw_required = true;
+    }
+#endif  // defined(RGB_MATRIX_ENABLE)
+
     // Show the Djinn logo and two vertical bars on both sides
     if (redraw_required) {
         qp_drawimage_recolor(lcd, 120 - gfx_djinn->width / 2, 32, gfx_djinn, curr_hue, 255, 255);
@@ -243,15 +308,30 @@ void draw_ui_user(void) {
         qp_rect(lcd, 231, 0, 239, 319, curr_hue, 255, 255, true);
     }
 
+    int ypos = 4;
+
     // Show layer info on the left side
     if (is_keyboard_left()) {
-        static uint32_t last_layer_state = 0;
-        if (redraw_required || last_layer_state != layer_state) {
-            last_layer_state = layer_state;
+        if (redraw_required) {
+            char buf[32] = {0};
+            int  xpos    = 16;
+
+#if defined(RGB_MATRIX_ENABLE)
+            static int max_rgb_xpos = 0;
+            xpos                    = 16;
+            snprintf_(buf, sizeof(buf), "rgb: %s", rgb_matrix_name(curr_effect));
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            if (max_rgb_xpos < xpos) {
+                max_rgb_xpos = xpos;
+            }
+            qp_rect(lcd, xpos, ypos, max_rgb_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
+
+            ypos += font_thintel15->glyph_height + 4;
+#endif  // defined(RGB_MATRIX_ENABLE)
 
             const char *layer_name = "unknown";
             switch (get_highest_layer(layer_state)) {
-                case LAYER_BASE:
+                case 
                     layer_name = "qwerty";
                     break;
                 case LAYER_LOWER:
@@ -265,50 +345,49 @@ void draw_ui_user(void) {
                     break;
             }
 
-            static int max_xpos = 0;
-            int        xpos     = 16;
-            int        ypos     = 4;
-            char       buf[32]  = {0};
+            static int max_layer_xpos = 0;
+            xpos                      = 16;
             snprintf_(buf, sizeof(buf), "layer: %s", layer_name);
             xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
-            if (max_xpos < xpos) {
-                max_xpos = xpos;
+            if (max_layer_xpos < xpos) {
+                max_layer_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
-        }
+            qp_rect(lcd, xpos, ypos, max_layer_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
 
-        static uint32_t last_scan_update = 0;
-        if (redraw_required || timer_elapsed32(last_scan_update) > 125) {
-            last_scan_update = timer_read32();
+            ypos += font_thintel15->glyph_height + 4;
 
-            static int max_xpos = 0;
-            int        xpos     = 16;
-            int        ypos     = 4 + font_thintel15->glyph_height + 4;
-            char       buf[32]  = {0};
-            snprintf_(buf, sizeof(buf), "scans: %d", (int)user_state.scan_rate);
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
-            if (max_xpos < xpos) {
-                max_xpos = xpos;
-            }
-            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
-
-            xpos = 16;
-            ypos += 4 + font_thintel15->glyph_height;
+            static int max_power_xpos = 0;
+            xpos                      = 16;
             snprintf_(buf, sizeof(buf), "power: %s", usbpd_str(kb_state.current_setting));
             xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
-            if (max_xpos < xpos) {
-                max_xpos = xpos;
+            if (max_power_xpos < xpos) {
+                max_power_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
+            qp_rect(lcd, xpos, ypos, max_power_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
 
-            xpos = 16;
-            ypos += 4 + font_thintel15->glyph_height;
+            ypos += font_thintel15->glyph_height + 4;
+
+            static int max_scans_xpos = 0;
+            xpos                      = 16;
+            snprintf_(buf, sizeof(buf), "scans: %d", (int)user_state.scan_rate);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            if (max_scans_xpos < xpos) {
+                max_scans_xpos = xpos;
+            }
+            qp_rect(lcd, xpos, ypos, max_scans_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
+
+            ypos += font_thintel15->glyph_height + 4;
+
+            static int max_wpm_xpos = 0;
+            xpos                    = 16;
             snprintf_(buf, sizeof(buf), "wpm: %d", (int)get_current_wpm());
             xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
-            if (max_xpos < xpos) {
-                max_xpos = xpos;
+            if (max_wpm_xpos < xpos) {
+                max_wpm_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
+            qp_rect(lcd, xpos, ypos, max_wpm_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
+
+            ypos += font_thintel15->glyph_height + 4;
         }
     }
 
