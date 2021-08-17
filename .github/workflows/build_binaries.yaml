@@ -29,8 +29,9 @@ jobs:
 
     - name: Build
       run: |
-        cd "qmk_firmware" && PATH="$(pwd)/bin:$(pwd)/qmk_firmware/bin:$PATH" make git-submodule && cd ..
-        PATH="$(pwd)/qmk_firmware/bin:$PATH" remake -j1 -O nick
+        export PATH="$(pwd)/bin:$(pwd)/qmk_firmware/bin:$PATH"
+        cd "qmk_firmware" && make git-submodule && cd ..
+        remake -j1 -O nick
 
     - name: 'Upload binaries'
       uses: actions/upload-artifact@v2
