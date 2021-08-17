@@ -49,10 +49,9 @@ hard_reset() {
     pcmd git clean -xfd
     pcmd git remote set-url origin git@github.com:tzarc/$repo_name.git
     pcmd git remote set-url origin git@github.com:tzarc/$repo_name.git --push
-    pcmd git remote set-url upstream git@github.com:$repo_upstream/$repo_name.git
+    pcmd git remote set-url upstream git@github.com:$repo_upstream/$repo_name.git || pcmd git remote add upstream git@github.com:$repo_upstream/$repo_name.git
     pcmd git remote set-url upstream git@github.com:$repo_upstream/$repo_name.git --push
     pcmd git fetch --all --tags --prune
-    pcmd git fetch --unshallow upstream || true
     pcmd git clean -xfd
     pcmd git checkout -f $repo_branch
     pcmd git reset --hard upstream/$repo_branch || pcmd git reset --hard origin/$repo_branch
@@ -63,14 +62,17 @@ hard_reset() {
 }
 
 upgrade-chibios() {
+    pushd "$script_dir/qmk_firmware"
+    ./util/update_chibios_mirror.sh
+    popd
+
     pushd "$script_dir/qmk_firmware/lib/chibios"
-    git tag -d ver20.3.1
-    hard_reset ChibiOS ChibiOS $target_chibios
+    hard_reset qmk ChibiOS $target_chibios
     pcmd git push origin $target_branch --set-upstream --force-with-lease
     popd
 
     pushd "$script_dir/qmk_firmware/lib/chibios-contrib"
-    hard_reset ChibiOS ChibiOS-Contrib $target_chibios_contrib
+    hard_reset qmk ChibiOS-Contrib $target_chibios_contrib
     pcmd git push origin $target_branch --set-upstream --force-with-lease
     popd
 
