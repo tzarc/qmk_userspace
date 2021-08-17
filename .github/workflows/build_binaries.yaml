@@ -24,12 +24,12 @@ jobs:
         git submodule update --init --recursive
         cd "qmk_firmware" && git checkout generated-workarea && cd ..
         python3 -m pip install -U scan-build
-        python3 -m pip install -r "qmk_firmware/requirements.txt"
         apt-get update && apt-get install -y bear remake
+        ./bin/qmk --update
 
     - name: Build
       run: |
-        cd "qmk_firmware" && PATH="$(pwd)/qmk_firmware/bin:$PATH" make git-submodule && cd ..
+        cd "qmk_firmware" && PATH="$(pwd)/bin:$(pwd)/qmk_firmware/bin:$PATH" make git-submodule && cd ..
         PATH="$(pwd)/qmk_firmware/bin:$PATH" remake -j1 -O nick
 
     - name: 'Upload binaries'
