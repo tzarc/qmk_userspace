@@ -30,8 +30,6 @@ prs_to_apply+=(12670) # Pixel anims
 declare -a cherry_picks
 #cherry_picks+=(749aca03c90c9316189b58e3236bea9242f3990f) # RGB_MATRIX slave scan
 
-rm -f "$script_dir"/*.patch || true
-
 pcmd() {
     echo -e "\e[38;5;203mExecuting:\e[38;5;131m $@\e[0m"
     "$@"
