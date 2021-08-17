@@ -16,8 +16,6 @@
 
 #pragma once
 
-//#define DEBUG_MATRIX_SCAN_RATE
-
 // 1000Hz poll rate
 #define USB_POLLING_INTERVAL_MS 1
 

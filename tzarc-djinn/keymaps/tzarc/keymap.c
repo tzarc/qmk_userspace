@@ -331,7 +331,7 @@ void draw_ui_user(void) {
 
             const char *layer_name = "unknown";
             switch (get_highest_layer(layer_state)) {
-                case 
+                case LAYER_BASE:
                     layer_name = "qwerty";
                     break;
                 case LAYER_LOWER:
