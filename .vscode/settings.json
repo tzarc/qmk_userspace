@@ -40,6 +40,8 @@
     "spi_master.h": "c",
     "keymap.h": "c",
     "raw_hid.h": "c",
-    "keyboard.h": "c"
+    "keyboard.h": "c",
+    "nodebug.h": "c",
+    "wait.h": "c"
   }
 }

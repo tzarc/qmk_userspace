@@ -465,16 +465,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 
 void matrix_scan_user(void) {
-    static uint32_t last_numlock_check = 0;
-    uint32_t        now                = timer_read32();
-    if (timer_elapsed32(last_numlock_check) > 2500) {
-        last_numlock_check = now;
-        led_t led_state    = host_keyboard_led_state();
-        if (!led_state.num_lock) {
-            tap_code(KC_NUMLOCK);
-        }
-    }
-
     if (typing_mode == KC_WOWMODE) {
         matrix_scan_wow();
     } else if (typing_mode == KC_D3MODE) {

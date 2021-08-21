@@ -18,8 +18,6 @@
 
 #include "config_common.h"
 
-#define DEBUG_EEPROM_OUTPUT
-
 // USB Device parameters
 #define VENDOR_ID 0x1209
 #define PRODUCT_ID 0x4919

@@ -95,6 +95,64 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
     [LAYER_RAISE] =  { ENCODER_CCW_CW(RGB_VAD, RGB_VAI),           ENCODER_CCW_CW(RGB_SPD, RGB_SPI)  },
     [LAYER_ADJUST] = { ENCODER_CCW_CW(RGB_RMOD, RGB_MOD),          ENCODER_CCW_CW(KC_LEFT, KC_RIGHT) },
 };
+#else
+bool encoder_update_keymap(uint8_t index, bool clockwise) {
+    uint8_t temp_mod = get_mods();
+    uint8_t temp_osm = get_oneshot_mods();
+    bool    is_ctrl  = (temp_mod | temp_osm) & MOD_MASK_CTRL;
+    bool    is_shift = (temp_mod | temp_osm) & MOD_MASK_SHIFT;
+
+    if (is_shift) {
+        if (index == 0) { /* First encoder */
+            if (clockwise) {
+                rgblight_increase_hue();
+            } else {
+                rgblight_decrease_hue();
+            }
+        } else if (index == 1) { /* Second encoder */
+            if (clockwise) {
+                rgblight_decrease_sat();
+            } else {
+                rgblight_increase_sat();
+            }
+        }
+    } else if (is_ctrl) {
+        if (index == 0) { /* First encoder */
+            if (clockwise) {
+                rgblight_increase_val();
+            } else {
+                rgblight_decrease_val();
+            }
+        } else if (index == 1) { /* Second encoder */
+            if (clockwise) {
+                rgblight_increase_speed();
+            } else {
+                rgblight_decrease_speed();
+            }
+        }
+    } else {
+        if (index == 0) { /* First encoder */
+            if (clockwise) {
+                tap_code16(KC_MS_WH_DOWN);
+            } else {
+                tap_code16(KC_MS_WH_UP);
+            }
+        } else if (index == 1) { /* Second encoder */
+            uint16_t held_keycode_timer = timer_read();
+            uint16_t mapped_code        = 0;
+            if (clockwise) {
+                mapped_code = KC_VOLU;
+            } else {
+                mapped_code = KC_VOLD;
+            }
+            register_code(mapped_code);
+            while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY)
+                ; /* no-op */
+            unregister_code(mapped_code);
+        }
+    }
+    return false;
+}
 #endif
 
 #ifdef SWAP_HANDS_ENABLE
@@ -218,7 +276,7 @@ void user_state_update(void) {
 }
 
 void user_state_sync(void) {
-    if (!is_transport_connected()) return;
+    //    if (!is_transport_connected()) return;
 
     if (is_keyboard_master()) {
         // Keep track of the last state, so that we can tell if we need to propagate to slave

@@ -16,9 +16,6 @@
 
 #pragma once
 
-// Debugging
-#define DEBUG_EEPROM_OUTPUT
-
 // 1000Hz poll rate
 #define USB_POLLING_INTERVAL_MS 1
 

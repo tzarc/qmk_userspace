@@ -19,8 +19,6 @@ UNICODE_ENABLE ?= yes
 VPATH += $(USER_PATH)/graphics/src
 
 ifeq ($(strip $(PLATFORM_KEY)),chibios)
-	# We can actually fit this debounce algorithm on an ARM chip, with the rest of the stuff
-	DEBOUNCE_TYPE ?= asym_eager_defer_pk
 	XAP_ENABLE = no
 else ifeq ($(strip $(PLATFORM_KEY)),arm_atsam)
 	XAP_ENABLE = no

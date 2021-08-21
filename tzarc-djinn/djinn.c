@@ -83,7 +83,7 @@ void kb_state_update(void) {
 }
 
 void kb_state_sync(void) {
-    if (!is_transport_connected()) return;
+    //    if (!is_transport_connected()) return;
 
     if (is_keyboard_master()) {
         // Keep track of the last state, so that we can tell if we need to propagate to slave
@@ -239,9 +239,6 @@ void housekeeping_task_kb(void) {
 // Initialisation
 
 void keyboard_post_init_kb(void) {
-    // debug_enable = true;
-    // debug_matrix = true;
-
     // Register keyboard state sync split transaction
     transaction_register_rpc(RPC_ID_SYNC_STATE_KB, kb_state_sync_slave);
 
