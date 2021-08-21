@@ -1,0 +1,6 @@
+#!/bin/bash
+
+rm -rf lib/chibios-contrib/ext/mcux-sdk
+git submodule sync --recursive --quiet
+git submodule update --init --recursive --progress --quiet
+
