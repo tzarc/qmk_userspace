@@ -26,6 +26,7 @@ prs_to_apply+=(10174) # Quantum Painter
 #prs_to_apply+=(13286) # encoder mapping
 #prs_to_apply+=(13523) # Split one-hand
 #prs_to_apply+=(12670) # Pixel anims
+prs_to_apply+=(14095) # Fix SPI EEPROM
 
 declare -a cherry_picks
 #cherry_picks+=(749aca03c90c9316189b58e3236bea9242f3990f) # RGB_MATRIX slave scan

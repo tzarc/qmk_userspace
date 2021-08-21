@@ -28,7 +28,6 @@
 #endif  // TAPPING_TERM
 #define TAPPING_TERM 120
 
-/*
 #define RETRO_TAPPING
 #define TAPPING_TERM_PER_KEY
 #define PERMISSIVE_HOLD
@@ -37,7 +36,6 @@
 #define IGNORE_MOD_TAP_INTERRUPT_PER_KEY
 #define TAPPING_FORCE_HOLD
 #define TAPPING_FORCE_HOLD_PER_KEY
-*/
 
 // Pre-define the amount of space to use for userspace EEPROM
 #define TZARC_EEPROM_ALLOCATION 32
