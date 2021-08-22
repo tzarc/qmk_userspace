@@ -24,8 +24,8 @@ fi
 declare -a prs_to_apply
 prs_to_apply+=(10174) # Quantum Painter
 #prs_to_apply+=(13286) # encoder mapping
-#prs_to_apply+=(13523) # Split one-hand
-#prs_to_apply+=(12670) # Pixel anims
+prs_to_apply+=(13523) # Split one-hand
+prs_to_apply+=(12670) # Pixel anims
 prs_to_apply+=(14095) # Fix SPI EEPROM
 
 declare -a cherry_picks

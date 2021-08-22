@@ -53,3 +53,8 @@
 // Disable old stuff
 #define NO_ACTION_MACRO
 #define NO_ACTION_FUNCTION
+
+// Ensure transient EEPROM has enough space
+#ifdef EEPROM_TRANSIENT
+#    define EEPROM_SIZE 96
+#endif  // EEPROM_TRANSIENT
