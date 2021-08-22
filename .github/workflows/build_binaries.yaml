@@ -23,13 +23,12 @@ jobs:
         sed -i 's#git@github.com:#https://github.com/#g' .gitmodules
         git submodule update --init --recursive
         cd "qmk_firmware" && git checkout generated-workarea && cd ..
-        python3 -m pip install -U scan-build
         apt-get update && apt-get install -y bear remake python3-venv
         ./bin/qmk --update
 
     - name: Build
       run: |
-        export PATH="$(pwd)/bin:$(pwd)/qmk_firmware/bin:$PATH"
+        export PATH="$(pwd)/bin:$PATH"
         cd "qmk_firmware" && make git-submodule && cd ..
         remake -j1 -O nick
 

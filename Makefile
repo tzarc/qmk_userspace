@@ -103,7 +103,7 @@ links: format_prereq
 
 .INTERMEDIATE: version-h
 version-h:
-	qmk generate-version-h -q -o $(ROOTDIR)/qmk_firmware/quantum/version.h
+	$(ROOTDIR)/bin/qmk generate-version-h -q -o $(ROOTDIR)/qmk_firmware/quantum/version.h
 
 define handle_link_entry
 link_source_$1 := $$(word 1,$$(subst !, ,$1))
