@@ -75,6 +75,14 @@ format_prereq:
 	@ln -sf $(ROOTDIR)/qmk_firmware/.clang-format $(ROOTDIR)/.clang-format
 
 format: format_prereq
+	@for file in $$(ls -1 $(ROOTDIR)/rle/*.c) ; do \
+		echo "\e[38;5;14mclang-format'ing: $$file\e[0m" ; \
+		clang-format -i "$$file" >/dev/null 2>&1 || true ; \
+	done
+	@for file in $$(ls -1 $(ROOTDIR)/rle/*.c) ; do \
+		dos2unix "$$file" >/dev/null 2>&1 ; \
+	done
+
 
 links: format_prereq
 
