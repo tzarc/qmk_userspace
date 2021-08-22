@@ -62,29 +62,6 @@ nick: iris sat75 luddite mysterium-nick chocopad ctrl djinn bm16s one2mini
 
 djinn: djinn_rev1 djinn_rev2
 
-## QMK Logo generation
-#$(ROOTDIR)/tzarc-djinn/gfx-djinn.c: Makefile $(ROOTDIR)/tzarc-djinn/graphics/djinn.png $(ROOTDIR)/tzarc-djinn/graphics/lock-caps.png $(ROOTDIR)/tzarc-djinn/graphics/lock-scrl.png $(ROOTDIR)/tzarc-djinn/graphics/lock-num.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-caps.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-scrl.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-num.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-caps-OFF.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-scrl-OFF.png $(ROOTDIR)/tzarc-cyclone/graphics/lock-num-OFF.png
-#	cd $(ROOTDIR)/tzarc-djinn/graphics \
-#		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i djinn.png -f mono16 \
-#		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-caps.png -f mono4 \
-#		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-scrl.png -f mono4 \
-#		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-num.png -f mono4 \
-#		&& cd $(ROOTDIR)/tzarc-cyclone/graphics \
-#		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-caps.png -f mono2 \
-#		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-scrl.png -f mono2 \
-#		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-num.png -f mono2 \
-#		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-caps-OFF.png -f mono2 \
-#		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-scrl-OFF.png -f mono2 \
-#		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-graphics -i lock-num-OFF.png -f mono2 \
-#		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-make-font-image --font CandC-Red-Alert-LAN.ttf --size 13 -o noto.png --unicode-glyphs "ĄȽɂɻɣɈʣ" \
-#		&& $(ROOTDIR)/qmk_firmware/bin/qmk painter-convert-font-image --input noto.png -f mono2 --unicode-glyphs "ĄȽɂɻɣɈʣ" \
-#		# && for size in `seq 4 18` ; do $(ROOTDIR)/qmk_firmware/bin/qmk painter-make-font-image --font CandC-Red-Alert-LAN.ttf --size $$size -o noto$$size.png --unicode-glyphs "ĄȽɂɻɣɈʣ" ; done
-#
-#gfx: $(ROOTDIR)/tzarc-djinn/gfx-djinn.c
-#
-#bin_djinn: gfx
-#bin_cyclone: gfx
-
 remove_artifacts:
 	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.uf2 "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format "$(ROOTDIR)"/compile_commands.json "$(ROOTDIR)"/qmk_firmware/compile_commands.json >/dev/null 2>&1 || true
 

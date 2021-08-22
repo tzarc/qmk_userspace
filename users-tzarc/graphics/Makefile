@@ -1,7 +1,7 @@
 ################################################################################################################################################################
 # Generated files
 
-QMK_BIN := ../../qmk_firmware/bin/qmk
+QMK_BIN := ../../bin/qmk
 USER_PATH := .
 GENERATED_OUTPUT := ./src
 
@@ -14,6 +14,16 @@ distclean: clean
 
 ################################################################################################################################################################
 # Fonts
+
+generated-files: $(GENERATED_OUTPUT)/noto11.h
+
+$(GENERATED_OUTPUT)/noto11.png: $(USER_PATH)/Makefile $(USER_PATH)/NotoSans-ExtraCondensedBold.ttf
+	[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
+	$(QMK_BIN) painter-make-font-image --font $(USER_PATH)/NotoSans-ExtraCondensedBold.ttf --size 11 -o $(GENERATED_OUTPUT)/noto11.png --unicode-glyphs "ĄȽɂɻɣɈʣ"
+
+$(GENERATED_OUTPUT)/noto11.h: $(GENERATED_OUTPUT)/noto11.png
+	[ -d $(GENERATED_OUTPUT) ] || mkdir -p $(GENERATED_OUTPUT)
+	$(QMK_BIN) painter-convert-font-image --input $(GENERATED_OUTPUT)/noto11.png -f mono4 --unicode-glyphs "ĄȽɂɻɣɈʣ"
 
 generated-files: $(GENERATED_OUTPUT)/noto16.h
 
