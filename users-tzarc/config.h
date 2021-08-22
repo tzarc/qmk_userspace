@@ -50,10 +50,6 @@
 // Completely incompatible with the change in RAW usage page and ID.
 #define VIA_EEPROM_MAGIC_ADDR (EECONFIG_SIZE + TZARC_EEPROM_ALLOCATION + 1)
 
-// Disable old stuff
-#define NO_ACTION_MACRO
-#define NO_ACTION_FUNCTION
-
 // Ensure transient EEPROM has enough space
 #ifdef EEPROM_TRANSIENT
 #    define EEPROM_SIZE 96

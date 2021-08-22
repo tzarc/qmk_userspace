@@ -58,7 +58,7 @@ all: bin
 
 arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
 
-nick: iris sat75 luddite mysterium-nick chocopad ctrl djinn bm16s
+nick: iris sat75 luddite mysterium-nick chocopad ctrl djinn bm16s one2mini
 
 djinn: djinn_rev1 djinn_rev2
 
@@ -100,6 +100,10 @@ format_prereq:
 format: format_prereq
 
 links: format_prereq
+
+.INTERMEDIATE: version-h
+version-h:
+	qmk generate-version-h -q -o $(ROOTDIR)/qmk_firmware/quantum/version.h
 
 define handle_link_entry
 link_source_$1 := $$(word 1,$$(subst !, ,$1))
@@ -153,7 +157,7 @@ board_file_$1 := $$(shell echo $$(board_qmk_$1) | sed -e 's@/@_@g' -e 's@:@_@g')
 board_files_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f \( -name '*.h' -or -name '*.c' \) -and -not -name '*conf.h' -and -not -name 'board.c' -and -not -name 'board.h' | sort)
 board_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f | sort)
 
-bin_$$(board_name_$1): links #compiledb_$$(board_name_$1)
+bin_$$(board_name_$1): links version-h
 	@echo "\e[38;5;14mBuilding: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	+cd "$(ROOTDIR)/qmk_firmware" \
 		&& bear $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false

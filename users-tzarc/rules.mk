@@ -6,6 +6,7 @@ SRC += \
 	tzarc_diablo3.c
 
 NKRO_ENABLE = no
+COMMAND_ENABLE = no
 SPACE_CADET_ENABLE = no
 MAGIC_ENABLE = no
 LTO_ENABLE ?= yes
