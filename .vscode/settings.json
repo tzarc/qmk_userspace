@@ -9,6 +9,10 @@
     "editor.trimAutoWhitespace": false,
     "files.trimTrailingWhitespace": false
   },
+  "[properties]": {
+    "editor.trimAutoWhitespace": false,
+    "files.trimTrailingWhitespace": false
+  },
   "files.associations": {
     "array": "cpp",
     "system_error": "c",

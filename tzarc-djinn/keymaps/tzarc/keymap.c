@@ -34,7 +34,7 @@
 #include "graphics/src/lock-caps-OFF.c"
 #include "graphics/src/lock-scrl-OFF.c"
 #include "graphics/src/lock-num-OFF.c"
-#include "graphics/src/noto11.c"
+#include "graphics/src/thintel15.c"
 
 #define MEDIA_KEY_DELAY 2
 
@@ -408,14 +408,14 @@ void draw_ui_user(void) {
                     buf[i] = tolower(buf[i]);
             }
 
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_noto11, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_rgb_xpos < xpos) {
                 max_rgb_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_rgb_xpos, ypos + font_noto11->glyph_height, 0, 0, 0, true);
+            qp_rect(lcd, xpos, ypos, max_rgb_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
         }
 
-        ypos += font_noto11->glyph_height + 4;
+        ypos += font_thintel15->glyph_height + 4;
 #endif  // defined(RGB_MATRIX_ENABLE)
 
         if (hue_redraw || layer_state_redraw) {
@@ -438,53 +438,53 @@ void draw_ui_user(void) {
             static int max_layer_xpos = 0;
             xpos                      = 16;
             snprintf_(buf, sizeof(buf), "layer: %s", layer_name);
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_noto11, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_layer_xpos < xpos) {
                 max_layer_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_layer_xpos, ypos + font_noto11->glyph_height, 0, 0, 0, true);
+            qp_rect(lcd, xpos, ypos, max_layer_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
         }
 
-        ypos += font_noto11->glyph_height + 4;
+        ypos += font_thintel15->glyph_height + 4;
 
         if (hue_redraw || power_state_redraw) {
             static int max_power_xpos = 0;
             xpos                      = 16;
             snprintf_(buf, sizeof(buf), "power: %s", usbpd_str(kb_state.current_setting));
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_noto11, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_power_xpos < xpos) {
                 max_power_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_power_xpos, ypos + font_noto11->glyph_height, 0, 0, 0, true);
+            qp_rect(lcd, xpos, ypos, max_power_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
         }
 
-        ypos += font_noto11->glyph_height + 4;
+        ypos += font_thintel15->glyph_height + 4;
 
         if (hue_redraw || scan_redraw) {
             static int max_scans_xpos = 0;
             xpos                      = 16;
             snprintf_(buf, sizeof(buf), "scans: %d", (int)user_state.scan_rate);
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_noto11, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_scans_xpos < xpos) {
                 max_scans_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_scans_xpos, ypos + font_noto11->glyph_height, 0, 0, 0, true);
+            qp_rect(lcd, xpos, ypos, max_scans_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
         }
 
-        ypos += font_noto11->glyph_height + 4;
+        ypos += font_thintel15->glyph_height + 4;
 
         if (hue_redraw || wpm_redraw) {
             static int max_wpm_xpos = 0;
             xpos                    = 16;
             snprintf_(buf, sizeof(buf), "wpm: %d", (int)get_current_wpm());
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_noto11, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_wpm_xpos < xpos) {
                 max_wpm_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_wpm_xpos, ypos + font_noto11->glyph_height, 0, 0, 0, true);
+            qp_rect(lcd, xpos, ypos, max_wpm_xpos, ypos + font_thintel15->glyph_height, 0, 0, 0, true);
         }
 
-        ypos += font_noto11->glyph_height + 4;
+        ypos += font_thintel15->glyph_height + 4;
     }
 
     // Show LED lock indicators on the right side
@@ -508,7 +508,7 @@ void draw_ui_user(void) {
         qp_drawtext_recolor(lcd, 0, font_noto16->glyph_height, font_noto16, "with Quantum Painter...", 0, 255, 255, 0, 255, 0);
         qp_drawtext_recolor(lcd, 0, 2 * font_noto16->glyph_height, font_noto16, "Perhaps a different background?", 43, 255, 255, 169, 255, 255);
         qp_drawtext(lcd, 0, 3 * font_noto16->glyph_height, font_noto28, "Unicode: ĄȽɂɻɣɈʣ");
-        qp_drawtext(lcd, 0, 3 * font_noto16->glyph_height + font_noto28->glyph_height, font_noto11, "And here we are, with another font!");
+        qp_drawtext(lcd, 0, 3 * font_noto16->glyph_height + font_noto28->glyph_height, font_thintel15, "And here we are, with another font!");
     }
 #endif
 }

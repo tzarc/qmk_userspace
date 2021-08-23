@@ -5,3 +5,6 @@
 [submodule "qmk_udev"]
 	path = qmk_udev
 	url = git@github.com:qmk/qmk_udev.git
+[submodule "qmk_cli"]
+	path = qmk_cli
+	url = https://github.com/qmk/qmk_cli
