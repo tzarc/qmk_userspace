@@ -36,7 +36,7 @@
 #include "graphics/src/lock-num-OFF.c"
 #include "graphics/src/thintel15.c"
 
-#define MEDIA_KEY_DELAY 2
+#define MEDIA_KEY_DELAY 5
 
 painter_device_t surf;
 
@@ -139,17 +139,11 @@ bool encoder_update_keymap(uint8_t index, bool clockwise) {
                 tap_code16(KC_MS_WH_UP);
             }
         } else if (index == 1) { /* Second encoder */
-            uint16_t held_keycode_timer = timer_read();
-            uint16_t mapped_code        = 0;
             if (clockwise) {
-                mapped_code = KC_VOLU;
+                tap_code_delay(KC_VOLU, MEDIA_KEY_DELAY);
             } else {
-                mapped_code = KC_VOLD;
+                tap_code_delay(KC_VOLD, MEDIA_KEY_DELAY);
             }
-            register_code(mapped_code);
-            while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY)
-                ; /* no-op */
-            unregister_code(mapped_code);
         }
     }
     return false;

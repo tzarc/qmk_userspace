@@ -8,3 +8,6 @@
 [submodule "qmk_cli"]
 	path = qmk_cli
 	url = https://github.com/qmk/qmk_cli
+[submodule "qmk_fpm"]
+	path = qmk_fpm
+	url = https://github.com/qmk/qmk_fpm/

@@ -20,14 +20,17 @@
 #define RLE_ENCODER
 #define RLE_HAS_FILE_IO
 
-#include "../qmk_firmware/quantum/rle.c"
+#define LZJB_COMPRESSOR
 
-int main(int argc, const char *argv[]) {
+#include "../qmk_firmware/quantum/rle.c"
+#include "lzjb.c"
+
+int main(int argc, const char* argv[]) {
     bool        decode          = false;
-    const char *input_filename  = "-";
-    const char *output_filename = "-";
+    const char* input_filename  = "-";
+    const char* output_filename = "-";
     for (int i = 1; i < argc; ++i) {
-        const char *const arg = argv[i];
+        const char* const arg = argv[i];
         if (strcmp(arg, "-d") == 0)  // decode
         {
             decode = true;
@@ -44,21 +47,23 @@ int main(int argc, const char *argv[]) {
         }
     }
 
-    FILE *input_file = strcmp(input_filename, "-") == 0 ? stdin : fopen(input_filename, "rb");
+    FILE* input_file = strcmp(input_filename, "-") == 0 ? stdin : fopen(input_filename, "rb");
     if (!input_file) return -1;
-    FILE *output_file = strcmp(output_filename, "-") == 0 ? stdout : fopen(output_filename, "wb");
+    FILE* output_file = strcmp(output_filename, "-") == 0 ? stdout : fopen(output_filename, "wb");
     if (!output_file) return -1;
 
     file_rle_stream_t in  = make_file_rle_stream_t(input_file);
     file_rle_stream_t out = make_file_rle_stream_t(output_file);
 
-    if (decode)
-        rle_decode((rle_stream_t *)&in, (rle_stream_t *)&out);
-    else
-        rle_encode((rle_stream_t *)&in, (rle_stream_t *)&out);
+    int ret;
+    if (decode) {
+        ret = rle_decode((rle_stream_t*)&in, (rle_stream_t*)&out) ? 0 : -1;
+    } else {
+        ret = rle_encode((rle_stream_t*)&in, (rle_stream_t*)&out) ? 0 : -1;
+    }
 
     fclose(input_file);
     fclose(output_file);
 
-    return 0;
+    return ret;
 }

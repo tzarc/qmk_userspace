@@ -26,7 +26,7 @@ setup_qmk() {
     fi
 
     exec env -i HOME="$HOME" SHELL="$SHELL" PATH="/usr/local/bin:/usr/bin:/bin" QMK_FIRMWARE="$QMK_FIRMWARE" \
-        /bin/bash -c "set -e; source \"${qmk_venv}/bin/activate\"; python3 -m pip install --upgrade pip wheel; python3 -m pip install --upgrade qmk; python3 -m pip install --upgrade -r \"$QMK_FIRMWARE/requirements-dev.txt\""
+        /bin/bash -c "set -e; source \"${qmk_venv}/bin/activate\"; python3 -m pip install --upgrade pip wheel; python3 -m pip install qmk; python3 -m pip install -r \"$QMK_FIRMWARE/requirements-dev.txt\""
 }
 
 if [[ ! -d "${qmk_venv}" ]] || [[ "${1:-}" == "--update" ]] || [[ "${1:-}" == "--upgrade" ]] ; then

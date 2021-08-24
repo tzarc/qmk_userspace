@@ -46,6 +46,7 @@
     "raw_hid.h": "c",
     "keyboard.h": "c",
     "nodebug.h": "c",
-    "wait.h": "c"
+    "wait.h": "c",
+    "rle.h": "c"
   }
 }

@@ -200,7 +200,7 @@ EOF
     } 2>&1 > /home/qmk/index.html
 }
 
-python3 -m pip install -U qmk milc >/dev/null 2>&1
+python3 -m pip install -U qmk >/dev/null 2>&1
 
 get_qmk >/dev/null 2>&1
 
