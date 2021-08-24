@@ -52,7 +52,7 @@
 #define LEMPEL_SIZE 1024
 
 #ifdef LZJB_COMPRESSOR
-size_t lzjb_compress(void* s_start, void* d_start, size_t s_len, size_t d_len, int n) {
+size_t lzjb_compress(void* s_start, void* d_start, size_t s_len, size_t d_len) {
     uint8_t*  src = s_start;
     uint8_t*  dst = d_start;
     uint8_t*  cpy;
@@ -101,7 +101,7 @@ size_t lzjb_compress(void* s_start, void* d_start, size_t s_len, size_t d_len, i
 }
 #endif  // LZJB_COMPRESSOR
 
-int lzjb_decompress(void* s_start, void* d_start, size_t s_len, size_t d_len, int n) {
+int lzjb_decompress(void* s_start, void* d_start, size_t s_len, size_t d_len) {
     uint8_t* src   = s_start;
     uint8_t* dst   = d_start;
     uint8_t* d_end = (uint8_t*)d_start + d_len;

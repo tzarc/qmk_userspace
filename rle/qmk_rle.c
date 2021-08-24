@@ -62,8 +62,31 @@ int main(int argc, const char* argv[]) {
         ret = rle_encode((rle_stream_t*)&in, (rle_stream_t*)&out) ? 0 : -1;
     }
 
+    long rle_size = 0;
+    if(input_filename[0] != '-' && input_filename[1] != '\0') {
+        rle_size = ftell(output_file);
+    }
+
     fclose(input_file);
     fclose(output_file);
+
+    if(input_filename[0] != '-' && input_filename[1] != '\0') {
+        input_file = fopen(input_filename, "rb");
+        if(input_file) {
+            fseek(input_file, 0, SEEK_END);
+            long length = ftell(input_file);
+            fseek(input_file, 0, SEEK_SET);
+            uint8_t *uncomp = (uint8_t *)calloc(sizeof(uint8_t), length);
+            uint8_t *comp = (uint8_t *)calloc(sizeof(uint8_t), length*2);
+            size_t compressed = lzjb_compress(uncomp, comp, length, length*2);
+            printf("       Original size: %d\n", (int)length);
+            printf("LZJB-compressed size: %d\n", (int)compressed);
+            printf(" RLE-compressed size: %d\n", (int)rle_size);
+            free(comp);
+            free(uncomp);
+            fclose(input_file);
+        }
+    }
 
     return ret;
 }
