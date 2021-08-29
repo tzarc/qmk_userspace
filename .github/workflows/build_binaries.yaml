@@ -29,7 +29,7 @@ jobs:
     - name: Build
       run: |
         export PATH="$(pwd)/bin:$PATH"
-        cd "qmk_firmware" && make git-submodule && cd ..
+        cd "qmk_firmware" && make git-submodule && qmk doctor && cd ..
         remake -j1 -O nick
 
     - name: 'Upload binaries'
