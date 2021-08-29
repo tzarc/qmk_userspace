@@ -60,13 +60,11 @@ size_t lzjb_compress(void* s_start, void* d_start, size_t s_len, size_t d_len) {
     int       copymask = 1 << (NBBY - 1);
     int       mlen, offset, hash;
     uint16_t* hp;
-    uint16_t* lempel;
-
-    lempel = (uint16_t*)calloc(LEMPEL_SIZE, sizeof(uint16_t));
+    uint16_t  lempel_buf[LEMPEL_SIZE] = {0};
+    uint16_t* lempel                  = lempel_buf;
     while (src < (uint8_t*)s_start + s_len) {
         if ((copymask <<= 1) == (1 << NBBY)) {
             if (dst >= (uint8_t*)d_start + d_len - 1 - 2 * NBBY) {
-                free(lempel);
                 return (s_len);
             }
             copymask = 1;
@@ -96,7 +94,6 @@ size_t lzjb_compress(void* s_start, void* d_start, size_t s_len, size_t d_len) {
         }
     }
 
-    free(lempel);
     return (dst - (uint8_t*)d_start);
 }
 #endif  // LZJB_COMPRESSOR
@@ -104,12 +101,14 @@ size_t lzjb_compress(void* s_start, void* d_start, size_t s_len, size_t d_len) {
 int lzjb_decompress(void* s_start, void* d_start, size_t s_len, size_t d_len) {
     uint8_t* src   = s_start;
     uint8_t* dst   = d_start;
+    uint8_t* s_end = (uint8_t*)s_start + s_len;
     uint8_t* d_end = (uint8_t*)d_start + d_len;
     uint8_t* cpy;
     uint8_t  copymap  = 0;
     int      copymask = 1 << (NBBY - 1);
+    int max_offset = -1;
 
-    while (dst < d_end) {
+    while (src < s_end) {
         if ((copymask <<= 1) == (1 << NBBY)) {
             copymask = 1;
             copymap  = *src++;
@@ -117,6 +116,7 @@ int lzjb_decompress(void* s_start, void* d_start, size_t s_len, size_t d_len) {
         if (copymap & copymask) {
             int mlen   = (src[0] >> (NBBY - MATCH_BITS)) + MATCH_MIN;
             int offset = ((src[0] << NBBY) | src[1]) & OFFSET_MASK;
+            max_offset = offset > max_offset ? offset : max_offset;
             src += 2;
             if ((cpy = dst - offset) < (uint8_t*)d_start) return (-1);
             while (--mlen >= 0 && dst < d_end) *dst++ = *cpy++;
@@ -124,5 +124,6 @@ int lzjb_decompress(void* s_start, void* d_start, size_t s_len, size_t d_len) {
             *dst++ = *src++;
         }
     }
-    return (0);
+    printf("Max offset: %d\n", max_offset);
+    return (dst - (uint8_t*)d_start);
 }

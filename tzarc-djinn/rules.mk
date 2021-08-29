@@ -42,8 +42,4 @@ USE_FPU = yes
 LTO_ENABLE = yes
 OPT = 2
 
-#LTO_ENABLE = no
-#OPT = 0
-#OPT_DEFS += -g
-
 DEFAULT_FOLDER = tzarc/djinn/rev2

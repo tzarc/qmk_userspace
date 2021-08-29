@@ -12,21 +12,22 @@ unset upgrade_chibios_confs
 
 target_branch="generated-workarea"
 target_qmk="develop"
+
 target_chibios="svn-mirror/stable_20.3.x"
-target_chibios_contrib="chibios-20.3.x"
+target_chibios_contrib="mirror/chibios-20.3.x"
+
 if [ ! -z ${upgrade_chibios:-} ] ; then
-target_branch="generated-chibios-master-upgrade"
-target_qmk="develop"
-target_chibios="svn-mirror/trunk"
-target_chibios_contrib="chibios-20.3.x"
+    target_branch="generated-chibios-master-upgrade"
+    target_qmk="develop"
+
+    target_chibios="svn-mirror/stable_21.6.x"
+    target_chibios_contrib="mirror/chibios-20.3.x"
 fi
 
 declare -a prs_to_apply
+prs_to_apply+=(14208) # ChibiOS master support
 prs_to_apply+=(10174) # Quantum Painter
 #prs_to_apply+=(13286) # encoder mapping
-prs_to_apply+=(13523) # Split one-hand
-prs_to_apply+=(12670) # Pixel anims
-prs_to_apply+=(14095) # Fix SPI EEPROM
 
 declare -a cherry_picks
 #cherry_picks+=(749aca03c90c9316189b58e3236bea9242f3990f) # RGB_MATRIX slave scan
@@ -48,16 +49,21 @@ hard_reset() {
     pcmd git clean -xfd
     pcmd git remote set-url origin git@github.com:tzarc/$repo_name.git
     pcmd git remote set-url origin git@github.com:tzarc/$repo_name.git --push
-    pcmd git remote set-url upstream git@github.com:$repo_upstream/$repo_name.git || pcmd git remote add upstream git@github.com:$repo_upstream/$repo_name.git
+    pcmd git remote set-url upstream git@github.com:$repo_upstream/$repo_name.git \
+        || pcmd git remote add upstream git@github.com:$repo_upstream/$repo_name.git
     pcmd git remote set-url upstream git@github.com:$repo_upstream/$repo_name.git --push
     pcmd git fetch --all --tags --prune
     pcmd git clean -xfd
     pcmd git checkout -f $repo_branch
-    pcmd git reset --hard upstream/$repo_branch || pcmd git reset --hard origin/$repo_branch
+    pcmd git reset --hard upstream/$repo_branch \
+        || pcmd git reset --hard origin/$repo_branch \
+        || pcmd git reset --hard $repo_branch
     pcmd git push origin $repo_branch --force-with-lease
     pcmd git branch -D $target_branch || true
     pcmd git checkout -b $target_branch
-    pcmd git reset --hard upstream/$repo_branch || pcmd git reset --hard origin/$repo_branch
+    pcmd git reset --hard upstream/$repo_branch \
+        || pcmd git reset --hard origin/$repo_branch \
+        || pcmd git reset --hard $repo_branch
 }
 
 upgrade-chibios() {
@@ -67,12 +73,22 @@ upgrade-chibios() {
 
     pushd "$script_dir/qmk_firmware/lib/chibios"
     hard_reset qmk ChibiOS $target_chibios
-    pcmd git push origin $target_branch --set-upstream --force-with-lease
+    if [[ ! -z "$(git remote -v | grep origin | grep push | grep tzarc)" ]] ; then
+        pcmd git push origin $target_branch --set-upstream --force
+    else
+        echo "Failed to push to tzarc/ChibiOS" >&2
+        exit 1
+    fi
     popd
 
     pushd "$script_dir/qmk_firmware/lib/chibios-contrib"
     hard_reset qmk ChibiOS-Contrib $target_chibios_contrib
-    pcmd git push origin $target_branch --set-upstream --force-with-lease
+    if [[ ! -z "$(git remote -v | grep origin | grep push | grep tzarc)" ]] ; then
+        pcmd git push origin $target_branch --set-upstream --force
+    else
+        echo "Failed to push to tzarc/ChibiOS-Contrib" >&2
+        exit 1
+    fi
     popd
 
     pushd "$script_dir/qmk_firmware"
