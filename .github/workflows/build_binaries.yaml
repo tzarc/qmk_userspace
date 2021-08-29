@@ -14,22 +14,35 @@ jobs:
     if: github.repository == 'tzarc/qmk_build'
 
     steps:
+    - name: Install dependencies
+      run: |
+        apt-get update && apt-get install -y bear remake
+
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
 
-    - name: Install dependencies
+    - name: Deploy submodules
       run: |
         sed -i 's#git@github.com:#https://github.com/#g' .gitmodules
         git submodule update --init --recursive
-        cd "qmk_firmware" && git checkout generated-workarea && cd ..
-        apt-get update && apt-get install -y bear remake python3-venv
-        ./bin/qmk --update
+        cd "qmk_firmware" \
+          && git fetch --all --tags \
+          && git checkout generated-workarea \
+          && cd .. \
+          || { echo "FAILED" >&2 ; exit 1 ; }
+
+    - name: Install QMK CLI
+      run: |
+        rm bin/qmk # GitHub actions doesn't like this, use the system-wide QMK CLI instead
+        # ./bin/qmk --update
+        python3 -m pip install --upgrade qmk
+        python3 -m pip install -r qmk_firmware/requirements-dev.txt
 
     - name: Build
       run: |
         export PATH="$(pwd)/bin:$PATH"
-        cd "qmk_firmware" && make git-submodule && qmk doctor && cd ..
+        remake git-submodule
         remake -j1 -O nick
 
     - name: 'Upload binaries'

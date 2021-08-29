@@ -49,11 +49,6 @@ EXTRA_LINK_DEFS := \
 	layout-60_ansi-tzarc!layouts/community/60_ansi/tzarc \
 	users-tzarc!users/tzarc
 
-git-submodule: clean
-	cd $(ROOTDIR)/qmk_firmware \
-		&& git fetch --all --tags \
-		&& git reset --hard origin/$(shell cd $(ROOTDIR)/qmk_firmware && git rev-parse --abbrev-ref HEAD)
-
 all: bin
 
 arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
@@ -85,9 +80,8 @@ format: format_prereq
 
 links: format_prereq extra-links
 
-.INTERMEDIATE: version-h
-version-h:
-	$(ROOTDIR)/bin/qmk generate-version-h -q -o $(ROOTDIR)/qmk_firmware/quantum/version.h
+git-submodule:
+	+$(MAKE) -C "$(ROOTDIR)/qmk_firmware" git-submodule
 
 define handle_link_entry
 link_source_$1 := $$(word 1,$$(subst !, ,$1))
@@ -141,7 +135,7 @@ board_file_$1 := $$(shell echo $$(board_qmk_$1) | sed -e 's@/@_@g' -e 's@:@_@g')
 board_files_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f \( -name '*.h' -or -name '*.c' \) -and -not -name '*conf.h' -and -not -name 'board.c' -and -not -name 'board.h' | sort)
 board_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f | sort)
 
-bin_$$(board_name_$1): board_link_$$(board_name_$1) version-h
+bin_$$(board_name_$1): board_link_$$(board_name_$1)
 	@echo "\e[38;5;14mBuilding: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	+cd "$(ROOTDIR)/qmk_firmware" \
 		&& bear $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false
