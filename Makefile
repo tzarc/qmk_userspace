@@ -8,6 +8,7 @@ export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH
 # Add qmk wrapper to path
 export PATH := $(ROOTDIR)/bin:$(PATH)
 
+export CLANG_TIDY := $(shell find /usr/lib/llvm* -name 'run-clang-tidy.py')
 export CLANG_TIDY_CHECKS := *,-clang-diagnostic-error,-llvm-include-order,-cppcoreguidelines-avoid-non-const-global-variables,-hicpp-braces-around-statements,-readability-braces-around-statements,-google-readability-braces-around-statements,-llvm-header-guard
 export CLANG_TIDY_HEADER_FILTER := .*
 
@@ -138,13 +139,18 @@ board_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f | so
 bin_$$(board_name_$1): board_link_$$(board_name_$1)
 	@echo "\e[38;5;14mBuilding: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	+cd "$(ROOTDIR)/qmk_firmware" \
-		&& bear $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false
-	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR)/qmk_firmware/compile_commands.json $$(ROOTDIR)
+		&& $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false
+	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR) || true
 
-tidy_$$(board_name_$1): bin_$$(board_name_$1)
+tidy_$$(board_name_$1): board_link_$$(board_name_$1)
 	@echo "\e[38;5;14mRunning clang-tidy on: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
+	@rm -f "$$(ROOTDIR)/clang-tidy_$$(board_name_$1).log" || true
 	cd "$(ROOTDIR)/qmk_firmware" \
-		&& /usr/lib/llvm-11/share/clang/run-clang-tidy.py -extra-arg-before='-target arm-none-eabi' -header-filter='$(CLANG_TIDY_HEADER_FILTER)' -checks='$(CLANG_TIDY_CHECKS)' -p . keyboards drivers quantum tmk_core -j9 > $$(ROOTDIR)/clang-tidy_$$(board_name_$1).log 2>&1
+		&& $$(MAKE) distclean \
+		&& bear -- $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false \
+		&& $(CLANG_TIDY) -extra-arg-before='-target arm-none-eabi' -header-filter='$(CLANG_TIDY_HEADER_FILTER)' -checks='$(CLANG_TIDY_CHECKS)' -p . keyboards drivers quantum tmk_core -j9 > "$$(ROOTDIR)/clang-tidy_$$(board_name_$1).log" 2>&1 \
+		|| true
+	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR)/qmk_firmware/compile_commands.json $$(ROOTDIR) || true
 
 flash_$$(board_name_$1): bin_$$(board_name_$1)
 	@echo "\e[38;5;14mFlashing: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"

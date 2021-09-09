@@ -1,8 +1,8 @@
-/* Copyright 2021 Nick Brassel (@tzarc)
+/* Copyright 2020 Nick Brassel (@tzarc)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -16,19 +16,11 @@
 
 #pragma once
 
-// 1000Hz poll rate
-#define USB_POLLING_INTERVAL_MS 1
+#include <qp.h>
 
-// Encoder settings
-#define ENCODER_RESOLUTION 2
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Quantum Painter OLED wrapper device factory
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// LCD blanking period
-#define LCD_ACTIVITY_TIMEOUT 30000
-
-// RGB settings
-#define RGBLIGHT_ANIMATIONS
-#define RGB_MATRIX_KEYPRESSES
-#define RGB_MATRIX_FRAMEBUFFER_EFFECTS
-
-// Allow for an extra sync command over the split
-#define SPLIT_TRANSACTION_IDS_USER USER_DATA_SYNC
+// Factory method for wrapping the normal QMK OLED functionality
+painter_device_t qp_qmk_oled_wrapper_make_device(void);

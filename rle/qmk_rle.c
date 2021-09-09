@@ -83,8 +83,8 @@ int main(int argc, const char* argv[]) {
             printf("   RLE-compressed size: %d\n", (int)rle_size);
             printf("  LZJB-compressed size: %d\n", (int)compressed);
             memset(uncomp, 0, length);
-            uint8_t* uncomp2      = (uint8_t*)calloc(sizeof(uint8_t), length*2);
-            int   decompressed = lzjb_decompress(comp, uncomp2, compressed, length*2);
+            uint8_t* uncomp2      = (uint8_t*)calloc(sizeof(uint8_t), length * 2);
+            int      decompressed = lzjb_decompress(comp, uncomp2, compressed, length * 2);
             printf("LZJB-decompressed size: %d\n", (int)decompressed);
             printf("       LZJB comparison: %s\n", (memcmp(uncomp, uncomp2, length) == 0) ? "match" : "mismatch");
             free(uncomp2);

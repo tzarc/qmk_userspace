@@ -104,9 +104,9 @@ int lzjb_decompress(void* s_start, void* d_start, size_t s_len, size_t d_len) {
     uint8_t* s_end = (uint8_t*)s_start + s_len;
     uint8_t* d_end = (uint8_t*)d_start + d_len;
     uint8_t* cpy;
-    uint8_t  copymap  = 0;
-    int      copymask = 1 << (NBBY - 1);
-    int max_offset = -1;
+    uint8_t  copymap    = 0;
+    int      copymask   = 1 << (NBBY - 1);
+    int      max_offset = -1;
 
     while (src < s_end) {
         if ((copymask <<= 1) == (1 << NBBY)) {

@@ -15,7 +15,8 @@
  */
 
 #include <string.h>
-#include <hal.h>
+#include <quantum.h>
+#include <hal_pal.h>
 
 #include "djinn.h"
 #include "serial.h"
