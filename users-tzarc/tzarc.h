@@ -24,6 +24,12 @@
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Config
+
+#define WOW_KEY_MIN (KC_A)
+#define WOW_KEY_MAX (KC_NUMLOCK)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Common functionality
 
 extern bool     config_enabled;
@@ -58,7 +64,7 @@ layer_state_t layer_state_set_user(layer_state_t state);
 
 __attribute__((packed)) struct tzarc_eeprom_cfg_t {
     uint8_t magic1;
-    uint8_t wow_enabled[BITMASK_BYTES_REQUIRED(KC_0, KC_A)];
+    uint8_t wow_enabled[BITMASK_BYTES_REQUIRED(WOW_KEY_MAX, WOW_KEY_MIN)];
     uint8_t d3_enabled[BITMASK_BYTES_REQUIRED(KC_4, KC_1)];
     uint8_t magic2;
 };
@@ -76,11 +82,13 @@ void tzarc_eeprom_load(void);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // WoW
 
-#define WOW_BUTTON_COUNT (KC_0 - KC_A + 1)
+#define WOW_KEY_OFFSET(kc) ((kc) - (WOW_KEY_MIN))
+#define WOW_BUTTON_COUNT (WOW_KEY_OFFSET(WOW_KEY_MAX) + 1)
 
 struct wow_config_t {
-    uint8_t  keydown[BITMASK_BYTES_REQUIRED(KC_0, KC_A)];
-    uint8_t  released[BITMASK_BYTES_REQUIRED(KC_0, KC_A)];
+    uint8_t  keydown[BITMASK_BYTES_REQUIRED(WOW_KEY_MAX, WOW_KEY_MIN)];
+    uint8_t  released[BITMASK_BYTES_REQUIRED(WOW_KEY_MAX, WOW_KEY_MIN)];
+    uint8_t  auto_registered[BITMASK_BYTES_REQUIRED(WOW_KEY_MAX, WOW_KEY_MIN)];
     uint32_t last_keydown[WOW_BUTTON_COUNT];
     uint32_t next_trigger[WOW_BUTTON_COUNT];
 };

@@ -152,6 +152,13 @@ tidy_$$(board_name_$1): board_link_$$(board_name_$1)
 		|| true
 	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR)/qmk_firmware/compile_commands.json $$(ROOTDIR) || true
 
+db_$$(board_name_$1): board_link_$$(board_name_$1)
+	@echo "\e[38;5;14mCreating compiledb for: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
+	cd "$(ROOTDIR)/qmk_firmware" \
+		&& $$(MAKE) distclean \
+		&& qmk generate-compilation-database -kb $$(board_qmk_$1) -km $$(board_keymap_$1)
+	@cp $$(ROOTDIR)/qmk_firmware/compile_commands.json $$(ROOTDIR) || true
+
 flash_$$(board_name_$1): bin_$$(board_name_$1)
 	@echo "\e[38;5;14mFlashing: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	cd "$(ROOTDIR)/qmk_firmware" \

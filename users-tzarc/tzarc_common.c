@@ -452,7 +452,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     } else if (typing_mode == KC_ZALGO) {
         return process_record_zalgo(keycode, record);
     } else if (typing_mode == KC_WOWMODE) {
-        if ((KC_A <= keycode) && (keycode <= KC_0)) {
+        if ((WOW_KEY_MIN <= keycode) && (keycode <= WOW_KEY_MAX)) {
             return process_record_wow(keycode, record);
         }
     } else if (typing_mode == KC_D3MODE) {
