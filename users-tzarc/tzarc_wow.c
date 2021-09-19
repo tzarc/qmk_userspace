@@ -186,7 +186,7 @@ void matrix_scan_wow(void) {
                 wow_key_auto_registered_set(keycode, false);
             } else {
                 // Toggle the keypress with random timing below
-                if(!wow_key_auto_registered_get(keycode)) {
+                if (!wow_key_auto_registered_get(keycode)) {
                     register_code(keycode);
                     wow_key_auto_registered_set(keycode, true);
                 } else {

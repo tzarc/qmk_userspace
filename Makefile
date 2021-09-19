@@ -139,18 +139,22 @@ board_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f | so
 bin_$$(board_name_$1): board_link_$$(board_name_$1)
 	@echo "\e[38;5;14mBuilding: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	+cd "$(ROOTDIR)/qmk_firmware" \
-		&& $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false
-	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR) || true
+		&& $$(MAKE) distclean \
+		&& qmk generate-compilation-database -kb $$(board_qmk_$1) -km $$(board_keymap_$1) \
+		&& $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false CREATE_MAP=yes EXTRALDFLAGS=-Wl,--print-memory-usage
+	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR)/qmk_firmware/compile_commands.json $$(ROOTDIR) \
+		&& sed -i 's@/home/nickb/qmk_build/qmk_firmware@W:\\\\qmk_build\\\\qmk_firmware@g' $$(ROOTDIR)/compile_commands.json \
+		|| true
 
-tidy_$$(board_name_$1): board_link_$$(board_name_$1)
+tidy_$$(board_name_$1): bin_$$(board_name_$1)
 	@echo "\e[38;5;14mRunning clang-tidy on: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	@rm -f "$$(ROOTDIR)/clang-tidy_$$(board_name_$1).log" || true
 	cd "$(ROOTDIR)/qmk_firmware" \
-		&& $$(MAKE) distclean \
-		&& bear -- $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false \
-		&& $(CLANG_TIDY) -extra-arg-before='-target arm-none-eabi' -header-filter='$(CLANG_TIDY_HEADER_FILTER)' -checks='$(CLANG_TIDY_CHECKS)' -p . keyboards drivers quantum tmk_core -j9 > "$$(ROOTDIR)/clang-tidy_$$(board_name_$1).log" 2>&1 \
+		&& $(CLANG_TIDY) -header-filter='$(CLANG_TIDY_HEADER_FILTER)' -checks='$(CLANG_TIDY_CHECKS)' -p . keyboards drivers quantum tmk_core -j9 > "$$(ROOTDIR)/clang-tidy_$$(board_name_$1).log" 2>&1 \
 		|| true
-	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR)/qmk_firmware/compile_commands.json $$(ROOTDIR) || true
+
+#&& bear -- $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false \
+
 
 db_$$(board_name_$1): board_link_$$(board_name_$1)
 	@echo "\e[38;5;14mCreating compiledb for: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"

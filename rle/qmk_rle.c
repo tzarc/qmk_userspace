@@ -22,11 +22,13 @@
 
 #define LZJB_COMPRESSOR
 
+#include "../qmk_firmware/quantum/painter/stream.c"
 #include "../qmk_firmware/quantum/painter/rle.c"
 #include "lzjb.c"
 
 int main(int argc, const char* argv[]) {
     bool        decode          = false;
+    bool        lzjb            = false;
     const char* input_filename  = "-";
     const char* output_filename = "-";
     for (int i = 1; i < argc; ++i) {
@@ -44,6 +46,9 @@ int main(int argc, const char* argv[]) {
             ++i;
             if (i >= argc) return -1;
             output_filename = argv[i];
+        } else if (strcmp(arg, "-l") == 0)  // also run LZJB compression
+        {
+            lzjb = true;
         }
     }
 
@@ -52,25 +57,22 @@ int main(int argc, const char* argv[]) {
     FILE* output_file = strcmp(output_filename, "-") == 0 ? stdout : fopen(output_filename, "wb");
     if (!output_file) return -1;
 
-    file_rle_stream_t in  = make_file_rle_stream_t(input_file);
-    file_rle_stream_t out = make_file_rle_stream_t(output_file);
+    file_stream_t in  = make_file_stream(input_file);
+    file_stream_t out = make_file_stream(output_file);
 
     int ret;
     if (decode) {
-        ret = rle_decode((rle_stream_t*)&in, (rle_stream_t*)&out) ? 0 : -1;
+        ret = rle_decode((stream_t*)&in, (stream_t*)&out) ? 0 : -1;
     } else {
-        ret = rle_encode((rle_stream_t*)&in, (rle_stream_t*)&out) ? 0 : -1;
+        ret = rle_encode((stream_t*)&in, (stream_t*)&out) ? 0 : -1;
     }
 
-    long rle_size = 0;
-    if (input_filename[0] != '-' && input_filename[1] != '\0') {
-        rle_size = ftell(output_file);
-    }
+    long rle_size = stream_tell(out);
 
     fclose(input_file);
     fclose(output_file);
 
-    if (input_filename[0] != '-' && input_filename[1] != '\0') {
+    if (lzjb && input_filename[0] != '-' && input_filename[1] != '\0') {
         input_file = fopen(input_filename, "rb");
         if (input_file) {
             fseek(input_file, 0, SEEK_END);

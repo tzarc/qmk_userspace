@@ -51,53 +51,6 @@
 #define OFFSET_MASK ((1 << (16 - MATCH_BITS)) - 1)
 #define LEMPEL_SIZE 1024
 
-#ifdef LZJB_COMPRESSOR
-size_t lzjb_compress(void* s_start, void* d_start, size_t s_len, size_t d_len) {
-    uint8_t*  src = s_start;
-    uint8_t*  dst = d_start;
-    uint8_t*  cpy;
-    uint8_t*  copymap  = NULL;
-    int       copymask = 1 << (NBBY - 1);
-    int       mlen, offset, hash;
-    uint16_t* hp;
-    uint16_t  lempel_buf[LEMPEL_SIZE] = {0};
-    uint16_t* lempel                  = lempel_buf;
-    while (src < (uint8_t*)s_start + s_len) {
-        if ((copymask <<= 1) == (1 << NBBY)) {
-            if (dst >= (uint8_t*)d_start + d_len - 1 - 2 * NBBY) {
-                return (s_len);
-            }
-            copymask = 1;
-            copymap  = dst;
-            *dst++   = 0;
-        }
-        if (src > (uint8_t*)s_start + s_len - MATCH_MAX) {
-            *dst++ = *src++;
-            continue;
-        }
-        hash = (src[0] << 16) + (src[1] << 8) + src[2];
-        hash += hash >> 9;
-        hash += hash >> 5;
-        hp     = &lempel[hash & (LEMPEL_SIZE - 1)];
-        offset = (intptr_t)(src - *hp) & OFFSET_MASK;
-        *hp    = (uint16_t)(uintptr_t)src;
-        cpy    = src - offset;
-        if (cpy >= (uint8_t*)s_start && cpy != src && src[0] == cpy[0] && src[1] == cpy[1] && src[2] == cpy[2]) {
-            *copymap |= copymask;
-            for (mlen = MATCH_MIN; mlen < MATCH_MAX; mlen++)
-                if (src[mlen] != cpy[mlen]) break;
-            *dst++ = ((mlen - MATCH_MIN) << (NBBY - MATCH_BITS)) | (offset >> NBBY);
-            *dst++ = (uint8_t)offset;
-            src += mlen;
-        } else {
-            *dst++ = *src++;
-        }
-    }
-
-    return (dst - (uint8_t*)d_start);
-}
-#endif  // LZJB_COMPRESSOR
-
 int lzjb_decompress(void* s_start, void* d_start, size_t s_len, size_t d_len) {
     uint8_t* src   = s_start;
     uint8_t* dst   = d_start;
@@ -127,3 +80,52 @@ int lzjb_decompress(void* s_start, void* d_start, size_t s_len, size_t d_len) {
     printf("Max offset: %d\n", max_offset);
     return (dst - (uint8_t*)d_start);
 }
+
+#ifdef LZJB_COMPRESSOR
+size_t lzjb_compress(void* s_start, void* d_start, size_t s_len, size_t d_len) {
+    uint8_t*  src   = s_start;
+    uint8_t*  dst   = d_start;
+    uint8_t*  s_end = (uint8_t*)s_start + s_len;
+    uint8_t*  d_end = (uint8_t*)d_start + d_len;
+    uint8_t*  cpy;
+    uint8_t*  copymap  = NULL;
+    int       copymask = 1 << (NBBY - 1);
+    int       mlen, offset, hash;
+    uint16_t* hp;
+    uint16_t  lempel_buf[LEMPEL_SIZE] = {0};
+    uint16_t* lempel                  = lempel_buf;
+    while (src < s_end) {
+        if ((copymask <<= 1) == (1 << NBBY)) {
+            if (dst >= d_end - 1 - 2 * NBBY) {
+                return (s_len);
+            }
+            copymask = 1;
+            copymap  = dst;
+            *dst++   = 0;
+        }
+        if (src > s_end - MATCH_MAX) {
+            *dst++ = *src++;
+            continue;
+        }
+        hash = (src[0] << 16) + (src[1] << 8) + src[2];
+        hash += hash >> 9;
+        hash += hash >> 5;
+        hp     = &lempel[hash & (LEMPEL_SIZE - 1)];
+        offset = (intptr_t)(src - *hp) & OFFSET_MASK;
+        *hp    = (uint16_t)(uintptr_t)src;
+        cpy    = src - offset;
+        if (cpy >= (uint8_t*)s_start && cpy != src && src[0] == cpy[0] && src[1] == cpy[1] && src[2] == cpy[2]) {
+            *copymap |= copymask;
+            for (mlen = MATCH_MIN; mlen < MATCH_MAX; mlen++)
+                if (src[mlen] != cpy[mlen]) break;
+            *dst++ = ((mlen - MATCH_MIN) << (NBBY - MATCH_BITS)) | (offset >> NBBY);
+            *dst++ = (uint8_t)offset;
+            src += mlen;
+        } else {
+            *dst++ = *src++;
+        }
+    }
+
+    return (dst - (uint8_t*)d_start);
+}
+#endif  // LZJB_COMPRESSOR

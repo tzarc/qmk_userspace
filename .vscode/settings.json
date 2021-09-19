@@ -48,6 +48,13 @@
     "nodebug.h": "c",
     "wait.h": "c",
     "rle.h": "c",
-    "hal_pal.h": "c"
+    "hal_pal.h": "c",
+    "*.tcc": "c",
+    "string": "c",
+    "sstream": "c",
+    "qp_comms_spi.h": "c",
+    "qp_ili9xxx_internal.h": "c",
+    "gpio.h": "c",
+    "stddef.h": "c"
   }
 }

@@ -9,6 +9,7 @@ script_dir="$(realpath "$(dirname "$this_script")")"
 cd "$script_dir/build"
 
 cmake -G Ninja ..
+ninja clean
 ninja
 
 run_test() {
@@ -16,8 +17,8 @@ run_test() {
     [ "${1:-}" == "-q" ] && quiet=1
     cat > tmp.orig
 
-    cat tmp.orig | ./qmk_rle > tmp.rle
-    ./qmk_rle -d -i tmp.rle > tmp.dec
+    ./qmk_rle -i tmp.orig -o tmp.rle -l
+    ./qmk_rle -d -i tmp.rle -o tmp.dec
 
     local orig_sha1=$(sha1sum tmp.orig | awk '{print $1}')
     local dec_sha1=$(sha1sum tmp.dec | awk '{print $1}')
@@ -81,8 +82,3 @@ run_test() {
 {
     for n in {1..10}; do printf "0123456789abcdef"; done
 } | run_test
-
-# Run random tests
-for n in {1..64} ; do
-    dd if=/dev/urandom bs=1024 count=32 2>/dev/null | run_test -q
-done

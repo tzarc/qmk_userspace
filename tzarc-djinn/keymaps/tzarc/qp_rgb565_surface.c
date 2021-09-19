@@ -364,6 +364,22 @@ int16_t qp_rgb565_surface_drawtext(painter_device_t device, uint16_t x, uint16_t
 // Device creation
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Driver vtable
+static const struct painter_driver_vtable_t QP_RESIDENT_FLASH display_vtable = {
+    .init      = qp_rgb565_surface_init,
+    .clear     = qp_rgb565_surface_clear,
+    .power     = qp_rgb565_surface_power,
+    .pixdata   = qp_rgb565_surface_pixdata,
+    .viewport  = qp_rgb565_surface_viewport,
+    .setpixel  = qp_rgb565_surface_setpixel,
+    .line      = qp_fallback_line,
+    .rect      = qp_fallback_rect,
+    .circle    = qp_fallback_circle,
+    .ellipse   = qp_fallback_ellipse,
+    .drawimage = qp_rgb565_surface_drawimage,
+    .drawtext  = qp_rgb565_surface_drawtext,
+};
+
 // Driver storage
 static qmk_rgb565_surface_device_t driver = {0};
 
@@ -379,20 +395,9 @@ painter_device_t qp_rgb565_surface_make_device(uint16_t width, uint16_t height) 
         return NULL;
     }
 
-    driver.qp_driver.init      = qp_rgb565_surface_init;
-    driver.qp_driver.clear     = qp_rgb565_surface_clear;
-    driver.qp_driver.power     = qp_rgb565_surface_power;
-    driver.qp_driver.pixdata   = qp_rgb565_surface_pixdata;
-    driver.qp_driver.viewport  = qp_rgb565_surface_viewport;
-    driver.qp_driver.setpixel  = qp_rgb565_surface_setpixel;
-    driver.qp_driver.line      = qp_fallback_line;
-    driver.qp_driver.rect      = qp_fallback_rect;
-    driver.qp_driver.circle    = qp_fallback_circle;
-    driver.qp_driver.ellipse   = qp_fallback_ellipse;
-    driver.qp_driver.drawimage = qp_rgb565_surface_drawimage;
-    driver.qp_driver.drawtext  = qp_rgb565_surface_drawtext;
-    driver.width               = width;
-    driver.height              = height;
+    driver.qp_driver.vtable = &display_vtable;
+    driver.width            = width;
+    driver.height           = height;
     return (painter_device_t)&driver;
 }
 
