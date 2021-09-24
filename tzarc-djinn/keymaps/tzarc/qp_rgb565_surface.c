@@ -67,11 +67,11 @@ typedef struct qmk_rgb565_surface_device_t {
 
 // Static buffer to contain a generated color palette
 #if QUANTUM_PAINTER_SUPPORTS_256_PALETTE
-static HSV      hsv_lookup_table[256];
-static uint16_t rgb565_palette[256];
+static qp_pixel_color_t hsv_lookup_table[256];
+static uint16_t         rgb565_palette[256];
 #else
-static HSV      hsv_lookup_table[16];
-static uint16_t rgb565_palette[16];
+static qp_pixel_color_t hsv_lookup_table[16];
+static uint16_t         rgb565_palette[16];
 #endif
 
 #define BYTE_SWAP(x) (((((uint16_t)(x)) >> 8) & 0x00FF) | ((((uint16_t)(x)) << 8) & 0xFF00))
@@ -177,9 +177,9 @@ static inline void stream_mono_pixdata_recolor(qmk_rgb565_surface_device_t *surf
 
         // Generate the color lookup table
         uint16_t items = 1 << bits_per_pixel;  // number of items we need to interpolate
-        qp_generate_palette(hsv_lookup_table, items, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
+        qp_interpolate_palette(hsv_lookup_table, items, (qp_pixel_color_t){.hsv888 = {.h = hue_fg, .s = sat_fg, .v = val_fg}}, (qp_pixel_color_t){.hsv888 = {.h = hue_bg, .s = sat_bg, .v = val_bg}});
         for (uint16_t i = 0; i < items; ++i) {
-            rgb565_palette[i] = hsv_to_rgb565(hsv_lookup_table[i].h, hsv_lookup_table[i].s, hsv_lookup_table[i].v);
+            rgb565_palette[i] = hsv_to_rgb565(hsv_lookup_table[i].hsv888.h, hsv_lookup_table[i].hsv888.s, hsv_lookup_table[i].hsv888.v);
         }
     }
 
@@ -365,7 +365,7 @@ int16_t qp_rgb565_surface_drawtext(painter_device_t device, uint16_t x, uint16_t
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Driver vtable
-static const struct painter_driver_vtable_t QP_RESIDENT_FLASH display_vtable = {
+static const struct painter_driver_vtable_t QP_RESIDENT_FLASH driver_vtable = {
     .init      = qp_rgb565_surface_init,
     .clear     = qp_rgb565_surface_clear,
     .power     = qp_rgb565_surface_power,
@@ -395,13 +395,13 @@ painter_device_t qp_rgb565_surface_make_device(uint16_t width, uint16_t height) 
         return NULL;
     }
 
-    driver.qp_driver.vtable = &display_vtable;
-    driver.width            = width;
-    driver.height           = height;
+    driver.qp_driver.driver_vtable = &driver_vtable;
+    driver.width                   = width;
+    driver.height                  = height;
     return (painter_device_t)&driver;
 }
 
-const void *const qp_rgb565_surface_get_buffer_ptr(painter_device_t device) {
+const void *qp_rgb565_surface_get_buffer_ptr(painter_device_t device) {
     qmk_rgb565_surface_device_t *surf = (qmk_rgb565_surface_device_t *)device;
     return surf->buffer;
 }

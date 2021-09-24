@@ -55,6 +55,7 @@
     "qp_comms_spi.h": "c",
     "qp_ili9xxx_internal.h": "c",
     "gpio.h": "c",
-    "stddef.h": "c"
+    "stddef.h": "c",
+    "qp_internal.h": "c"
   }
 }
