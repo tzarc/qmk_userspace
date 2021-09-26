@@ -4,14 +4,6 @@
 			"path": "."
 		},
 		{
-			"path": "qmk_firmware\\keyboards\\handwired\\tzarc",
-			"name": "handwired-tzarc"
-		},
-		{
-			"path": "qmk_firmware\\keyboards\\tzarc",
-			"name": "keyboards-tzarc"
-		},
-		{
 			"path": "qmk_firmware\\drivers\\painter",
 			"name": "drivers-painter"
 		},

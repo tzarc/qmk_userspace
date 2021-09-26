@@ -15,6 +15,26 @@ distclean: clean
 ################################################################################################################################################################
 # Fonts
 
+generated-files: $(GENERATED_OUTPUT)/balthasar.h
+
+$(GENERATED_OUTPUT)/balthasar.png: $(USER_PATH)/Makefile $(USER_PATH)/BalthasarRegularNbp-va6O.ttf
+	[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
+	$(QMK_BIN) painter-make-font-image --font $(USER_PATH)/BalthasarRegularNbp-va6O.ttf --size 16 -o $(GENERATED_OUTPUT)/balthasar.png
+
+$(GENERATED_OUTPUT)/balthasar.h: $(GENERATED_OUTPUT)/balthasar.png
+	[ -d $(GENERATED_OUTPUT) ] || mkdir -p $(GENERATED_OUTPUT)
+	$(QMK_BIN) painter-convert-font-image --input $(GENERATED_OUTPUT)/balthasar.png -f mono2
+
+generated-files: $(GENERATED_OUTPUT)/epilepsysansbold.h
+
+$(GENERATED_OUTPUT)/epilepsysansbold.png: $(USER_PATH)/Makefile $(USER_PATH)/EpilepsySansBold-o0W4.ttf
+	[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
+	$(QMK_BIN) painter-make-font-image --font $(USER_PATH)/EpilepsySansBold-o0W4.ttf --size 13 -o $(GENERATED_OUTPUT)/epilepsysansbold.png
+
+$(GENERATED_OUTPUT)/epilepsysansbold.h: $(GENERATED_OUTPUT)/epilepsysansbold.png
+	[ -d $(GENERATED_OUTPUT) ] || mkdir -p $(GENERATED_OUTPUT)
+	$(QMK_BIN) painter-convert-font-image --input $(GENERATED_OUTPUT)/epilepsysansbold.png -f mono4
+
 generated-files: $(GENERATED_OUTPUT)/noto11.h
 
 $(GENERATED_OUTPUT)/noto11.png: $(USER_PATH)/Makefile $(USER_PATH)/NotoSans-ExtraCondensedBold.ttf
@@ -74,6 +94,16 @@ $(GENERATED_OUTPUT)/thintel15.png: $(USER_PATH)/Makefile $(USER_PATH)/Thintel.tt
 $(GENERATED_OUTPUT)/thintel15.h: $(GENERATED_OUTPUT)/thintel15.png
 	[ -d $(GENERATED_OUTPUT) ] || mkdir -p $(GENERATED_OUTPUT)
 	$(QMK_BIN) painter-convert-font-image --input $(GENERATED_OUTPUT)/thintel15.png -f mono2
+
+generated-files: $(GENERATED_OUTPUT)/hannover23.h
+
+$(GENERATED_OUTPUT)/hannover23.png: $(USER_PATH)/Makefile $(USER_PATH)/HannoverMesseSans-dewK.ttf
+	[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
+	$(QMK_BIN) painter-make-font-image --font $(USER_PATH)/HannoverMesseSans-dewK.ttf --size 23 -o $(GENERATED_OUTPUT)/hannover23.png
+
+$(GENERATED_OUTPUT)/hannover23.h: $(GENERATED_OUTPUT)/hannover23.png
+	[ -d $(GENERATED_OUTPUT) ] || mkdir -p $(GENERATED_OUTPUT)
+	$(QMK_BIN) painter-convert-font-image --input $(GENERATED_OUTPUT)/hannover23.png -f mono2
 
 ################################################################################################################################################################
 # Key lock images

@@ -35,14 +35,13 @@ __attribute__((weak)) void draw_ui_user(void) {}
 
 const char* usbpd_str(usbpd_allowance_t allowance) {
     switch (allowance) {
+        default:
         case USBPD_500MA:
             return "500mA";
         case USBPD_1500MA:
             return "1500mA";
         case USBPD_3000MA:
             return "3000mA";
-        default:
-            return "500mA";
     }
 }
 
@@ -269,7 +268,7 @@ void keyboard_post_init_kb(void) {
     wait_ms(50);
 
     // Initialise the LCD
-    lcd = qp_ili9341_make_spi_device(LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, 4, true);
+    lcd = qp_ili9341_make_spi_device(LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, 4);
     qp_init(lcd, QP_ROTATION_0);
 
     // Turn on the LCD and clear the display

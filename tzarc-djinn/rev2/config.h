@@ -27,7 +27,7 @@
 #    define SERIAL_USART_RX_PIN B11
 #    define SERIAL_USART_RX_PAL_MODE 7
 #    ifndef SERIAL_USART_SPEED
-#        define SERIAL_USART_SPEED 1500000
+#        define SERIAL_USART_SPEED 1200000
 #    endif  // SERIAL_USART_SPEED
 #    define SERIAL_USART_FULL_DUPLEX
 #endif  // defined(SERIAL_DRIVER_USART)

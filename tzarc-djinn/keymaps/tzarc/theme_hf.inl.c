@@ -7,7 +7,7 @@
 #include "graphics/src/hf_lock_num_OFF.c"
 #include "graphics/src/hf_lock_scrl_ON.c"
 #include "graphics/src/hf_lock_scrl_OFF.c"
-#include "graphics/src/minecraftia8.c"
+#include "graphics/src/thintel15.c"
 
 void draw_ui_user(void) {
     bool            layer_state_redraw = false;
@@ -58,21 +58,23 @@ void draw_ui_user(void) {
         }
     }
 
-    int ypadding = 8;
-    int ypos     = 319 - (font_minecraftia8->glyph_height + ypadding);
+    int initial_xpos = 8;
+    int ypadding     = 8;
+    int ypos         = 319 - (font_thintel15->glyph_height + ypadding);
 
     uint8_t text_fg_hue = (180 * 255) / 360;
+    uint8_t text_fg_sat = 0;
     uint8_t text_bg_hue = (272 * 255) / 360;
 
     // Show layer info on the left side
     if (is_keyboard_left()) {
         char buf[32] = {0};
-        int  xpos    = 16;
+        int  xpos    = initial_xpos;
 
 #if defined(RGB_MATRIX_ENABLE)
         if (!first_draw_complete || rgb_effect_redraw) {
             static int max_rgb_xpos = 0;
-            xpos                    = 16;
+            xpos                    = initial_xpos;
             snprintf_(buf, sizeof(buf), "rgb: %s", rgb_matrix_name(curr_effect));
 
             for (int i = 5; i < sizeof(buf); ++i) {
@@ -86,14 +88,14 @@ void draw_ui_user(void) {
                     buf[i] = tolower(buf[i]);
             }
 
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_minecraftia8, buf, text_fg_hue, 255, 255, text_bg_hue, (98 * 255) / 100, 255);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, text_fg_hue, text_fg_sat, 255, text_bg_hue, (98 * 255) / 100, 255);
             if (max_rgb_xpos < xpos) {
                 max_rgb_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_rgb_xpos, ypos + font_minecraftia8->glyph_height, text_bg_hue, (98 * 255) / 100, 255, true);
+            qp_rect(lcd, xpos, ypos, max_rgb_xpos, ypos + font_thintel15->glyph_height, text_bg_hue, (98 * 255) / 100, 255, true);
         }
 
-        ypos -= font_minecraftia8->glyph_height + ypadding;
+        ypos -= font_thintel15->glyph_height + ypadding;
 #endif  // defined(RGB_MATRIX_ENABLE)
 
         if (!first_draw_complete || layer_state_redraw) {
@@ -114,55 +116,55 @@ void draw_ui_user(void) {
             }
 
             static int max_layer_xpos = 0;
-            xpos                      = 16;
+            xpos                      = initial_xpos;
             snprintf_(buf, sizeof(buf), "layer: %s", layer_name);
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_minecraftia8, buf, text_fg_hue, 255, 255, text_bg_hue, (98 * 255) / 100, 255);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, text_fg_hue, text_fg_sat, 255, text_bg_hue, (98 * 255) / 100, 255);
             if (max_layer_xpos < xpos) {
                 max_layer_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_layer_xpos, ypos + font_minecraftia8->glyph_height, text_bg_hue, (98 * 255) / 100, 255, true);
+            qp_rect(lcd, xpos, ypos, max_layer_xpos, ypos + font_thintel15->glyph_height, text_bg_hue, (98 * 255) / 100, 255, true);
         }
 
-        ypos -= font_minecraftia8->glyph_height + ypadding;
+        ypos -= font_thintel15->glyph_height + ypadding;
 
         if (!first_draw_complete || power_state_redraw) {
             static int max_power_xpos = 0;
-            xpos                      = 16;
+            xpos                      = initial_xpos;
             snprintf_(buf, sizeof(buf), "power: %s", usbpd_str(kb_state.current_setting));
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_minecraftia8, buf, text_fg_hue, 255, 255, text_bg_hue, (98 * 255) / 100, 255);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, text_fg_hue, text_fg_sat, 255, text_bg_hue, (98 * 255) / 100, 255);
             if (max_power_xpos < xpos) {
                 max_power_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_power_xpos, ypos + font_minecraftia8->glyph_height, text_bg_hue, (98 * 255) / 100, 255, true);
+            qp_rect(lcd, xpos, ypos, max_power_xpos, ypos + font_thintel15->glyph_height, text_bg_hue, (98 * 255) / 100, 255, true);
         }
 
-        ypos -= font_minecraftia8->glyph_height + ypadding;
+        ypos -= font_thintel15->glyph_height + ypadding;
 
         if (!first_draw_complete || scan_redraw) {
             static int max_scans_xpos = 0;
-            xpos                      = 16;
+            xpos                      = initial_xpos;
             snprintf_(buf, sizeof(buf), "scans: %d", (int)user_state.scan_rate);
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_minecraftia8, buf, text_fg_hue, 255, 255, text_bg_hue, (98 * 255) / 100, 255);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, text_fg_hue, text_fg_sat, 255, text_bg_hue, (98 * 255) / 100, 255);
             if (max_scans_xpos < xpos) {
                 max_scans_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_scans_xpos, ypos + font_minecraftia8->glyph_height, text_bg_hue, (98 * 255) / 100, 255, true);
+            qp_rect(lcd, xpos, ypos, max_scans_xpos, ypos + font_thintel15->glyph_height, text_bg_hue, (98 * 255) / 100, 255, true);
         }
 
-        ypos -= font_minecraftia8->glyph_height + 6;
+        ypos -= font_thintel15->glyph_height + 6;
 
         if (!first_draw_complete || wpm_redraw) {
             static int max_wpm_xpos = 0;
-            xpos                    = 16;
+            xpos                    = initial_xpos;
             snprintf_(buf, sizeof(buf), "wpm: %d", (int)get_current_wpm());
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_minecraftia8, buf, text_fg_hue, 255, 255, text_bg_hue, (98 * 255) / 100, 255);
+            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, text_fg_hue, text_fg_sat, 255, text_bg_hue, (98 * 255) / 100, 255);
             if (max_wpm_xpos < xpos) {
                 max_wpm_xpos = xpos;
             }
-            qp_rect(lcd, xpos, ypos, max_wpm_xpos, ypos + font_minecraftia8->glyph_height, text_bg_hue, (98 * 255) / 100, 255, true);
+            qp_rect(lcd, xpos, ypos, max_wpm_xpos, ypos + font_thintel15->glyph_height, text_bg_hue, (98 * 255) / 100, 255, true);
         }
 
-        ypos -= font_minecraftia8->glyph_height + ypadding;
+        ypos -= font_thintel15->glyph_height + ypadding;
     }
 
     // Show LED lock indicators on the right side

@@ -25,7 +25,7 @@
 #include <split_util.h>
 
 #include "tzarc.h"
-#include "qp_rgb565_surface.h"
+//#include "qp_rgb565_surface.h"
 
 #define MEDIA_KEY_DELAY 5
 
@@ -236,6 +236,7 @@ void slave_counter_sync_callback(uint8_t initiator2target_buffer_size, const voi
 }
 
 void keyboard_post_init_keymap(void) {
+    /*
     // Initialise the framebuffer
     surf = qp_rgb565_surface_make_device(8, 320);
     qp_init(surf, QP_ROTATION_0);
@@ -245,6 +246,7 @@ void keyboard_post_init_keymap(void) {
 
     qp_viewport(lcd, 240 - 8 - 8 - 8, 0, 240 - 8 - 8 - 1, 319);
     qp_pixdata(lcd, qp_rgb565_surface_get_buffer_ptr(surf), qp_rgb565_surface_get_pixel_count(surf));
+    */
 
     // Register keyboard state sync split transaction
     transaction_register_rpc(RPC_ID_SYNC_STATE_USER, rpc_user_sync_callback);
@@ -314,8 +316,8 @@ void housekeeping_task_keymap(void) {
 
 //----------------------------------------------------------
 // Display
-//#include "theme_djinn.inl.c"
-#include "theme_hf.inl.c"
+#include "theme_djinn.inl.c"
+//#include "theme_hf.inl.c"
 
 //----------------------------------------------------------
 // Lua
