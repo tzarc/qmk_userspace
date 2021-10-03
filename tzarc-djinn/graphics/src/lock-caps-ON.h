@@ -22,4 +22,4 @@
 
 #include <qp.h>
 
-extern painter_image_t gfx_lock_caps_ON PROGMEM;
+extern painter_image_t gfx_lock_caps_ON QP_RESIDENT_FLASH;

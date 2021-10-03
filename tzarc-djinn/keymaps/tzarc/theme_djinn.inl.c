@@ -57,7 +57,7 @@ void draw_ui_user(void) {
 
     // Show the Djinn logo and two vertical bars on both sides
     if (hue_redraw) {
-        qp_drawimage_recolor(lcd, 120 - gfx_djinn->width / 2, 32, gfx_djinn, curr_hue, 255, 255);
+        qp_drawimage_recolor(lcd, 120 - gfx_djinn->width / 2, 32, gfx_djinn, curr_hue, 255, 255, curr_hue, 255, 0);
         qp_rect(lcd, 0, 0, 8, 319, curr_hue, 255, 255, true);
         qp_rect(lcd, 231, 0, 239, 319, curr_hue, 255, 255, false);
 
@@ -70,6 +70,8 @@ void draw_ui_user(void) {
         qp_ellipse(lcd, 214 - 8, 14, 4, 8, curr_hue, 255, 255, false);
         qp_ellipse(lcd, 225 - 8, 25, 8, 4, curr_hue, 255, 255, true);
     }
+
+    return;
 
     int ypos = 4;
 
@@ -179,9 +181,9 @@ void draw_ui_user(void) {
         static led_t last_led_state = {0};
         if (hue_redraw || last_led_state.raw != host_keyboard_led_state().raw) {
             last_led_state.raw = host_keyboard_led_state().raw;
-            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 3), 0, last_led_state.caps_lock ? gfx_lock_caps_ON : gfx_lock_caps_OFF, curr_hue, 255, last_led_state.caps_lock ? 255 : 32);
-            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 2), 0, last_led_state.num_lock ? gfx_lock_num_ON : gfx_lock_num_OFF, curr_hue, 255, last_led_state.num_lock ? 255 : 32);
-            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 1), 0, last_led_state.scroll_lock ? gfx_lock_scrl_ON : gfx_lock_scrl_OFF, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32);
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 3), 0, last_led_state.caps_lock ? gfx_lock_caps_ON : gfx_lock_caps_OFF, curr_hue, 255, last_led_state.caps_lock ? 255 : 32, curr_hue, 255, 0);
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 2), 0, last_led_state.num_lock ? gfx_lock_num_ON : gfx_lock_num_OFF, curr_hue, 255, last_led_state.num_lock ? 255 : 32, curr_hue, 255, 0);
+            qp_drawimage_recolor(lcd, 239 - 12 - (32 * 1), 0, last_led_state.scroll_lock ? gfx_lock_scrl_ON : gfx_lock_scrl_OFF, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32, curr_hue, 255, 0);
         }
     }
 

@@ -22,4 +22,4 @@
 
 #include <qp.h>
 
-extern painter_image_t gfx_hf_lock_scrl_ON PROGMEM;
+extern painter_image_t gfx_hf_lock_scrl_ON QP_RESIDENT_FLASH;

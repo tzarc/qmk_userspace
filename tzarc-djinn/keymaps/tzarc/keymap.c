@@ -316,8 +316,8 @@ void housekeeping_task_keymap(void) {
 
 //----------------------------------------------------------
 // Display
-#include "theme_djinn.inl.c"
-//#include "theme_hf.inl.c"
+//#include "theme_djinn.inl.c"
+#include "theme_hf.inl.c"
 
 //----------------------------------------------------------
 // Lua

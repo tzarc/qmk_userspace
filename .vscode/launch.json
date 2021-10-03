@@ -9,8 +9,8 @@
       "type": "python",
       "cwd": "${workspaceRoot}",
       "request": "launch",
-      "program": "${workspaceRoot}/qmk_firmware/bin/qmk",
-      "args": ["painter-convert-graphics", "--input", "tzarc-cyclone/graphics/lock-caps.png", "--format", "mono16"]
+      "program": "C:\\Users\\nickb\\AppData\\Roaming\\Python\\Python39\\Scripts\\qmk.exe",
+      "args": ["painter-convert-graphics", "--input", "tzarc-cyclone/graphics/lock-caps.png", "--format", "mono16", "--rle"]
     },
     {
       "name": "Python: painter-make-font-image",

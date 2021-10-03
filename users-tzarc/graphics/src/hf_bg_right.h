@@ -22,4 +22,4 @@
 
 #include <qp.h>
 
-extern painter_image_t gfx_hf_bg_right PROGMEM;
+extern painter_image_t gfx_hf_bg_right QP_RESIDENT_FLASH;

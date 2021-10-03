@@ -143,50 +143,52 @@ $(GENERATED_OUTPUT)/lock-scrl-OFF.h: $(USER_PATH)/Makefile $(USER_PATH)/lock-scr
 ################################################################################################################################################################
 # Hyperfuse
 
-generated-files: $(GENERATED_OUTPUT)/hf_bg_left.h
+generated-files: hyperfuse
+
+hyperfuse: $(GENERATED_OUTPUT)/hf_bg_left.h
 
 $(GENERATED_OUTPUT)/hf_bg_left.h: $(USER_PATH)/Makefile $(USER_PATH)/hf_bg_left.png
 	[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/hf_bg_left.png -o $(GENERATED_OUTPUT) -f pal16
+	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/hf_bg_left.png -o $(GENERATED_OUTPUT) -f pal16 --rle
 
-generated-files: $(GENERATED_OUTPUT)/hf_bg_right.h
+hyperfuse: $(GENERATED_OUTPUT)/hf_bg_right.h
 
 $(GENERATED_OUTPUT)/hf_bg_right.h: $(USER_PATH)/Makefile $(USER_PATH)/hf_bg_right.png
 	[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/hf_bg_right.png -o $(GENERATED_OUTPUT) -f pal16
+	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/hf_bg_right.png -o $(GENERATED_OUTPUT) -f pal16 --rle
 
-generated-files: $(GENERATED_OUTPUT)/hf_lock_caps_ON.h
+hyperfuse: $(GENERATED_OUTPUT)/hf_lock_caps_ON.h
 
 $(GENERATED_OUTPUT)/hf_lock_caps_ON.h: $(USER_PATH)/Makefile $(USER_PATH)/hf_lock_caps_ON.png
 	[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/hf_lock_caps_ON.png -o $(GENERATED_OUTPUT) -f pal4
+	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/hf_lock_caps_ON.png -o $(GENERATED_OUTPUT) -f pal4 --rle
 
-generated-files: $(GENERATED_OUTPUT)/hf_lock_num_ON.h
+hyperfuse: $(GENERATED_OUTPUT)/hf_lock_num_ON.h
 
 $(GENERATED_OUTPUT)/hf_lock_num_ON.h: $(USER_PATH)/Makefile $(USER_PATH)/hf_lock_num_ON.png
 	[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/hf_lock_num_ON.png -o $(GENERATED_OUTPUT) -f pal4
+	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/hf_lock_num_ON.png -o $(GENERATED_OUTPUT) -f pal4 --rle
 
-generated-files: $(GENERATED_OUTPUT)/hf_lock_scrl_ON.h
+hyperfuse: $(GENERATED_OUTPUT)/hf_lock_scrl_ON.h
 
 $(GENERATED_OUTPUT)/hf_lock_scrl_ON.h: $(USER_PATH)/Makefile $(USER_PATH)/hf_lock_scrl_ON.png
 	[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/hf_lock_scrl_ON.png -o $(GENERATED_OUTPUT) -f pal4
+	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/hf_lock_scrl_ON.png -o $(GENERATED_OUTPUT) -f pal4 --rle
 
-generated-files: $(GENERATED_OUTPUT)/hf_lock_caps_OFF.h
+hyperfuse: $(GENERATED_OUTPUT)/hf_lock_caps_OFF.h
 
 $(GENERATED_OUTPUT)/hf_lock_caps_OFF.h: $(USER_PATH)/Makefile $(USER_PATH)/hf_lock_caps_OFF.png
 	[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/hf_lock_caps_OFF.png -o $(GENERATED_OUTPUT) -f pal4
+	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/hf_lock_caps_OFF.png -o $(GENERATED_OUTPUT) -f pal4 --rle
 
-generated-files: $(GENERATED_OUTPUT)/hf_lock_num_OFF.h
+hyperfuse: $(GENERATED_OUTPUT)/hf_lock_num_OFF.h
 
 $(GENERATED_OUTPUT)/hf_lock_num_OFF.h: $(USER_PATH)/Makefile $(USER_PATH)/hf_lock_num_OFF.png
 	[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/hf_lock_num_OFF.png -o $(GENERATED_OUTPUT) -f pal4
+	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/hf_lock_num_OFF.png -o $(GENERATED_OUTPUT) -f pal4 --rle
 
-generated-files: $(GENERATED_OUTPUT)/hf_lock_scrl_OFF.h
+hyperfuse: $(GENERATED_OUTPUT)/hf_lock_scrl_OFF.h
 
 $(GENERATED_OUTPUT)/hf_lock_scrl_OFF.h: $(USER_PATH)/Makefile $(USER_PATH)/hf_lock_scrl_OFF.png
 	[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/hf_lock_scrl_OFF.png -o $(GENERATED_OUTPUT) -f pal4
+	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/hf_lock_scrl_OFF.png -o $(GENERATED_OUTPUT) -f pal4 --rle
