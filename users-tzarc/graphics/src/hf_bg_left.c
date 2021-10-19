@@ -505,6 +505,7 @@ static const uint8_t gfx_hf_bg_left_data[7297] QP_RESIDENT_FLASH = {
 
 static const painter_raw_image_descriptor_t gfx_hf_bg_left_raw QP_RESIDENT_FLASH = {
     .base = {
+        .image_type   = IMAGE_TYPE_LOCATION_FLASH,
         .image_format = IMAGE_FORMAT_PALETTE,
         .image_bpp    = 4,
         .compression  = IMAGE_COMPRESSED_RLE,

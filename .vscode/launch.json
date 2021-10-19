@@ -5,28 +5,56 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Python: test-qgf-convert",
+      "type": "python",
+      "cwd": "${workspaceRoot}/qmk_firmware",
+      "request": "launch",
+      "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+      "args": ["test-qgf-convert", "--input", "../tzarc-djinn/graphics/djinn.png", "--output", "qgf_test.qgf", "--format", "pal4"],
+      "console": "integratedTerminal",
+      "env": {
+        "MSYSTEM": "MINGW64",
+        "CHERE_INVOKING": "1"
+      }
+    },
+    {
       "name": "Python: painter-convert-graphics",
       "type": "python",
-      "cwd": "${workspaceRoot}",
+      "cwd": "${workspaceRoot}/qmk_firmware",
       "request": "launch",
-      "program": "C:\\Users\\nickb\\AppData\\Roaming\\Python\\Python39\\Scripts\\qmk.exe",
-      "args": ["painter-convert-graphics", "--input", "tzarc-cyclone/graphics/lock-caps.png", "--format", "mono16", "--rle"]
+      "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+      "args": ["painter-convert-graphics", "--input", "tzarc-cyclone/graphics/lock-caps.png", "--format", "mono16", "--rle"],
+      "console": "integratedTerminal",
+      "env": {
+        "MSYSTEM": "MINGW64",
+        "CHERE_INVOKING": "1"
+      }
     },
     {
       "name": "Python: painter-make-font-image",
       "type": "python",
       "cwd": "${workspaceRoot}",
       "request": "launch",
-      "program": "${workspaceRoot}/qmk_firmware/bin/qmk",
-      "args": ["painter-make-font-image", "--font", "tzarc-cyclone/graphics/NotoSans-ExtraCondensedBold.ttf", "--size", "16", "--output", "tzarc-cyclone/graphics/noto.png", "--unicode-glyphs", "ĄȽɂɻɣɈʣ"]
+      "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+      "args": ["painter-make-font-image", "--font", "tzarc-cyclone/graphics/NotoSans-ExtraCondensedBold.ttf", "--size", "16", "--output", "tzarc-cyclone/graphics/noto.png", "--unicode-glyphs", "ĄȽɂɻɣɈʣ"],
+      "console": "integratedTerminal",
+      "env": {
+        "MSYSTEM": "MINGW64",
+        "CHERE_INVOKING": "1"
+      }
     },
     {
       "name": "Python: painter-convert-font-image",
       "type": "python",
       "cwd": "${workspaceRoot}",
       "request": "launch",
-      "program": "${workspaceRoot}/qmk_firmware/bin/qmk",
-      "args": ["painter-convert-font-image", "--input", "tzarc-cyclone/graphics/noto.png", "--format", "mono4", "--unicode-glyphs", "ĄȽɂɻɣɈʣ"]
+      "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+      "args": ["painter-convert-font-image", "--input", "tzarc-cyclone/graphics/noto.png", "--format", "mono4", "--unicode-glyphs", "ĄȽɂɻɣɈʣ"],
+      "console": "integratedTerminal",
+      "env": {
+        "MSYSTEM": "MINGW64",
+        "CHERE_INVOKING": "1"
+      }
     },
     {
       "name": "Black Magic Probe (Djinn, cortex-debug)",

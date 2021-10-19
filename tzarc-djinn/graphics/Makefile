@@ -13,7 +13,7 @@ clean:
 .INTERMEDIATE: srcdir
 
 srcdir:
-	[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
+	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
 
 distclean: clean
 

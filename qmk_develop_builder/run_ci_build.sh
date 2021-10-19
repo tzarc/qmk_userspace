@@ -2,7 +2,7 @@
 
 set -e
 
-abs_path() { python -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "$1" ; }
+abs_path() { python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "$1" ; }
 
 this_script=$(abs_path "${BASH_SOURCE[@]}")
 script_dir=$(dirname "$this_script")

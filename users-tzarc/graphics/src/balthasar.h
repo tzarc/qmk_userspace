@@ -1,4 +1,4 @@
-﻿/* Copyright 2021 QMK
+/* Copyright 2021 QMK
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,4 +22,4 @@
 
 #include <qp.h>
 
-extern painter_font_t font_balthasar PROGMEM;
+extern painter_font_t font_balthasar QP_RESIDENT_FLASH;

@@ -1,5 +1,8 @@
 ifeq ($(strip $(PLATFORM_KEY)),chibios)
 	XAP_ENABLE = no
+	CREATE_MAP=yes
+	EXTRAFLAGS=-fstack-usage
+	EXTRALDFLAGS=-Wl,--print-memory-usage
 else ifeq ($(strip $(PLATFORM_KEY)),arm_atsam)
 	XAP_ENABLE = no
 	LTO_ENABLE = no

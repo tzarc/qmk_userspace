@@ -71,8 +71,6 @@ void draw_ui_user(void) {
         qp_ellipse(lcd, 225 - 8, 25, 8, 4, curr_hue, 255, 255, true);
     }
 
-    return;
-
     int ypos = 4;
 
     // Show layer info on the left side
@@ -97,7 +95,7 @@ void draw_ui_user(void) {
                     buf[i] = tolower(buf[i]);
             }
 
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos += qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_rgb_xpos < xpos) {
                 max_rgb_xpos = xpos;
             }
@@ -127,7 +125,7 @@ void draw_ui_user(void) {
             static int max_layer_xpos = 0;
             xpos                      = 16;
             snprintf_(buf, sizeof(buf), "layer: %s", layer_name);
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos += qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_layer_xpos < xpos) {
                 max_layer_xpos = xpos;
             }
@@ -140,7 +138,7 @@ void draw_ui_user(void) {
             static int max_power_xpos = 0;
             xpos                      = 16;
             snprintf_(buf, sizeof(buf), "power: %s", usbpd_str(kb_state.current_setting));
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos += qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_power_xpos < xpos) {
                 max_power_xpos = xpos;
             }
@@ -153,7 +151,7 @@ void draw_ui_user(void) {
             static int max_scans_xpos = 0;
             xpos                      = 16;
             snprintf_(buf, sizeof(buf), "scans: %d", (int)user_state.scan_rate);
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos += qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_scans_xpos < xpos) {
                 max_scans_xpos = xpos;
             }
@@ -166,7 +164,7 @@ void draw_ui_user(void) {
             static int max_wpm_xpos = 0;
             xpos                    = 16;
             snprintf_(buf, sizeof(buf), "wpm: %d", (int)get_current_wpm());
-            xpos = qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
+            xpos += qp_drawtext_recolor(lcd, xpos, ypos, font_thintel15, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             if (max_wpm_xpos < xpos) {
                 max_wpm_xpos = xpos;
             }

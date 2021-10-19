@@ -44,6 +44,7 @@ static const uint8_t gfx_lock_num_OFF_data[238] QP_RESIDENT_FLASH = {
 
 static const painter_raw_image_descriptor_t gfx_lock_num_OFF_raw QP_RESIDENT_FLASH = {
     .base = {
+        .image_type   = IMAGE_TYPE_LOCATION_FLASH,
         .image_format = IMAGE_FORMAT_GRAYSCALE,
         .image_bpp    = 2,
         .compression  = IMAGE_COMPRESSED_RLE,

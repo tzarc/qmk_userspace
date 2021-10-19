@@ -13,7 +13,7 @@
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "gcc-arm",
-            "compileCommands": "W:/QMK_BUILD/COMPILE_COMMANDS.JSON"
+            "compileCommands": "W:/qmk_build/qmk_firmware/compile_commands.json"
         },
         {
             "name": "Mac",

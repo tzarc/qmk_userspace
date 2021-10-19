@@ -141,7 +141,7 @@ bin_$$(board_name_$1): board_link_$$(board_name_$1)
 	+cd "$(ROOTDIR)/qmk_firmware" \
 		&& $$(MAKE) distclean \
 		&& qmk generate-compilation-database -kb $$(board_qmk_$1) -km $$(board_keymap_$1) \
-		&& $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false CREATE_MAP=yes EXTRAFLAGS=-fstack-usage EXTRALDFLAGS=-Wl,--print-memory-usage
+		&& $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false
 	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR)/qmk_firmware/compile_commands.json $$(ROOTDIR) \
 		&& sed -i 's@/home/nickb/qmk_build/qmk_firmware@W:\\\\qmk_build\\\\qmk_firmware@g' $$(ROOTDIR)/compile_commands.json \
 		|| true
