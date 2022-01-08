@@ -19,7 +19,7 @@
 #include <process_unicode_common.h>
 #include "tzarc.h"
 
-void register_hex32(uint32_t hex);
+void register_unicode(uint32_t hex);
 
 bool     config_enabled;
 uint16_t typing_mode;
@@ -73,7 +73,7 @@ void tap_code16_nomods(uint8_t kc) {
 void tap_unicode_glyph(uint32_t glyph) {
 #ifdef UNICODE_ENABLE
     unicode_input_start();
-    register_hex32(glyph);
+    register_unicode(glyph);
     unicode_input_finish();
 #endif
 }

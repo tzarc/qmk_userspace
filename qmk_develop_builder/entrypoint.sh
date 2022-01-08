@@ -94,9 +94,13 @@ discord_text() {
 
 send_discord() {
         local discord_output="$(discord_text)"
+        local discord_output_cut=${discord_output:0:1900}
+        if [[ $discord_output != $discord_output_cut ]] ; then
+            discord_output_cut="$(echo ${discord_output_cut%%\`}; echo; echo "<<snip>>\`\`\`")"
+        fi
         curl \
             -H "Content-Type: application/json" \
-            -d "{\"username\": \"QMK Develop Builder\", \"content\": \"${discord_output//$'\n'/\\n}\"}" \
+            -d "{\"username\": \"QMK Develop Builder\", \"content\": \"${discord_output_cut//$'\n'/\\n}\"}" \
             "${DISCORD_WEBHOOK}"
 }
 
@@ -170,7 +174,7 @@ a:hover { color: #F00; }
 <h2>Build date: $(date -u)</h2>
 <hr/>
 <pre>
-$(git log -n5 --color=always | ctlchars2html)
+$(git log -n5 --color=always --no-merges | ctlchars2html)
 </pre>
 <hr/>
 <pre>
