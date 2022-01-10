@@ -32,7 +32,6 @@
 painter_device_t surf;
 
 // clang-format off
-
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [LAYER_BASE] = LAYOUT_all_wrapper(
         ____________TZARC_7x4_BASE_R1_L__________,                                            ____________TZARC_7x4_BASE_R1_R__________,
@@ -79,13 +78,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                 _______,                                                             _______
     )
 };
+// clang-format on
 
 #ifdef ENCODER_MAP_ENABLE
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
-    [LAYER_BASE] =   { ENCODER_CCW_CW(KC_MS_WH_UP, KC_MS_WH_DOWN), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)  },
-    [LAYER_LOWER] =  { ENCODER_CCW_CW(RGB_HUD, RGB_HUI),           ENCODER_CCW_CW(RGB_SAD, RGB_SAI)  },
-    [LAYER_RAISE] =  { ENCODER_CCW_CW(RGB_VAD, RGB_VAI),           ENCODER_CCW_CW(RGB_SPD, RGB_SPI)  },
-    [LAYER_ADJUST] = { ENCODER_CCW_CW(RGB_RMOD, RGB_MOD),          ENCODER_CCW_CW(KC_LEFT, KC_RIGHT) },
+    [LAYER_BASE]   = {ENCODER_CCW_CW(KC_MS_WH_UP, KC_MS_WH_DOWN), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
+    [LAYER_LOWER]  = {ENCODER_CCW_CW(RGB_HUD, RGB_HUI), ENCODER_CCW_CW(RGB_SAD, RGB_SAI)},
+    [LAYER_RAISE]  = {ENCODER_CCW_CW(RGB_VAD, RGB_VAI), ENCODER_CCW_CW(RGB_SPD, RGB_SPI)},
+    [LAYER_ADJUST] = {ENCODER_CCW_CW(RGB_RMOD, RGB_MOD), ENCODER_CCW_CW(KC_LEFT, KC_RIGHT)},
 };
 #else
 bool encoder_update_keymap(uint8_t index, bool clockwise) {
@@ -141,6 +141,7 @@ bool encoder_update_keymap(uint8_t index, bool clockwise) {
 }
 #endif
 
+// clang-format off
 #ifdef SWAP_HANDS_ENABLE
 const keypos_t PROGMEM hand_swap_config[MATRIX_ROWS][MATRIX_COLS] = {
    { { 6,  6 }, { 5,  6 }, { 4,  6 }, { 3,  6 }, { 2,  6 }, { 1,  6 }, { 0,  6 } },
@@ -161,51 +162,7 @@ const keypos_t PROGMEM hand_swap_config[MATRIX_ROWS][MATRIX_COLS] = {
 const uint8_t PROGMEM encoder_hand_swap_config[NUM_ENCODERS] = { 1, 0 };
 #    endif
 #endif
-
 // clang-format on
-
-//----------------------------------------------------------
-// RGB Matrix naming
-#if defined(RGB_MATRIX_ENABLE)
-#    include <rgb_matrix.h>
-
-#    if defined(RGB_MATRIX_EFFECT)
-#        undef RGB_MATRIX_EFFECT
-#    endif  // defined(RGB_MATRIX_EFFECT)
-
-#    define RGB_MATRIX_EFFECT(x) RGB_MATRIX_EFFECT_##x,
-enum {
-    RGB_MATRIX_EFFECT_NONE,
-#    include "rgb_matrix_effects.inc"
-#    undef RGB_MATRIX_EFFECT
-#    ifdef RGB_MATRIX_CUSTOM_KB
-#        include "rgb_matrix_kb.inc"
-#    endif
-#    ifdef RGB_MATRIX_CUSTOM_USER
-#        include "rgb_matrix_user.inc"
-#    endif
-};
-
-#    define RGB_MATRIX_EFFECT(x)    \
-        case RGB_MATRIX_EFFECT_##x: \
-            return #x;
-const char *rgb_matrix_name(uint8_t effect) {
-    switch (effect) {
-        case RGB_MATRIX_EFFECT_NONE:
-            return "NONE";
-#    include "rgb_matrix_effects.inc"
-#    undef RGB_MATRIX_EFFECT
-#    ifdef RGB_MATRIX_CUSTOM_KB
-#        include "rgb_matrix_kb.inc"
-#    endif
-#    ifdef RGB_MATRIX_CUSTOM_USER
-#        include "rgb_matrix_user.inc"
-#    endif
-        default:
-            return "UNKNOWN";
-    }
-}
-#endif  // defined(RGB_MATRIX_ENABLE)
 
 //----------------------------------------------------------
 // Sync
@@ -254,6 +211,9 @@ void keyboard_post_init_keymap(void) {
 
     // Reset the initial shared data value between master and slave
     memset(&user_state, 0, sizeof(user_state));
+
+    void keyboard_post_init_display(void);
+    keyboard_post_init_display();
 }
 
 void user_state_update(void) {
@@ -316,8 +276,8 @@ void housekeeping_task_keymap(void) {
 
 //----------------------------------------------------------
 // Display
-//#include "theme_djinn.inl.c"
-#include "theme_hf.inl.c"
+#include "theme_djinn.inl.c"
+//#include "theme_hf.inl.c"
 
 //----------------------------------------------------------
 // Lua

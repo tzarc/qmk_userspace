@@ -303,7 +303,7 @@ void matrix_init_pins(void) {
     for (int i = 0; i < MATRIX_COLS; ++i) setPinInputHigh(col_pins[i]);
 }
 
-void matrix_read_rows_on_col(matrix_row_t current_matrix[], uint8_t current_col) {
+void matrix_read_rows_on_col(matrix_row_t current_matrix[], uint8_t current_col, matrix_row_t row_shifter) {
     // Setup the output column pin
     setPinOutput(col_pins[current_col]);
     writePinLow(col_pins[current_col]);
