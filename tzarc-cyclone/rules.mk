@@ -22,7 +22,7 @@ MCU  = cortex-m0plus
 ARMV = 6
 
 # Build Options
-BOOTMAGIC_ENABLE = lite
+BOOTMAGIC_ENABLE = yes
 MOUSEKEY_ENABLE = yes
 EXTRAKEY_ENABLE = yes
 CONSOLE_ENABLE = yes

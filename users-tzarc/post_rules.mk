@@ -1,17 +1,14 @@
 ifeq ($(strip $(PLATFORM_KEY)),chibios)
-	XAP_ENABLE = no
 	CREATE_MAP=yes
 	EXTRAFLAGS=-fstack-usage
 	EXTRALDFLAGS=-Wl,--print-memory-usage
 else ifeq ($(strip $(PLATFORM_KEY)),arm_atsam)
-	XAP_ENABLE = no
 	LTO_ENABLE = no
 else ifeq ($(strip $(PLATFORM_KEY)),avr)
 	ifeq ($(strip $(PROTOCOL)),LUFA)
-		# Uses defaults above
+		# Uses defaults as per rules.mk
 	else ifeq ($(strip $(PROTOCOL)),VUSB)
 		CONSOLE_ENABLE = no
-		XAP_ENABLE = no
-		RAW_ENABLE = no
+		DEBUG_MATRIX_SCAN_RATE_ENABLE = no
 	endif
 endif
