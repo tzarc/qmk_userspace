@@ -56,7 +56,6 @@
 #define SPI_MISO_PAL_MODE 6
 
 // LCD Configuration
-#define ILI9XXX_PIXDATA_BUFSIZE 240
 #define LCD_RST_PIN B3
 #define LCD_CS_PIN D2
 #define LCD_DC_PIN A15
@@ -74,10 +73,8 @@
 // RGB configuration
 #define WS2812_EXTERNAL_PULLUP
 #define RGB_DI_PIN B2
-#ifdef RGB_MATRIX_ENABLE
-#    define DRIVER_LED_TOTAL RGBLED_NUM
-#    define RGB_MATRIX_SPLIT RGBLED_SPLIT
-#endif  //  RGB_MATRIX_ENABLE
+#define DRIVER_LED_TOTAL RGBLED_NUM
+#define RGB_MATRIX_SPLIT RGBLED_SPLIT
 #define WS2812_PWM_DRIVER PWMD20
 #define WS2812_PWM_CHANNEL 1
 #define WS2812_PWM_PAL_MODE 3
@@ -94,7 +91,7 @@
 #    define STARTUP_SONG SONG(STARTUP_SOUND)
 #endif  // STARTUP_SONG
 
-/* disable these deprecated features by default */
+// Deprecated features
 #define NO_ACTION_MACRO
 #define NO_ACTION_FUNCTION
 
