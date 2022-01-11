@@ -17,7 +17,9 @@ convert_one() {
     git grep "$from_func" | cut -d: -f1 | sort | uniq | while read file ; do
         echo $file
         sed -i \
-            -e "s@$from_func(\s*\(\|(\(void\|uint8_t\|uint16_t\|uint32_t\)\s*\*)\)@$to_func(EECONFIG_NVRAM_FILENAME, @g" \
+            -e "s@$from_func(\s*@$to_func(EECONFIG_NVRAM_FILENAME, @g" \
+            -e "s@\(void\|uint8_t\|uint16_t\|uint32_t\) $to_func(EECONFIG_NVRAM_FILENAME, @\1 $from_func(@g" \
+            -e "s@EECONFIG_NVRAM_FILENAME, (\s*\(\|const \)\(void\|uint8_t\|uint16_t\|uint32_t\)\s*\*)\s*@EECONFIG_NVRAM_FILENAME, @g" \
             "$file"
     done
 }
