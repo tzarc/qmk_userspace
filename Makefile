@@ -72,11 +72,14 @@ format_prereq:
 
 format: format_prereq
 	@for file in $$(ls -1 $(ROOTDIR)/rle/*.c) ; do \
-		echo "\e[38;5;14mclang-format'ing: $$file\e[0m" ; \
-		clang-format -i "$$file" >/dev/null 2>&1 || true ; \
+		[ -f "$$file" ] && echo "\e[38;5;14mclang-format'ing: $$file\e[0m" ; \
+		[ -f "$$file" ] && clang-format -i "$$file" >/dev/null 2>&1 || true ; \
 	done
 	@for file in $$(ls -1 $(ROOTDIR)/rle/*.c) ; do \
-		dos2unix "$$file" >/dev/null 2>&1 ; \
+		[ -f "$$file" ] && echo "\e[38;5;14mdos2unix'ing: $$file\e[0m" ; \
+		[ -f "$$file" ] && dos2unix "$$file" >/dev/null 2>&1 ; \
+		[ -f "$$file" ] && echo "\e[38;5;14mchmod'ing: $$file\e[0m" ; \
+		[ -f "$$file" ] && chmod -x "$$file" >/dev/null 2>&1 ; \
 	done
 
 links: format_prereq extra-links
@@ -109,11 +112,14 @@ unlink_$$(link_source_$1):
 format: format_$$(link_source_$1)
 format_$$(link_source_$1): format_prereq
 	@for file in $$(link_files_$1) ; do \
-		echo "\e[38;5;14mclang-format'ing: $$$$file\e[0m" ; \
-		clang-format -i "$$$$file" >/dev/null 2>&1 ; \
+		[ -f "$$$$file" ] && echo "\e[38;5;14mclang-format'ing: $$$$file\e[0m" ; \
+		[ -f "$$$$file" ] && clang-format -i "$$$$file" >/dev/null 2>&1 || true ; \
 	done ; \
 	for file in $$(link_files_all_$1) ; do \
-		dos2unix "$$$$file" >/dev/null 2>&1 ; \
+		[ -f "$$$$file" ] && echo "\e[38;5;14mdos2unix'ing: $$$$file\e[0m" ; \
+		[ -f "$$$$file" ] && dos2unix "$$$$file" >/dev/null 2>&1 ; \
+		[ -f "$$$$file" ] && echo "\e[38;5;14mchmod'ing: $$$$file\e[0m" ; \
+		[ -f "$$$$file" ] && chmod -x "$$$$file" >/dev/null 2>&1 ; \
 	done
 
 endef
@@ -170,11 +176,14 @@ flash_$$(board_name_$1): bin_$$(board_name_$1)
 
 format_$$(board_name_$1): format_prereq
 	@for file in $$(board_files_$1) ; do \
-		echo "\e[38;5;14mclang-format'ing: $$$$file\e[0m" ; \
-		clang-format -i "$$$$file" >/dev/null 2>&1 || true ; \
+		[ -f "$$$$file" ] && echo "\e[38;5;14mclang-format'ing: $$$$file\e[0m" ; \
+		[ -f "$$$$file" ] && clang-format -i "$$$$file" >/dev/null 2>&1 || true ; \
 	done
 	@for file in $$(board_files_all_$1) ; do \
-		dos2unix "$$$$file" >/dev/null 2>&1 ; \
+		[ -f "$$$$file" ] && echo "\e[38;5;14mdos2unix'ing: $$$$file\e[0m" ; \
+		[ -f "$$$$file" ] && dos2unix "$$$$file" >/dev/null 2>&1 ; \
+		[ -f "$$$$file" ] && echo "\e[38;5;14mchmod'ing: $$$$file\e[0m" ; \
+		[ -f "$$$$file" ] && chmod -x "$$$$file" >/dev/null 2>&1 ; \
 	done
 
 format: format_$$(board_name_$1)
