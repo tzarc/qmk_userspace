@@ -128,6 +128,7 @@ void draw_ui_user(void) {
         qp_rect(lcd, 0, 0, 8, 319, curr_hue, 255, 255, true);
         qp_rect(lcd, 231, 0, 239, 319, curr_hue, 255, 255, false);
 
+        /*
         qp_line(lcd, 200 - 8, 0, 239 - 8, 39, curr_hue, 255, 255);
         qp_line(lcd, 200 - 8, 0, 200 - 8, 39, curr_hue, 255, 255);
         qp_line(lcd, 200 - 8, 39, 239 - 8, 39, curr_hue, 255, 255);
@@ -136,16 +137,18 @@ void draw_ui_user(void) {
 
         qp_ellipse(lcd, 214 - 8, 14, 4, 8, curr_hue, 255, 255, false);
         qp_ellipse(lcd, 225 - 8, 25, 8, 4, curr_hue, 255, 255, true);
+        */
     }
 
     int ypos = 4;
 
     // Show layer info on the left side
     if (is_keyboard_left()) {
-        char buf[32] = {0};
+        char buf[64] = {0};
         int  xpos    = 16;
 
 #if defined(RGB_MATRIX_ENABLE)
+        rgb_effect_redraw = false;
         if (hue_redraw || rgb_effect_redraw) {
             static int max_rgb_xpos = 0;
             xpos                    = 16;

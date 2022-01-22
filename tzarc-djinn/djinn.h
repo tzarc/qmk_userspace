@@ -57,4 +57,11 @@ _Static_assert(sizeof(kb_runtime_config) == 1, "Invalid data transfer size for k
 
 extern kb_runtime_config kb_state;
 
-const char *usbpd_str(usbpd_allowance_t allowance);
+void matrix_wait_for_interrupt(void);
+
+void kb_state_update(void);
+void kb_state_sync(void);
+void kb_state_sync_slave(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer);
+
+void        usbpd_update(void);
+const char* usbpd_str(usbpd_allowance_t allowance);

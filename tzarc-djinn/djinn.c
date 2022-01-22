@@ -12,103 +12,9 @@
 
 painter_device_t lcd;
 
-kb_runtime_config kb_state;
-uint32_t          last_slave_sync_time = 0;
-
 void board_init(void) { usbpd_init(); }
 
 __attribute__((weak)) void draw_ui_user(void) {}
-
-const char* usbpd_str(usbpd_allowance_t allowance) {
-    switch (allowance) {
-        default:
-        case USBPD_500MA:
-            return "500mA";
-        case USBPD_1500MA:
-            return "1500mA";
-        case USBPD_3000MA:
-            return "3000mA";
-    }
-}
-
-void usbpd_update(void) {
-    static uint32_t last_read = 0;
-    if (timer_elapsed32(last_read) > 250) {
-        last_read = timer_read32();
-        switch (usbpd_get_allowance()) {
-            case USBPD_500MA:
-                if (kb_state.current_setting != USBPD_500MA) {
-                    dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.current_setting), usbpd_str(USBPD_500MA));
-                    kb_state.current_setting = USBPD_500MA;
-                }
-                break;
-            case USBPD_1500MA:
-                if (kb_state.current_setting != USBPD_1500MA) {
-                    dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.current_setting), usbpd_str(USBPD_1500MA));
-                    kb_state.current_setting = USBPD_1500MA;
-                }
-                break;
-            case USBPD_3000MA:
-                if (kb_state.current_setting != USBPD_3000MA) {
-                    dprintf("Transitioning UCPD1 %s -> %s\n", usbpd_str(kb_state.current_setting), usbpd_str(USBPD_3000MA));
-                    kb_state.current_setting = USBPD_3000MA;
-                }
-                break;
-        }
-    }
-}
-
-void kb_state_update(void) {
-    if (is_keyboard_master()) {
-        // Modify allowed current limits
-        usbpd_update();
-
-        // Turn off the LCD if there's been no matrix activity
-        kb_state.lcd_power = (last_input_activity_elapsed() < LCD_ACTIVITY_TIMEOUT) ? 1 : 0;
-    }
-}
-
-void kb_state_sync(void) {
-    if (!is_transport_connected()) return;
-
-    if (is_keyboard_master()) {
-        // Keep track of the last state, so that we can tell if we need to propagate to slave
-        static kb_runtime_config last_kb_state;
-        static uint32_t          last_sync;
-        bool                     needs_sync = false;
-
-        // Check if the state values are different
-        if (memcmp(&kb_state, &last_kb_state, sizeof(kb_runtime_config))) {
-            needs_sync = true;
-            memcpy(&last_kb_state, &kb_state, sizeof(kb_runtime_config));
-        }
-
-        // Send to slave every 500ms regardless of state change
-        if (timer_elapsed32(last_sync) > 500) {
-            needs_sync = true;
-        }
-
-        // Perform the sync if requested
-        if (needs_sync) {
-            if (transaction_rpc_send(RPC_ID_SYNC_STATE_KB, sizeof(kb_runtime_config), &kb_state)) {
-                last_sync = timer_read32();
-            } else {
-                dprint("Failed to perform data transaction\n");
-            }
-        }
-    }
-}
-
-void kb_state_sync_slave(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
-    if (initiator2target_buffer_size == sizeof(kb_runtime_config)) {
-        memcpy(&kb_state, initiator2target_buffer, sizeof(kb_runtime_config));
-    }
-}
-
-#define MATRIX_ROW_PINS \
-    { B13, B14, B15, C6, C7, C8 }
-#define MATRIX_COL_PINS \
-    { C0, C1, C2, C3, A0, A1, A2 }
 
 void housekeeping_task_kb(void) {
     // Update kb_state so we can send to slave
@@ -161,12 +67,15 @@ void housekeeping_task_kb(void) {
 
     // Enable/disable RGB
     if (lcd_on) {
-        // Enable EEPROM so that we've got some colour data already being transmitted, by the time we turn on the RGB_PWR line
-        if (rgblight_is_enabled() != lcd_on) {
-            rgblight_enable_noeeprom();
-        }
         // Turn on RGB_PWR
         writePinHigh(RGB_POWER_ENABLE_PIN);
+        // Modify the RGB state if different to the LCD state
+        if (rgblight_is_enabled() != lcd_on) {
+            // Wait for a small amount of time to allow the RGB capacitors to charge, before enabling RGB output
+            wait_ms(10);
+            // Enable RGB
+            rgblight_enable_noeeprom();
+        }
     } else {
         // Turn off RGB_PWR
         writePinLow(RGB_POWER_ENABLE_PIN);
@@ -191,33 +100,7 @@ void housekeeping_task_kb(void) {
 
     // Go into low-scan interrupt-based mode if we haven't had any matrix activity in the last 5 seconds
     if (last_input_activity_elapsed() > 5000) {
-        // ROW2COL
-        const pin_t row_pins[] = MATRIX_ROW_PINS;
-        const pin_t col_pins[] = MATRIX_COL_PINS;
-
-        // Set up row/col pins and attach callback
-        for (int i = 0; i < sizeof(col_pins) / sizeof(pin_t); ++i) {
-            setPinOutput(col_pins[i]);
-            writePinLow(col_pins[i]);
-        }
-        for (int i = 0; i < sizeof(row_pins) / sizeof(pin_t); ++i) {
-            setPinInputHigh(row_pins[i]);
-            palEnableLineEvent(row_pins[i], PAL_EVENT_MODE_BOTH_EDGES);
-        }
-
-        // Wait for an interrupt
-        __WFI();
-
-        // Now that the interrupt has woken us up, reset all the row/col pins back to defaults
-        for (int i = 0; i < sizeof(row_pins) / sizeof(pin_t); ++i) {
-            palDisableLineEvent(row_pins[i]);
-            writePinHigh(row_pins[i]);
-            setPinInputHigh(row_pins[i]);
-        }
-        for (int i = 0; i < sizeof(col_pins) / sizeof(pin_t); ++i) {
-            writePinHigh(col_pins[i]);
-            setPinInputHigh(col_pins[i]);
-        }
+        matrix_wait_for_interrupt();
     }
 }
 
@@ -273,85 +156,30 @@ void keyboard_post_init_kb(void) {
 //----------------------------------------------------------
 // QMK overrides
 
-// Read the ports in one go
-#define GPIOB_BITMASK (1 << 13 | 1 << 14 | 1 << 15)  // B13, B14, B15
-#define GPIOB_OFFSET 13
-#define GPIOB_COUNT 3
-#define GPIOC_BITMASK (1 << 6 | 1 << 7 | 1 << 8)  // C6, C7, C8
-#define GPIOC_OFFSET 6
-
-// Pin definitions
-static const pin_t row_pins[MATRIX_ROWS] = MATRIX_ROW_PINS;
-static const pin_t col_pins[MATRIX_COLS] = MATRIX_COL_PINS;
-
-void matrix_init_pins(void) {
-    for (int i = 0; i < MATRIX_ROWS; ++i) setPinInputHigh(row_pins[i]);
-    for (int i = 0; i < MATRIX_COLS; ++i) setPinInputHigh(col_pins[i]);
-}
-
-void matrix_read_rows_on_col(matrix_row_t current_matrix[], uint8_t current_col, matrix_row_t row_shifter) {
-    // Setup the output column pin
-    setPinOutput(col_pins[current_col]);
-    writePinLow(col_pins[current_col]);
-    rtcnt_t start = chSysGetRealtimeCounterX();
-    rtcnt_t end   = start + 500;
-    while (chSysIsCounterWithinX(chSysGetRealtimeCounterX(), start, end))
-        if (readPin(col_pins[current_col]) == 0) break;
-
-    // Read the row ports
-    uint32_t gpio_b = palReadPort(GPIOB);
-    uint32_t gpio_c = palReadPort(GPIOC);
-
-    // Unselect the row pin
-    setPinInputHigh(col_pins[current_col]);
-
-    // Consutrct the packed bitmask for the pins
-    uint32_t readback = ~(((gpio_b & GPIOB_BITMASK) >> GPIOB_OFFSET) | (((gpio_c & GPIOC_BITMASK) >> GPIOC_OFFSET) << GPIOB_COUNT));
-
-    // Inject values into the matrix
-    for (int i = 0; i < MATRIX_ROWS; ++i) {
-        if (readback & (1 << i))
-            current_matrix[i] |= (1ul << current_col);
-        else
-            current_matrix[i] &= ~(1ul << current_col);
-    }
-
-    // Wait for readback of each port to go high -- unselecting the row would have been completed
-    start = chSysGetRealtimeCounterX();
-    end   = start + 500;
-    while (chSysIsCounterWithinX(chSysGetRealtimeCounterX(), start, end))
-        if ((palReadPort(GPIOB) & GPIOB_BITMASK) == GPIOB_BITMASK) break;
-    while (chSysIsCounterWithinX(chSysGetRealtimeCounterX(), start, end))
-        if ((palReadPort(GPIOC) & GPIOC_BITMASK) == GPIOC_BITMASK) break;
-}
-
 #if defined(RGB_MATRIX_ENABLE)
-#    define rgb_to_hsv_hook_func rgb_matrix_hsv_to_rgb
-#elif defined(RGBLIGHT_ENABLE)
-#    define rgb_to_hsv_hook_func rgblight_hsv_to_rgb
-#endif
-RGB rgb_to_hsv_hook_func(HSV hsv) {
+RGB rgb_matrix_hsv_to_rgb(HSV hsv) {
     float scale;
     switch (kb_state.current_setting) {
         default:
         case USBPD_500MA:
             scale = 0.35f;
             break;
-#ifdef DJINN_SUPPORTS_3A_FUSE
+#    ifdef DJINN_SUPPORTS_3A_FUSE
         case USBPD_1500MA:
             scale = 0.75f;
             break;
         case USBPD_3000MA:
             scale = 1.0f;
             break;
-#else
+#    else
         case USBPD_1500MA:
         case USBPD_3000MA:
             scale = 0.75f;
             break;
-#endif
+#    endif
     }
 
     hsv.v = (uint8_t)(hsv.v * scale);
     return hsv_to_rgb(hsv);
 }
+#endif

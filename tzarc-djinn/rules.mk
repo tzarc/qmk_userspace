@@ -1,4 +1,10 @@
 MCU = STM32G474
+BOOTLOADER = stm32-dfu
+
+SRC += \
+	djinn_portscan_matrix.c \
+	djinn_split_sync.c \
+	djinn_usbpd.c
 
 BOOTMAGIC_ENABLE = yes      # Virtual DIP switch configuration
 MOUSEKEY_ENABLE = no        # Mouse keys
@@ -21,9 +27,6 @@ BACKLIGHT_DRIVER = pwm
 
 WS2812_DRIVER = pwm
 CIE1931_CURVE = yes
-
-RGBLIGHT_ENABLE = no
-RGBLIGHT_DRIVER = WS2812
 
 RGB_MATRIX_ENABLE = yes
 RGB_MATRIX_DRIVER = WS2812
