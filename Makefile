@@ -159,9 +159,6 @@ tidy_$$(board_name_$1): bin_$$(board_name_$1)
 		&& $(CLANG_TIDY) -p . keyboards drivers quantum tmk_core -j9 > "$$(ROOTDIR)/clang-tidy_$$(board_name_$1).log" 2>&1 \
 		|| true
 
-#&& bear -- $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false \
-
-
 db_$$(board_name_$1): board_link_$$(board_name_$1)
 	@echo "\e[38;5;14mCreating compiledb for: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	cd "$(ROOTDIR)/qmk_firmware" \

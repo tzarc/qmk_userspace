@@ -40,7 +40,7 @@ clear_s3_bucket() {
 <style type='text/css'>
 $(ansi2html.sh --bg=dark --palette=linux --css-only 2>/dev/null)
 pre { font-size: 80%; }
-h1, h2, pre { font-family: 'Iosevka Term', 'Iosevka Fixed', Consolas, Menlo, 'Courier New', monospace; }
+h1, h2, h3, pre { font-family: 'Iosevka Term', 'Iosevka Fixed', Consolas, Menlo, 'Courier New', monospace; }
 a { color: #FF0; font-weight: bold; }
 a:visited { color: #FF0; }
 a:hover { color: #F00; }
@@ -145,7 +145,9 @@ failure_output() {
     echo "<h3>Failure logs:</h3>"
 
     { ls -1 /home/qmk/qmk_firmware/.build/failed* 2>/dev/null || true ; } | sort | while read failure ; do
-        echo "<hr/><pre>"
+        echo "<hr/>"
+        echo "<h3>$(echo $failure | rev | cut -d. -f1 | rev)</h3>"
+        echo "<pre>"
         cat $failure | ctlchars2html
         echo "</pre>"
     done

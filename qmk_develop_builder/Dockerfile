@@ -1,4 +1,4 @@
-FROM qmkfm/base_container
+FROM qmkfm/base_container:latest
 
 ENV PATH="/home/qmk/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 

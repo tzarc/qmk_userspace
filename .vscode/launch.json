@@ -5,17 +5,23 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: test-qgf-convert",
-      "type": "python",
-      "cwd": "${workspaceRoot}/qmk_firmware",
+      "name": "Encoder Tests",
+      "type": "cppdbg",
       "request": "launch",
-      "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-      "args": ["test-qgf-convert", "--input", "../tzarc-djinn/graphics/djinn.png", "--output", "qgf_test.qgf", "--format", "pal4"],
-      "console": "integratedTerminal",
-      "env": {
-        "MSYSTEM": "MINGW64",
-        "CHERE_INVOKING": "1"
-      }
+      "program": "${workspaceFolder}/qmk_firmware/.build/test/encoder_split_left_gt_right.elf",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/qmk_firmware/.build/test/",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+          {
+              "description": "Enable pretty-printing for gdb",
+              "text": "-enable-pretty-printing",
+              "ignoreFailures": true
+          }
+      ],
     },
     {
       "name": "Python: painter-convert-graphics",

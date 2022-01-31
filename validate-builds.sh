@@ -9,7 +9,7 @@ qmk_firmware_dir="$(realpath "$script_dir/qmk_firmware/")" # change this once mo
 validation_output="$script_dir/validation-output"
 
 source_branch="develop"
-branch_under_test="disable-all-chibios-subsystems"
+branch_under_test="dynamic-keymap-maxlen"
 
 export PATH=/home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$PATH
 
@@ -53,12 +53,12 @@ validate_build() {
 
     pushd "$qmk_firmware_dir" >/dev/null 2>&1
 
-    git clean -xfd >/dev/null 2>&1
+    git clean -xfd >/dev/null 2>&1 || true
     git checkout -- . >/dev/null 2>&1
     git checkout "$source_branch" >/dev/null 2>&1
     local before="$(build_single "$build_target" before ${extraflags:-})"
 
-    git clean -xfd >/dev/null 2>&1
+    git clean -xfd >/dev/null 2>&1 || true
     git checkout -- . >/dev/null 2>&1
     git checkout "$branch_under_test" >/dev/null 2>&1
     local after="$(build_single "$build_target" after ${extraflags:-})"
@@ -75,8 +75,9 @@ validate_build() {
 }
 
 required_keyboard_builds() {
-    echo zvecr/zv48/f401:default
-    echo zvecr/zv48/f411:default
+    pushd "$qmk_firmware_dir" >/dev/null 2>&1
+    find keyboards -type d -name via | sort | sed -e 's@keyboards/@@g' -e 's@/keymaps/@:@g'
+    popd >/dev/null 2>&1
 }
 
 [[ -d "$validation_output" ]] || mkdir -p "$validation_output"
