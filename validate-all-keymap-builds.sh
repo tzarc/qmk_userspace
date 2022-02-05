@@ -44,7 +44,8 @@ run_once() {
 
     mkdir "$validation_output/.build-$test_branch/asm"
 
-    find "$validation_output/.build-$test_branch" -name '*.elf' | while read file ; do
+    find "$validation_output/.build-$test_branch" -name '*.elf' | sort | while read file ; do
+        echo -en "Decompiling '$file'...                                        \r"
         if [[ -n "$(file "$file" | grep 'AVR')" ]] ; then
             avr-objdump -S "$file" > "$validation_output/.build-$test_branch/asm/$(basename "$file" .elf).asm.txt"
         elif [[ -n "$(file "$file" | grep 'ARM')" ]] ; then
@@ -54,14 +55,20 @@ run_once() {
         fi
     done
 
-    find "$validation_output/.build-$test_branch/asm" -name '*.asm.txt' | while read file ; do
-        sed -iE \
-            -e "s@build-$test_branch/@@g" \
-            -e 's@[ \t][0-9a-f]\+:@xx:@g' \
-            "$file"
+    find "$validation_output/.build-$test_branch/asm" -name '*.asm.txt' | sort | while read file ; do
+        echo -en "Massaging '$file'...                                        \r"
+        perl -p -i -e "s/\.build-$test_branch\///g" "$file" || true
+        perl -p -i -e 's/[0-9a-f]{8}/xxxxxxxx/g' "$file" || true
+        perl -p -i -e 's/[0-9a-f]{7}/xxxxxxx/g' "$file" || true
+        perl -p -i -e 's/[0-9a-f]{4}/xxxx/g' "$file" || true
     done
+    echo
 
-    find "$validation_output/.build-$test_branch" -name cflags.txt | while read file ; do sed -i -e 's/ /\n/g' "$file" ; done
+    find "$validation_output/.build-$test_branch" -name cflags.txt | sort | while read file ; do
+        echo -en "Massaging '$file'...                                        \r"
+        sed -i -e 's/ /\n/g' "$file"
+    done
+    echo
 
     popd >/dev/null 2>&1
 }

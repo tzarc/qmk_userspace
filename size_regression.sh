@@ -23,7 +23,8 @@ function usage() {
 }
 
 if [[ ${#} -eq 0 ]]; then
-   usage
+    usage
+    exit 0
 fi
 
 while getopts "hj:s:d:i:n" opt "$@" ; do
@@ -50,12 +51,8 @@ function build_executor() {
 
         make distclean >/dev/null 2>&1
 
-        #### absolute hack to deal with crlf stupidity
-        git add -A >/dev/null 2>&1 || true
-        git commit -m dummy >/dev/null 2>&1 || true
-        #### end hack
-
-        git checkout $revision >/dev/null 2>&1 || { echo "Failed to check out revision ${revision}" >&2 ; exit 1 ; }
+        git clean -xfd >/dev/null 2>&1 || true
+        git checkout -f $revision >/dev/null 2>&1 || { echo "Failed to check out revision ${revision}" >&2 ; exit 1 ; }
         make -j${job_count} $keyboard_target >/dev/null 2>&1 || true
         file_size=$(arm-none-eabi-size .build/*.elf 2>/dev/null | awk '/elf/ {print $1}' 2>/dev/null || true)
 
@@ -64,9 +61,9 @@ function build_executor() {
 
         if [[ -n "$last_line" ]] ; then
             size_delta=$(( $last_size - $file_size ))
-            #if { [[ -n "${skip_zero:-}" ]] && [[ $size_delta -ne 0 ]] ; } || [[ $file_size -eq 0 ]] ; then
+            if { [[ -n "${skip_zero:-}" ]] && [[ $size_delta -ne 0 ]] ; } || [[ $file_size -eq 0 ]] ; then
                 printf "Size: %8d, delta: %+6d -- %s\n" "$last_size" "$size_delta" "$last_line"
-            #fi
+            fi
         fi
 
         last_size=$file_size

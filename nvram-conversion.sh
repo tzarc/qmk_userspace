@@ -8,7 +8,21 @@ this_script="$(realpath "${BASH_SOURCE[0]}")"
 script_dir="$(realpath "$(dirname "$this_script")")"
 qmk_firmware_dir="$(realpath "$script_dir/qmk_firmware/")" # change this once moved to util
 
+target_branch="nvram-refactor"
+
 cd "$qmk_firmware_dir"
+
+git checkout $target_branch
+
+if [[ "$target_branch" != "$(git branch --show-current)" ]] ; then
+    echo "Expected branch '$target_branch', was branch '$(git branch --show-current)'" >&2
+    exit 1
+fi
+
+git fetch --all --tags --prune
+git reset --hard upstream/develop
+git clean -xfd || true
+hub merge --squash --no-commit https://github.com/qmk/qmk_firmware/pull/16170
 
 string_replace() {
     local from_text=$1
@@ -73,30 +87,61 @@ convert_one eeprom_read_dword nvram_read_u32
 convert_one eeprom_write_dword nvram_write_u32
 convert_one eeprom_update_dword nvram_update_u32
 
-# TODO: Need to swap order of function parameters here
 convert_one eeprom_read_block nvram_read_block
-convert_one eeprom_write_block nvram_write_block
-convert_one eeprom_update_block nvram_update_block
-
 block_reorder nvram_read_block
+convert_one eeprom_write_block nvram_write_block
 block_reorder nvram_write_block
+convert_one eeprom_update_block nvram_update_block
 block_reorder nvram_update_block
 
 git mv drivers/eeprom drivers/nvram
 git mv platforms/chibios/drivers/eeprom platforms/chibios/drivers/nvram
-git mv platforms/chibios/eeprom_* platforms/chibios/drivers/nvram
 
-git mv platforms/chibios/drivers/nvram/eeprom_stm32.c platforms/chibios/drivers/nvram/nvram_emulated_flash.c
-git mv platforms/chibios/drivers/nvram/eeprom_stm32.h platforms/chibios/drivers/nvram/nvram_emulated_flash.h
-git mv platforms/chibios/drivers/nvram/eeprom_stm32_defs.h platforms/chibios/drivers/nvram/nvram_emulated_flash_defs.h
+git reset -- platforms/eeprom.h
+git checkout -- platforms/eeprom.h
 
-git mv drivers/nvram/eeprom_driver.c drivers/nvram/nvram_driver.c
-git mv drivers/nvram/eeprom_driver.h drivers/nvram/nvram_driver.h
+git mv quantum/eeconfig.c quantum/nvconfig.c
+git mv quantum/eeconfig.h quantum/nvconfig.h
+string_replace 'eeconfig\.' 'nvconfig.'
+string_replace 'eeconfig_' 'nvconfig_'
+string_replace 'EECONFIG_' 'NVCONFIG_'
+
+git mv platforms/chibios/drivers/nvram/eeprom_flash_emulated.c platforms/chibios/drivers/nvram/nvram_emulated_flash.c
+git mv platforms/chibios/drivers/nvram/eeprom_flash_emulated.h platforms/chibios/drivers/nvram/nvram_emulated_flash.h
+git mv platforms/chibios/drivers/nvram/eeprom_flash_emulated_defs.h platforms/chibios/drivers/nvram/nvram_emulated_flash_defs.h
+string_replace 'eeprom_stm32\.' 'nvram_emulated_flash.'
+string_replace 'eeprom_flash_emulated\.' 'nvram_emulated_flash.'
+string_replace 'EEPROM_STM32_FLASH_EMULATED' 'NVRAM_EMULATED_FLASH'
+
+git mv platforms/chibios/drivers/nvram/eeprom_teensy.c platforms/chibios/drivers/nvram/nvram_kinetis_flexram.c
+git mv platforms/chibios/drivers/nvram/eeprom_teensy.h platforms/chibios/drivers/nvram/nvram_kinetis_flexram.h
+string_replace 'eeprom_teensy\.' 'nvram_kinetis_flexram.'
+string_replace 'EEPROM_TEENSY' 'NVRAM_KINETIS_FLEXRAM'
+
+git mv drivers/nvram/eeprom_driver.c platforms/nvram_common.c
+git mv drivers/nvram/eeprom_driver.h platforms/nvram_common.h
+string_replace 'eeprom_driver' 'nvram_driver'
+string_replace 'EEPROM_CUSTOM' 'NVRAM_CUSTOM'
+string_replace 'EEPROM_DRIVER' 'NVRAM_DRIVER'
+string_replace 'DNVRAM_DRIVER' 'DNVRAM_COMMON'
+string_replace 'defined(NVRAM_DRIVER)' 'defined(NVRAM_COMMON)'
+string_replace 'ifdef NVRAM_DRIVER' 'ifdef NVRAM_COMMON'
+string_replace 'nvram_driver\.h' 'nvram_common.h'
+string_replace 'nvram_driver\.c' 'nvram_common.c'
+
 git mv drivers/nvram/eeprom_transient.c drivers/nvram/nvram_transient.c
 git mv drivers/nvram/eeprom_transient.h drivers/nvram/nvram_transient.h
+string_replace 'eeprom_transient' 'nvram_transient'
+string_replace 'EEPROM_TRANSIENT' 'NVRAM_TRANSIENT'
+
 git mv drivers/nvram/eeprom_custom.c-template drivers/nvram/nvram_custom.c-template
 
+git reset -- docs/eeprom_driver.md
+git checkout -- docs/eeprom_driver.md
 git mv docs/eeprom_driver.md docs/nvram_driver.md
+# TODO: modify docs/nvram_driver.md
+
+string_replace 'not a valid EEPROM driver' 'not a valid NVRAM driver'
 
 string_replace 'EEPROM' 'NVRAM' docs
 string_replace 'eeprom-storage' 'nvram-storage' docs
@@ -113,13 +158,23 @@ string_replace 'these NVRAM files' 'these EEPROM files' docs
 string_replace 'true NVRAM' 'true EEPROM' docs
 string_replace 'Reset NVRAM' 'Reset EEPROM' docs
 string_replace 'NVRAM chips' 'EEPROM chips' docs
-git reset -- docs/ChangeLog
-git checkout -- docs/ChangeLog
-git checkout -- docs/fuse.txt
 
-string_replace 'eeprom_stm32\.' 'eeprom_emulated_flash.'
-string_replace 'eeprom_driver' 'nvram_driver'
-string_replace 'eeprom_transient' 'nvram_transient'
+string_replace 'stored in the NVRAM after' 'stored in the EEPROM after' docs
+string_replace 'stored in the NVRAM of your controller' 'stored in the NVRAM of your keyboard' docs
+string_replace 'shorten the life of your MCU\.' "shorten the life of your board's persistent storage." docs
+string_replace 'sets the handedness setting in NVRAM\.' 'sets the handedness setting in NVRAM (requires internal MCU NVRAM to be used).'
+
+git reset -- docs/ChangeLog docs/faq_misc.md docs/fuse.txt
+git checkout -- docs/ChangeLog docs/faq_misc.md docs/fuse.txt
+
 string_replace 'drivers/eeprom' 'drivers/nvram'
+string_replace '_noeeprom' '_no_nvram'
 
-git diff
+string_replace '/eeprom$' '/nvram'
+
+cat <<__EOF__ >> quantum/nvram_common.h
+uint8_t nvram_read_u8(uint32_t addr);
+__EOF__
+
+git add -A
+git diff --cached
