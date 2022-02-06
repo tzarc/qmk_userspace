@@ -11,6 +11,8 @@ dest_ref="develop"
 ignore_ref="master"
 unset skip_zero
 
+export SIZE_REGRESSION_EXECUTING=1
+
 function usage() {
     echo "Usage: $(basename "$0") [-h] [-j <jobs>] [-s <source>] [-d <dest>] [-n] planck/rev6:default"
     echo "    -h           : Shows this usage page."
@@ -26,6 +28,20 @@ if [[ ${#} -eq 0 ]]; then
     usage
     exit 0
 fi
+
+unset cleanup_completed
+_internal_cleanup() {
+    if [[ -z "${cleanup_completed:-}" ]] ; then
+        echo
+        echo
+        echo 'Your git repository is in an indeterminate state!' >&2
+        echo 'Make sure you swap to your intended branch.' >&2
+        echo
+        unset SIZE_REGRESSION_EXECUTING
+    fi
+    cleanup_completed=1
+}
+trap _internal_cleanup EXIT HUP INT
 
 while getopts "hj:s:d:i:n" opt "$@" ; do
     case "$opt" in

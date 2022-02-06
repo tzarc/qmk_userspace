@@ -44,6 +44,7 @@ BOARD_DEFS := \
 	l151x8xxA!alternates/l151x8xxA!l151x8xxA!reset \
 	f072_shiftreg!alternates/f072_shiftreg!f072_shiftreg!default \
 	l412_shiftreg!alternates/l412_shiftreg!l412_shiftreg!default \
+	qp_test!alternates/qp_test!qp_test/stm32l412kb!default
 
 EXTRA_LINK_DEFS := \
 	layout-tkl_ansi-tzarc!layouts/community/tkl_ansi/tzarc \
@@ -149,7 +150,6 @@ bin_$$(board_name_$1): board_link_$$(board_name_$1)
 		&& qmk generate-compilation-database -kb $$(board_qmk_$1) -km $$(board_keymap_$1) \
 		&& $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false
 	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR)/qmk_firmware/compile_commands.json $$(ROOTDIR) \
-		&& sed -i 's@/home/nickb/qmk_build/qmk_firmware@W:\\\\qmk_build\\\\qmk_firmware@g' $$(ROOTDIR)/compile_commands.json \
 		|| true
 
 tidy_$$(board_name_$1): bin_$$(board_name_$1)

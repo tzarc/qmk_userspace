@@ -136,9 +136,12 @@ string_replace 'EEPROM_TRANSIENT' 'NVRAM_TRANSIENT'
 
 git mv drivers/nvram/eeprom_custom.c-template drivers/nvram/nvram_custom.c-template
 
-git reset -- docs/eeprom_driver.md
-git checkout -- docs/eeprom_driver.md
-git mv docs/eeprom_driver.md docs/nvram_driver.md
+
+git ls-files | grep 'eeprom_driver\.md' | while read file ; do
+    git reset -- $file
+    git checkout -- $file
+    git mv $file $(dirname $file)/nvram_driver.md
+done
 # TODO: modify docs/nvram_driver.md
 
 string_replace 'not a valid EEPROM driver' 'not a valid NVRAM driver'
