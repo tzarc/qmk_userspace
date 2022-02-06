@@ -44,7 +44,7 @@ BOARD_DEFS := \
 	l151x8xxA!alternates/l151x8xxA!l151x8xxA!reset \
 	f072_shiftreg!alternates/f072_shiftreg!f072_shiftreg!default \
 	l412_shiftreg!alternates/l412_shiftreg!l412_shiftreg!default \
-	qp_test!alternates/qp_test!qp_test/stm32l412kb!default
+	qp_test!alternates/qp_test!qp_test!default!qp_test/stm32l412kb
 
 EXTRA_LINK_DEFS := \
 	layout-tkl_ansi-tzarc!layouts/community/tkl_ansi/tzarc \
