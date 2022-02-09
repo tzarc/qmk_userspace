@@ -9,10 +9,11 @@ export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH
 export PATH := $(ROOTDIR)/bin:$(PATH)
 
 export CLANG_TIDY := $(shell find /usr/lib/llvm* -name 'run-clang-tidy.py')
-export CLANG_TIDY_CHECKS := *,-clang-diagnostic-error,-llvm-include-order,-cppcoreguidelines-avoid-non-const-global-variables,-hicpp-braces-around-statements,-readability-braces-around-statements,-google-readability-braces-around-statements,-llvm-header-guard,-bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,-clang-diagnostic-ignored-attributes,-misc-unused-parameters,hicpp-signed-bitwise
+export CLANG_TIDY_CHECKS := *,-clang-diagnostic-error,-llvm-include-order,-cppcoreguidelines-avoid-non-const-global-variables,-hicpp-braces-around-statements,-readability-braces-around-statements,-google-readability-braces-around-statements,-llvm-header-guard,-bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,-clang-diagnostic-ignored-attributes,-clang-diagnostic-unknown-attributes,-misc-unused-parameters,-hicpp-signed-bitwise
 export CLANG_TIDY_HEADER_FILTER := .*
 
 BOARD_DEFS := \
+	iris_default!tzarc-iris_rev4!keebio/iris/rev4/keymaps/tzarc!default \
 	iris!tzarc-iris_rev4!keebio/iris/rev4/keymaps/tzarc!tzarc \
 	ctrl!tzarc-ctrl!massdrop/ctrl/keymaps/tzarc!tzarc \
 	sat75!tzarc-sat75!cannonkeys/satisfaction75/rev1/keymaps/tzarc!tzarc \
@@ -156,7 +157,7 @@ tidy_$$(board_name_$1): bin_$$(board_name_$1)
 	@echo "\e[38;5;14mRunning clang-tidy on: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	@rm -f "$$(ROOTDIR)/clang-tidy_$$(board_name_$1).log" || true
 	cd "$(ROOTDIR)/qmk_firmware" \
-		&& $(CLANG_TIDY) -p . keyboards drivers quantum tmk_core -j9 > "$$(ROOTDIR)/clang-tidy_$$(board_name_$1).log" 2>&1 \
+		&& $(CLANG_TIDY) -p . keyboards drivers quantum tmk_core -j9 -checks '$(CLANG_TIDY_CHECKS)' > "$$(ROOTDIR)/clang-tidy_$$(board_name_$1).log" 2>&1 \
 		|| true
 
 db_$$(board_name_$1): board_link_$$(board_name_$1)

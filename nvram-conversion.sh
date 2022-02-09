@@ -100,11 +100,11 @@ git mv platforms/chibios/drivers/eeprom platforms/chibios/drivers/nvram
 git reset -- platforms/eeprom.h
 git checkout -- platforms/eeprom.h
 
-git mv quantum/eeconfig.c quantum/nvconfig.c
-git mv quantum/eeconfig.h quantum/nvconfig.h
-string_replace 'eeconfig\.' 'nvconfig.'
-string_replace 'eeconfig_' 'nvconfig_'
-string_replace 'EECONFIG_' 'NVCONFIG_'
+#git mv quantum/eeconfig.c quantum/nvconfig.c
+#git mv quantum/eeconfig.h quantum/nvconfig.h
+#string_replace 'eeconfig\.' 'nvconfig.'
+#string_replace 'eeconfig_' 'nvconfig_'
+#string_replace 'EECONFIG_' 'NVCONFIG_'
 
 git mv platforms/chibios/drivers/nvram/eeprom_flash_emulated.c platforms/chibios/drivers/nvram/nvram_emulated_flash.c
 git mv platforms/chibios/drivers/nvram/eeprom_flash_emulated.h platforms/chibios/drivers/nvram/nvram_emulated_flash.h
@@ -175,8 +175,22 @@ string_replace '_noeeprom' '_no_nvram'
 
 string_replace '/eeprom$' '/nvram'
 
-cat <<__EOF__ >> quantum/nvram_common.h
+cat <<__EOF__ >> platforms/nvram_common.h
+
 uint8_t nvram_read_u8(uint32_t addr);
+uint16_t nvram_read_u16(uint32_t addr);
+uint32_t nvram_read_u32(uint32_t addr);
+void nvram_read_block(uint32_t addr, void *buf, uint32_t len);
+
+void nvram_write_u8(uint32_t addr, uint8_t value);
+void nvram_write_u16(uint32_t addr, uint16_t value);
+void nvram_write_u32(uint32_t addr, uint32_t value);
+void nvram_write_block(uint32_t addr, const void *buf, size_t len);
+
+void nvram_update_u8(uint32_t addr, uint8_t value);
+void nvram_update_u16(uint32_t addr, uint16_t value);
+void nvram_update_u32(uint32_t addr, uint32_t value);
+void nvram_update_block(uint32_t addr, const void *buf, size_t len);
 __EOF__
 
 git add -A
