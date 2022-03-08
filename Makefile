@@ -156,15 +156,17 @@ board_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f | so
 bin_$$(board_name_$1): board_link_$$(board_name_$1)
 	@echo "\e[38;5;14mBuilding: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	+cd "$(ROOTDIR)/qmk_firmware" \
-		&& { [ -z "$$(NO_CDB)"] && qmk generate-compilation-database -kb $$(board_qmk_$1) -km $$(board_keymap_$1) || true; } \
+		&& { [ -z "$$(NO_CDB)" ] && qmk generate-compilation-database -kb $$(board_qmk_$1) -km $$(board_keymap_$1) || true; } \
 		&& { \
-			if [ -e ""$(ROOTDIR)/qmk_firmware/builddefs/build_keyboard.mk"" ] ; then \
+			if [ -e "$(ROOTDIR)/qmk_firmware/builddefs/build_keyboard.mk" ] ; then \
 				$$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/builddefs/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false ; \
 			else \
 				$$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false ; \
 			fi ; \
 		}
-	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR)/qmk_firmware/compile_commands.json $$(ROOTDIR) \
+	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR) \
+		|| true
+	@[ -e "$$(ROOTDIR)/qmk_firmware/compile_commands.json" ] && cp $$(ROOTDIR)/qmk_firmware/compile_commands.json $$(ROOTDIR) \
 		|| true
 
 tidy_$$(board_name_$1): bin_$$(board_name_$1)
