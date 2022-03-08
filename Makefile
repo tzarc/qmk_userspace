@@ -57,12 +57,16 @@ all-chibios:
 		qmk multibuild -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2) -f MCU=$$mcu ; \
 	done
 
+all: NO_CDB = true
 all: bin
 
+arm: NO_CDB = true
 arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
 
+nick: NO_CDB = true
 nick: iris sat75 luddite mysterium-nick chocopad ctrl djinn bm16s one2mini
 
+djinn: NO_CDB = true
 djinn: djinn_rev1 djinn_rev2
 
 remove_artifacts:
@@ -152,8 +156,7 @@ board_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f | so
 bin_$$(board_name_$1): board_link_$$(board_name_$1)
 	@echo "\e[38;5;14mBuilding: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	+cd "$(ROOTDIR)/qmk_firmware" \
-		&& $$(MAKE) distclean \
-		&& qmk generate-compilation-database -kb $$(board_qmk_$1) -km $$(board_keymap_$1) \
+		&& { [ -z "$$(NO_CDB)"] && qmk generate-compilation-database -kb $$(board_qmk_$1) -km $$(board_keymap_$1) || true; } \
 		&& { \
 			if [ -e ""$(ROOTDIR)/qmk_firmware/builddefs/build_keyboard.mk"" ] ; then \
 				$$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/builddefs/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false ; \

@@ -51,38 +51,3 @@ void eeconfig_init_keymap(void) {
     backlight_level(BACKLIGHT_LEVELS);
 #endif
 }
-
-//----------------------------------------------------------
-// Sync
-#include <print.h>
-#include <string.h>
-#include <transactions.h>
-
-uint32_t counter = 0;
-
-void slave_counter_sync(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
-    uint32_t* send = (uint32_t*)target2initiator_buffer;
-    *send          = timer_read32() / 1000;
-}
-
-void keyboard_post_init_keymap(void) {
-    // Register keyboard state sync split transaction
-    transaction_register_rpc(RPC_ID_SLAVE_COUNTER, slave_counter_sync);
-}
-
-void user_state_sync(void) {
-    if (is_keyboard_master()) {
-        // Send to slave every 500ms
-        static uint32_t last_sync = 0;
-        if (timer_elapsed32(last_sync) > 500) {
-            last_sync = timer_read32();
-            transaction_rpc_recv(RPC_ID_SLAVE_COUNTER, sizeof(counter), &counter);
-            dprintf("Slave timer: %d\n", (int)counter);
-        }
-    }
-}
-
-void housekeeping_task_keymap(void) {
-    // Data sync from master to slave
-    user_state_sync();
-}

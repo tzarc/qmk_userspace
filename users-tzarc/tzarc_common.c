@@ -179,6 +179,7 @@ DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_script, 0x1D4EA, 0x1D4D
 DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_boxes, 0x1F170, 0x1F170, '0', '1', 0x2002);
 DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_regional, 0x1F1E6, 0x1F1E6, '0', '1', 0x2003);
 
+#ifndef __AVR__
 DEFINE_UNICODE_LUT_TRANSLATOR(unicode_lut_translator_aussie,
                               0x0250, // a
                               'q',    // b
@@ -283,6 +284,7 @@ bool process_record_zalgo(uint16_t keycode, keyrecord_t *record) {
     }
     return process_record_keymap(keycode, record);
 }
+#endif // __AVR__
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t reset_key_timer  = 0;
@@ -441,10 +443,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 return false;
             }
         }
+#ifndef __AVR__
     } else if (typing_mode == KC_AUSSIE) {
         return process_record_aussie(keycode, record);
     } else if (typing_mode == KC_ZALGO) {
         return process_record_zalgo(keycode, record);
+#endif // __AVR__
     } else if (typing_mode == KC_WOWMODE) {
         if ((WOW_KEY_MIN <= keycode) && (keycode <= WOW_KEY_MAX)) {
             return process_record_wow(keycode, record);
