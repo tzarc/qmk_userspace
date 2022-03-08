@@ -148,7 +148,6 @@ void draw_ui_user(void) {
         int  xpos    = 16;
 
 #if defined(RGB_MATRIX_ENABLE)
-        rgb_effect_redraw = false;
         if (hue_redraw || rgb_effect_redraw) {
             static int max_rgb_xpos = 0;
             xpos                    = 16;
