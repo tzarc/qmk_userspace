@@ -8,4 +8,4 @@
 #include <qp.h>
 
 extern const uint32_t gfx_lock_scrl_ON_length;
-extern const uint8_t  gfx_lock_scrl_ON[296] QP_RESIDENT_FLASH;
+extern const uint8_t  gfx_lock_scrl_ON[296];

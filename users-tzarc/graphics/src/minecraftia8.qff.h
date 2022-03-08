@@ -8,4 +8,4 @@
 #include <qp.h>
 
 extern const uint32_t font_minecraftia8_length;
-extern const uint8_t  font_minecraftia8[926] QP_RESIDENT_FLASH;
+extern const uint8_t  font_minecraftia8[926];

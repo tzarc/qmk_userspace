@@ -52,6 +52,11 @@ EXTRA_LINK_DEFS := \
 	layout-60_ansi-tzarc!layouts/community/60_ansi/tzarc \
 	users-tzarc!users/tzarc
 
+all-chibios:
+	for mcu in $(shell hjson -j $(ROOTDIR)/qmk_firmware/data/schemas/keyboard.jsonschema | jq .properties.processor.enum | grep '"' | sed -e 's@[", ]@@g' | grep -vP "(cortex-|atmega|attiny|at90|unknown)" | sort | uniq | xargs echo) ; do \
+		qmk multibuild -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2) -f MCU=$$mcu ; \
+	done
+
 all: bin
 
 arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
@@ -149,7 +154,7 @@ bin_$$(board_name_$1): board_link_$$(board_name_$1)
 	+cd "$(ROOTDIR)/qmk_firmware" \
 		&& $$(MAKE) distclean \
 		&& qmk generate-compilation-database -kb $$(board_qmk_$1) -km $$(board_keymap_$1) \
-		&& $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false
+		&& $$(MAKE) --no-print-directory -r -R -C "$(ROOTDIR)/qmk_firmware" -f "$(ROOTDIR)/qmk_firmware/builddefs/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_qmk_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false
 	@cp $$(ROOTDIR)/qmk_firmware/$$(board_file_$1)* $$(ROOTDIR)/qmk_firmware/compile_commands.json $$(ROOTDIR) \
 		|| true
 
@@ -212,3 +217,20 @@ distclean: board_unlink_$$(board_name_$1)
 endef
 
 $(foreach board_entry,$(BOARD_DEFS),$(eval $(call handle_board_entry,$(board_entry))))
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CONTAINER_PREAMBLE := export HOME="/tmp"; export PYTHONUSERBASE="/tmp/python"; export PATH="\$$PYTHONUSERBASE/bin:\$$PATH"; pip install --upgrade pip; hash -r; pip install -r requirements-dev.txt
+
+format-core:
+	cd $(ROOTDIR)/qmk_firmware \
+		&& ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk format-c --core-only -a" \
+		&& ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk format-python -a"
+
+pytest:
+	cd $(ROOTDIR)/qmk_firmware \
+		&& ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk pytest"
+
+container-shell:
+	cd $(ROOTDIR)/qmk_firmware \
+		&& ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); exec bash"

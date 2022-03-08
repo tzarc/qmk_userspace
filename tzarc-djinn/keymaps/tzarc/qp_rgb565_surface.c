@@ -351,7 +351,7 @@ int16_t qp_rgb565_surface_drawtext(painter_device_t device, uint16_t x, uint16_t
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Driver vtable
-static const struct painter_driver_vtable_t QP_RESIDENT_FLASH driver_vtable = {
+static const struct painter_driver_vtable_t  driver_vtable = {
     .init      = qp_rgb565_surface_init,
     .clear     = qp_rgb565_surface_clear,
     .power     = qp_rgb565_surface_power,

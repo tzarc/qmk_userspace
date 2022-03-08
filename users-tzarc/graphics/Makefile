@@ -109,33 +109,34 @@ $(GENERATED_OUTPUT)/hannover23.qff.h: $(GENERATED_OUTPUT)/hannover23.png
 # Key lock images
 
 LOCK_IMAGE_FORMAT := mono4
+DJINN_GRAPHICS_PATH := ../../tzarc-djinn/graphics
 
 generated-files: $(GENERATED_OUTPUT)/lock-caps-ON.qgf.h $(GENERATED_OUTPUT)/lock-caps-OFF.qgf.h
 
-$(GENERATED_OUTPUT)/lock-caps-ON.qgf.h: $(USER_PATH)/Makefile $(USER_PATH)/lock-caps-ON.png
+$(GENERATED_OUTPUT)/lock-caps-ON.qgf.h: $(USER_PATH)/Makefile $(DJINN_GRAPHICS_PATH)/lock-caps-ON.png
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/lock-caps-ON.png -o $(GENERATED_OUTPUT) -f $(LOCK_IMAGE_FORMAT)
+	$(QMK_BIN) painter-convert-graphics -i $(DJINN_GRAPHICS_PATH)/lock-caps-ON.png -o $(GENERATED_OUTPUT) -f $(LOCK_IMAGE_FORMAT)
 
-$(GENERATED_OUTPUT)/lock-caps-OFF.qgf.h: $(USER_PATH)/Makefile $(USER_PATH)/lock-caps-OFF.png
+$(GENERATED_OUTPUT)/lock-caps-OFF.qgf.h: $(USER_PATH)/Makefile $(DJINN_GRAPHICS_PATH)/lock-caps-OFF.png
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/lock-caps-OFF.png -o $(GENERATED_OUTPUT) -f $(LOCK_IMAGE_FORMAT)
+	$(QMK_BIN) painter-convert-graphics -i $(DJINN_GRAPHICS_PATH)/lock-caps-OFF.png -o $(GENERATED_OUTPUT) -f $(LOCK_IMAGE_FORMAT)
 
 generated-files: $(GENERATED_OUTPUT)/lock-num-ON.qgf.h $(GENERATED_OUTPUT)/lock-num-OFF.qgf.h
 
-$(GENERATED_OUTPUT)/lock-num-ON.qgf.h: $(USER_PATH)/Makefile $(USER_PATH)/lock-num-ON.png
+$(GENERATED_OUTPUT)/lock-num-ON.qgf.h: $(USER_PATH)/Makefile $(DJINN_GRAPHICS_PATH)/lock-num-ON.png
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/lock-num-ON.png -o $(GENERATED_OUTPUT) -f $(LOCK_IMAGE_FORMAT)
+	$(QMK_BIN) painter-convert-graphics -i $(DJINN_GRAPHICS_PATH)/lock-num-ON.png -o $(GENERATED_OUTPUT) -f $(LOCK_IMAGE_FORMAT)
 
-$(GENERATED_OUTPUT)/lock-num-OFF.qgf.h: $(USER_PATH)/Makefile $(USER_PATH)/lock-num-OFF.png
+$(GENERATED_OUTPUT)/lock-num-OFF.qgf.h: $(USER_PATH)/Makefile $(DJINN_GRAPHICS_PATH)/lock-num-OFF.png
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/lock-num-OFF.png -o $(GENERATED_OUTPUT) -f $(LOCK_IMAGE_FORMAT)
+	$(QMK_BIN) painter-convert-graphics -i $(DJINN_GRAPHICS_PATH)/lock-num-OFF.png -o $(GENERATED_OUTPUT) -f $(LOCK_IMAGE_FORMAT)
 
 generated-files: $(GENERATED_OUTPUT)/lock-scrl-ON.qgf.h $(GENERATED_OUTPUT)/lock-scrl-OFF.qgf.h
 
-$(GENERATED_OUTPUT)/lock-scrl-ON.qgf.h: $(USER_PATH)/Makefile $(USER_PATH)/lock-scrl-ON.png
+$(GENERATED_OUTPUT)/lock-scrl-ON.qgf.h: $(USER_PATH)/Makefile $(DJINN_GRAPHICS_PATH)/lock-scrl-ON.png
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/lock-scrl-ON.png -o $(GENERATED_OUTPUT) -f $(LOCK_IMAGE_FORMAT)
+	$(QMK_BIN) painter-convert-graphics -i $(DJINN_GRAPHICS_PATH)/lock-scrl-ON.png -o $(GENERATED_OUTPUT) -f $(LOCK_IMAGE_FORMAT)
 
-$(GENERATED_OUTPUT)/lock-scrl-OFF.qgf.h: $(USER_PATH)/Makefile $(USER_PATH)/lock-scrl-OFF.png
+$(GENERATED_OUTPUT)/lock-scrl-OFF.qgf.h: $(USER_PATH)/Makefile $(DJINN_GRAPHICS_PATH)/lock-scrl-OFF.png
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/lock-scrl-OFF.png -o $(GENERATED_OUTPUT) -f $(LOCK_IMAGE_FORMAT)
+	$(QMK_BIN) painter-convert-graphics -i $(DJINN_GRAPHICS_PATH)/lock-scrl-OFF.png -o $(GENERATED_OUTPUT) -f $(LOCK_IMAGE_FORMAT)

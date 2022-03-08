@@ -8,4 +8,4 @@
 #include <qp.h>
 
 extern const uint32_t font_noto16_length;
-extern const uint8_t  font_noto16[2874] QP_RESIDENT_FLASH;
+extern const uint8_t  font_noto16[2874];

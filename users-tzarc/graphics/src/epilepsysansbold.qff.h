@@ -8,4 +8,4 @@
 #include <qp.h>
 
 extern const uint32_t font_epilepsysansbold_length;
-extern const uint8_t  font_epilepsysansbold[1868] QP_RESIDENT_FLASH;
+extern const uint8_t  font_epilepsysansbold[1868];

@@ -8,4 +8,4 @@
 #include <qp.h>
 
 extern const uint32_t font_redalert13_length;
-extern const uint8_t  font_redalert13[1190] QP_RESIDENT_FLASH;
+extern const uint8_t  font_redalert13[1190];
