@@ -72,7 +72,8 @@ int lzjb_decompress(void* s_start, void* d_start, size_t s_len, size_t d_len) {
             max_offset = offset > max_offset ? offset : max_offset;
             src += 2;
             if ((cpy = dst - offset) < (uint8_t*)d_start) return (-1);
-            while (--mlen >= 0 && dst < d_end) *dst++ = *cpy++;
+            while (--mlen >= 0 && dst < d_end)
+                *dst++ = *cpy++;
         } else {
             *dst++ = *src++;
         }
@@ -128,4 +129,4 @@ size_t lzjb_compress(void* s_start, void* d_start, size_t s_len, size_t d_len) {
 
     return (dst - (uint8_t*)d_start);
 }
-#endif  // LZJB_COMPRESSOR
+#endif // LZJB_COMPRESSOR

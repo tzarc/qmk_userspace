@@ -5,7 +5,7 @@
 /* USB Device descriptor parameter */
 #define VENDOR_ID 0x00DE
 #define PRODUCT_ID 0x0080
-#define DEVICE_VER 0x0076  // L for L151 version
+#define DEVICE_VER 0x0076 // L for L151 version
 #define MANUFACTURER Mode
 #define PRODUCT Eighty
 

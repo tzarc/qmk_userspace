@@ -22,7 +22,7 @@
 
 // Device definition
 typedef struct qmk_rgb565_surface_device_t {
-    struct painter_driver_t qp_driver;  // must be first, so it can be cast from the painter_device_t* type
+    struct painter_driver_t qp_driver; // must be first, so it can be cast from the painter_device_t* type
 
     // Geometry and buffer
     uint16_t  width;
@@ -90,7 +90,9 @@ static inline void increment_pixdata_location(qmk_rgb565_surface_device_t *surf)
     }
 }
 
-static inline void setpixel(qmk_rgb565_surface_device_t *surf, uint16_t x, uint16_t y, uint16_t color) { surf->buffer[y * surf->width + x] = color; }
+static inline void setpixel(qmk_rgb565_surface_device_t *surf, uint16_t x, uint16_t y, uint16_t color) {
+    surf->buffer[y * surf->width + x] = color;
+}
 
 static inline void append_pixel(qmk_rgb565_surface_device_t *surf, uint16_t pixel) {
     setpixel(surf, surf->pixdata_x, surf->pixdata_y, pixel);
@@ -112,7 +114,7 @@ static inline void stream_palette_pixdata_impl(qmk_rgb565_surface_device_t *surf
     const uint8_t  pixel_bitmask    = (1 << bits_per_pixel) - 1;
     const uint8_t  pixels_per_byte  = 8 / bits_per_pixel;
     const uint8_t *pixdata          = (const uint8_t *)pixel_data;
-    uint32_t       remaining_pixels = pixel_count;  // don't try to derive from byte_count, we may not use an entire byte
+    uint32_t       remaining_pixels = pixel_count; // don't try to derive from byte_count, we may not use an entire byte
 
     // Transmit each block of pixels
     while (remaining_pixels > 0) {
@@ -131,7 +133,7 @@ static inline void stream_palette_pixdata_impl(qmk_rgb565_surface_device_t *surf
 // Recolored renderer
 static inline void stream_palette_pixdata(qmk_rgb565_surface_device_t *surf, const uint8_t *const rgb_palette, uint8_t bits_per_pixel, uint32_t pixel_count, const void *const pixel_data, uint32_t byte_count) {
     // Generate the color lookup table
-    uint16_t items = 1 << bits_per_pixel;  // number of items we need to interpolate
+    uint16_t items = 1 << bits_per_pixel; // number of items we need to interpolate
     for (uint16_t i = 0; i < items; ++i) {
         rgb565_palette[i] = hsv_to_rgb565(rgb_palette[i * 3 + 0], rgb_palette[i * 3 + 1], rgb_palette[i * 3 + 2]);
     }
@@ -162,7 +164,7 @@ static inline void stream_mono_pixdata_recolor(qmk_rgb565_surface_device_t *surf
         last_val_bg         = val_bg;
 
         // Generate the color lookup table
-        uint16_t items = 1 << bits_per_pixel;  // number of items we need to interpolate
+        uint16_t items = 1 << bits_per_pixel; // number of items we need to interpolate
         qp_interpolate_palette(hsv_lookup_table, items, (qp_pixel_color_t){.hsv888 = {.h = hue_fg, .s = sat_fg, .v = val_fg}}, (qp_pixel_color_t){.hsv888 = {.h = hue_bg, .s = sat_bg, .v = val_bg}});
         for (uint16_t i = 0; i < items; ++i) {
             rgb565_palette[i] = hsv_to_rgb565(hsv_lookup_table[i].hsv888.h, hsv_lookup_table[i].hsv888.s, hsv_lookup_table[i].hsv888.v);
@@ -194,7 +196,7 @@ static bool drawimage_uncompressed_impl(qmk_rgb565_surface_device_t *surf, paint
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool qp_rgb565_surface_init(painter_device_t device, painter_rotation_t rotation) {
-    (void)rotation;  // no rotation supported.
+    (void)rotation; // no rotation supported.
     qmk_rgb565_surface_device_t *surf = (qmk_rgb565_surface_device_t *)device;
     if (surf->buffer) {
         return true;
@@ -224,7 +226,9 @@ bool qp_rgb565_surface_clear(painter_device_t device) {
     return true;
 }
 
-bool qp_rgb565_surface_power(painter_device_t device, bool power_on) { return true; }
+bool qp_rgb565_surface_power(painter_device_t device, bool power_on) {
+    return true;
+}
 
 bool qp_rgb565_surface_pixdata(painter_device_t device, const void *pixel_data, uint32_t native_pixel_count) {
     qmk_rgb565_surface_device_t *surf = (qmk_rgb565_surface_device_t *)device;
@@ -314,9 +318,9 @@ int16_t qp_rgb565_surface_drawtext(painter_device_t device, uint16_t x, uint16_t
                         } else {
                             byte_count = fdesc->byte_count - glyph_desc->offset;
                         }
-#else   // UNICODE_ENABLE
+#else  // UNICODE_ENABLE
                         byte_count = fdesc->byte_count - glyph_desc->offset;
-#endif  // UNICODE_ENABLE
+#endif // UNICODE_ENABLE
                     }
 
                     qp_rgb565_surface_viewport(surf, x, y, x + glyph_desc->width - 1, y + font->glyph_height - 1);
@@ -339,7 +343,7 @@ int16_t qp_rgb565_surface_drawtext(painter_device_t device, uint16_t x, uint16_t
                     }
                 }
             }
-#endif  // UNICODE_ENABLE
+#endif // UNICODE_ENABLE
         }
     }
 
@@ -351,7 +355,7 @@ int16_t qp_rgb565_surface_drawtext(painter_device_t device, uint16_t x, uint16_t
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Driver vtable
-static const struct painter_driver_vtable_t  driver_vtable = {
+static const struct painter_driver_vtable_t driver_vtable = {
     .init      = qp_rgb565_surface_init,
     .clear     = qp_rgb565_surface_clear,
     .power     = qp_rgb565_surface_power,

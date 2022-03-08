@@ -86,20 +86,20 @@
 #    define RGB_DI_PIN PIN_WS2812_3V3
 #    define RGBLED_NUM 15
 // Bitbang
-#    define NOP_FUDGE 0.5  // default of 0.4 gives flickering
+#    define NOP_FUDGE 0.5 // default of 0.4 gives flickering
 // PWM
-#    define WS2812_PWM_DRIVER PWMD2               // default: PWMD2
-#    define WS2812_PWM_CHANNEL 3                  // default: 2
-#    define WS2812_PWM_PAL_MODE 2                 // Pin "alternate function", see the respective datasheet for the appropriate values for your MCU. default: 2
-#    define WS2812_DMA_STREAM STM32_DMA1_STREAM2  // DMA Stream for TIMx_UP, see the respective reference manual for the appropriate values for your MCU.
-#    define WS2812_DMA_CHANNEL 8                  // DMA Channel for TIMx_UP, see the respective reference manual for the appropriate values for your MCU.
-#endif                                            // WS2812
+#    define WS2812_PWM_DRIVER PWMD2              // default: PWMD2
+#    define WS2812_PWM_CHANNEL 3                 // default: 2
+#    define WS2812_PWM_PAL_MODE 2                // Pin "alternate function", see the respective datasheet for the appropriate values for your MCU. default: 2
+#    define WS2812_DMA_STREAM STM32_DMA1_STREAM2 // DMA Stream for TIMx_UP, see the respective reference manual for the appropriate values for your MCU.
+#    define WS2812_DMA_CHANNEL 8                 // DMA Channel for TIMx_UP, see the respective reference manual for the appropriate values for your MCU.
+#endif                                           // WS2812
 
 /* RGB backlighting configuration */
 #ifdef RGBLIGHT_ENABLE
 #    define RGBLIGHT_ANIMATIONS
 #    define RGBLIGHT_LIMIT_VAL 160
-#endif  // RGBLIGHT_ENABLE
+#endif // RGBLIGHT_ENABLE
 
 /* RGB matrix configuration */
 #ifdef RGB_MATRIX_ENABLE
@@ -107,7 +107,7 @@
 #    define RGB_MATRIX_MAXIMUM_BRIGHTNESS 160
 #    define RGB_MATRIX_KEYPRESSES
 #    define RGB_MATRIX_FRAMEBUFFER_EFFECTS
-#endif  // RGB_MATRIX_ENABLE
+#endif // RGB_MATRIX_ENABLE
 
 #define OLED_DISPLAY_128X64
 
@@ -115,12 +115,12 @@
 #    define LCDWIDTH 128
 #    define LCDHEIGHT 64
 #    define I2C_ADDRESS_SA0_1 0x3C
-#endif  // QWIIC_MICRO_OLED_ENABLE
+#endif // QWIIC_MICRO_OLED_ENABLE
 
 #define JOYSTICK_BUTTON_COUNT 16
 #define JOYSTICK_AXES_COUNT 0
 
-#define IS_COMMAND() (matrix_is_on(6, 0) && matrix_is_on(7, 0) && matrix_is_on(7, 1) && matrix_is_on(7, 2))  // shift+ctrl+win+alt
+#define IS_COMMAND() (matrix_is_on(6, 0) && matrix_is_on(7, 0) && matrix_is_on(7, 1) && matrix_is_on(7, 2)) // shift+ctrl+win+alt
 
 /*
  * Feature disable options

@@ -25,7 +25,7 @@ static painter_font_handle_t  thintel;
 
 #if defined(RGB_MATRIX_EFFECT)
 #    undef RGB_MATRIX_EFFECT
-#endif  // defined(RGB_MATRIX_EFFECT)
+#endif // defined(RGB_MATRIX_EFFECT)
 
 #define RGB_MATRIX_EFFECT(x) RGB_MATRIX_EFFECT_##x,
 enum {
@@ -120,7 +120,7 @@ void draw_ui_user(void) {
         last_effect       = curr_effect;
         rgb_effect_redraw = true;
     }
-#endif  // defined(RGB_MATRIX_ENABLE)
+#endif // defined(RGB_MATRIX_ENABLE)
 
     // Show the Djinn logo and two vertical bars on both sides
     if (hue_redraw) {
@@ -173,7 +173,7 @@ void draw_ui_user(void) {
         }
 
         ypos += thintel->line_height + 4;
-#endif  // defined(RGB_MATRIX_ENABLE)
+#endif // defined(RGB_MATRIX_ENABLE)
 
         if (hue_redraw || layer_state_redraw) {
             const char *layer_name = "unknown";

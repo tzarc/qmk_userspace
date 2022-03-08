@@ -41,4 +41,6 @@ void enter_bootloader_mode_if_requested(void) {
     }
 }
 
-void early_hardware_init_post(void) { enter_bootloader_mode_if_requested(); }
+void early_hardware_init_post(void) {
+    enter_bootloader_mode_if_requested();
+}

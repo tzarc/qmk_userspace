@@ -257,7 +257,7 @@ void housekeeping_task_keymap(void) {
 #ifdef LUA_ENABLE
     void test_lua(void);
     test_lua();
-#endif  // LUA_ENABLE
+#endif // LUA_ENABLE
 }
 
 //----------------------------------------------------------
@@ -277,7 +277,7 @@ lua_State *L                 = 0;
 bool       lua_test_executed = false;
 
 static int dprint_wrapper(lua_State *L) {
-    const char *arg = luaL_checkstring(L, 1);  // first arg is what we want to print
+    const char *arg = luaL_checkstring(L, 1); // first arg is what we want to print
     (void)arg;
     dprintf("%s\n", arg);
     return 0;
@@ -290,10 +290,10 @@ void test_lua(void) {
         L = luaL_newstate();
         luaL_openlibs(L);
 
-        lua_newtable(L);                                              // new table
-        lua_pushnumber(L, 1);                                         // table index
-        lua_pushstring(L, "This is a test from executing lua code");  // value
-        lua_rawset(L, -3);                                            // set tbl[1]='This is a test from executing lua code'
+        lua_newtable(L);                                             // new table
+        lua_pushnumber(L, 1);                                        // table index
+        lua_pushstring(L, "This is a test from executing lua code"); // value
+        lua_rawset(L, -3);                                           // set tbl[1]='This is a test from executing lua code'
 
         // Set the "blah" global table to the newly-created table
         lua_setglobal(L, "blah");
@@ -303,7 +303,7 @@ void test_lua(void) {
 
         // now we can use blah[1] == 'This is a test from executing lua code'
 
-        const char *code = "dprint(blah[1])";  // should debug print "This is a test from executing lua code" in QMK Toolbox
+        const char *code = "dprint(blah[1])"; // should debug print "This is a test from executing lua code" in QMK Toolbox
         if (luaL_loadstring(L, code) == LUA_OK) {
             if (lua_pcall(L, 0, 1, 0) == LUA_OK) {
                 lua_pop(L, lua_gettop(L));
@@ -317,4 +317,33 @@ void test_lua(void) {
         lua_close(L);
     }
 }
-#endif  // LUA_ENABLE
+#endif // LUA_ENABLE
+
+#ifdef DEBUG_EEPROM_OUTPUT
+void matrix_scan_keymap(void) {
+    static uint32_t last_eeprom_access = 0;
+    uint32_t        now                = timer_read32();
+    if (now - last_eeprom_access > 5000) {
+        dprint("reading eeprom\n");
+        last_eeprom_access = now;
+
+        union {
+            uint8_t  bytes[4];
+            uint32_t raw;
+        } tmp;
+        extern uint8_t prng(void);
+        tmp.bytes[0] = prng();
+        tmp.bytes[1] = prng();
+        tmp.bytes[2] = prng();
+        tmp.bytes[3] = prng();
+
+        eeconfig_update_user(tmp.raw);
+        uint32_t value = eeconfig_read_user();
+        if (value != tmp.raw) {
+            dprint("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+            dprint("!! EEPROM readback mismatch!\n");
+            dprint("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+        }
+    }
+}
+#endif // DEBUG_EEPROM_OUTPUT

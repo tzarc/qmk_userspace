@@ -13,21 +13,21 @@ unset upgrade_chibios_confs
 target_branch="generated-workarea"
 target_qmk="develop"
 
-target_chibios="svn-mirror/stable_20.3.x"
-target_chibios_contrib="mirror/chibios-20.3.x"
+target_chibios="svn-mirror/stable_21.11.x"
+target_chibios_contrib="mirror/chibios-21.11.x"
 
 if [ ! -z ${upgrade_chibios:-} ] ; then
     target_branch="generated-chibios-master-upgrade"
     target_qmk="develop"
 
-    target_chibios="svn-mirror/stable_21.6.x"
-    target_chibios_contrib="mirror/chibios-20.3.x"
+    target_chibios="svn-mirror/stable_21.11.x"
+    target_chibios_contrib="mirror/chibios-21.11.x"
 fi
 
 declare -a prs_to_apply
 #prs_to_apply+=(14208) # ChibiOS master support
 prs_to_apply+=(10174) # Quantum Painter
-#prs_to_apply+=(13286) # encoder mapping
+prs_to_apply+=(13286) # encoder mapping
 
 declare -a cherry_picks
 #cherry_picks+=(749aca03c90c9316189b58e3236bea9242f3990f) # RGB_MATRIX slave scan

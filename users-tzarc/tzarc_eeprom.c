@@ -24,7 +24,9 @@ static inline void dump_config(const char *name, struct tzarc_eeprom_cfg_t *cfg)
 }
 #endif
 
-void tzarc_eeprom_init(void) { memset(&tzarc_eeprom_cfg, 0, sizeof(tzarc_eeprom_cfg)); }
+void tzarc_eeprom_init(void) {
+    memset(&tzarc_eeprom_cfg, 0, sizeof(tzarc_eeprom_cfg));
+}
 
 static uint8_t tzarc_eeprom_calculate_magic(struct tzarc_eeprom_cfg_t *cfg) {
     uint8_t magic = TZARC_EEPROM_MAGIC_SEED;

@@ -12,7 +12,9 @@
 
 painter_device_t lcd;
 
-void board_init(void) { usbpd_init(); }
+void board_init(void) {
+    usbpd_init();
+}
 
 __attribute__((weak)) void draw_ui_user(void) {}
 
@@ -127,17 +129,17 @@ void keyboard_post_init_kb(void) {
 #ifdef EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN
     setPinOutput(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN);
     writePinHigh(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN);
-#endif  // EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN
+#endif // EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN
 
     // Turn on the LCD
     setPinOutput(LCD_POWER_ENABLE_PIN);
     writePinHigh(LCD_POWER_ENABLE_PIN);
 
     // Let the LCD get some power...
-    wait_ms(50);
+    wait_ms(150);
 
     // Initialise the LCD
-    lcd = qp_ili9341_make_spi_device(320, 240, LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, 4, 0);
+    lcd = qp_ili9341_make_spi_device(320, 240, LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, 4, 3);
     qp_init(lcd, QP_ROTATION_0);
 
     // Turn on the LCD and clear the display

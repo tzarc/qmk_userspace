@@ -6,7 +6,8 @@
 
 // Delays can be shorter than 30us.
 void matrix_io_delay(void) {
-    for (int i = 0; i < 10; ++i) __asm__ volatile("nop\nnop\nnop\n");
+    for (int i = 0; i < 10; ++i)
+        __asm__ volatile("nop\nnop\nnop\n");
 }
 
 bool is_keyboard_master(void) {
@@ -88,4 +89,4 @@ led_config_t g_led_config = {
     }
 };
 // clang-format on
-#endif  // RGB_MATRIX_ENABLE
+#endif // RGB_MATRIX_ENABLE

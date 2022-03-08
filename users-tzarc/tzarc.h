@@ -48,7 +48,7 @@ layer_state_t layer_state_set_user(layer_state_t state);
 #define BITMASK_BIT_ASSIGN(array, value, n, first) (value ? BITMASK_BIT_SET((array), (n), (first)) : BITMASK_BIT_CLEAR((array), (n), (first)))
 
 #define TZARC_EEPROM_LOCATION ((uint8_t *)EECONFIG_SIZE)
-#define TZARC_EEPROM_MAGIC_SEED (uint8_t)((uint8_t)__TIME__[0] + (uint8_t)__TIME__[1] + (uint8_t)__TIME__[3] + (uint8_t)__TIME__[4] + (uint8_t)__TIME__[6] + (uint8_t)__TIME__[7])  // HH:MM::SS
+#define TZARC_EEPROM_MAGIC_SEED (uint8_t)((uint8_t)__TIME__[0] + (uint8_t)__TIME__[1] + (uint8_t)__TIME__[3] + (uint8_t)__TIME__[4] + (uint8_t)__TIME__[6] + (uint8_t)__TIME__[7]) // HH:MM::SS
 
 __attribute__((packed)) struct tzarc_eeprom_cfg_t {
     uint8_t magic1;

@@ -28,7 +28,7 @@
 
 #ifndef ENCODER_RESOLUTION
 #    define ENCODER_RESOLUTION 2
-#endif  // ENCODER_RESOLUTION
+#endif // ENCODER_RESOLUTION
 
 // Bootloader
 #define STM32_BOOTLOADER_DUAL_BANK TRUE
@@ -61,7 +61,7 @@
 #define LCD_DC_PIN A15
 #ifndef LCD_ACTIVITY_TIMEOUT
 #    define LCD_ACTIVITY_TIMEOUT 30000
-#endif  // LCD_ACTIVITY_TIMEOUT
+#endif // LCD_ACTIVITY_TIMEOUT
 
 // Backlight driver (to control LCD backlight)
 #define BACKLIGHT_LEVELS 4
@@ -89,7 +89,7 @@
 #define A5_AUDIO
 #ifndef STARTUP_SONG
 #    define STARTUP_SONG SONG(STARTUP_SOUND)
-#endif  // STARTUP_SONG
+#endif // STARTUP_SONG
 
 // Deprecated features
 #define NO_ACTION_MACRO

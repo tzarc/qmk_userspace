@@ -87,32 +87,58 @@ static const char* wow_keycode_display_map[][2] = {
     [WOW_KEY_OFFSET(KC_NUMLOCK)]    = {"NumL", "NumL"},
 };
 
-const char* wow_key_char(uint16_t keycode) { return wow_keycode_display_map[WOW_KEY_OFFSET(keycode)][0]; }
+const char* wow_key_char(uint16_t keycode) {
+    return wow_keycode_display_map[WOW_KEY_OFFSET(keycode)][0];
+}
 
 struct wow_config_t wow_config;
 
-bool wow_key_enabled_get(uint16_t keycode) { return BITMASK_BIT_GET(tzarc_eeprom_cfg.wow_enabled, keycode, WOW_KEY_MIN); }
+bool wow_key_enabled_get(uint16_t keycode) {
+    return BITMASK_BIT_GET(tzarc_eeprom_cfg.wow_enabled, keycode, WOW_KEY_MIN);
+}
 void wow_key_enabled_set(uint16_t keycode, bool on) {
     BITMASK_BIT_ASSIGN(tzarc_eeprom_cfg.wow_enabled, on, keycode, WOW_KEY_MIN);
     tzarc_eeprom_save();
 }
 
-bool wow_key_keydown_get(uint16_t keycode) { return BITMASK_BIT_GET(wow_config.keydown, keycode, WOW_KEY_MIN); }
-void wow_key_keydown_set(uint16_t keycode, bool on) { BITMASK_BIT_ASSIGN(wow_config.keydown, on, keycode, WOW_KEY_MIN); }
+bool wow_key_keydown_get(uint16_t keycode) {
+    return BITMASK_BIT_GET(wow_config.keydown, keycode, WOW_KEY_MIN);
+}
+void wow_key_keydown_set(uint16_t keycode, bool on) {
+    BITMASK_BIT_ASSIGN(wow_config.keydown, on, keycode, WOW_KEY_MIN);
+}
 
-bool wow_key_released_get(uint16_t keycode) { return BITMASK_BIT_GET(wow_config.released, keycode, WOW_KEY_MIN); }
-void wow_key_released_set(uint16_t keycode, bool on) { BITMASK_BIT_ASSIGN(wow_config.released, on, keycode, WOW_KEY_MIN); }
+bool wow_key_released_get(uint16_t keycode) {
+    return BITMASK_BIT_GET(wow_config.released, keycode, WOW_KEY_MIN);
+}
+void wow_key_released_set(uint16_t keycode, bool on) {
+    BITMASK_BIT_ASSIGN(wow_config.released, on, keycode, WOW_KEY_MIN);
+}
 
-bool wow_key_auto_registered_get(uint16_t keycode) { return BITMASK_BIT_GET(wow_config.auto_registered, keycode, WOW_KEY_MIN); }
-void wow_key_auto_registered_set(uint16_t keycode, bool on) { BITMASK_BIT_ASSIGN(wow_config.auto_registered, on, keycode, WOW_KEY_MIN); }
+bool wow_key_auto_registered_get(uint16_t keycode) {
+    return BITMASK_BIT_GET(wow_config.auto_registered, keycode, WOW_KEY_MIN);
+}
+void wow_key_auto_registered_set(uint16_t keycode, bool on) {
+    BITMASK_BIT_ASSIGN(wow_config.auto_registered, on, keycode, WOW_KEY_MIN);
+}
 
-uint32_t wow_key_last_keydown_get(uint16_t keycode) { return wow_config.last_keydown[WOW_KEY_OFFSET(keycode)]; }
-void     wow_key_last_keydown_set(uint16_t keycode, uint32_t last_keydown) { wow_config.last_keydown[WOW_KEY_OFFSET(keycode)] = last_keydown; }
+uint32_t wow_key_last_keydown_get(uint16_t keycode) {
+    return wow_config.last_keydown[WOW_KEY_OFFSET(keycode)];
+}
+void wow_key_last_keydown_set(uint16_t keycode, uint32_t last_keydown) {
+    wow_config.last_keydown[WOW_KEY_OFFSET(keycode)] = last_keydown;
+}
 
-uint32_t wow_key_next_trigger_get(uint16_t keycode) { return wow_config.next_trigger[WOW_KEY_OFFSET(keycode)]; }
-void     wow_key_next_trigger_set(uint16_t keycode, uint32_t next_trigger) { wow_config.next_trigger[WOW_KEY_OFFSET(keycode)] = next_trigger; }
+uint32_t wow_key_next_trigger_get(uint16_t keycode) {
+    return wow_config.next_trigger[WOW_KEY_OFFSET(keycode)];
+}
+void wow_key_next_trigger_set(uint16_t keycode, uint32_t next_trigger) {
+    wow_config.next_trigger[WOW_KEY_OFFSET(keycode)] = next_trigger;
+}
 
-void tzarc_wow_init(void) { memset(&wow_config, 0, sizeof(wow_config)); }
+void tzarc_wow_init(void) {
+    memset(&wow_config, 0, sizeof(wow_config));
+}
 
 bool process_record_wow(uint16_t keycode, keyrecord_t* record) {
     if (config_enabled) {

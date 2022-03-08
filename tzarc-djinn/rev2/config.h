@@ -14,9 +14,9 @@
 #    define SERIAL_USART_RX_PAL_MODE 7
 #    ifndef SERIAL_USART_SPEED
 #        define SERIAL_USART_SPEED 1200000
-#    endif  // SERIAL_USART_SPEED
+#    endif // SERIAL_USART_SPEED
 #    define SERIAL_USART_FULL_DUPLEX
-#endif  // defined(SERIAL_DRIVER_USART)
+#endif // defined(SERIAL_DRIVER_USART)
 
 // RGB configuration
 #define RGB_POWER_ENABLE_PIN B0
@@ -28,15 +28,15 @@
 
 // EEPROM configuration
 #define EXTERNAL_EEPROM_SPI_SLAVE_SELECT_PIN B5
-#define EXTERNAL_EEPROM_SPI_CLOCK_DIVISOR 8  // (160MHz/8) => 20MHz
+#define EXTERNAL_EEPROM_SPI_CLOCK_DIVISOR 8 // (160MHz/8) => 20MHz
 #define EXTERNAL_EEPROM_BYTE_COUNT 8192
-#define EXTERNAL_EEPROM_PAGE_SIZE 64  // it's FRAM, so it doesn't actually matter, this just sets the RAM buffer
+#define EXTERNAL_EEPROM_PAGE_SIZE 64 // it's FRAM, so it doesn't actually matter, this just sets the RAM buffer
 
 // External flash config
 #define EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN A8
-#define EXTERNAL_FLASH_SPI_CLOCK_DIVISOR 8           // (160MHz/8) => 20MHz
-#define EXTERNAL_FLASH_BYTE_COUNT (4 * 1024 * 1024)  // 32Mb/4MB capacity
-#define EXTERNAL_FLASH_PAGE_SIZE (4 * 1024)          // 4kB pages
+#define EXTERNAL_FLASH_SPI_CLOCK_DIVISOR 8          // (160MHz/8) => 20MHz
+#define EXTERNAL_FLASH_BYTE_COUNT (4 * 1024 * 1024) // 32Mb/4MB capacity
+#define EXTERNAL_FLASH_PAGE_SIZE (4 * 1024)         // 4kB pages
 
 // Fault indicators
 #define BOARD_POWER_FAULT_PIN C9

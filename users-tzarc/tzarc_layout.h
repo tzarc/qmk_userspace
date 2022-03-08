@@ -12,7 +12,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 #define KC_RAISE MO(LAYER_RAISE)
 
 #define KC_CTL_ESC MT(MOD_LCTL, KC_ESC)
-#define KC_SFT_ENT MT(MOD_RSFT, KC_ENT)  // KC_SFTENT doesn't seem to abide by tapping term timing?
+#define KC_SFT_ENT MT(MOD_RSFT, KC_ENT) // KC_SFTENT doesn't seem to abide by tapping term timing?
 
 #define KC_RGUI_LOWER LT(LAYER_LOWER, KC_RGUI)
 #define KC_APP_RAISE LT(LAYER_RAISE, KC_APP)

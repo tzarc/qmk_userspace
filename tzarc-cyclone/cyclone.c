@@ -16,16 +16,16 @@
 
 #ifdef OLED_DRIVER_ENABLE
 #    include "oled_driver.h"
-#endif  // OLED_DRIVER_ENABLE
+#endif // OLED_DRIVER_ENABLE
 
 #ifdef QWIIC_MICRO_OLED_ENABLE
 #    include "micro_oled.h"
 static void draw_ui(void);
-#endif  // QWIIC_MICRO_OLED_ENABLE
+#endif // QWIIC_MICRO_OLED_ENABLE
 
 #ifdef QUANTUM_PAINTER_ENABLE
 static void draw_ui(void);
-#endif  // QUANTUM_PAINTER_ENABLE
+#endif // QUANTUM_PAINTER_ENABLE
 
 #ifdef RGB_MATRIX_ENABLE
 led_config_t g_led_config = {{// Key Matrix to LED Index
@@ -55,9 +55,11 @@ led_config_t g_led_config = {{// Key Matrix to LED Index
                               {0, 64}},
                              {// LED Index to Flag
                               4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4}};
-#endif  // RGB_MATRIX_ENABLE
+#endif // RGB_MATRIX_ENABLE
 
-void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
+void matrix_io_delay(void) {
+    __asm__ volatile("nop\nnop\nnop\n");
+}
 
 void housekeeping_task_kb(void) {
 #ifdef TEST_SPI_OUTPUT
@@ -81,7 +83,7 @@ void housekeeping_task_kb(void) {
 #if defined(QWIIC_MICRO_OLED_ENABLE) || defined(QUANTUM_PAINTER_ENABLE)
     (void)draw_ui;
     draw_ui();
-#endif  // defined(QWIIC_MICRO_OLED_ENABLE) || defined(QUANTUM_PAINTER_ENABLE)
+#endif // defined(QWIIC_MICRO_OLED_ENABLE) || defined(QUANTUM_PAINTER_ENABLE)
 
     /*
     static uint32_t        last_oled_timer_print = 0;
@@ -123,7 +125,7 @@ void keyboard_post_init_kb(void) {
     if (!eeconfig_is_enabled()) {
         eeconfig_init();
     }
-#endif  // EEPROM_ENABLE
+#endif // EEPROM_ENABLE
 
     debug_enable   = true;
     debug_matrix   = true;
@@ -141,7 +143,7 @@ void keyboard_post_init_kb(void) {
         writePinHigh(A5);
         wait_ms(1);
     }
-#endif  // TEST_AUDIO_PIN_OUTPUT
+#endif // TEST_AUDIO_PIN_OUTPUT
 }
 
 #if defined(QUANTUM_PAINTER_ENABLE)
@@ -181,7 +183,7 @@ void draw_ui(void) {
         qp_drawimage(oled, 64, 32, last_led_state.scroll_lock ? gfx_lock_scrl : gfx_lock_scrl_OFF);
     }
 }
-#endif  // defined(QUANTUM_PAINTER_ENABLE)
+#endif // defined(QUANTUM_PAINTER_ENABLE)
 
 #if defined(OLED_DRIVER_ENABLE) && !defined(QUANTUM_PAINTER_ENABLE)
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
@@ -191,32 +193,32 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 
 uint8_t last_led_usb_state = 0xFF;
 void    oled_task_user(void) {
-    // Host Keyboard LED Status
+       // Host Keyboard LED Status
     uint8_t led_usb_state = host_keyboard_leds();
     if (last_led_usb_state != led_usb_state) {
-        last_led_usb_state = led_usb_state;
-        oled_write_ln_P(led_usb_state & (1 << USB_LED_NUM_LOCK) ? PSTR("NUM  ") : PSTR("     "), false);
-        oled_advance_page(true);
-        oled_write_ln_P(led_usb_state & (1 << USB_LED_CAPS_LOCK) ? PSTR("CAP  ") : PSTR("     "), false);
-        oled_advance_page(true);
-        oled_write_ln_P(led_usb_state & (1 << USB_LED_SCROLL_LOCK) ? PSTR("SCR  ") : PSTR("     "), false);
+           last_led_usb_state = led_usb_state;
+           oled_write_ln_P(led_usb_state & (1 << USB_LED_NUM_LOCK) ? PSTR("NUM  ") : PSTR("     "), false);
+           oled_advance_page(true);
+           oled_write_ln_P(led_usb_state & (1 << USB_LED_CAPS_LOCK) ? PSTR("CAP  ") : PSTR("     "), false);
+           oled_advance_page(true);
+           oled_write_ln_P(led_usb_state & (1 << USB_LED_SCROLL_LOCK) ? PSTR("SCR  ") : PSTR("     "), false);
     }
 }
-#endif  // defined(OLED_DRIVER_ENABLE) && !defined(QUANTUM_PAINTER_ENABLE)
+#endif // defined(OLED_DRIVER_ENABLE) && !defined(QUANTUM_PAINTER_ENABLE)
 
 #ifdef QWIIC_MICRO_OLED_ENABLE
 uint8_t last_led_usb_state = 0xFF;
 void    draw_ui(void) {
-    uint8_t led_usb_state = host_keyboard_leds();
-    if (last_led_usb_state != led_usb_state) {
-        last_led_usb_state = led_usb_state;
-        draw_string(2, 2, led_usb_state & (1 << USB_LED_NUM_LOCK) ? PSTR("NUM  ") : PSTR("     "), PIXEL_ON, NORM, 0);
-        draw_string(2, 12, led_usb_state & (1 << USB_LED_CAPS_LOCK) ? PSTR("CAPS") : PSTR("     "), PIXEL_ON, NORM, 0);
-        draw_string(2, 22, led_usb_state & (1 << USB_LED_SCROLL_LOCK) ? PSTR("SCRL") : PSTR("     "), PIXEL_ON, NORM, 0);
+       uint8_t led_usb_state = host_keyboard_leds();
+       if (last_led_usb_state != led_usb_state) {
+           last_led_usb_state = led_usb_state;
+           draw_string(2, 2, led_usb_state & (1 << USB_LED_NUM_LOCK) ? PSTR("NUM  ") : PSTR("     "), PIXEL_ON, NORM, 0);
+           draw_string(2, 12, led_usb_state & (1 << USB_LED_CAPS_LOCK) ? PSTR("CAPS") : PSTR("     "), PIXEL_ON, NORM, 0);
+           draw_string(2, 22, led_usb_state & (1 << USB_LED_SCROLL_LOCK) ? PSTR("SCRL") : PSTR("     "), PIXEL_ON, NORM, 0);
     }
-    send_buffer();
+       send_buffer();
 }
-#endif  // QWIIC_MICRO_OLED_ENABLE
+#endif // QWIIC_MICRO_OLED_ENABLE
 
 void chibi_system_halt_hook(const char* reason) {
     // re-route to QMK toolbox...

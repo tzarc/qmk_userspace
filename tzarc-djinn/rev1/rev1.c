@@ -20,7 +20,7 @@ bool is_keyboard_master(void) {
 
     return is_master;
 }
-#endif  // USE_PLUG_DETECT_PIN
+#endif // USE_PLUG_DETECT_PIN
 
 #ifdef RGB_MATRIX_ENABLE
 // clang-format off
@@ -85,4 +85,4 @@ led_config_t g_led_config = {
     }
 };
 // clang-format on
-#endif  // RGB_MATRIX_ENABLE
+#endif // RGB_MATRIX_ENABLE

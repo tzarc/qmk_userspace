@@ -45,4 +45,6 @@ void keyboard_post_init_user(void) {
     rgblight_enable();
 }
 
-void matrix_io_delay(void) { __asm__ volatile("nop\nnop\nnop\n"); }
+void matrix_io_delay(void) {
+    __asm__ volatile("nop\nnop\nnop\n");
+}

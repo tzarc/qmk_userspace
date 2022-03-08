@@ -77,13 +77,19 @@ __attribute__((weak)) void eeconfig_init_keymap(void) {}
 __attribute__((weak)) void keyboard_pre_init_keymap(void) {}
 __attribute__((weak)) void keyboard_post_init_keymap(void) {}
 
-__attribute__((weak)) bool process_record_keymap(uint16_t keycode, keyrecord_t *record) { return true; }
+__attribute__((weak)) bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
+    return true;
+}
 
 __attribute__((weak)) void matrix_scan_keymap(void) {}
 
-__attribute__((weak)) layer_state_t layer_state_set_keymap(layer_state_t state) { return state; }
+__attribute__((weak)) layer_state_t layer_state_set_keymap(layer_state_t state) {
+    return state;
+}
 
-__attribute__((weak)) bool encoder_update_keymap(uint8_t index, bool clockwise) { return true; }
+__attribute__((weak)) bool encoder_update_keymap(uint8_t index, bool clockwise) {
+    return true;
+}
 
 __attribute__((weak)) void housekeeping_task_keymap(void) {}
 
@@ -100,7 +106,9 @@ void eeconfig_init_user(void) {
     eeconfig_init_keymap();
 }
 
-void keyboard_pre_init_user(void) { keyboard_pre_init_keymap(); }
+void keyboard_pre_init_user(void) {
+    keyboard_pre_init_keymap();
+}
 
 void keyboard_post_init_user(void) {
     tzarc_common_init();
@@ -149,7 +157,7 @@ bool process_record_glyph_replacement(uint16_t keycode, keyrecord_t *record, tra
             }
             return false;
         } else if (KC_1 <= keycode && keycode <= KC_0) {
-            if (is_shifted) {  // skip shifted numbers, so that we can still use symbols etc.
+            if (is_shifted) { // skip shifted numbers, so that we can still use symbols etc.
                 return process_record_keymap(keycode, record);
             }
             if (record->event.pressed) {
@@ -172,42 +180,42 @@ DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_boxes, 0x1F170, 0x1F170
 DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_regional, 0x1F1E6, 0x1F1E6, '0', '1', 0x2003);
 
 DEFINE_UNICODE_LUT_TRANSLATOR(unicode_lut_translator_aussie,
-                              0x0250,  // a
-                              'q',     // b
-                              0x0254,  // c
-                              'p',     // d
-                              0x01DD,  // e
-                              0x025F,  // f
-                              0x0183,  // g
-                              0x0265,  // h
-                              0x1D09,  // i
-                              0x027E,  // j
-                              0x029E,  // k
-                              'l',     // l
-                              0x026F,  // m
-                              'u',     // n
-                              'o',     // o
-                              'd',     // p
-                              'b',     // q
-                              0x0279,  // r
-                              's',     // s
-                              0x0287,  // t
-                              'n',     // u
-                              0x028C,  // v
-                              0x028D,  // w
-                              0x2717,  // x
-                              0x028E,  // y
-                              'z',     // z
-                              0x0269,  // 1
-                              0x3139,  // 2
-                              0x0190,  // 3
-                              0x3123,  // 4
-                              0x03DB,  // 5
-                              '9',     // 6
-                              0x3125,  // 7
-                              '8',     // 8
-                              '6',     // 9
-                              '0'      // 0
+                              0x0250, // a
+                              'q',    // b
+                              0x0254, // c
+                              'p',    // d
+                              0x01DD, // e
+                              0x025F, // f
+                              0x0183, // g
+                              0x0265, // h
+                              0x1D09, // i
+                              0x027E, // j
+                              0x029E, // k
+                              'l',    // l
+                              0x026F, // m
+                              'u',    // n
+                              'o',    // o
+                              'd',    // p
+                              'b',    // q
+                              0x0279, // r
+                              's',    // s
+                              0x0287, // t
+                              'n',    // u
+                              0x028C, // v
+                              0x028D, // w
+                              0x2717, // x
+                              0x028E, // y
+                              'z',    // z
+                              0x0269, // 1
+                              0x3139, // 2
+                              0x0190, // 3
+                              0x3123, // 4
+                              0x03DB, // 5
+                              '9',    // 6
+                              0x3125, // 7
+                              '8',    // 8
+                              '6',    // 9
+                              '0'     // 0
 );
 
 bool process_record_aussie(uint16_t keycode, keyrecord_t *record) {
@@ -471,5 +479,9 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return layer_state_set_keymap(state);
 }
 
-bool encoder_update_user(uint8_t index, bool clockwise) { return encoder_update_keymap(index, clockwise); }
-void housekeeping_task_user(void) { housekeeping_task_keymap(); }
+bool encoder_update_user(uint8_t index, bool clockwise) {
+    return encoder_update_keymap(index, clockwise);
+}
+void housekeeping_task_user(void) {
+    housekeeping_task_keymap();
+}

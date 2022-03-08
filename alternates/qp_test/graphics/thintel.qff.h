@@ -8,4 +8,4 @@
 #include <qp.h>
 
 extern const uint32_t font_thintel_length;
-extern const uint8_t  font_thintel[966] ;
+extern const uint8_t  font_thintel[966];

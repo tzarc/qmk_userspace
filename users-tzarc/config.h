@@ -11,7 +11,7 @@
 // Handle per-key tapping timing
 #ifdef TAPPING_TERM
 #    undef TAPPING_TERM
-#endif  // TAPPING_TERM
+#endif // TAPPING_TERM
 #define TAPPING_TERM 120
 
 #define RETRO_TAPPING
@@ -39,4 +39,4 @@
 // Ensure transient EEPROM has enough space
 #ifdef EEPROM_TRANSIENT
 #    define EEPROM_SIZE 96
-#endif  // EEPROM_TRANSIENT
+#endif // EEPROM_TRANSIENT

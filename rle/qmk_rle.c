@@ -19,20 +19,20 @@ int main(int argc, const char* argv[]) {
     const char* output_filename = "-";
     for (int i = 1; i < argc; ++i) {
         const char* const arg = argv[i];
-        if (strcmp(arg, "-d") == 0)  // decode
+        if (strcmp(arg, "-d") == 0) // decode
         {
             decode = true;
-        } else if (strcmp(arg, "-i") == 0)  // input file
+        } else if (strcmp(arg, "-i") == 0) // input file
         {
             ++i;
             if (i >= argc) return -1;
             input_filename = argv[i];
-        } else if (strcmp(arg, "-o") == 0)  // output file
+        } else if (strcmp(arg, "-o") == 0) // output file
         {
             ++i;
             if (i >= argc) return -1;
             output_filename = argv[i];
-        } else if (strcmp(arg, "-l") == 0)  // also run LZJB compression
+        } else if (strcmp(arg, "-l") == 0) // also run LZJB compression
         {
             lzjb = true;
         }
