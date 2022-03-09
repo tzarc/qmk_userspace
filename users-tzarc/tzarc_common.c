@@ -58,11 +58,13 @@ void tap_code16_nomods(uint8_t kc) {
 }
 
 void tap_unicode_glyph_nomods(uint32_t glyph) {
+#ifdef UNICODE_ENABLE
     uint8_t temp_mod = get_mods();
     clear_mods();
     clear_oneshot_mods();
     tap_unicode_glyph(glyph);
     set_mods(temp_mod);
+#endif
 }
 
 __attribute__((weak)) void eeconfig_init_keymap(void) {}
@@ -149,6 +151,7 @@ typedef uint32_t (*translator_function_t)(bool is_shifted, uint32_t keycode);
     }
 
 bool process_record_glyph_replacement(uint16_t keycode, keyrecord_t *record, translator_function_t translator) {
+#ifdef UNICODE_ENABLE
     uint8_t temp_mod   = get_mods();
     uint8_t temp_osm   = get_oneshot_mods();
     bool    is_shifted = (temp_mod | temp_osm) & MOD_MASK_SHIFT;
@@ -173,6 +176,7 @@ bool process_record_glyph_replacement(uint16_t keycode, keyrecord_t *record, tra
             return false;
         }
     }
+#endif
     return process_record_keymap(keycode, record);
 }
 
