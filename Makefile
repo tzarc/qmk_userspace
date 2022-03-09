@@ -231,12 +231,12 @@ $(foreach board_entry,$(BOARD_DEFS),$(eval $(call handle_board_entry,$(board_ent
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CONTAINER_PREAMBLE := export HOME="/tmp"; export PYTHONUSERBASE="/tmp/python"; export PATH="\$$PYTHONUSERBASE/bin:\$$PATH"; pip install --upgrade pip; hash -r; pip install -r requirements-dev.txt
+CONTAINER_PREAMBLE := export HOME="/tmp"; export PYTHONUSERBASE="/tmp/python"; export PATH="\$$PYTHONUSERBASE/bin:\$$PATH"; python3 -m pip install -r requirements-dev.txt
 
 format-core:
 	cd $(ROOTDIR)/qmk_firmware \
 		&& ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk format-c --core-only -a" \
-		&& ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk format-python -a"
+		&& qmk format-python -a
 
 pytest:
 	cd $(ROOTDIR)/qmk_firmware \

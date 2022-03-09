@@ -8,6 +8,9 @@
 // We don't ever have more than 8 layers.
 #define LAYER_STATE_8BIT
 
+// Unicode modes available for use
+#define UNICODE_SELECTED_MODES UC_MAC, UC_LNX, UC_WINC
+
 // Handle per-key tapping timing
 #ifdef TAPPING_TERM
 #    undef TAPPING_TERM

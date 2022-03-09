@@ -205,7 +205,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 //
 //                                               ┌─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────┐
 //                                               | 6           | 7           | 8           | 9           | 0           | Backspace   |
-#define ____________TZARC_6x4_ADJUST_R1_R________ _______,      _______,      _______,      DEBUG,        TIME_EEPRST,  TIME_RESET
+#define ____________TZARC_6x4_ADJUST_R1_R________ _______,      _______,      UC_MOD,       DEBUG,        TIME_EEPRST,  TIME_RESET
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | Y           | U           | U           | O           | P           | Backslash   |
 #define ____________TZARC_6x4_ADJUST_R2_R________ _______,      _______,      _______,      _______,      _______,      _______

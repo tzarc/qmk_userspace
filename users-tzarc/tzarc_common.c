@@ -6,6 +6,7 @@
 #include "tzarc.h"
 
 void register_unicode(uint32_t hex);
+#define tap_unicode_glyph register_unicode
 
 bool     config_enabled;
 uint16_t typing_mode;
@@ -56,14 +57,6 @@ void tap_code16_nomods(uint8_t kc) {
     set_mods(temp_mod);
 }
 
-void tap_unicode_glyph(uint32_t glyph) {
-#ifdef UNICODE_ENABLE
-    unicode_input_start();
-    register_unicode(glyph);
-    unicode_input_finish();
-#endif
-}
-
 void tap_unicode_glyph_nomods(uint32_t glyph) {
     uint8_t temp_mod = get_mods();
     clear_mods();
@@ -106,8 +99,17 @@ void eeconfig_init_user(void) {
     eeconfig_init_keymap();
 }
 
+int8_t tzarc_sendchar(uint8_t c) {
+    // TBD: hook
+
+    // This sends it through to console output by default.
+    extern int8_t sendchar(uint8_t c);
+    return sendchar(c);
+}
+
 void keyboard_pre_init_user(void) {
     keyboard_pre_init_keymap();
+    print_set_sendchar(tzarc_sendchar);
 }
 
 void keyboard_post_init_user(void) {
@@ -424,7 +426,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
     }
 
-    if (typing_mode == KC_WIDE) {
+    if (typing_mode == KC_WOWMODE) {
+        if ((WOW_KEY_MIN <= keycode) && (keycode <= WOW_KEY_MAX)) {
+            return process_record_wow(keycode, record);
+        }
+    } else if (typing_mode == KC_D3MODE) {
+        if ((KC_1 <= keycode) && (keycode <= KC_4)) {
+            return process_record_diablo3(keycode, record);
+        }
+    } else if (typing_mode == KC_WIDE) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
             return process_record_glyph_replacement(keycode, record, unicode_range_translator_wide);
         }
@@ -443,21 +453,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 return false;
             }
         }
+    }
 #ifndef __AVR__
-    } else if (typing_mode == KC_AUSSIE) {
+    else if (typing_mode == KC_AUSSIE) {
         return process_record_aussie(keycode, record);
     } else if (typing_mode == KC_ZALGO) {
         return process_record_zalgo(keycode, record);
-#endif // __AVR__
-    } else if (typing_mode == KC_WOWMODE) {
-        if ((WOW_KEY_MIN <= keycode) && (keycode <= WOW_KEY_MAX)) {
-            return process_record_wow(keycode, record);
-        }
-    } else if (typing_mode == KC_D3MODE) {
-        if ((KC_1 <= keycode) && (keycode <= KC_4)) {
-            return process_record_diablo3(keycode, record);
-        }
     }
+#endif // __AVR__
 
     return process_record_keymap(keycode, record);
 }
