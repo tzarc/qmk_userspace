@@ -33,10 +33,11 @@
 #define EXTERNAL_EEPROM_PAGE_SIZE 64 // it's FRAM, so it doesn't actually matter, this just sets the RAM buffer
 
 // External flash config
+#define EXTERNAL_FLASH_SPI_MODE 3
 #define EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN A8
-#define EXTERNAL_FLASH_SPI_CLOCK_DIVISOR 8          // (160MHz/8) => 20MHz
-#define EXTERNAL_FLASH_BYTE_COUNT (4 * 1024 * 1024) // 32Mb/4MB capacity
-#define EXTERNAL_FLASH_PAGE_SIZE (4 * 1024)         // 4kB pages
+#define EXTERNAL_FLASH_SPI_CLOCK_DIVISOR 4    // (160MHz/4) => 40MHz
+#define EXTERNAL_FLASH_SIZE (4 * 1024 * 1024) // 32Mb/4MB capacity
+#define DEBUG_FLASH_SPI_OUTPUT
 
 // Fault indicators
 #define BOARD_POWER_FAULT_PIN C9

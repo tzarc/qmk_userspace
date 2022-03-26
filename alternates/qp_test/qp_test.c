@@ -105,7 +105,7 @@ void keyboard_post_init_kb(void) {
 void matrix_scan_kb(void) {
     static uint32_t last_scan = 0;
     uint32_t        now       = timer_read32();
-    if (TIMER_DIFF_32(now, last_scan) >= 8000) {
+    if (TIMER_DIFF_32(now, last_scan) >= 3000) {
         last_scan = now;
         draw_test(ili9163, "ILI9163", now);
         draw_test(st7789, "ST7789", now);

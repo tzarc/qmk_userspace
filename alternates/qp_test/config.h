@@ -11,3 +11,6 @@
 #define DEVICE_VER 0x0001
 #define MANUFACTURER QMK
 #define PRODUCT Quantum Painter Tester
+
+//#define QUANTUM_PAINTER_DEBUG
+//#define DEBUG_EEPROM_OUTPUT

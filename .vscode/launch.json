@@ -114,17 +114,23 @@
     {
       "name": "Black Magic Probe (L412, cortex-debug)",
       "type": "cortex-debug",
-      "request": "launch",
+      "request": "attach",
       "cwd": "${workspaceRoot}/qmk_firmware",
       "svdFile": "${workspaceRoot}/svd/STM32L4x2.svd",
-      "executable": "${workspaceRoot}\\qmk_firmware\\.build\\l412_shiftreg_default.elf",
       "servertype": "bmp",
-      "BMPGDBSerialPort": "COM3",
       "device": "STM32L4x2",
       "v1": false,
+      "linux": {
+        "BMPGDBSerialPort": "/dev/ttyACM0",
+        "executable": "${workspaceRoot}/qmk_firmware/.build/qp_test_stm32l412kb_default.elf",
+        "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
+      },
       "windows": {
-        "armToolchainPath": "E:\\QMK_MSYS\\mingw64\\bin"
-      }
+        "BMPGDBSerialPort": "COM9",
+        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\qp_test_stm32l412kb_default.elf",
+        "armToolchainPath": "E:\\gcc-arm-none-eabi-10-2020-q4-major\\bin"
+      },
+      "showDevDebugOutput": "both"
     },
   ]
 }
