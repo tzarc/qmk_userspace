@@ -7,11 +7,19 @@
 #include "qp_ssd1351.h"
 
 #include "ghoul-logo.qgf.c"
+#include "ghoul-name.qgf.c"
+#include "lock-caps.qgf.c"
+#include "lock-num.qgf.c"
+#include "lock-scrl.qgf.c"
 #include "thintel15.qff.c"
 
 static painter_device_t       oled;
 static painter_image_handle_t logo;
+static painter_image_handle_t name;
 static painter_font_handle_t  font;
+static painter_image_handle_t lock_caps;
+static painter_image_handle_t lock_num;
+static painter_image_handle_t lock_scrl;
 
 void early_hardware_init_post(void) {
     // Forcefully disable the RGB output
@@ -24,14 +32,18 @@ void keyboard_post_init_kb(void) {
     debug_matrix   = true;
     debug_keyboard = true;
 
-    oled = qp_ssd1351_make_spi_device(128, 128, OLED_CS_PIN, OLED_DC_PIN, OLED_RST_PIN, 8, 0);
-    logo = qp_load_image_mem(gfx_ghoul_logo);
-    font = qp_load_font_mem(font_thintel15);
+    oled      = qp_ssd1351_make_spi_device(128, 128, OLED_CS_PIN, OLED_DC_PIN, OLED_RST_PIN, 8, 0);
+    logo      = qp_load_image_mem(gfx_ghoul_logo);
+    name      = qp_load_image_mem(gfx_ghoul_name);
+    font      = qp_load_font_mem(font_thintel15);
+    lock_caps = qp_load_image_mem(gfx_lock_caps);
+    lock_num  = qp_load_image_mem(gfx_lock_num);
+    lock_scrl = qp_load_image_mem(gfx_lock_scrl);
 
     qp_init(oled, QP_ROTATION_90);
     qp_rect(oled, 0, 0, 127, 127, 0, 0, 0, true);
+    qp_drawimage_recolor(oled, 0, 64 - (name->height / 2), name, 0, 255, 255, 0, 255, 0);
     qp_drawimage_recolor(oled, 127 - logo->width, 0, logo, 0, 255, 255, 0, 255, 0);
-    qp_drawtext(oled, 0, 0, font, "Ghoul v1.0");
     qp_flush(oled);
 
     // Enable RGB current limiter and wait for a bit before allowing RGB to continue
@@ -78,7 +90,20 @@ void housekeeping_task_kb(void) {
     }
 
     if (hue_redraw) {
+        qp_drawimage_recolor(oled, 0, 64 - (name->height / 2), name, curr_hue, 255, 255, curr_hue, 255, 0);
         qp_drawimage_recolor(oled, 127 - logo->width, 0, logo, curr_hue, 255, 255, curr_hue, 255, 0);
+    }
+
+    static led_t last_led_state = {0};
+    if (hue_redraw || last_led_state.raw != host_keyboard_led_state().raw) {
+        last_led_state.raw = host_keyboard_led_state().raw;
+        qp_drawimage_recolor(oled, lock_caps->width * 0, 0, lock_caps, curr_hue, 255, last_led_state.caps_lock ? 255 : 32, curr_hue, 255, 0);
+        qp_drawimage_recolor(oled, lock_caps->width * 1, 0, lock_num, curr_hue, 255, last_led_state.num_lock ? 255 : 32, curr_hue, 255, 0);
+        qp_drawimage_recolor(oled, lock_caps->width * 2, 0, lock_scrl, curr_hue, 255, last_led_state.scroll_lock ? 255 : 32, curr_hue, 255, 0);
+
+        qp_rect(oled, lock_caps->width * 0 + 1, lock_caps->height + 2, lock_caps->width * 1 - 1, lock_caps->height + 3, curr_hue, 255, last_led_state.caps_lock ? 255 : 0, true);
+        qp_rect(oled, lock_caps->width * 1 + 1, lock_caps->height + 2, lock_caps->width * 2 - 1, lock_caps->height + 3, curr_hue, 255, last_led_state.num_lock ? 255 : 0, true);
+        qp_rect(oled, lock_caps->width * 2 + 1, lock_caps->height + 2, lock_caps->width * 3 - 1, lock_caps->height + 3, curr_hue, 255, last_led_state.scroll_lock ? 255 : 0, true);
     }
 
     static int16_t current_reads[NUM_ADC_READS] = {0};
@@ -125,9 +150,23 @@ void housekeeping_task_kb(void) {
 
         char buf[32] = {0};
         sprintf(buf, "Current: %dmA", avg_current_ma);
-        qp_drawtext(oled, 0, 127 - (font->line_height * 2), font, buf);
+        static int16_t maxlen_curr = 0;
+        int16_t        len         = qp_drawtext_recolor(oled, 0, 127 - (font->line_height * 2), font, buf, 0, 0, 32, 0, 0, 0);
+        if (len < maxlen_curr) {
+            qp_rect(oled, len, 127 - (font->line_height * 2), maxlen_curr, 127 - (font->line_height * 1), 0, 0, 0, true);
+        } else if (len > maxlen_curr) {
+            maxlen_curr = len;
+        }
+
+        static int16_t maxlen_volt = 0;
         sprintf(buf, "Voltage: %dmV", avg_voltage_mv);
-        qp_drawtext(oled, 0, 127 - (font->line_height * 1), font, buf);
+        len = qp_drawtext_recolor(oled, 0, 127 - (font->line_height * 1), font, buf, 0, 0, 32, 0, 0, 0);
+        if (len < maxlen_volt) {
+            qp_rect(oled, len, 127 - (font->line_height * 1), maxlen_volt, 127 - (font->line_height * 0), 0, 0, 0, true);
+        } else if (len > maxlen_volt) {
+            maxlen_volt = len;
+        }
+
         qp_flush(oled);
 
         last_draw = timer_read32();
