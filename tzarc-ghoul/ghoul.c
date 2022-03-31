@@ -69,6 +69,18 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
 #define NUM_ADC_READS 32
 
 void housekeeping_task_kb(void) {
+    bool            hue_redraw = false;
+    static uint16_t last_hue   = 0xFFFF;
+    uint8_t         curr_hue   = rgblight_get_hue();
+    if (last_hue != curr_hue) {
+        last_hue   = curr_hue;
+        hue_redraw = true;
+    }
+
+    if (hue_redraw) {
+        qp_drawimage_recolor(oled, 127 - logo->width, 0, logo, curr_hue, 255, 255, curr_hue, 255, 0);
+    }
+
     static int16_t current_reads[NUM_ADC_READS] = {0};
     static int16_t voltage_reads[NUM_ADC_READS] = {0};
     static int     write_offset                 = 0;
@@ -98,7 +110,7 @@ void housekeeping_task_kb(void) {
     }
 
     static uint32_t last_draw = 0;
-    if (timer_elapsed32(last_draw) >= 250) {
+    if (hue_redraw || timer_elapsed32(last_draw) >= 250) {
         // Accumulate
         int32_t total_current_ma = 0;
         int32_t total_voltage_mv = 0;
