@@ -12,7 +12,9 @@ target_branch="nvram-refactor"
 
 cd "$qmk_firmware_dir"
 
-git checkout $target_branch
+git checkout -f develop || true
+git branch -D $target_branch || true
+git checkout -f -b $target_branch develop
 
 if [[ "$target_branch" != "$(git branch --show-current)" ]] ; then
     echo "Expected branch '$target_branch', was branch '$(git branch --show-current)'" >&2
@@ -30,7 +32,7 @@ string_replace() {
     local location=${3:-.}
     pushd "$location"
     echo -- "-------------------------"
-    git grep "$from_text" | cut -d: -f1 | sort | uniq | while read file ; do
+    git grep --name-only "$from_text" | sort | uniq | while read file ; do
         echo $file
         sed -i \
             -e "s@$from_text@$to_text@g" \
@@ -43,7 +45,7 @@ convert_one() {
     local from_func=$1
     local to_func=$2
     echo -- "-------------------------"
-    git grep "$from_func" | cut -d: -f1 | sort | uniq | while read file ; do
+    git grep --name-only "$from_func" | sort | uniq | while read file ; do
         echo $file
         sed -i \
             -e "s@$from_func(\s*@$to_func(@g" \
@@ -64,7 +66,7 @@ convert_one() {
 block_reorder() {
     local search_func=$1
     echo -- "-------------------------"
-    git grep "$search_func" | cut -d: -f1 | sort | uniq | while read file ; do
+    git grep --name-only "$search_func" | sort | uniq | while read file ; do
         echo $file
         sed -i \
             -e "s@$search_func(\s*\\(.*\\)\s*,\s*\\(.*\\)\s*,\s*\\(.*\\)\s*)@$search_func(\2, \1, \3)@g" \

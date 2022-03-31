@@ -16,11 +16,11 @@
       "externalConsole": false,
       "MIMode": "gdb",
       "setupCommands": [
-          {
-              "description": "Enable pretty-printing for gdb",
-              "text": "-enable-pretty-printing",
-              "ignoreFailures": true
-          }
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
       ]
     },
     {
@@ -35,11 +35,11 @@
       "externalConsole": false,
       "MIMode": "gdb",
       "setupCommands": [
-          {
-              "description": "Enable pretty-printing for gdb",
-              "text": "-enable-pretty-printing",
-              "ignoreFailures": true
-          }
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
       ]
     },
     {
@@ -48,7 +48,14 @@
       "cwd": "${workspaceRoot}/qmk_firmware",
       "request": "launch",
       "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-      "args": ["painter-convert-graphics", "--input", "tzarc-cyclone/graphics/lock-caps.png", "--format", "mono16", "--rle"],
+      "args": [
+        "painter-convert-graphics",
+        "--input",
+        "tzarc-cyclone/graphics/lock-caps.png",
+        "--format",
+        "mono16",
+        "--rle"
+      ],
       "console": "integratedTerminal",
       "env": {
         "MSYSTEM": "MINGW64",
@@ -61,7 +68,17 @@
       "cwd": "${workspaceRoot}",
       "request": "launch",
       "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-      "args": ["painter-make-font-image", "--font", "tzarc-cyclone/graphics/NotoSans-ExtraCondensedBold.ttf", "--size", "16", "--output", "tzarc-cyclone/graphics/noto.png", "--unicode-glyphs", "ĄȽɂɻɣɈʣ"],
+      "args": [
+        "painter-make-font-image",
+        "--font",
+        "tzarc-cyclone/graphics/NotoSans-ExtraCondensedBold.ttf",
+        "--size",
+        "16",
+        "--output",
+        "tzarc-cyclone/graphics/noto.png",
+        "--unicode-glyphs",
+        "ĄȽɂɻɣɈʣ"
+      ],
       "console": "integratedTerminal",
       "env": {
         "MSYSTEM": "MINGW64",
@@ -74,41 +91,19 @@
       "cwd": "${workspaceRoot}",
       "request": "launch",
       "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-      "args": ["painter-convert-font-image", "--input", "tzarc-cyclone/graphics/noto.png", "--format", "mono4", "--unicode-glyphs", "ĄȽɂɻɣɈʣ"],
+      "args": [
+        "painter-convert-font-image",
+        "--input",
+        "tzarc-cyclone/graphics/noto.png",
+        "--format",
+        "mono4",
+        "--unicode-glyphs",
+        "ĄȽɂɻɣɈʣ"
+      ],
       "console": "integratedTerminal",
       "env": {
         "MSYSTEM": "MINGW64",
         "CHERE_INVOKING": "1"
-      }
-    },
-    {
-      "name": "Black Magic Probe (Djinn, cortex-debug)",
-      "type": "cortex-debug",
-      "request": "launch",
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "svdFile": "${workspaceRoot}/svd/STM32G474xx.svd",
-      "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_djinn_rev1_tzarc.elf",
-      "servertype": "bmp",
-      "BMPGDBSerialPort": "COM3",
-      "device": "STM32G474",
-      "v1": false,
-      "windows": {
-        "armToolchainPath": "E:\\QMK_MSYS\\mingw64\\bin"
-      }
-    },
-    {
-      "name": "Black Magic Probe (m65s, cortex-debug)",
-      "type": "cortex-debug",
-      "request": "launch",
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "svdFile": "${workspaceRoot}/svd/STM32F411.svd",
-      "executable": "${workspaceRoot}\\qmk_firmware\\.build\\mode_m65s_default.elf",
-      "servertype": "bmp",
-      "BMPGDBSerialPort": "COM9",
-      "device": "STM32F411",
-      "v1": false,
-      "windows": {
-        "armToolchainPath": "E:\\QMK_MSYS\\mingw64\\bin"
       }
     },
     {
@@ -118,19 +113,44 @@
       "cwd": "${workspaceRoot}/qmk_firmware",
       "svdFile": "${workspaceRoot}/svd/STM32L4x2.svd",
       "servertype": "bmp",
+      "interface": "swd",
       "device": "STM32L4x2",
-      "v1": false,
       "linux": {
         "BMPGDBSerialPort": "/dev/ttyACM0",
         "executable": "${workspaceRoot}/qmk_firmware/.build/qp_test_stm32l412kb_default.elf",
         "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
       },
       "windows": {
-        "BMPGDBSerialPort": "COM9",
+        "BMPGDBSerialPort": "COM6",
         "executable": "${workspaceRoot}\\qmk_firmware\\.build\\qp_test_stm32l412kb_default.elf",
-        "armToolchainPath": "E:\\gcc-arm-none-eabi-10-2020-q4-major\\bin"
+        "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
       },
-      "showDevDebugOutput": "both"
+      "showDevDebugOutput": "parsed",
+      "preAttachCommands": ["set mem inaccessible-by-default off"],
+      "postAttachCommands": []
     },
+    {
+      "name": "Black Magic Probe (Ghoul, cortex-debug)",
+      "type": "cortex-debug",
+      "request": "attach",
+      "cwd": "${workspaceRoot}/qmk_firmware",
+      "svdFile": "${workspaceRoot}/svd/STM32F405.svd",
+      "servertype": "bmp",
+      "interface": "swd",
+      "device": "STM32F405",
+      "linux": {
+        "BMPGDBSerialPort": "/dev/ttyACM0",
+        "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_tzarc_ghoul_stm32_default.elf",
+        "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
+      },
+      "windows": {
+        "BMPGDBSerialPort": "COM6",
+        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_ghoul_stm32_default.elf",
+        "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
+      },
+      "showDevDebugOutput": "parsed",
+      "preAttachCommands": ["set mem inaccessible-by-default off"],
+      "postAttachCommands": []
+    }
   ]
 }

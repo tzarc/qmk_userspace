@@ -22,4 +22,4 @@ QUANTUM_PAINTER_DRIVERS = ili9163_spi st7789_spi ssd1351_spi
 
 LTO_ENABLE = yes
 
-#OPT = g
+OPT = g

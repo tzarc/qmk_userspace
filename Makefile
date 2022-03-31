@@ -26,6 +26,7 @@ BOARD_DEFS := \
 	cyclone!tzarc-cyclone!handwired/tzarc/cyclone!tzarc \
 	djinn_rev1!tzarc-djinn!handwired/tzarc/djinn!tzarc!handwired/tzarc/djinn/rev1 \
 	djinn_rev2!tzarc-djinn!handwired/tzarc/djinn!tzarc!handwired/tzarc/djinn/rev2 \
+	ghoul!tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/stm32 \
 	onekey_h743!alternates/nucleo144_h743zi!handwired/onekey/nucleo144_h743zi!reset \
 	onekey_l152!alternates/nucleo64_l152re!handwired/onekey/nucleo64_l152re!reset \
 	onekey_g431!alternates/nucleo64_g431rb!handwired/onekey/nucleo64_g431rb!reset \
