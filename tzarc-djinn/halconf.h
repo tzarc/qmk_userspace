@@ -22,7 +22,7 @@
 
 #define SERIAL_BUFFERS_SIZE 256
 
-// This enables interrupt-driven moe
+// This enables interrupt-driven mode
 #define PAL_USE_WAIT TRUE
 
 #if defined(SERIAL_DRIVER_USART) || defined(SERIAL_DRIVER_USART_DUPLEX_ALT)

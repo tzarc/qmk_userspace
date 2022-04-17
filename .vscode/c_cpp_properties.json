@@ -10,7 +10,7 @@
             "cStandard": "c17",
             "cppStandard": "c++14",
             "intelliSenseMode": "linux-clang-x64",
-            "compileCommands": "${workspaceFolder}/qmk_firmware/compile_commands.json"
+            "compileCommands": "/home/nickb/qmk_build/qmk_firmware/compile_commands.json"
         }
     ],
     "version": 4

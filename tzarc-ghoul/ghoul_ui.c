@@ -62,6 +62,7 @@ void ui_task(void) {
         qp_rect(oled, lock_caps->width * 2 + 1, lock_caps->height + 2, lock_caps->width * 3 - 1, lock_caps->height + 3, curr_hue, 255, last_led_state.scroll_lock ? 255 : 0, true);
     }
 
+#if HAL_USE_ADC
     static int16_t current_reads[NUM_ADC_READS] = {0};
     static int16_t voltage_reads[NUM_ADC_READS] = {0};
     static int     write_offset                 = 0;
@@ -72,7 +73,7 @@ void ui_task(void) {
         int16_t current    = analogReadPin(ADC_CURRENT_PIN);
         int16_t voltage    = analogReadPin(ADC_VOLTAGE_PIN);
         int16_t current_ma = (int16_t)(((3300 * (int32_t)current) / ADC_SATURATION));
-        int16_t voltage_mv = (int16_t)(2 * (3300 * (int32_t)voltage) / ADC_SATURATION);
+        int16_t voltage_mv = (int16_t)((2 * (3300 * (int32_t)voltage)) / ADC_SATURATION);
 
         // Duplicate the first read so that averages work
         if (last_read == 0) {
@@ -86,6 +87,12 @@ void ui_task(void) {
         current_reads[write_offset] = current_ma;
         voltage_reads[write_offset] = voltage_mv;
         write_offset                = (write_offset + 1) % NUM_ADC_READS;
+
+        static int counter = 0;
+        counter = (counter + 1) % 2500;
+        if(counter == 0) {
+            dprintf("Current: %dmA (%d) -- Voltage: %dmV (%d)\n", (int)current_ma, (int)current, (int)voltage_mv, (int)voltage);
+        }
 
         last_read = timer_read32();
     }
@@ -127,4 +134,5 @@ void ui_task(void) {
 
         last_draw = timer_read32();
     }
+#endif // HAL_USE_ADC
 }

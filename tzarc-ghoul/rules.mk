@@ -19,4 +19,4 @@ RGBLIGHT_DRIVER = WS2812
 QUANTUM_PAINTER_ENABLE = yes
 QUANTUM_PAINTER_DRIVERS = ssd1351_spi
 
-SRC += analog.c ghoul_ui.c
+SRC += ghoul_ui.c
