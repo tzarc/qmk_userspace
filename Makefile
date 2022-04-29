@@ -26,7 +26,8 @@ BOARD_DEFS := \
 	cyclone!tzarc-cyclone!handwired/tzarc/cyclone!tzarc \
 	djinn_rev1!tzarc-djinn!handwired/tzarc/djinn!tzarc!handwired/tzarc/djinn/rev1 \
 	djinn_rev2!tzarc-djinn!handwired/tzarc/djinn!tzarc!handwired/tzarc/djinn/rev2 \
-	ghoul!tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/stm32 \
+	ghoul_stm32!tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/stm32 \
+	ghoul_rp2040!tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/rp2040 \
 	onekey_h743!alternates/nucleo144_h743zi!handwired/onekey/nucleo144_h743zi!reset \
 	onekey_l152!alternates/nucleo64_l152re!handwired/onekey/nucleo64_l152re!reset \
 	onekey_g431!alternates/nucleo64_g431rb!handwired/onekey/nucleo64_g431rb!reset \
@@ -69,6 +70,9 @@ nick: iris sat75 luddite mysterium-nick chocopad ctrl djinn bm16s one2mini
 
 djinn: NO_CDB = true
 djinn: djinn_rev1 djinn_rev2
+
+ghoul: NO_CDB = true
+ghoul: ghoul_stm32 ghoul_rp2040
 
 remove_artifacts:
 	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.uf2 "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format "$(ROOTDIR)"/compile_commands.json "$(ROOTDIR)"/qmk_firmware/compile_commands.json >/dev/null 2>&1 || true

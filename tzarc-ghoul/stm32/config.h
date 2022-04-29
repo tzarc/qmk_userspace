@@ -5,10 +5,11 @@
 #include "config_common.h"
 
 // Change PRODUCT based on hosted MicroMod
-#define PRODUCT Ghoul / STM32
+#define PRODUCT Ghoul_STM32
 
 // Matrix configuration
 #define SPI_MATRIX_CHIP_SELECT_PIN C4
+#define SPI_MATRIX_DIVISOR 32
 
 // Encoder
 #define ENCODERS_PAD_A \

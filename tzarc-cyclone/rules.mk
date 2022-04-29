@@ -21,6 +21,8 @@ MCU  = cortex-m0plus
 # ARM version, CORTEX-M0/M1 are 6, CORTEX-M3/M4/M7 are 7
 ARMV = 6
 
+BOOTLOADER = stm32-dfu
+
 # Build Options
 BOOTMAGIC_ENABLE = yes
 MOUSEKEY_ENABLE = yes
@@ -49,7 +51,12 @@ DFU_ARGS = -d 0483:df11 -a 0 -s 0x08000000:leave
 # Debugging
 #OPT_DEFS += -g -O0 -fno-lto
 
+DEBUG_MATRIX_SCAN_RATE_ENABLE = yes
+
 STM32_BOOTLOADER_ADDRESS = 0x1FF00000
 
-QUANTUM_PAINTER_ENABLE = yes
-QUANTUM_PAINTER_DRIVERS = qmk_oled_wrapper
+#QUANTUM_PAINTER_ENABLE = yes
+#QUANTUM_PAINTER_DRIVERS = qmk_oled_wrapper
+
+# rgb_matrix parser doesn't like this board
+ALLOW_WARNINGS = yes

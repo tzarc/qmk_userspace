@@ -5,7 +5,7 @@
 #include "quantum.h"
 
 // clang-format off
-#define LAYOUT_Cyclone( \
+#define LAYOUT_cyclone( \
      k0101, k0102, k0103, k0104, k0105, k0106, k0107, k0108,               \
      k0201, k0202, k0203, k0204, k0205, k0206, k0207, k0208,               \
      k0301,        k0303, k0304, k0305, k0306,        k0308,               \
