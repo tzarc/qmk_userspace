@@ -253,4 +253,4 @@ container-shell:
 
 xap-build:
 	cd $(ROOTDIR)/qmk_firmware \
-		&& ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); make -j -O kprepublic/bm16s:default XAP_ENABLE=yes"
+		&& ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); make -j -O kprepublic/bm16s:default XAP_ENABLE=yes SKIP_GIT=yes"

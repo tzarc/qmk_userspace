@@ -5,35 +5,17 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "(gdb) Launch encoder_tests_split_no_left",
+      "name": "(gdb) Launch wear_leveling_2byte_consolidation",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/qmk_firmware/.build/test/encoder_split_no_left.elf",
+      "program": "${workspaceFolder}/qmk_firmware/.build/test/wear_leveling_2byte_consolidation.elf",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}/qmk_firmware/.build/test",
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
-      ]
-    },
-    {
-      "name": "(gdb) Launch encoder_tests_split_no_right",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${workspaceFolder}/qmk_firmware/.build/test/encoder_split_no_right.elf",
-      "args": [],
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/qmk_firmware/.build/test",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "gdb",
+      //"preLaunchTask": "build wear_leveling tests",
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb",

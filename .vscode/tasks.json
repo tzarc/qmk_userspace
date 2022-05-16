@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build wear_leveling tests",
+      "type": "shell",
+      "command": "make -j -O test:wear_leveling:wear_leveling_2byte",
+      "options": {
+        "cwd": "${workspaceFolder}/qmk_firmware/",
+        "env": {
+            "PATH": "/home/nickb/qmk_build/bin:${env:PATH}"
+        }
+      }
+    }
+  ]
+}

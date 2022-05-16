@@ -9,6 +9,7 @@ NKRO_ENABLE = no
 COMMAND_ENABLE = no
 SPACE_CADET_ENABLE = no
 MAGIC_ENABLE = no
+CONSOLE_ENABLE ?= yes
 LTO_ENABLE ?= yes
 DEBUG_MATRIX_SCAN_RATE_ENABLE ?= yes
 BOOTMAGIC_ENABLE ?= yes
@@ -22,3 +23,18 @@ VPATH += $(USER_PATH)/graphics/src
 XAP_ENABLE ?= no
 RAW_ENABLE ?= no
 VIA_ENABLE ?= no
+
+ifeq ($(strip $(PLATFORM_KEY)),chibios)
+	CREATE_MAP=yes
+	EXTRAFLAGS=-fstack-usage
+	EXTRALDFLAGS=-Wl,--print-memory-usage
+else ifeq ($(strip $(PLATFORM_KEY)),arm_atsam)
+	LTO_ENABLE = no
+else ifeq ($(strip $(PLATFORM_KEY)),avr)
+	ifeq ($(strip $(PROTOCOL)),LUFA)
+		# Uses defaults as per rules.mk
+	else ifeq ($(strip $(PROTOCOL)),VUSB)
+		CONSOLE_ENABLE = no
+		DEBUG_MATRIX_SCAN_RATE_ENABLE = no
+	endif
+endif

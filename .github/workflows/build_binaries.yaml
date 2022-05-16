@@ -28,7 +28,8 @@ jobs:
         git submodule update --init --recursive
         cd "qmk_firmware" \
           && git fetch --all --tags \
-          && git checkout generated-workarea \
+          && git checkout develop \
+          && git pull --ff-only \
           && cd .. \
           || { echo "FAILED" >&2 ; exit 1 ; }
 
