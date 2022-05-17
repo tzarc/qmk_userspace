@@ -90,8 +90,8 @@ void ui_task(void) {
         write_offset                = (write_offset + 1) % NUM_ADC_READS;
 
         static int counter = 0;
-        counter = (counter + 1) % 2500;
-        if(counter == 0) {
+        counter            = (counter + 1) % 2500;
+        if (counter == 0) {
             dprintf("Current: %dmA (%d) -- Voltage: %dmV (%d)\n", (int)current_ma, (int)current, (int)voltage_mv, (int)voltage);
         }
 
