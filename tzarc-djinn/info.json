@@ -1,7 +1,7 @@
 {
-    "keyboard_name": "",
-    "maintainer": "qmk",
-    "url": "",
+    "keyboard_name": "Djinn",
+    "maintainer": "tzarc",
+    "url": "https://github.com/tzarc/djinn",
     "layouts": {
         "LAYOUT": {
             "layout": [
