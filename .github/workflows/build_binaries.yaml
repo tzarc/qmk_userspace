@@ -24,7 +24,7 @@ jobs:
 
     - name: Deploy submodules
       run: |
-        sed -i 's#git@github.com:#https://github.com/#g' .gitmodules
+        sed -i 's#git@github.com:tzarc#https://github.com/qmk#g' .gitmodules
         cd "qmk_firmware" \
           && git fetch --all --tags \
           && git checkout develop \
