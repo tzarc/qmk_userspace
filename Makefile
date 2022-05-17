@@ -66,7 +66,7 @@ arm: NO_CDB = true
 arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
 
 nick: NO_CDB = true
-nick: iris sat75 luddite mysterium-nick chocopad ctrl djinn bm16s one2mini
+nick: iris sat75 luddite mysterium-nick chocopad ctrl djinn bm16s one2mini ghoul_stm32
 
 djinn: NO_CDB = true
 djinn: djinn_rev1 djinn_rev2
