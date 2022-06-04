@@ -4,24 +4,24 @@
 			"path": "."
 		},
 		{
-			"path": "qmk_firmware/quantum/wear_leveling",
-			"name": "wear_leveling"
-		},
-		{
 			"path": "qmk_firmware/lib/python/qmk",
 			"name": "python-qmk"
 		},
 		{
-			"path": "qmk_firmware/keyboards/qmk",
-			"name": "keyboards-qmk"
+			"path": "qmk_firmware/data/xap",
+			"name": "xap-defs"
 		},
 		{
-			"path": "qmk_firmware/drivers/painter",
-			"name": "drivers-painter"
+			"path": "qmk_firmware/lib/python/qmk/xap",
+			"name": "xap-python"
 		},
 		{
-			"path": "qmk_firmware/quantum/painter",
-			"name": "quantum-painter"
+			"path": "qmk_firmware/lib/python/qmk/cli/xap",
+			"name": "xap-python-cli"
+		},
+		{
+			"path": "qmk_firmware/data/templates/xap",
+			"name": "xap-templates"
 		},
 	],
 	"settings": {

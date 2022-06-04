@@ -25,9 +25,8 @@ if [ ! -z ${upgrade_chibios:-} ] ; then
 fi
 
 declare -a prs_to_apply
-#prs_to_apply+=(14208) # ChibiOS master support
-prs_to_apply+=(10174) # Quantum Painter
-prs_to_apply+=(13286) # encoder mapping
+prs_to_apply+=(14877) # RP2040 support
+prs_to_apply+=(16996) # Generic wear-leveling
 
 declare -a cherry_picks
 #cherry_picks+=(749aca03c90c9316189b58e3236bea9242f3990f) # RGB_MATRIX slave scan

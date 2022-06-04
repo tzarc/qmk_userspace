@@ -127,18 +127,24 @@ build_qmk() {
         cd /home/qmk/qmk_firmware
         env -i HOME="$HOME" PATH="/home/qmk/.local/bin:/usr/local/bin:/usr/bin:/bin" TERM="linux" PWD="${PWD:-}" /home/qmk/run_ci_build.sh | sort || true
     } 2>&1 > /home/qmk/qmk_build_all.log
+
+#    {
+#        cd /home/qmk/qmk_firmware
+#        { qmk list-keyboards | grep handwired/onekey | while read kb ; do fmake ${kb}:all 2>&1 ; done | grep Making ; } || true
+#    } 2>&1 > /home/qmk/qmk_build_onekey.log
 }
 
 summary() {
-    num_successes=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(OK)\]' | wc -l)
-    num_skipped=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(SKIPPED)\]' | wc -l)
-    num_warnings=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(WARNINGS)\]' | wc -l)
-    num_failures=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(ERRORS)\]' | wc -l)
+    local logfile="$1"
+    num_successes=$(cat "$logfile" | grep -E '\[(OK)\]' | wc -l)
+    num_skipped=$(cat "$logfile" | grep -E '\[(SKIPPED)\]' | wc -l)
+    num_warnings=$(cat "$logfile" | grep -E '\[(WARNINGS)\]' | wc -l)
+    num_failures=$(cat "$logfile" | grep -E '\[(ERRORS)\]' | wc -l)
     echo "Successful builds: $num_successes"
     echo "Skipped builds: $num_skipped"
     echo "Warning builds: $num_warnings"
     echo "Failing builds: $num_failures"
-    cat /home/qmk/qmk_build_all.log | grep -E '\[(ERRORS)\]'
+    cat "$logfile" | grep -E '\[(ERRORS)\]'
 }
 
 failure_output() {
@@ -180,7 +186,7 @@ $(git log -n5 --color=always --no-merges | ctlchars2html)
 </pre>
 <hr/>
 <pre>
-$(summary | ctlchars2html)
+$(summary /home/qmk/qmk_build_all.log | ctlchars2html)
 </pre>
 <hr/>
 $(failure_output)
@@ -201,6 +207,14 @@ $(cd /home/qmk/qmk_firmware/ >/dev/null 2>&1; for f in $(ls *.hex *.bin *.uf2 2>
 done)
 </pre>
 </div>
+<!--
+<div style='float:left'>
+<h1>QMK develop branch OneKey builds</h1>
+<pre>
+$(summary /home/qmk/qmk_build_onekey.log | ctlchars2html)
+</pre>
+</div>
+-->
 </body></html>
 EOF
     } 2>&1 > /home/qmk/index.html
