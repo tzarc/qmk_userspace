@@ -19,6 +19,13 @@ void board_init(void) {
 __attribute__((weak)) void draw_ui_user(void) {}
 
 void housekeeping_task_kb(void) {
+    static bool written_layer_count = false;
+    if(timer_read32() > 15000 && !written_layer_count) {
+        written_layer_count = true;
+        dprintf("     keymap layer count: %d\n", (int)keymap_layer_count());
+        dprintf("encoder map layer count: %d\n", (int)encodermap_layer_count());
+    }
+
     // Update kb_state so we can send to slave
     kb_state_update();
 

@@ -4,7 +4,7 @@ if [[ ! -z $SIZE_REGRESSION_EXECUTING ]] ; then
     exit 0
 fi
 
-if [ "$1" != "$2" ]; then
+if [ "$1" = "" -o "$1" != "$2" ] ; then
     [ -e lib/ugfx ] && rm -rf lib/ugfx
     [ -e lib/lua ] && rm -rf lib/lua
     [ -e lib/littlefs ] && rm -rf lib/littlefs
