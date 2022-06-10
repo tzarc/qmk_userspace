@@ -19,6 +19,7 @@ BOARD_DEFS := \
 	sat75!tzarc-sat75!cannonkeys/satisfaction75/rev1/keymaps/tzarc!tzarc \
 	luddite!tzarc-luddite!40percentclub/luddite/keymaps/tzarc!tzarc \
 	one2mini!tzarc-one2mini!ducky/one2mini/1861st/keymaps/tzarc!tzarc \
+	annepro2!tzarc-annepro2!annepro2/c18/keymaps/tzarc!tzarc \
 	mysterium-nick!tzarc-mysterium!coseyfannitutti/mysterium/keymaps/tzarc!tzarc \
 	mysterium-dad!tzarc-mysterium-dad!coseyfannitutti/mysterium/keymaps/tzarc-dad!tzarc-dad \
 	chocopad!tzarc-chocopad!keebio/chocopad/keymaps/tzarc!tzarc \

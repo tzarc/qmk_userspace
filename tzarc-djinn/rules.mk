@@ -1,11 +1,6 @@
 MCU = STM32G474
 BOOTLOADER = stm32-dfu
 
-SRC += \
-	djinn_portscan_matrix.c \
-	djinn_split_sync.c \
-	djinn_usbpd.c
-
 BOOTMAGIC_ENABLE = yes      # Virtual DIP switch configuration
 MOUSEKEY_ENABLE = no        # Mouse keys
 EXTRAKEY_ENABLE = yes       # Audio control and System control
@@ -16,7 +11,11 @@ NKRO_ENABLE = no            # USB Nkey Rollover
 UNICODE_ENABLE = no         # Unicode
 WPM_ENABLE = yes
 
+CUSTOM_MATRIX = lite
+LTO_ENABLE = yes
+
 SPLIT_KEYBOARD = yes
+SERIAL_DRIVER = usart
 
 ENCODER_ENABLE = yes
 
@@ -41,8 +40,19 @@ AUDIO_PIN_ALT = A4
 QUANTUM_PAINTER_ENABLE = yes
 QUANTUM_PAINTER_DRIVERS = ili9341_spi
 
-USE_FPU = yes
-LTO_ENABLE = yes
-OPT = 2
+SRC += \
+	djinn_portscan_matrix.c \
+	djinn_split_sync.c \
+	djinn_usbpd.c
 
-DEFAULT_FOLDER = tzarc/djinn/rev2
+VPATH += \
+	$(KEYBOARD_PATH_5)/graphics \
+	$(KEYBOARD_PATH_5)/graphics/src \
+	$(KEYBOARD_PATH_4)/graphics \
+	$(KEYBOARD_PATH_4)/graphics/src \
+	$(KEYBOARD_PATH_3)/graphics \
+	$(KEYBOARD_PATH_3)/graphics/src \
+	$(KEYBOARD_PATH_2)/graphics \
+	$(KEYBOARD_PATH_2)/graphics/src \
+	$(KEYBOARD_PATH_1)/graphics \
+	$(KEYBOARD_PATH_1)/graphics/src

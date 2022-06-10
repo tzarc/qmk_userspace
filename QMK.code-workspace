@@ -31,6 +31,14 @@
 			"path": "qmk_firmware/.build/obj_kprepublic_bm16s_default/src",
 			"name": "xap-generated-bm16s"
 		},
+		{
+			"path": "qmk_firmware/.build/obj_handwired_tzarc_djinn_rev1/src",
+			"name": "xap-generated-djinn-rev1"
+		},
+		{
+			"path": "qmk_firmware/.build/obj_handwired_tzarc_djinn_rev2/src",
+			"name": "xap-generated-djinn-rev2"
+		},
 	],
 	"settings": {
 		"git.ignoreLimitWarning": true,

@@ -2,12 +2,20 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+// Limit the backlight brightness
+#ifndef BACKLIGHT_LIMIT_VAL
+#    define BACKLIGHT_LIMIT_VAL 144
+#endif // BACKLIGHT_LIMIT_VAL
+
 // Split configuration
+#define SPLIT_HAND_PIN B11
+
 #define SERIAL_USART_DRIVER SD3
 #define SERIAL_USART_TX_PAL_MODE 7
 #define SOFT_SERIAL_PIN B9
-#define SERIAL_USART_SPEED 640000
-#define SPLIT_HAND_PIN B11
+#ifndef SERIAL_USART_SPEED
+#    define SERIAL_USART_SPEED 640000
+#endif // SERIAL_USART_SPEED
 
 // RGB configuration
 #define RGB_POWER_ENABLE_PIN B1
@@ -19,6 +27,6 @@
 
 // EEPROM configuration
 #define EXTERNAL_EEPROM_SPI_SLAVE_SELECT_PIN B5
-#define EXTERNAL_EEPROM_SPI_CLOCK_DIVISOR 32
-#define EXTERNAL_EEPROM_BYTE_COUNT 4096
-#define EXTERNAL_EEPROM_PAGE_SIZE 64
+#define EXTERNAL_EEPROM_SPI_CLOCK_DIVISOR 8 // (160MHz/8) => 20MHz
+#define EXTERNAL_EEPROM_BYTE_COUNT 8192
+#define EXTERNAL_EEPROM_PAGE_SIZE 64 // it's FRAM, so it doesn't actually matter, this just sets the RAM buffer size

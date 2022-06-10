@@ -1,1 +1,1 @@
-SERIAL_DRIVER = usart
+# Placeholder to make the build system work.

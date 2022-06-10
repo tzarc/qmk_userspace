@@ -20,7 +20,27 @@
 static const pin_t row_pins[MATRIX_ROWS] = MATRIX_ROW_PINS;
 static const pin_t col_pins[MATRIX_COLS] = MATRIX_COL_PINS;
 
-void matrix_init_pins(void) {
+void matrix_wait_for_pin(pin_t pin, uint8_t target_state) {
+    rtcnt_t start = chSysGetRealtimeCounterX();
+    rtcnt_t end   = start + 5000;
+    while (chSysIsCounterWithinX(chSysGetRealtimeCounterX(), start, end)) {
+        if (readPin(pin) == target_state) {
+            break;
+        }
+    }
+}
+
+void matrix_wait_for_port(stm32_gpio_t *port, uint32_t target_bitmask) {
+    rtcnt_t start = chSysGetRealtimeCounterX();
+    rtcnt_t end   = start + 5000;
+    while (chSysIsCounterWithinX(chSysGetRealtimeCounterX(), start, end)) {
+        if ((palReadPort(port) & target_bitmask) == target_bitmask) {
+            break;
+        }
+    }
+}
+
+void matrix_init_custom(void) {
     for (int i = 0; i < MATRIX_ROWS; ++i) {
         setPinInputHigh(row_pins[i]);
     }
@@ -29,50 +49,51 @@ void matrix_init_pins(void) {
     }
 }
 
-void matrix_read_rows_on_col(matrix_row_t current_matrix[], uint8_t current_col, matrix_row_t row_shifter) {
-    // Setup the output column pin
-    setPinOutput(col_pins[current_col]);
-    writePinLow(col_pins[current_col]);
-    rtcnt_t start = chSysGetRealtimeCounterX();
-    rtcnt_t end   = start + 500;
-    while (chSysIsCounterWithinX(chSysGetRealtimeCounterX(), start, end)) {
-        if (readPin(col_pins[current_col]) == 0) {
-            break;
+bool matrix_scan_custom(matrix_row_t current_matrix[]) {
+    static matrix_row_t temp_matrix[MATRIX_ROWS] = {0};
+
+    for (int current_col = 0; current_col < MATRIX_COLS; ++current_col) {
+        // Keep track of the pin we're working with
+        pin_t curr_col_pin = col_pins[current_col];
+
+        // Setup the output column pin
+        setPinOutput(curr_col_pin);
+        writePinLow(curr_col_pin);
+        matrix_wait_for_pin(curr_col_pin, 0);
+
+        // Read the row ports
+        uint32_t gpio_b = palReadPort(GPIOB);
+        uint32_t gpio_c = palReadPort(GPIOC);
+
+        // Unselect the row pin
+        setPinInputHigh(curr_col_pin);
+
+        // Construct the packed bitmask for the pins
+        uint32_t readback = ~(((gpio_b & GPIOB_BITMASK) >> GPIOB_OFFSET) | (((gpio_c & GPIOC_BITMASK) >> GPIOC_OFFSET) << GPIOB_COUNT));
+
+        // Inject values into the matrix
+        for (int i = 0; i < MATRIX_ROWS; ++i) {
+            if (readback & (1 << i)) {
+                temp_matrix[i] |= (1ul << current_col);
+            } else {
+                temp_matrix[i] &= ~(1ul << current_col);
+            }
         }
+
+        // Wait for readback of the unselected column to go high
+        matrix_wait_for_pin(curr_col_pin, 1);
+
+        // Wait for readback of each port to go high -- unselecting the row would have been completed
+        matrix_wait_for_port(GPIOB, GPIOB_BITMASK);
+        matrix_wait_for_port(GPIOC, GPIOC_BITMASK);
     }
 
-    // Read the row ports
-    uint32_t gpio_b = palReadPort(GPIOB);
-    uint32_t gpio_c = palReadPort(GPIOC);
-
-    // Unselect the row pin
-    setPinInputHigh(col_pins[current_col]);
-
-    // Consutrct the packed bitmask for the pins
-    uint32_t readback = ~(((gpio_b & GPIOB_BITMASK) >> GPIOB_OFFSET) | (((gpio_c & GPIOC_BITMASK) >> GPIOC_OFFSET) << GPIOB_COUNT));
-
-    // Inject values into the matrix
-    for (int i = 0; i < MATRIX_ROWS; ++i) {
-        if (readback & (1 << i)) {
-            current_matrix[i] |= (1ul << current_col);
-        } else {
-            current_matrix[i] &= ~(1ul << current_col);
-        }
+    // Check if we've changed, return the last-read data
+    bool changed = memcmp(current_matrix, temp_matrix, sizeof(temp_matrix)) != 0;
+    if (changed) {
+        memcpy(current_matrix, temp_matrix, sizeof(temp_matrix));
     }
-
-    // Wait for readback of each port to go high -- unselecting the row would have been completed
-    start = chSysGetRealtimeCounterX();
-    end   = start + 500;
-    while (chSysIsCounterWithinX(chSysGetRealtimeCounterX(), start, end)) {
-        if ((palReadPort(GPIOB) & GPIOB_BITMASK) == GPIOB_BITMASK) {
-            break;
-        }
-    }
-    while (chSysIsCounterWithinX(chSysGetRealtimeCounterX(), start, end)) {
-        if ((palReadPort(GPIOC) & GPIOC_BITMASK) == GPIOC_BITMASK) {
-            break;
-        }
-    }
+    return changed;
 }
 
 void matrix_wait_for_interrupt(void) {

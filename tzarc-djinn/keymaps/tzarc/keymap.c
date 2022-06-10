@@ -11,15 +11,13 @@
 #include <split_util.h>
 
 #include "tzarc.h"
-//#include "qp_rgb565_surface.h"
 
-#define MEDIA_KEY_DELAY 5
-
-painter_device_t surf;
+//----------------------------------------------------------
+// Key map
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [LAYER_BASE] = LAYOUT_all_wrapper(
+    [LAYER_BASE] = LAYOUT_djinn_wrapper(
         ____________TZARC_7x4_BASE_R1_L__________,                                            ____________TZARC_7x4_BASE_R1_R__________,
         ____________TZARC_7x4_BASE_R2_L__________,                                            ____________TZARC_7x4_BASE_R2_R__________,
         ____________TZARC_7x4_BASE_R3_L__________,                                            ____________TZARC_7x4_BASE_R3_R__________,
@@ -30,7 +28,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                        KC_LEFT, _______, KC_RIGHT,                                            KC_LEFT, _______, KC_RIGHT,
                                 KC_DOWN,                                                               KC_DOWN
     ),
-    [LAYER_LOWER] = LAYOUT_all_wrapper(
+    [LAYER_LOWER] = LAYOUT_djinn_wrapper(
         ____________TZARC_7x4_LOWER_R1_L_________,                                            ____________TZARC_7x4_LOWER_R1_R_________,
         ____________TZARC_7x4_LOWER_R2_L_________,                                            ____________TZARC_7x4_LOWER_R2_R_________,
         ____________TZARC_7x4_LOWER_R3_L_________,                                            ____________TZARC_7x4_LOWER_R3_R_________,
@@ -41,7 +39,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                        _______, _______, _______,                                           _______, _______, _______,
                                 _______,                                                             _______
     ),
-    [LAYER_RAISE] = LAYOUT_all_wrapper(
+    [LAYER_RAISE] = LAYOUT_djinn_wrapper(
         ____________TZARC_7x4_RAISE_R1_L_________,                                            ____________TZARC_7x4_RAISE_R1_R_________,
         ____________TZARC_7x4_RAISE_R2_L_________,                                            ____________TZARC_7x4_RAISE_R2_R_________,
         ____________TZARC_7x4_RAISE_R3_L_________,                                            ____________TZARC_7x4_RAISE_R3_R_________,
@@ -52,7 +50,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                        _______, _______, _______,                                           _______, _______, _______,
                                 _______,                                                             _______
     ),
-    [LAYER_ADJUST] = LAYOUT_all_wrapper(
+    [LAYER_ADJUST] = LAYOUT_djinn_wrapper(
         ____________TZARC_7x4_ADJUST_R1_L________,                                            ____________TZARC_7x4_ADJUST_R1_R________,
         ____________TZARC_7x4_ADJUST_R2_L________,                                            ____________TZARC_7x4_ADJUST_R2_R________,
         ____________TZARC_7x4_ADJUST_R3_L________,                                            ____________TZARC_7x4_ADJUST_R3_R________,
@@ -66,134 +64,56 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-#ifdef ENCODER_MAP_ENABLE
+//----------------------------------------------------------
+// Encoder map
+
+// clang-format on
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
     [LAYER_BASE]   = {ENCODER_CCW_CW(KC_MS_WH_UP, KC_MS_WH_DOWN), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
     [LAYER_LOWER]  = {ENCODER_CCW_CW(RGB_HUD, RGB_HUI), ENCODER_CCW_CW(RGB_SAD, RGB_SAI)},
     [LAYER_RAISE]  = {ENCODER_CCW_CW(RGB_VAD, RGB_VAI), ENCODER_CCW_CW(RGB_SPD, RGB_SPI)},
     [LAYER_ADJUST] = {ENCODER_CCW_CW(RGB_RMOD, RGB_MOD), ENCODER_CCW_CW(KC_LEFT, KC_RIGHT)},
 };
-#else
-bool encoder_update_keymap(uint8_t index, bool clockwise) {
-    uint8_t temp_mod = get_mods();
-    uint8_t temp_osm = get_oneshot_mods();
-    bool    is_ctrl  = (temp_mod | temp_osm) & MOD_MASK_CTRL;
-    bool    is_shift = (temp_mod | temp_osm) & MOD_MASK_SHIFT;
-
-    if (is_shift) {
-        if (index == 0) { /* First encoder */
-            if (clockwise) {
-                rgblight_increase_hue();
-            } else {
-                rgblight_decrease_hue();
-            }
-        } else if (index == 1) { /* Second encoder */
-            if (clockwise) {
-                rgblight_decrease_sat();
-            } else {
-                rgblight_increase_sat();
-            }
-        }
-    } else if (is_ctrl) {
-        if (index == 0) { /* First encoder */
-            if (clockwise) {
-                rgblight_increase_val();
-            } else {
-                rgblight_decrease_val();
-            }
-        } else if (index == 1) { /* Second encoder */
-            if (clockwise) {
-                rgblight_increase_speed();
-            } else {
-                rgblight_decrease_speed();
-            }
-        }
-    } else {
-        if (index == 0) { /* First encoder */
-            if (clockwise) {
-                tap_code16(KC_MS_WH_DOWN);
-            } else {
-                tap_code16(KC_MS_WH_UP);
-            }
-        } else if (index == 1) { /* Second encoder */
-            if (clockwise) {
-                tap_code_delay(KC_VOLU, MEDIA_KEY_DELAY);
-            } else {
-                tap_code_delay(KC_VOLD, MEDIA_KEY_DELAY);
-            }
-        }
-    }
-    return false;
-}
-#endif
-
-// clang-format off
-#ifdef SWAP_HANDS_ENABLE
-const keypos_t PROGMEM hand_swap_config[MATRIX_ROWS][MATRIX_COLS] = {
-   { { 6,  6 }, { 5,  6 }, { 4,  6 }, { 3,  6 }, { 2,  6 }, { 1,  6 }, { 0,  6 } },
-   { { 6,  7 }, { 5,  7 }, { 4,  7 }, { 3,  7 }, { 2,  7 }, { 1,  7 }, { 0,  7 } },
-   { { 6,  8 }, { 5,  8 }, { 4,  8 }, { 3,  8 }, { 2,  8 }, { 1,  8 }, { 0,  8 } },
-   { { 6,  9 }, { 5,  9 }, { 4,  9 }, { 3,  9 }, { 2,  9 }, { 1,  9 }, { 0,  9 } },
-   { { 0,  0 }, { 0,  0 }, { 0,  0 }, { 6, 10 }, { 5, 10 }, { 4, 10 }, { 3, 10 } },
-   { { 0,  0 }, { 6, 11 }, { 5, 11 }, { 4, 11 }, { 3, 11 }, { 2, 11 }, { 1, 11 } },
-
-   { { 6,  0 }, { 5,  0 }, { 4,  0 }, { 3,  0 }, { 2,  0 }, { 1,  0 }, { 0,  0 } },
-   { { 6,  1 }, { 5,  1 }, { 4,  1 }, { 3,  1 }, { 2,  1 }, { 1,  1 }, { 0,  1 } },
-   { { 6,  2 }, { 5,  2 }, { 4,  2 }, { 3,  2 }, { 2,  2 }, { 1,  2 }, { 0,  2 } },
-   { { 6,  3 }, { 5,  3 }, { 4,  3 }, { 3,  3 }, { 2,  3 }, { 1,  3 }, { 0,  3 } },
-   { { 0,  0 }, { 0,  0 }, { 0,  0 }, { 6,  4 }, { 5,  4 }, { 4,  4 }, { 3,  4 } },
-   { { 0,  0 }, { 6,  5 }, { 5,  5 }, { 4,  5 }, { 3,  5 }, { 2,  5 }, { 1,  5 } },
-};
-#    ifdef ENCODER_MAP_ENABLE
-const uint8_t PROGMEM encoder_hand_swap_config[NUM_ENCODERS] = { 1, 0 };
-#    endif
-#endif
 // clang-format on
 
 //----------------------------------------------------------
+// Layer naming
+
+const char *current_layer_name(void) {
+    switch (get_highest_layer(layer_state)) {
+        case LAYER_BASE:
+            return "qwerty";
+        case LAYER_LOWER:
+            return "lower";
+        case LAYER_RAISE:
+            return "raise";
+        case LAYER_ADJUST:
+            return "adjust";
+    }
+    return "unknown";
+}
+
+//----------------------------------------------------------
 // Sync
+
 #pragma pack(push)
 #pragma pack(1)
-
 typedef struct user_runtime_config {
     uint32_t scan_rate;
 } user_runtime_config;
-
 #pragma pack(pop)
-
-_Static_assert(sizeof(user_runtime_config) == 4, "Invalid data transfer size for user sync data");
 
 user_runtime_config user_state;
 
-void rpc_user_sync_callback(uint8_t initiator2target_buffer_size, const void *initiator2target_buffer, uint8_t target2initiator_buffer_size, void *target2initiator_buffer) {
-    if (initiator2target_buffer_size == sizeof(user_state)) {
-        memcpy(&user_state, initiator2target_buffer, sizeof(user_runtime_config));
+void rpc_user_sync_callback(uint8_t m2s_size, const void *m2s_buffer, uint8_t s2m_size, void *s2m_buffer) {
+    if (m2s_size == sizeof(user_state)) {
+        memcpy(&user_state, m2s_buffer, m2s_size);
     }
-}
-
-static uint32_t counter = 0;
-
-void slave_counter_sync_callback(uint8_t initiator2target_buffer_size, const void *initiator2target_buffer, uint8_t target2initiator_buffer_size, void *target2initiator_buffer) {
-    uint32_t *send = (uint32_t *)target2initiator_buffer;
-    *send          = ++counter;
 }
 
 void keyboard_post_init_keymap(void) {
-    /*
-    // Initialise the framebuffer
-    surf = qp_rgb565_surface_make_device(8, 320);
-    qp_init(surf, QP_ROTATION_0);
-    for (int i = 0; i < 320; ++i) {
-        qp_line(surf, 0, i, 7, i, i % 256, 255, 255);
-    }
-
-    qp_viewport(lcd, 240 - 8 - 8 - 8, 0, 240 - 8 - 8 - 1, 319);
-    qp_pixdata(lcd, qp_rgb565_surface_get_buffer_ptr(surf), qp_rgb565_surface_get_pixel_count(surf));
-    */
-
     // Register keyboard state sync split transaction
     transaction_register_rpc(RPC_ID_SYNC_STATE_USER, rpc_user_sync_callback);
-    transaction_register_rpc(RPC_ID_GET_COUNTER, slave_counter_sync_callback);
 
     // Reset the initial shared data value between master and slave
     memset(&user_state, 0, sizeof(user_state));
@@ -236,13 +156,6 @@ void user_state_sync(void) {
             } else {
                 dprint("Failed to perform rpc call\n");
             }
-
-            uint32_t counter;
-            if (transaction_rpc_recv(RPC_ID_GET_COUNTER, sizeof(counter), &counter)) {
-                // dprintf("Slave counter: %d\n", (int)counter);
-            } else {
-                dprint("Failed to perform rpc call\n");
-            }
         }
     }
 }
@@ -261,8 +174,9 @@ void housekeeping_task_keymap(void) {
 }
 
 //----------------------------------------------------------
-// Display
-#include "theme_djinn.inl.c"
+// Display theme
+
+#include "theme_djinn_default.inl.c"
 
 //----------------------------------------------------------
 // Lua

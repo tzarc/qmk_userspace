@@ -51,9 +51,9 @@ void kb_state_sync(void) {
     }
 }
 
-void kb_state_sync_slave(uint8_t initiator2target_buffer_size, const void* initiator2target_buffer, uint8_t target2initiator_buffer_size, void* target2initiator_buffer) {
-    if (initiator2target_buffer_size == sizeof(kb_runtime_config)) {
-        memcpy(&kb_state, initiator2target_buffer, sizeof(kb_runtime_config));
+void kb_state_sync_slave(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
+    if (m2s_size == sizeof(kb_runtime_config)) {
+        memcpy(&kb_state, m2s_buffer, sizeof(kb_runtime_config));
         last_slave_sync_time = timer_read32();
     }
 }

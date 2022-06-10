@@ -30,6 +30,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 #define LAYOUT_tkl_ansi_wrapper(...) LAYOUT_tkl_ansi(__VA_ARGS__)
 #define LAYOUT_60_ansi_wrapper(...) LAYOUT_60_ansi(__VA_ARGS__)
 #define LAYOUT_ortho_4x4_wrapper(...) LAYOUT_ortho_4x4(__VA_ARGS__)
+#define LAYOUT_djinn_wrapper(...) LAYOUT_djinn(__VA_ARGS__)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Layout Helpers: 4x4 macropad layout

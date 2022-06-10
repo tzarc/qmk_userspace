@@ -12,105 +12,31 @@
 
 painter_device_t lcd;
 
+// clang-format off
+#ifdef SWAP_HANDS_ENABLE
+const keypos_t PROGMEM hand_swap_config[MATRIX_ROWS][MATRIX_COLS] = {
+   { { 6,  6 }, { 5,  6 }, { 4,  6 }, { 3,  6 }, { 2,  6 }, { 1,  6 }, { 0,  6 } },
+   { { 6,  7 }, { 5,  7 }, { 4,  7 }, { 3,  7 }, { 2,  7 }, { 1,  7 }, { 0,  7 } },
+   { { 6,  8 }, { 5,  8 }, { 4,  8 }, { 3,  8 }, { 2,  8 }, { 1,  8 }, { 0,  8 } },
+   { { 6,  9 }, { 5,  9 }, { 4,  9 }, { 3,  9 }, { 2,  9 }, { 1,  9 }, { 0,  9 } },
+   { { 0,  0 }, { 0,  0 }, { 0,  0 }, { 6, 10 }, { 5, 10 }, { 4, 10 }, { 3, 10 } },
+   { { 0,  0 }, { 6, 11 }, { 5, 11 }, { 4, 11 }, { 3, 11 }, { 2, 11 }, { 1, 11 } },
+
+   { { 6,  0 }, { 5,  0 }, { 4,  0 }, { 3,  0 }, { 2,  0 }, { 1,  0 }, { 0,  0 } },
+   { { 6,  1 }, { 5,  1 }, { 4,  1 }, { 3,  1 }, { 2,  1 }, { 1,  1 }, { 0,  1 } },
+   { { 6,  2 }, { 5,  2 }, { 4,  2 }, { 3,  2 }, { 2,  2 }, { 1,  2 }, { 0,  2 } },
+   { { 6,  3 }, { 5,  3 }, { 4,  3 }, { 3,  3 }, { 2,  3 }, { 1,  3 }, { 0,  3 } },
+   { { 0,  0 }, { 0,  0 }, { 0,  0 }, { 6,  4 }, { 5,  4 }, { 4,  4 }, { 3,  4 } },
+   { { 0,  0 }, { 6,  5 }, { 5,  5 }, { 4,  5 }, { 3,  5 }, { 2,  5 }, { 1,  5 } },
+};
+#    ifdef ENCODER_MAP_ENABLE
+const uint8_t PROGMEM encoder_hand_swap_config[NUM_ENCODERS] = { 1, 0 };
+#    endif
+#endif
+// clang-format on
+
 void board_init(void) {
     usbpd_init();
-}
-
-__attribute__((weak)) void draw_ui_user(void) {}
-
-void housekeeping_task_kb(void) {
-    static bool written_layer_count = false;
-    if(timer_read32() > 15000 && !written_layer_count) {
-        written_layer_count = true;
-        dprintf("     keymap layer count: %d\n", (int)keymap_layer_count());
-        dprintf("encoder map layer count: %d\n", (int)encodermap_layer_count());
-    }
-
-    // Update kb_state so we can send to slave
-    kb_state_update();
-
-    // Data sync from master to slave
-    kb_state_sync();
-
-    // Work out if we've changed our current limit, update the limiter circuit switches
-    static uint8_t current_setting = USBPD_500MA;
-    if (current_setting != kb_state.current_setting) {
-        current_setting = kb_state.current_setting;
-        switch (current_setting) {
-            default:
-            case USBPD_500MA:
-                writePinLow(RGB_CURR_1500mA_OK_PIN);
-                writePinLow(RGB_CURR_3000mA_OK_PIN);
-                break;
-#ifdef DJINN_SUPPORTS_3A_FUSE
-            case USBPD_1500MA:
-                writePinHigh(RGB_CURR_1500mA_OK_PIN);
-                writePinLow(RGB_CURR_3000mA_OK_PIN);
-                break;
-            case USBPD_3000MA:
-                writePinHigh(RGB_CURR_1500mA_OK_PIN);
-                writePinHigh(RGB_CURR_3000mA_OK_PIN);
-                break;
-#else
-            case USBPD_1500MA:
-            case USBPD_3000MA:
-                writePinHigh(RGB_CURR_1500mA_OK_PIN);
-                writePinLow(RGB_CURR_3000mA_OK_PIN);
-                break;
-#endif
-        }
-
-        // Toggle rgblight on and off, if it's already on, to force a brightness update on all LEDs
-        if (is_keyboard_master() && rgblight_is_enabled()) {
-            rgblight_disable_noeeprom();
-            rgblight_enable_noeeprom();
-        }
-    }
-
-    // Turn on/off the LCD
-    static bool lcd_on = false;
-    if (lcd_on != (bool)kb_state.lcd_power) {
-        lcd_on = (bool)kb_state.lcd_power;
-        qp_power(lcd, lcd_on);
-    }
-
-    // Enable/disable RGB
-    if (lcd_on) {
-        // Turn on RGB_PWR
-        writePinHigh(RGB_POWER_ENABLE_PIN);
-        // Modify the RGB state if different to the LCD state
-        if (rgblight_is_enabled() != lcd_on) {
-            // Wait for a small amount of time to allow the RGB capacitors to charge, before enabling RGB output
-            wait_ms(10);
-            // Enable RGB
-            rgblight_enable_noeeprom();
-        }
-    } else {
-        // Turn off RGB_PWR
-        writePinLow(RGB_POWER_ENABLE_PIN);
-        // Disable the PWM output for the RGB
-        if (rgblight_is_enabled() != lcd_on) {
-            rgblight_disable_noeeprom();
-        }
-    }
-
-    // Match the backlight to the LCD state
-    if (is_keyboard_master() && is_backlight_enabled() != lcd_on) {
-        if (lcd_on)
-            backlight_enable();
-        else
-            backlight_disable();
-    }
-
-    // Draw the UI
-    if (kb_state.lcd_power) {
-        draw_ui_user();
-    }
-
-    // Go into low-scan interrupt-based mode if we haven't had any matrix activity in the last 5 seconds
-    if (last_input_activity_elapsed() > 5000) {
-        matrix_wait_for_interrupt();
-    }
 }
 
 //----------------------------------------------------------
@@ -163,7 +89,7 @@ void keyboard_post_init_kb(void) {
 }
 
 //----------------------------------------------------------
-// QMK overrides
+// RGB brightness scaling dependent on USBPD state
 
 #if defined(RGB_MATRIX_ENABLE)
 RGB rgb_matrix_hsv_to_rgb(HSV hsv) {
@@ -173,22 +99,103 @@ RGB rgb_matrix_hsv_to_rgb(HSV hsv) {
         case USBPD_500MA:
             scale = 0.35f;
             break;
-#    ifdef DJINN_SUPPORTS_3A_FUSE
         case USBPD_1500MA:
             scale = 0.75f;
             break;
         case USBPD_3000MA:
             scale = 1.0f;
             break;
-#    else
-        case USBPD_1500MA:
-        case USBPD_3000MA:
-            scale = 0.75f;
-            break;
-#    endif
     }
 
     hsv.v = (uint8_t)(hsv.v * scale);
     return hsv_to_rgb(hsv);
 }
 #endif
+
+//----------------------------------------------------------
+// UI Placeholder, implemented in themes
+
+__attribute__((weak)) void draw_ui_user(void) {}
+
+//----------------------------------------------------------
+// Housekeeping
+
+void housekeeping_task_kb(void) {
+    // Update kb_state so we can send to slave
+    kb_state_update();
+
+    // Data sync from master to slave
+    kb_state_sync();
+
+    // Work out if we've changed our current limit, update the limiter circuit switches
+    static uint8_t current_setting = USBPD_500MA;
+    if (current_setting != kb_state.current_setting) {
+        current_setting = kb_state.current_setting;
+        switch (current_setting) {
+            default:
+            case USBPD_500MA:
+                writePinLow(RGB_CURR_1500mA_OK_PIN);
+                writePinLow(RGB_CURR_3000mA_OK_PIN);
+                break;
+            case USBPD_1500MA:
+                writePinHigh(RGB_CURR_1500mA_OK_PIN);
+                writePinLow(RGB_CURR_3000mA_OK_PIN);
+                break;
+            case USBPD_3000MA:
+                writePinHigh(RGB_CURR_1500mA_OK_PIN);
+                writePinHigh(RGB_CURR_3000mA_OK_PIN);
+                break;
+        }
+
+        // If we've changed the current limit, toggle rgb off and on if it was on, to force a brightness update on all LEDs
+        if (is_keyboard_master() && rgb_matrix_is_enabled()) {
+            rgb_matrix_disable_noeeprom();
+            rgb_matrix_enable_noeeprom();
+        }
+    }
+
+    // Turn on/off the LCD
+    static bool lcd_on = false;
+    if (lcd_on != (bool)kb_state.lcd_power) {
+        lcd_on = (bool)kb_state.lcd_power;
+        qp_power(lcd, lcd_on);
+    }
+
+    // Enable/disable RGB
+    if (lcd_on) {
+        // Turn on RGB
+        writePinHigh(RGB_POWER_ENABLE_PIN);
+        // Modify the RGB state if different to the LCD state
+        if (rgb_matrix_is_enabled() != lcd_on) {
+            // Wait for a small amount of time to allow the RGB capacitors to charge, before enabling RGB output
+            wait_ms(10);
+            // Enable RGB
+            rgb_matrix_enable_noeeprom();
+        }
+    } else {
+        // Turn off RGB
+        writePinLow(RGB_POWER_ENABLE_PIN);
+        // Disable the PWM output for the RGB
+        if (rgb_matrix_is_enabled() != lcd_on) {
+            rgb_matrix_disable_noeeprom();
+        }
+    }
+
+    // Match the backlight to the LCD state
+    if (is_keyboard_master() && is_backlight_enabled() != lcd_on) {
+        if (lcd_on)
+            backlight_enable();
+        else
+            backlight_disable();
+    }
+
+    // Draw the UI
+    if (kb_state.lcd_power) {
+        draw_ui_user();
+    }
+
+    // Go into low-scan interrupt-based mode if we haven't had any matrix activity in the last 250 milliseconds
+    if (last_input_activity_elapsed() > 250) {
+        matrix_wait_for_interrupt();
+    }
+}
