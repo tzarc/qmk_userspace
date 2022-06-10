@@ -82,7 +82,3 @@
 #ifndef STARTUP_SONG
 #    define STARTUP_SONG SONG(STARTUP_SOUND)
 #endif // STARTUP_SONG
-
-// Deprecated features
-#define NO_ACTION_MACRO
-#define NO_ACTION_FUNCTION

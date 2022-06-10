@@ -25,69 +25,32 @@
       ]
     },
     {
-      "name": "Python: painter-convert-graphics",
+      "name": "Python: generate-layouts, Djinn",
       "type": "python",
       "cwd": "${workspaceRoot}/qmk_firmware",
       "request": "launch",
-      "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
       "args": [
-        "painter-convert-graphics",
-        "--input",
-        "tzarc-cyclone/graphics/lock-caps.png",
-        "--format",
-        "mono16",
-        "--rle"
+        "generate-layouts",
+        "-kb",
+        "handwired/tzarc/djinn/rev1",
+        "-o",
+        "-"
       ],
       "console": "integratedTerminal",
-      "env": {
-        "MSYSTEM": "MINGW64",
-        "CHERE_INVOKING": "1"
+      "linux": {
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/qmk_venv/bin/python3"
+        },
+        "program": "/home/nickb/.local/qmk_venv/bin/qmk"
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
       }
-    },
-    {
-      "name": "Python: painter-make-font-image",
-      "type": "python",
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-      "args": [
-        "painter-make-font-image",
-        "--font",
-        "tzarc-cyclone/graphics/NotoSans-ExtraCondensedBold.ttf",
-        "--size",
-        "16",
-        "--output",
-        "tzarc-cyclone/graphics/noto.png",
-        "--unicode-glyphs",
-        "ĄȽɂɻɣɈʣ"
-      ],
-      "console": "integratedTerminal",
-      "env": {
-        "MSYSTEM": "MINGW64",
-        "CHERE_INVOKING": "1"
-      }
-    },
-    {
-      "name": "Python: painter-convert-font-image",
-      "type": "python",
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-      "args": [
-        "painter-convert-font-image",
-        "--input",
-        "tzarc-cyclone/graphics/noto.png",
-        "--format",
-        "mono4",
-        "--unicode-glyphs",
-        "ĄȽɂɻɣɈʣ"
-      ],
-      "console": "integratedTerminal",
-      "env": {
-        "MSYSTEM": "MINGW64",
-        "CHERE_INVOKING": "1"
-      }
-    },
+    }
     {
       "name": "Black Magic Probe (L412, cortex-debug)",
       "type": "cortex-debug",
@@ -112,7 +75,7 @@
       "postAttachCommands": []
     },
     {
-      "name": "Black Magic Probe (Ghoul, cortex-debug)",
+      "name": "Black Magic Probe (Ghoul STM32F4, cortex-debug)",
       "type": "cortex-debug",
       "request": "attach",
       "cwd": "${workspaceRoot}/qmk_firmware",
