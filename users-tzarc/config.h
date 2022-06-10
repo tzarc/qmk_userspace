@@ -43,3 +43,9 @@
 #ifdef EEPROM_TRANSIENT
 #    define EEPROM_SIZE 96
 #endif // EEPROM_TRANSIENT
+
+// Slightly larger debounce
+#ifdef DEBOUNCE
+#    undef DEBOUNCE
+#endif
+#define DEBOUNCE 12

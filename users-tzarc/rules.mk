@@ -18,6 +18,8 @@ MOUSEKEY_ENABLE ?= yes
 RAW_ENABLE ?= no
 UNICODE_ENABLE ?= yes
 
+DEBOUNCE_TYPE = asym_eager_defer_pk
+
 VPATH += $(USER_PATH)/graphics/src
 
 XAP_ENABLE ?= no
