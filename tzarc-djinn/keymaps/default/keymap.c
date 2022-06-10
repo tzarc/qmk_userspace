@@ -18,7 +18,7 @@ enum { _QWERTY, _LOWER, _RAISE, _ADJUST };
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [_QWERTY] = LAYOUT_djinn(
+    [_QWERTY] = LAYOUT_all(
         KC_ESC,   KC_1,   KC_2,    KC_3,    KC_4,      KC_5,    KC_GRV,                              KC_DEL,  KC_6,     KC_7,      KC_8,    KC_9,    KC_0,    KC_BSPC,
         KC_TAB,   KC_Q,   KC_W,    KC_E,    KC_R,      KC_T,    KC_LBRC,                             KC_RBRC, KC_Y,     KC_U,      KC_I,    KC_O,    KC_P,    KC_BSLS,
         KC_LCTL,  KC_A,   KC_S,    KC_D,    KC_F,      KC_G,    KC_HOME,                             KC_PGUP, KC_H,     KC_J,      KC_K,    KC_L,    KC_SCLN, KC_QUOT,
@@ -29,7 +29,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                             KC_LEFT,   _______, KC_RIGHT,                            KC_LEFT, _______, KC_RIGHT,
                                                        KC_DOWN,                                               KC_DOWN
     ),
-    [_LOWER] = LAYOUT_djinn(
+    [_LOWER] = LAYOUT_all(
         KC_F12,  KC_F1,   KC_F2,   KC_F3,   KC_F4,     KC_F5,   _______,                             _______, KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,
         _______, _______, KC_UP,   _______, _______,   _______, _______,                             _______, _______, _______, _______, _______, _______, _______,
         _______, KC_LEFT, KC_DOWN, KC_RIGHT,_______,   _______, _______,                             _______, _______, _______, _______, _______, _______, _______,
@@ -40,7 +40,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                             _______,   _______, _______,                             _______, _______, _______,
                                                      _______,                                               _______
     ),
-    [_RAISE] = LAYOUT_djinn(
+    [_RAISE] = LAYOUT_all(
         KC_F12, KC_F1,   KC_F2,    KC_F3,   KC_F4,     KC_F5,   _______,                             _______, KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,
         _______,_______, KC_UP,    _______, _______,   _______, _______,                             _______, _______, _______, _______, _______, _______, _______,
         _______,KC_LEFT, KC_DOWN,  KC_RIGHT,_______,   KC_UNDS, KC_NO,                               KC_NO,   KC_EQL,  _______, _______, _______, _______, _______,
@@ -51,7 +51,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                             _______,   _______, _______,                             _______, _______, _______,
                                                      _______,                                               _______
     ),
-    [_ADJUST] = LAYOUT_djinn(
+    [_ADJUST] = LAYOUT_all(
         _______, KC_CLCK, KC_NLCK, KC_SLCK, _______,   _______, _______,                             _______, _______, _______, _______, DEBUG,   EEP_RST, QK_BOOT,
         _______, _______, _______, _______, _______,   _______, _______,                             _______, _______, _______, _______, _______, _______, _______,
         _______, _______, _______, _______, _______,   _______, _______,                             _______, _______, _______, _______, _______, _______, _______,
@@ -68,12 +68,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //----------------------------------------------------------
 // Encoder map
 
-// clang-format on
+// clang-format off
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
-    [_QWERTY] = {ENCODER_CCW_CW(KC_MS_WH_UP, KC_MS_WH_DOWN), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
-    [_LOWER]  = {ENCODER_CCW_CW(RGB_HUD, RGB_HUI), ENCODER_CCW_CW(RGB_SAD, RGB_SAI)},
-    [_RAISE]  = {ENCODER_CCW_CW(RGB_VAD, RGB_VAI), ENCODER_CCW_CW(RGB_SPD, RGB_SPI)},
-    [_ADJUST] = {ENCODER_CCW_CW(RGB_RMOD, RGB_MOD), ENCODER_CCW_CW(KC_LEFT, KC_RIGHT)},
+    [_QWERTY] = { ENCODER_CCW_CW(KC_MS_WH_UP, KC_MS_WH_DOWN), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)  },
+    [_LOWER]  = { ENCODER_CCW_CW(RGB_HUD, RGB_HUI),           ENCODER_CCW_CW(RGB_SAD, RGB_SAI)  },
+    [_RAISE]  = { ENCODER_CCW_CW(RGB_VAD, RGB_VAI),           ENCODER_CCW_CW(RGB_SPD, RGB_SPI)  },
+    [_ADJUST] = { ENCODER_CCW_CW(RGB_RMOD, RGB_MOD),          ENCODER_CCW_CW(KC_LEFT, KC_RIGHT) },
 };
 // clang-format on
 
