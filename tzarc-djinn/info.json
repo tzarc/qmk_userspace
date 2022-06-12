@@ -3,6 +3,40 @@
   "manufacturer": "tzarc",
   "maintainer": "tzarc",
   "url": "https://github.com/tzarc/djinn",
+  "processor": "STM32G474",
+  "bootloader": "stm32-dfu",
+  "bootloader_instructions": "Press the physical RESET button on the top of the board, or hold the top-left key when plugging in the board.",
+  "build": {
+    "lto": true
+  },
+  "debounce": 5,
+  "features": {
+    "audio": true,
+    "backlight": true,
+    "bootmagic": true,
+    "console": true,
+    "encoder": true,
+    "mousekey": true,
+    "extrakey": true,
+    "nkro": true,
+    "quantum_painter": true,
+    "rgb_matrix": true,
+    "unicode": false,
+    "usbpd": true,
+    "wpm": true
+  },
+  "matrix_pins": {
+    "custom_lite": true,
+    "rows": ["B13", "B14", "B15", "C6", "C7", "C8"],
+    "cols": ["C0", "C1", "C2", "C3", "A0", "A1", "A2"]
+  },
+  "backlight": {
+    "pin": "A7"
+  },
+  "split": {
+    "enabled": true,
+    "main": "pin"
+  },
   "layouts": {
     "LAYOUT_all": {
       "layout": [
@@ -75,10 +109,10 @@
         { "matrix": [4, 5], "label": "Space", "x": 4.5, "y": 5.06 },
         { "matrix": [4, 6], "label": " ", "x": 5.5, "y": 5.4 },
 
-        { "matrix": [10, 3], "label": " ", "x": 12.5, "y": 5.4 },
-        { "matrix": [10, 4], "label": "Space", "x": 13.5, "y": 5.06 },
-        { "matrix": [10, 5], "label": "Raise", "x": 14.5, "y": 4.88 },
-        { "matrix": [10, 6], "label": "Alt", "x": 15.5, "y": 4.9 },
+        { "matrix": [10, 6], "label": " ", "x": 12.5, "y": 5.4 },
+        { "matrix": [10, 5], "label": "Space", "x": 13.5, "y": 5.06 },
+        { "matrix": [10, 4], "label": "Raise", "x": 14.5, "y": 4.88 },
+        { "matrix": [10, 3], "label": "Alt", "x": 15.5, "y": 4.9 },
 
         { "matrix": [5, 6], "label": "RGB", "x": 7.25, "y": 4.9 },
         { "matrix": [11, 6], "label": "RGB", "x": 10.75, "y": 4.9 },

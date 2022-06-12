@@ -80,9 +80,9 @@ void draw_ui_user(void) {
     bool            hue_redraw = false;
     static uint16_t last_hue   = 0xFFFF;
 #if defined(RGB_MATRIX_ENABLE)
-    uint8_t curr_hue = rgb_matrix_get_hue();
+    uint16_t curr_hue = rgb_matrix_get_hue();
 #else  // defined(RGB_MATRIX_ENABLE)
-    uint8_t curr_hue = 0;
+    uint16_t curr_hue = 0;
 #endif // defined(RGB_MATRIX_ENABLE)
     if (last_hue != curr_hue) {
         last_hue   = curr_hue;

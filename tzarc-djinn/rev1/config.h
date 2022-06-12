@@ -18,12 +18,12 @@
 #endif // SERIAL_USART_SPEED
 
 // RGB configuration
+#define RGBLED_NUM 84
+#define DRIVER_LED_TOTAL 84
+#define RGB_MATRIX_SPLIT {42, 42}
 #define RGB_POWER_ENABLE_PIN B1
 #define RGB_CURR_1500mA_OK_PIN B0
 #define RGB_CURR_3000mA_OK_PIN C5
-#define RGBLED_NUM 84
-#define RGBLED_SPLIT \
-    { 42, 42 }
 
 // EEPROM configuration
 #define EXTERNAL_EEPROM_SPI_SLAVE_SELECT_PIN B5

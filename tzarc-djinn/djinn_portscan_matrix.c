@@ -4,12 +4,6 @@
 #include <hal_pal.h>
 #include "djinn.h"
 
-// Read the ports in one go
-#define MATRIX_ROW_PINS \
-    { B13, B14, B15, C6, C7, C8 }
-#define MATRIX_COL_PINS \
-    { C0, C1, C2, C3, A0, A1, A2 }
-
 #define GPIOB_BITMASK (1 << 13 | 1 << 14 | 1 << 15) // B13, B14, B15
 #define GPIOB_OFFSET 13
 #define GPIOB_COUNT 3

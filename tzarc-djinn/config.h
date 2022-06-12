@@ -4,10 +4,6 @@
 
 #include "config_common.h"
 
-// Matrix
-#define MATRIX_ROWS 12
-#define MATRIX_COLS 7
-
 // Encoders -- right-side is reversed
 #define ENCODERS_PAD_A \
     { C14 }
@@ -57,16 +53,13 @@
 
 // Backlight driver (to control LCD backlight)
 #define BACKLIGHT_LEVELS 4
-#define BACKLIGHT_PIN A7
 #define BACKLIGHT_PWM_DRIVER PWMD17
 #define BACKLIGHT_PWM_CHANNEL 1
 #define BACKLIGHT_PAL_MODE 1
 
 // RGB configuration
-#define WS2812_EXTERNAL_PULLUP
 #define RGB_DI_PIN B2
-#define DRIVER_LED_TOTAL RGBLED_NUM
-#define RGB_MATRIX_SPLIT RGBLED_SPLIT
+#define WS2812_EXTERNAL_PULLUP
 #define WS2812_PWM_DRIVER PWMD20
 #define WS2812_PWM_CHANNEL 1
 #define WS2812_PWM_PAL_MODE 3
