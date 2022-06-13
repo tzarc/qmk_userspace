@@ -1,9 +1,38 @@
 FROM qmkfm/base_container:latest
 
+#FROM fedora:latest
+
 ENV PATH="/home/qmk/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 RUN apt-get update \
     && apt-get install -y awscli curl gawk nano
+
+#RUN dnf install -y \
+#    arm-none-eabi-binutils-cs \
+#    arm-none-eabi-gcc-cs \
+#    arm-none-eabi-newlib \
+#    avr-gcc \
+#    avrdude \
+#    binutils \
+#    clang-tools-extra \
+#    dfu-programmer \
+#    dfu-util \
+#    dos2unix \
+#    gcc \
+#    gcc-c++ \
+#    git \
+#    glibc-devel \
+#    libtool \
+#    make \
+#    pkgconf \
+#    pkgconf-m4 \
+#    pkgconf-pkg-config \
+#    python3 \
+#    python3-pip \
+#    tar \
+#    unzip \
+#    wget \
+#    zip
 
 RUN groupadd -f qmk -g 10000 \
     && useradd -d /home/qmk -g qmk -m -N -u 10000 qmk

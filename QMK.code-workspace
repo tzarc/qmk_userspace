@@ -4,6 +4,10 @@
 			"path": "."
 		},
 		{
+			"path": "qmk_firmware/keyboards/handwired/onekey",
+			"name": "onekey"
+		},
+		{
 			"path": "qmk_firmware/lib/python/qmk",
 			"name": "python-qmk"
 		},
@@ -42,5 +46,8 @@
 	],
 	"settings": {
 		"git.ignoreLimitWarning": true,
+		"files.associations": {
+			"eeprom_transient.h": "c"
+		},
 	}
 }
