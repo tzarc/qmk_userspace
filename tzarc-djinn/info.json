@@ -1,6 +1,6 @@
 {
   "keyboard_name": "Djinn",
-  "manufacturer": "tzarc",
+  "manufacturer": "Tzarc",
   "maintainer": "tzarc",
   "url": "https://github.com/tzarc/djinn",
   "processor": "STM32G474",

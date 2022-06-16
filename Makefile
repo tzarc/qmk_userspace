@@ -18,6 +18,7 @@ BOARD_DEFS := \
 	ctrl!tzarc-ctrl!massdrop/ctrl/keymaps/tzarc!tzarc \
 	sat75!tzarc-sat75!cannonkeys/satisfaction75/rev1/keymaps/tzarc!tzarc \
 	luddite!tzarc-luddite!40percentclub/luddite/keymaps/tzarc!tzarc \
+	bm60!tzarc-bm60hsrgb_poker_rev2!kprepublic/bm60hsrgb_poker/rev2/keymaps/tzarc!tzarc \
 	one2mini!tzarc-one2mini!ducky/one2mini/1861st/keymaps/tzarc!tzarc \
 	annepro2!tzarc-annepro2!annepro2/c18/keymaps/tzarc!tzarc \
 	mysterium-nick!tzarc-mysterium!coseyfannitutti/mysterium/keymaps/tzarc!tzarc \
@@ -25,6 +26,8 @@ BOARD_DEFS := \
 	chocopad!tzarc-chocopad!keebio/chocopad/keymaps/tzarc!tzarc \
 	bm16s!tzarc-bm16s!kprepublic/bm16s/keymaps/tzarc!tzarc \
 	cyclone!tzarc-cyclone!handwired/tzarc/cyclone!tzarc \
+	djinn_rev1_actual!tzarc-djinn/keymaps/tzarc!tzarc/djinn/rev1/keymaps/tzarc!tzarc \
+	djinn_rev2_actual!tzarc-djinn/keymaps/tzarc!tzarc/djinn/rev2/keymaps/tzarc!tzarc \
 	djinn_rev1!tzarc-djinn!handwired/tzarc/djinn!tzarc!handwired/tzarc/djinn/rev1 \
 	djinn_rev2!tzarc-djinn!handwired/tzarc/djinn!tzarc!handwired/tzarc/djinn/rev2 \
 	ghoul_stm32!tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/stm32 \
@@ -67,10 +70,10 @@ arm: NO_CDB = true
 arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
 
 nick: NO_CDB = true
-nick: iris sat75 luddite mysterium-nick chocopad ctrl djinn bm16s one2mini ghoul_stm32 annepro2
+nick: iris sat75 luddite mysterium-nick chocopad ctrl djinn bm16s one2mini ghoul_stm32 annepro2 bm60
 
 djinn: NO_CDB = true
-djinn: djinn_rev1 djinn_rev2
+djinn: djinn_rev1 djinn_rev2 djinn_rev1_actual djinn_rev2_actual
 
 ghoul: NO_CDB = true
 ghoul: ghoul_stm32 ghoul_rp2040

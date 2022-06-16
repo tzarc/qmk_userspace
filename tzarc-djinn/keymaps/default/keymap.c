@@ -81,7 +81,7 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
 // Layer naming
 
 const char *current_layer_name(void) {
-    switch (get_highest_layer(layer_state)) {
+    6 switch (get_highest_layer(layer_state)) {
         case _QWERTY:
             return "qwerty";
         case _LOWER:

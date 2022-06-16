@@ -142,10 +142,10 @@ typedef uint32_t (*translator_function_t)(bool is_shifted, uint32_t keycode);
 
 #define DEFINE_UNICODE_LUT_TRANSLATOR(translator_name, ...)                     \
     static inline uint32_t translator_name(bool is_shifted, uint32_t keycode) { \
-        static const uint32_t translation[] = {__VA_ARGS__};                    \
-        uint32_t              ret           = keycode;                          \
+        static const uint32_t translation[] PROGMEM = {__VA_ARGS__};            \
+        uint32_t              ret                   = keycode;                  \
         if ((keycode - KC_A) < (sizeof(translation) / sizeof(uint32_t))) {      \
-            ret = translation[keycode - KC_A];                                  \
+            ret = pgm_read_dword(&translation[keycode - KC_A]);                 \
         }                                                                       \
         return ret;                                                             \
     }
@@ -484,7 +484,9 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     // Default handler for lower/raise/adjust
     state = update_tri_layer_state(state, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST);
     if (last_state != state) {
+#ifndef __AVR__
         dprintf("Layer state change: %08lX -> %08lX --- %032lb -> %032lb\n", (uint32_t)last_state, (uint32_t)state, (uint32_t)last_state, (uint32_t)state);
+#endif // __AVR__
         last_state = state;
     }
     return layer_state_set_keymap(state);

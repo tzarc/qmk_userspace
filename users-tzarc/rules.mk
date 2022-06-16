@@ -5,10 +5,11 @@ SRC += \
 	tzarc_wow.c \
 	tzarc_diablo3.c
 
-NKRO_ENABLE = no
-COMMAND_ENABLE = no
-SPACE_CADET_ENABLE = no
-MAGIC_ENABLE = no
+TOP_SYMBOLS = yes
+NKRO_ENABLE ?= no
+COMMAND_ENABLE ?= no
+SPACE_CADET_ENABLE ?= no
+MAGIC_ENABLE ?= no
 CONSOLE_ENABLE ?= yes
 LTO_ENABLE ?= yes
 DEBUG_MATRIX_SCAN_RATE_ENABLE ?= yes
@@ -17,8 +18,6 @@ EXTRAKEY_ENABLE ?= yes
 MOUSEKEY_ENABLE ?= yes
 RAW_ENABLE ?= no
 UNICODE_ENABLE ?= yes
-
-DEBOUNCE_TYPE = asym_eager_defer_pk
 
 VPATH += $(USER_PATH)/graphics/src
 
@@ -30,6 +29,7 @@ ifeq ($(strip $(PLATFORM_KEY)),chibios)
 	CREATE_MAP=yes
 	EXTRAFLAGS=-fstack-usage
 	EXTRALDFLAGS=-Wl,--print-memory-usage
+	DEBOUNCE_TYPE = asym_eager_defer_pk
 else ifeq ($(strip $(PLATFORM_KEY)),arm_atsam)
 	LTO_ENABLE = no
 else ifeq ($(strip $(PLATFORM_KEY)),avr)

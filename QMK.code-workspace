@@ -47,7 +47,12 @@
 	"settings": {
 		"git.ignoreLimitWarning": true,
 		"files.associations": {
-			"eeprom_transient.h": "c"
+			"eeprom_transient.h": "c",
+			"*.inc": "cpp",
+			"type_traits": "c",
+			"quantum.h": "c",
+			"platform_deps.h": "c",
+			"pgmspace.h": "c"
 		},
 	}
 }

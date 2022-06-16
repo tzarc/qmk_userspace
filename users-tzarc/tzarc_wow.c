@@ -4,7 +4,8 @@
 #include <quantum.h>
 #include "tzarc.h"
 
-static const char* wow_keycode_display_map[][2] = {
+#ifndef __AVR__
+static const char* const wow_keycode_display_map[][2] = {
     [WOW_KEY_OFFSET(KC_A)]      = {"a", "A"},
     [WOW_KEY_OFFSET(KC_B)]      = {"b", "B"},
     [WOW_KEY_OFFSET(KC_C)]      = {"c", "C"},
@@ -48,7 +49,7 @@ static const char* wow_keycode_display_map[][2] = {
     [WOW_KEY_OFFSET(KC_SPACE)]  = {"Spc", "Spc"},
     [WOW_KEY_OFFSET(KC_MINUS)]  = {"-", "_"},
     [WOW_KEY_OFFSET(KC_EQUAL)]  = {"=", "="},
-#if defined(QUANTUM_PAINTER)
+#    if defined(QUANTUM_PAINTER)
     [WOW_KEY_OFFSET(KC_LBRACKET)]   = {"[", "{"},
     [WOW_KEY_OFFSET(KC_RBRACKET)]   = {"]", "}"},
     [WOW_KEY_OFFSET(KC_BSLASH)]     = {"\\", "|"},
@@ -86,12 +87,17 @@ static const char* wow_keycode_display_map[][2] = {
     [WOW_KEY_OFFSET(KC_DOWN)]       = {"Up", "Up"},
     [WOW_KEY_OFFSET(KC_UP)]         = {"Down", "Down"},
     [WOW_KEY_OFFSET(KC_NUMLOCK)]    = {"NumL", "NumL"},
-#endif // defined(QUANTUM_PAINTER)
+#    endif // defined(QUANTUM_PAINTER)
 };
 
 const char* wow_key_char(uint16_t keycode) {
     return wow_keycode_display_map[WOW_KEY_OFFSET(keycode)][0];
 }
+#else
+const char* wow_key_char(uint16_t keycode) {
+    return "Unknown";
+}
+#endif // __AVR__
 
 struct wow_config_t wow_config;
 
