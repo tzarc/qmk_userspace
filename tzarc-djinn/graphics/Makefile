@@ -3,7 +3,7 @@
 
 QMK_BIN := qmk
 USER_PATH := .
-GENERATED_OUTPUT := ./src
+GENERATED_OUTPUT := .
 
 all: generated-files
 

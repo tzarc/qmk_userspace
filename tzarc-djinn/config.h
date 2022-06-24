@@ -1,7 +1,6 @@
 // Copyright 2018-2022 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
-
 #include "config_common.h"
 
 // Encoders -- right-side is reversed
@@ -26,7 +25,6 @@
 #define LCD_POWER_ENABLE_PIN A6
 
 // Split configuration
-#define SPLIT_PLUG_DETECT_PIN B12
 #define SPLIT_TRANSACTION_IDS_KB RPC_ID_SYNC_STATE_KB
 #define SPLIT_TRANSPORT_MIRROR
 #define SPLIT_LAYER_STATE_ENABLE
@@ -71,7 +69,6 @@
 #define AUDIO_PIN A5
 #define AUDIO_PIN_ALT A4
 #define AUDIO_PIN_ALT_AS_NEGATIVE
-#define A5_AUDIO
 #ifndef STARTUP_SONG
 #    define STARTUP_SONG SONG(STARTUP_SOUND)
 #endif // STARTUP_SONG

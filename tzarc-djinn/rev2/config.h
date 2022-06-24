@@ -9,6 +9,7 @@
 
 // Split configuration
 #define SPLIT_HAND_PIN B9
+#define USB_VBUS_PIN B12
 #define SERIAL_USART_DRIVER SD3
 #define SERIAL_USART_PIN_SWAP
 #define SERIAL_USART_TX_PIN B10

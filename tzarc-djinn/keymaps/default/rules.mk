@@ -2,14 +2,14 @@ DEBUG_MATRIX_SCAN_RATE_ENABLE ?= api
 ENCODER_MAP_ENABLE = yes
 SWAP_HANDS_ENABLE = no
 
-VPATH += \
-	$(KEYBOARD_PATH_5)/graphics \
-	$(KEYBOARD_PATH_5)/graphics/src \
-	$(KEYBOARD_PATH_4)/graphics \
-	$(KEYBOARD_PATH_4)/graphics/src \
-	$(KEYBOARD_PATH_3)/graphics \
-	$(KEYBOARD_PATH_3)/graphics/src \
-	$(KEYBOARD_PATH_2)/graphics \
-	$(KEYBOARD_PATH_2)/graphics/src \
-	$(KEYBOARD_PATH_1)/graphics \
-	$(KEYBOARD_PATH_1)/graphics/src
+VPATH += keyboards/tzarc/djinn/graphics
+SRC += \
+	theme_djinn_default.c \
+	djinn.qgf.c \
+	lock-caps-ON.qgf.c \
+	lock-scrl-ON.qgf.c \
+	lock-num-ON.qgf.c \
+	lock-caps-OFF.qgf.c \
+	lock-scrl-OFF.qgf.c \
+	lock-num-OFF.qgf.c \
+	thintel15.qff.c

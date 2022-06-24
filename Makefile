@@ -9,7 +9,7 @@ export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH
 export PATH := $(ROOTDIR)/bin:$(PATH)
 
 export CLANG_TIDY := $(shell find /usr/lib/llvm* -name 'run-clang-tidy.py')
-export CLANG_TIDY_CHECKS := *,-clang-diagnostic-error,-llvm-include-order,-cppcoreguidelines-avoid-non-const-global-variables,-hicpp-braces-around-statements,-readability-braces-around-statements,-google-readability-braces-around-statements,-llvm-header-guard,-bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,-clang-diagnostic-ignored-attributes,-clang-diagnostic-unknown-attributes,-misc-unused-parameters,-hicpp-signed-bitwise
+export CLANG_TIDY_CHECKS := *,-clang-diagnostic-error,-llvm-include-order,-cppcoreguidelines-avoid-non-const-global-variables,-hicpp-braces-around-statements,-readability-braces-around-statements,-google-readability-braces-around-statements,-llvm-header-guard,-bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,-clang-diagnostic-ignored-attributes,-clang-diagnostic-unknown-attributes,-misc-unused-parameters,-hicpp-signed-bitwise,-llvmlibc*,-hicpp-uppercase-literal-suffix,-readability-uppercase-literal-suffix,-hicpp-no-assembler
 export CLANG_TIDY_HEADER_FILTER := .*
 
 BOARD_DEFS := \
@@ -91,7 +91,7 @@ format_prereq:
 	@ln -sf $(ROOTDIR)/qmk_firmware/.clang-format $(ROOTDIR)/.clang-format
 
 format: format_prereq
-	@for file in $$(ls -1 $(ROOTDIR)/rle/*.c) ; do \
+	@for file in $$(find $(ROOTDIR)/rle $(ROOTDIR)/qmk_firmware/keyboards/tzarc \( -iname '*.c' -or -iname '*.h' -or -iname '*.cpp' -or -iname '*.hpp' \) ) ; do \
 		[ -f "$$file" ] && echo "\e[38;5;14mclang-format'ing: $$file\e[0m" ; \
 		[ -f "$$file" ] && clang-format -i "$$file" >/dev/null 2>&1 || true ; \
 		[ -f "$$file" ] && echo "\e[38;5;14mdos2unix'ing: $$file\e[0m" ; \

@@ -1,10 +1,9 @@
 // Copyright 2018-2022 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include <string.h>
-#include <quantum.h>
-#include <transactions.h>
-#include <split_util.h>
-
+#include "quantum.h"
+#include "transactions.h"
+#include "split_util.h"
 #include "djinn.h"
 
 kb_runtime_config kb_state;

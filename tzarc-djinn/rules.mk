@@ -12,8 +12,6 @@ RGB_MATRIX_DRIVER = WS2812
 EEPROM_DRIVER = spi
 
 AUDIO_DRIVER = pwm_software
-AUDIO_PIN = A5
-AUDIO_PIN_ALT = A4
 
 QUANTUM_PAINTER_DRIVERS = ili9341_spi
 
@@ -21,3 +19,5 @@ SRC += \
 	djinn_portscan_matrix.c \
 	djinn_split_sync.c \
 	djinn_usbpd.c
+
+DEFAULT_FOLDER = tzarc/djinn/rev2

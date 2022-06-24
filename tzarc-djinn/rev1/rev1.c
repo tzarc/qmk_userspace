@@ -1,10 +1,11 @@
 // Copyright 2018-2022 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
-#include <hal.h>
-#include <quantum.h>
-#include "rev1.h"
+#if 0
+#    include <hal.h>
+#    include <quantum.h>
+#    include "rev1.h"
 
-#ifdef USE_PLUG_DETECT_PIN
+#    ifdef USE_PLUG_DETECT_PIN
 bool is_keyboard_master(void) {
     static bool determined = false;
     static bool is_master;
@@ -20,4 +21,5 @@ bool is_keyboard_master(void) {
 
     return is_master;
 }
-#endif // USE_PLUG_DETECT_PIN
+#    endif // USE_PLUG_DETECT_PIN
+#endif     // 0
