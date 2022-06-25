@@ -25,3 +25,8 @@ SRC += \
 	lock-scrl-OFF.qgf.c \
 	lock-num-OFF.qgf.c \
 	thintel15.qff.c
+
+#EEPROM_DRIVER = wear_leveling
+#WEAR_LEVELING_DRIVER = efl
+#OPT = 1
+#OPT_DEFS += -g

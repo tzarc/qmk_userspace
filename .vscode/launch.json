@@ -5,10 +5,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "(gdb) Launch wear_leveling_2byte",
+      "name": "(gdb) Launch wear_leveling_general",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/qmk_firmware/.build/test/wear_leveling_2byte.elf",
+      "program": "${workspaceFolder}/qmk_firmware/.build/test/wear_leveling_general.elf",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}/qmk_firmware/.build/test",
@@ -50,7 +50,30 @@
           "CHERE_INVOKING": "1"
         }
       }
-    }
+    },
+    {
+      "name": "Black Magic Probe (Djinn G474, cortex-debug)",
+      "type": "cortex-debug",
+      "request": "attach",
+      "cwd": "${workspaceRoot}/qmk_firmware",
+      "svdFile": "${workspaceRoot}/svd/STM32G474xx.svd",
+      "servertype": "bmp",
+      "interface": "swd",
+      "device": "STM32G474",
+      "linux": {
+        "BMPGDBSerialPort": "/dev/ttyACM0",
+        "executable": "${workspaceRoot}/qmk_firmware/.build/tzarc_djinn_rev1_tzarc.elf",
+        "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
+      },
+      "windows": {
+        "BMPGDBSerialPort": "COM3",
+        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\tzarc_djinn_rev1_tzarc.elf",
+        "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
+      },
+      "showDevDebugOutput": "parsed",
+      "preAttachCommands": ["set mem inaccessible-by-default off"],
+      "postAttachCommands": []
+    },
     {
       "name": "Black Magic Probe (L412, cortex-debug)",
       "type": "cortex-debug",

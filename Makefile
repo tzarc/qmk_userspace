@@ -25,6 +25,7 @@ BOARD_DEFS := \
 	mysterium-dad!tzarc-mysterium-dad!coseyfannitutti/mysterium/keymaps/tzarc-dad!tzarc-dad \
 	chocopad!tzarc-chocopad!keebio/chocopad/keymaps/tzarc!tzarc \
 	bm16s!tzarc-bm16s!kprepublic/bm16s/keymaps/tzarc!tzarc \
+	geekboards!tzarc-geekboards-macropad_v2!geekboards/macropad_v2/keymaps/tzarc!tzarc \
 	cyclone!tzarc-cyclone!handwired/tzarc/cyclone!tzarc \
 	djinn_rev1_actual!tzarc-djinn/keymaps/tzarc!tzarc/djinn/rev1/keymaps/tzarc!tzarc \
 	djinn_rev2_actual!tzarc-djinn/keymaps/tzarc!tzarc/djinn/rev2/keymaps/tzarc!tzarc \
