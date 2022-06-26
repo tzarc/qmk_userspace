@@ -71,9 +71,6 @@ all-arm:
 all: NO_CDB = true
 all: bin
 
-arm: NO_CDB = true
-arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
-
 nick: NO_CDB = true
 nick: annepro2 bm16s bm60 chocopad ctrl cyclone djinn geekboards ghoul iris luddite mysterium-nick one2mini sat75
 
