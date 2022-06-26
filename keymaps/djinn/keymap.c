@@ -161,6 +161,11 @@ void test_lua(void) {
 #endif // LUA_ENABLE
 
 #ifdef DEBUG_EEPROM_OUTPUT
+
+#ifdef WEAR_LEVELING_ENABLE
+#include "wear_leveling.h"
+#endif // WEAR_LEVELING_ENABLE
+
 void matrix_scan_keymap(void) {
     static uint32_t last_eeprom_access = 0;
     uint32_t        now                = timer_read32();
@@ -186,5 +191,15 @@ void matrix_scan_keymap(void) {
             dprint("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
         }
     }
+
+#ifdef WEAR_LEVELING_ENABLE
+    static uint32_t last_wear_leveling_init = 0;
+    if (now - last_wear_leveling_init > 30000) {
+        dprint("init'ing wear-leveling\n");
+        last_wear_leveling_init = now;
+        wear_leveling_init();
+    }
+#endif // WEAR_LEVELING_ENABLE
 }
+
 #endif // DEBUG_EEPROM_OUTPUT

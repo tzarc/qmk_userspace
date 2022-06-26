@@ -28,5 +28,9 @@ SRC += \
 
 #EEPROM_DRIVER = wear_leveling
 #WEAR_LEVELING_DRIVER = efl
+
+#EEPROM_DRIVER = wear_leveling
+#WEAR_LEVELING_DRIVER = flash_spi
+
 #OPT = 1
 #OPT_DEFS += -g
