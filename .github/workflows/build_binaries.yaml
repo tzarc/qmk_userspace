@@ -18,18 +18,17 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Deploy submodules
+    - name: Deploy QMK Firmware
       run: |
-        sed -i 's#git@github.com:tzarc#https://github.com/qmk#g' .gitmodules
-        git submodule update --init
+        make qmk_firmware
 
     - name: Switch to develop
       run: |
         cd qmk_firmware
-        git remote set-url origin https://github.com/qmk/qmk_firmware.git
+        git remote add upstream https://github.com/qmk/qmk_firmware.git
         git remote -v
-        git fetch origin develop
-        git checkout develop
+        git fetch upstream develop
+        git checkout -b develop upstream/develop
         git pull --ff-only
         make git-submodule
         cd ..

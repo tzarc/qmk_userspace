@@ -1,3 +1,5 @@
+/qmk_firmware
+
 *.hex
 *.bin
 *.uf2

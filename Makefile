@@ -12,6 +12,11 @@ export CLANG_TIDY := $(shell find /usr/lib/llvm* -name 'run-clang-tidy.py')
 export CLANG_TIDY_CHECKS := *,-clang-diagnostic-error,-llvm-include-order,-cppcoreguidelines-avoid-non-const-global-variables,-hicpp-braces-around-statements,-readability-braces-around-statements,-google-readability-braces-around-statements,-llvm-header-guard,-bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,-clang-diagnostic-ignored-attributes,-clang-diagnostic-unknown-attributes,-misc-unused-parameters,-hicpp-signed-bitwise,-llvmlibc*,-hicpp-uppercase-literal-suffix,-readability-uppercase-literal-suffix,-hicpp-no-assembler
 export CLANG_TIDY_HEADER_FILTER := .*
 
+qmk_firmware: $(ROOTDIR)/qmk_firmware
+
+$(ROOTDIR)/qmk_firmware:
+	git clone --depth=1 https://github.com/tzarc/qmk_firmware.git $(ROOTDIR)/qmk_firmware
+
 BOARD_DEFS := \
 	iris_default!tzarc-iris_rev4!keebio/iris/rev4/keymaps/tzarc!default \
 	iris!tzarc-iris_rev4!keebio/iris/rev4/keymaps/tzarc!tzarc \
@@ -88,7 +93,7 @@ clean: remove_artifacts
 distclean: remove_artifacts
 	+$(MAKE) $(MAKEFLAGS) -C "$(ROOTDIR)/qmk_firmware" distclean || true
 
-format_prereq:
+format_prereq: qmk_firmware
 	@ln -sf $(ROOTDIR)/qmk_firmware/.clang-format $(ROOTDIR)/.clang-format
 
 format: format_prereq
@@ -103,7 +108,7 @@ format: format_prereq
 
 links: format_prereq extra-links
 
-git-submodule:
+git-submodule: qmk_firmware
 	+$(MAKE) -C "$(ROOTDIR)/qmk_firmware" git-submodule
 
 define handle_link_entry
@@ -113,7 +118,7 @@ link_files_$1 := $$(shell find $$(ROOTDIR)/$$(link_source_$1) -type f \( -name '
 link_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(link_source_$1) -type f | sort)
 
 extra-links: link_$$(link_source_$1)
-link_$$(link_source_$1):
+link_$$(link_source_$1): qmk_firmware
 	@if [ ! -L "$(ROOTDIR)/qmk_firmware/$$(link_target_$1)" ] ; then \
 		echo "\e[38;5;14mSymlinking: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
 		ln -sf $(ROOTDIR)/$$(link_source_$1) $(ROOTDIR)/qmk_firmware/$$(link_target_$1) ; \
@@ -122,7 +127,7 @@ link_$$(link_source_$1):
 clean: unlink_$$(link_source_$1)
 distclean: unlink_$$(link_source_$1)
 unlinks: unlink_$$(link_source_$1)
-unlink_$$(link_source_$1):
+unlink_$$(link_source_$1): qmk_firmware
 	@if [ -L "$(ROOTDIR)/qmk_firmware/$$(link_target_$1)" ] ; then \
 		echo "\e[38;5;14mRemoving symlink: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
 		rm $(ROOTDIR)/qmk_firmware/$$(link_target_$1) || true; \
