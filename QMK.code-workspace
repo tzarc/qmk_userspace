@@ -4,6 +4,14 @@
 			"path": "."
 		},
 		{
+			"path": "qmk_firmware/quantum/wear_leveling",
+			"name": "quantum-wear_leveling"
+		},
+		{
+			"path": "qmk_firmware/platforms/chibios/drivers/wear_leveling",
+			"name": "drivers-wear_leveling"
+		},
+		{
 			"path": "qmk_firmware/keyboards/handwired/onekey",
 			"name": "onekey"
 		},
