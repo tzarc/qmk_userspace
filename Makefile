@@ -18,25 +18,25 @@ $(ROOTDIR)/qmk_firmware:
 	git clone --depth=1 https://github.com/tzarc/qmk_firmware.git $(ROOTDIR)/qmk_firmware
 
 BOARD_DEFS := \
-	annepro2!tzarc-annepro2!annepro2/c18/keymaps/tzarc!tzarc \
-	bm16s!tzarc-bm16s!kprepublic/bm16s/keymaps/tzarc!tzarc \
-	bm60!tzarc-bm60hsrgb_poker_rev2!kprepublic/bm60hsrgb_poker/rev2/keymaps/tzarc!tzarc \
-	chocopad!tzarc-chocopad!keebio/chocopad/keymaps/tzarc!tzarc \
-	ctrl!tzarc-ctrl!massdrop/ctrl/keymaps/tzarc!tzarc \
-	cyclone!tzarc-cyclone!handwired/tzarc/cyclone!tzarc \
-	djinn_rev1_actual!tzarc-djinn/keymaps/tzarc!tzarc/djinn/rev1/keymaps/tzarc!tzarc \
-	djinn_rev1!tzarc-djinn!handwired/tzarc/djinn!tzarc!handwired/tzarc/djinn/rev1 \
-	djinn_rev2_actual!tzarc-djinn/keymaps/tzarc!tzarc/djinn/rev2/keymaps/tzarc!tzarc \
-	djinn_rev2!tzarc-djinn!handwired/tzarc/djinn!tzarc!handwired/tzarc/djinn/rev2 \
-	geekboards!tzarc-geekboards-macropad_v2!geekboards/macropad_v2/keymaps/tzarc!tzarc \
-	ghoul_rp2040!tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/rp2040 \
-	ghoul_stm32!tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/stm32 \
-	iris!tzarc-iris_rev4!keebio/iris/rev4/keymaps/tzarc!tzarc \
-	luddite!tzarc-luddite!40percentclub/luddite/keymaps/tzarc!tzarc \
-	mysterium-dad!tzarc-mysterium-dad!coseyfannitutti/mysterium/keymaps/tzarc-dad!tzarc-dad \
-	mysterium-nick!tzarc-mysterium!coseyfannitutti/mysterium/keymaps/tzarc!tzarc \
-	one2mini!tzarc-one2mini!ducky/one2mini/1861st/keymaps/tzarc!tzarc \
-	sat75!tzarc-sat75!cannonkeys/satisfaction75/rev1/keymaps/tzarc!tzarc \
+	cyclone!keyboards/tzarc-cyclone!handwired/tzarc/cyclone!tzarc \
+	ghoul_rp2040!keyboards/tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/rp2040 \
+	ghoul_stm32!keyboards/tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/stm32 \
+	\
+	annepro2!keymaps/annepro2!annepro2/c18/keymaps/tzarc!tzarc \
+	bm16s!keymaps/bm16s!kprepublic/bm16s/keymaps/tzarc!tzarc \
+	bm60!keymaps/bm60hsrgb_poker_rev2!kprepublic/bm60hsrgb_poker/rev2/keymaps/tzarc!tzarc \
+	chocopad!keymaps/chocopad!keebio/chocopad/keymaps/tzarc!tzarc \
+	ctrl!keymaps/ctrl!massdrop/ctrl/keymaps/tzarc!tzarc \
+	djinn_rev1!keymaps/djinn!tzarc/djinn/rev1/keymaps/tzarc!tzarc \
+	djinn_rev2!keymaps/djinn!tzarc/djinn/rev2/keymaps/tzarc!tzarc \
+	geekboards!keymaps/geekboards-macropad_v2!geekboards/macropad_v2/keymaps/tzarc!tzarc \
+	iris!keymaps/iris_rev4!keebio/iris/rev4/keymaps/tzarc!tzarc \
+	luddite!keymaps/luddite!40percentclub/luddite/keymaps/tzarc!tzarc \
+	mysterium-dad!keymaps/mysterium-dad!coseyfannitutti/mysterium/keymaps/dad!dad \
+	mysterium-nick!keymaps/mysterium!coseyfannitutti/mysterium/keymaps/tzarc!tzarc \
+	one2mini!keymaps/one2mini!ducky/one2mini/1861st/keymaps/tzarc!tzarc \
+	sat75!keymaps/sat75!cannonkeys/satisfaction75/rev1/keymaps/tzarc!tzarc \
+	\
 	onekey_h743!alternates/nucleo144_h743zi!handwired/onekey/nucleo144_h743zi!reset \
 	onekey_l152!alternates/nucleo64_l152re!handwired/onekey/nucleo64_l152re!reset \
 	onekey_g431!alternates/nucleo64_g431rb!handwired/onekey/nucleo64_g431rb!reset \
@@ -59,8 +59,8 @@ BOARD_DEFS := \
 	qp_test!alternates/qp_test!qp_test!default!qp_test/stm32l412kb
 
 EXTRA_LINK_DEFS := \
-	layout-tkl_ansi-tzarc!layouts/community/tkl_ansi/tzarc \
-	layout-60_ansi-tzarc!layouts/community/60_ansi/tzarc \
+	layouts/layout-tkl_ansi!layouts/community/tkl_ansi/tzarc \
+	layouts/layout-60_ansi!layouts/community/60_ansi/tzarc \
 	users-tzarc!users/tzarc
 
 all-arm:
@@ -78,7 +78,7 @@ nick: NO_CDB = true
 nick: annepro2 bm16s bm60 chocopad ctrl cyclone djinn geekboards ghoul iris luddite mysterium-nick one2mini sat75
 
 djinn: NO_CDB = true
-djinn: djinn_rev1 djinn_rev2 djinn_rev1_actual djinn_rev2_actual
+djinn: djinn_rev1 djinn_rev2
 
 ghoul: NO_CDB = true
 ghoul: ghoul_stm32
