@@ -5,8 +5,8 @@
 // Uncomment the following if your board uses 1.5A and 3.0A hold current fuses.
 //#define DJINN_SUPPORTS_3A_FUSE
 //#define QUANTUM_PAINTER_DEBUG
-#define DEBUG_EEPROM_OUTPUT
-#define WEAR_LEVELING_DEBUG_OUTPUT
+//#define DEBUG_EEPROM_OUTPUT
+//#define WEAR_LEVELING_DEBUG_OUTPUT
 //#define WEAR_LEVELING_EFL_FIRST_SECTOR 119
 
 // Encoder settings
