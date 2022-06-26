@@ -102,7 +102,7 @@ format_prereq: qmk_firmware
 	@ln -sf $(ROOTDIR)/qmk_firmware/.clang-format $(ROOTDIR)/.clang-format
 
 format: format_prereq
-	@for file in $$(find $(ROOTDIR)/rle $(ROOTDIR)/qmk_firmware/keyboards/tzarc \( -iname '*.c' -or -iname '*.h' -or -iname '*.cpp' -or -iname '*.hpp' \) ) ; do \
+	@for file in $$(find $(ROOTDIR)/qmk_firmware/keyboards/tzarc \( -iname '*.c' -or -iname '*.h' -or -iname '*.cpp' -or -iname '*.hpp' \) ) ; do \
 		[ -f "$$file" ] && echo "\e[38;5;14mclang-format'ing: $$file\e[0m" ; \
 		[ -f "$$file" ] && clang-format -i "$$file" >/dev/null 2>&1 || true ; \
 		[ -f "$$file" ] && echo "\e[38;5;14mdos2unix'ing: $$file\e[0m" ; \
