@@ -18,26 +18,25 @@ $(ROOTDIR)/qmk_firmware:
 	git clone --depth=1 https://github.com/tzarc/qmk_firmware.git $(ROOTDIR)/qmk_firmware
 
 BOARD_DEFS := \
-	iris_default!tzarc-iris_rev4!keebio/iris/rev4/keymaps/tzarc!default \
-	iris!tzarc-iris_rev4!keebio/iris/rev4/keymaps/tzarc!tzarc \
-	ctrl!tzarc-ctrl!massdrop/ctrl/keymaps/tzarc!tzarc \
-	sat75!tzarc-sat75!cannonkeys/satisfaction75/rev1/keymaps/tzarc!tzarc \
-	luddite!tzarc-luddite!40percentclub/luddite/keymaps/tzarc!tzarc \
-	bm60!tzarc-bm60hsrgb_poker_rev2!kprepublic/bm60hsrgb_poker/rev2/keymaps/tzarc!tzarc \
-	one2mini!tzarc-one2mini!ducky/one2mini/1861st/keymaps/tzarc!tzarc \
 	annepro2!tzarc-annepro2!annepro2/c18/keymaps/tzarc!tzarc \
-	mysterium-nick!tzarc-mysterium!coseyfannitutti/mysterium/keymaps/tzarc!tzarc \
-	mysterium-dad!tzarc-mysterium-dad!coseyfannitutti/mysterium/keymaps/tzarc-dad!tzarc-dad \
-	chocopad!tzarc-chocopad!keebio/chocopad/keymaps/tzarc!tzarc \
 	bm16s!tzarc-bm16s!kprepublic/bm16s/keymaps/tzarc!tzarc \
-	geekboards!tzarc-geekboards-macropad_v2!geekboards/macropad_v2/keymaps/tzarc!tzarc \
+	bm60!tzarc-bm60hsrgb_poker_rev2!kprepublic/bm60hsrgb_poker/rev2/keymaps/tzarc!tzarc \
+	chocopad!tzarc-chocopad!keebio/chocopad/keymaps/tzarc!tzarc \
+	ctrl!tzarc-ctrl!massdrop/ctrl/keymaps/tzarc!tzarc \
 	cyclone!tzarc-cyclone!handwired/tzarc/cyclone!tzarc \
 	djinn_rev1_actual!tzarc-djinn/keymaps/tzarc!tzarc/djinn/rev1/keymaps/tzarc!tzarc \
-	djinn_rev2_actual!tzarc-djinn/keymaps/tzarc!tzarc/djinn/rev2/keymaps/tzarc!tzarc \
 	djinn_rev1!tzarc-djinn!handwired/tzarc/djinn!tzarc!handwired/tzarc/djinn/rev1 \
+	djinn_rev2_actual!tzarc-djinn/keymaps/tzarc!tzarc/djinn/rev2/keymaps/tzarc!tzarc \
 	djinn_rev2!tzarc-djinn!handwired/tzarc/djinn!tzarc!handwired/tzarc/djinn/rev2 \
-	ghoul_stm32!tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/stm32 \
+	geekboards!tzarc-geekboards-macropad_v2!geekboards/macropad_v2/keymaps/tzarc!tzarc \
 	ghoul_rp2040!tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/rp2040 \
+	ghoul_stm32!tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/stm32 \
+	iris!tzarc-iris_rev4!keebio/iris/rev4/keymaps/tzarc!tzarc \
+	luddite!tzarc-luddite!40percentclub/luddite/keymaps/tzarc!tzarc \
+	mysterium-dad!tzarc-mysterium-dad!coseyfannitutti/mysterium/keymaps/tzarc-dad!tzarc-dad \
+	mysterium-nick!tzarc-mysterium!coseyfannitutti/mysterium/keymaps/tzarc!tzarc \
+	one2mini!tzarc-one2mini!ducky/one2mini/1861st/keymaps/tzarc!tzarc \
+	sat75!tzarc-sat75!cannonkeys/satisfaction75/rev1/keymaps/tzarc!tzarc \
 	onekey_h743!alternates/nucleo144_h743zi!handwired/onekey/nucleo144_h743zi!reset \
 	onekey_l152!alternates/nucleo64_l152re!handwired/onekey/nucleo64_l152re!reset \
 	onekey_g431!alternates/nucleo64_g431rb!handwired/onekey/nucleo64_g431rb!reset \
@@ -65,7 +64,7 @@ EXTRA_LINK_DEFS := \
 	users-tzarc!users/tzarc
 
 all-arm:
-	for mcu in $(shell hjson -j $(ROOTDIR)/qmk_firmware/data/schemas/keyboard.jsonschema | jq .properties.processor.enum | grep '"' | sed -e 's@[", ]@@g' | grep -vP "(atmega|attiny|at90|unknown)" | sort | uniq | xargs echo) ; do \
+	@for mcu in $(shell hjson -j $(ROOTDIR)/qmk_firmware/data/schemas/keyboard.jsonschema | jq .properties.processor.enum | grep '"' | sed -e 's@[", ]@@g' | grep -vP "(atmega|attiny|at90|unknown)" | sort | uniq | xargs echo) ; do \
 		qmk multibuild -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2) -f MCU=$$mcu ; \
 	done
 
@@ -76,13 +75,19 @@ arm: NO_CDB = true
 arm: cyclone onekey_l152 onekey_g431 onekey_g474 onekey_l082 split_l082
 
 nick: NO_CDB = true
-nick: iris sat75 luddite mysterium-nick chocopad ctrl djinn bm16s one2mini ghoul_stm32 annepro2 bm60
+nick: annepro2 bm16s bm60 chocopad ctrl cyclone djinn geekboards ghoul iris luddite mysterium-nick one2mini sat75
 
 djinn: NO_CDB = true
 djinn: djinn_rev1 djinn_rev2 djinn_rev1_actual djinn_rev2_actual
 
 ghoul: NO_CDB = true
-ghoul: ghoul_stm32 ghoul_rp2040
+ghoul: ghoul_stm32
+
+# Only build the RP2040 ghoul if it exists in the repo
+ifneq ($(wildcard $(ROOTDIR)/qmk_firmware/lib/pico-sdk),)
+ghoul: ghoul_rp2040
+nick: ghoul_rp2040
+endif
 
 remove_artifacts:
 	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.uf2 "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format "$(ROOTDIR)"/compile_commands.json "$(ROOTDIR)"/qmk_firmware/compile_commands.json >/dev/null 2>&1 || true
@@ -168,7 +173,7 @@ board_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f | so
 
 bin_$$(board_name_$1): board_link_$$(board_name_$1)
 	@echo "\e[38;5;14mBuilding: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
-	+cd "$(ROOTDIR)/qmk_firmware" \
+	+@cd "$(ROOTDIR)/qmk_firmware" \
 		&& { [ -z "$$(NO_CDB)" ] && qmk generate-compilation-database -kb $$(board_qmk_$1) -km $$(board_keymap_$1) || true; } \
 		&& { \
 			if [ -e "$(ROOTDIR)/qmk_firmware/builddefs/build_keyboard.mk" ] ; then \
