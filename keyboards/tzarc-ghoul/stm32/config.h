@@ -27,8 +27,9 @@
 #define SPI_MISO_PIN A7
 #define SPI_MISO_PAL_MODE 5
 
-// EEPROM configuration
+// EEPROM/Flash configuration
 #define EXTERNAL_EEPROM_SPI_SLAVE_SELECT_PIN B3
+#define EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN A4
 
 // RGB configuration
 #define RGB_DI_PIN C6

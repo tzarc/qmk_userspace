@@ -119,6 +119,8 @@ link_target_$1 := $$(word 2,$$(subst !, ,$1))
 link_files_$1 := $$(shell find $$(ROOTDIR)/$$(link_source_$1) -type f \( -name '*.h' -or -name '*.c' \) -and -not -name '*conf.h' -and -not -name 'board.c' -and -not -name 'board.h' | sort)
 link_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(link_source_$1) -type f | sort)
 
+DOCKER_VOLUME_LIST += -v $$(shell readlink -f "$$(link_source_$1)"):/qmk_firmware/$$(link_target_$1)
+
 extra-links: link_$$(link_source_$1)
 link_$$(link_source_$1): qmk_firmware
 	@if [ ! -L "$(ROOTDIR)/qmk_firmware/$$(link_target_$1)" ] ; then \
@@ -230,6 +232,8 @@ board_link_$$(board_name_$1): extra-links
 	fi
 	@touch $$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)
 
+DOCKER_VOLUME_LIST += -v $$(shell readlink -f "$$(board_source_$1)"):/qmk_firmware/keyboards/$$(board_target_$1)
+
 board_unlink_$$(board_name_$1):
 	@if [ -L "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ] ; then \
 		echo "\e[38;5;14mRemoving symlink: $$(board_target_$1)\e[0m" ; \
@@ -260,3 +264,12 @@ pytest:
 container-shell:
 	cd $(ROOTDIR)/qmk_firmware \
 		&& ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); exec bash"
+
+docker-test:
+	@docker run --rm \
+		--user $(shell id -u):$(shell id -g) \
+		-w /qmk_firmware \
+		-v $(shell readlink -f "$(ROOTDIR)/qmk_firmware"):/qmk_firmware \
+		$(DOCKER_VOLUME_LIST) \
+		qmkfm/qmk_cli:latest \
+		qmk compile -j 20 -kb tzarc/djinn/rev2 -km tzarc
