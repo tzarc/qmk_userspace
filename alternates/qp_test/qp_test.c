@@ -100,6 +100,8 @@ void keyboard_post_init_kb(void) {
 
     ssd1351 = qp_ssd1351_make_spi_device(128, 128, DISPLAY_CS_PIN_1_5_INCH_OLED_SSD1351, DISPLAY_DC_PIN, DISPLAY_RST_PIN_1_5_INCH_OLED_SSD1351, 8, 0);
     init_and_clear(ssd1351, QP_ROTATION_180);
+
+    keyboard_post_init_user();
 }
 
 void matrix_scan_kb(void) {
@@ -127,4 +129,6 @@ void matrix_scan_kb(void) {
             }
         }
     }
+
+    matrix_scan_user();
 }

@@ -1,4 +1,8 @@
 MCU = STM32L412
 BOOTLOADER = stm32-dfu
 
-EEPROM_DRIVER = i2c
+EEPROM_DRIVER = wear_leveling
+WEAR_LEVELING_DRIVER = efl
+
+OPT = 1
+OPT_DEFS += -g

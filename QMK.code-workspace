@@ -1,137 +1,73 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "qmk_firmware/quantum/wear_leveling",
-			"name": "quantum-wear_leveling"
-		},
-		{
-			"path": "qmk_firmware/platforms/chibios/drivers/wear_leveling",
-			"name": "drivers-wear_leveling"
-		},
-		{
-			"path": "qmk_firmware/keyboards/handwired/onekey",
-			"name": "onekey"
-		},
-		{
-			"path": "qmk_firmware/keyboards/tzarc",
-			"name": "keyboards-tzarc"
-		},
-		{
-			"path": "qmk_firmware/lib/python/qmk",
-			"name": "python-qmk"
-		},
-		{
-			"path": "qmk_firmware/data/xap",
-			"name": "xap-defs"
-		},
-		{
-			"path": "qmk_firmware/lib/python/qmk/xap",
-			"name": "xap-python"
-		},
-		{
-			"path": "qmk_firmware/lib/python/qmk/cli/xap",
-			"name": "xap-python-cli"
-		},
-		{
-			"path": "qmk_firmware/data/templates/xap",
-			"name": "xap-templates"
-		},
-		{
-			"path": "qmk_firmware/quantum/xap",
-			"name": "xap-qmk"
-		},
-		{
-			"path": "qmk_firmware/.build/obj_kprepublic_bm16s_default/src",
-			"name": "xap-generated-bm16s"
-		},
-		{
-			"path": "qmk_firmware/.build/obj_handwired_tzarc_djinn_rev1/src",
-			"name": "xap-generated-djinn-rev1"
-		},
-		{
-			"path": "qmk_firmware/.build/obj_handwired_tzarc_djinn_rev2/src",
-			"name": "xap-generated-djinn-rev2"
-		},
-	],
-	"settings": {
-		"git.ignoreLimitWarning": true,
-		"files.associations": {
-			"eeprom_transient.h": "c",
-			"*.inc": "cpp",
-			"type_traits": "c",
-			"quantum.h": "c",
-			"platform_deps.h": "c",
-			"pgmspace.h": "c",
-			"lock-num-off.qgf.h": "c",
-			"split_util.h": "c",
-			"djinn.qgf.h": "c",
-			"any": "cpp",
-			"array": "cpp",
-			"atomic": "cpp",
-			"bit": "cpp",
-			"*.tcc": "cpp",
-			"bitset": "cpp",
-			"cctype": "cpp",
-			"chrono": "cpp",
-			"clocale": "cpp",
-			"cmath": "cpp",
-			"compare": "cpp",
-			"concepts": "cpp",
-			"cstdarg": "cpp",
-			"cstddef": "cpp",
-			"cstdint": "cpp",
-			"cstdio": "cpp",
-			"cstdlib": "cpp",
-			"cstring": "cpp",
-			"ctime": "cpp",
-			"cwchar": "cpp",
-			"cwctype": "cpp",
-			"deque": "cpp",
-			"forward_list": "cpp",
-			"list": "cpp",
-			"map": "cpp",
-			"set": "cpp",
-			"unordered_map": "cpp",
-			"unordered_set": "cpp",
-			"vector": "cpp",
-			"exception": "cpp",
-			"algorithm": "cpp",
-			"functional": "cpp",
-			"iterator": "cpp",
-			"memory": "cpp",
-			"memory_resource": "cpp",
-			"numeric": "cpp",
-			"optional": "cpp",
-			"random": "cpp",
-			"ratio": "cpp",
-			"regex": "cpp",
-			"string": "cpp",
-			"string_view": "cpp",
-			"system_error": "cpp",
-			"tuple": "cpp",
-			"utility": "cpp",
-			"fstream": "cpp",
-			"initializer_list": "cpp",
-			"iomanip": "cpp",
-			"iosfwd": "cpp",
-			"iostream": "cpp",
-			"istream": "cpp",
-			"limits": "cpp",
-			"new": "cpp",
-			"ostream": "cpp",
-			"ranges": "cpp",
-			"sstream": "cpp",
-			"stdexcept": "cpp",
-			"stop_token": "cpp",
-			"streambuf": "cpp",
-			"thread": "cpp",
-			"cinttypes": "cpp",
-			"typeinfo": "cpp",
-			"variant": "cpp",
-			"timer.h": "c"
-		},
-	}
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "qmk_firmware/docs",
+      "name": "qmk-docs"
+    },
+    {
+      "path": "qmk_firmware/quantum/wear_leveling",
+      "name": "quantum-wear_leveling"
+    },
+    {
+      "path": "qmk_firmware/drivers/wear_leveling",
+      "name": "drivers-wear_leveling"
+    },
+    {
+      "path": "qmk_firmware/platforms/chibios/drivers/wear_leveling",
+      "name": "drivers-chibios-wear_leveling"
+    },
+    {
+      "path": "qmk_firmware/keyboards/handwired/onekey",
+      "name": "onekey"
+    },
+    {
+      "path": "qmk_firmware/keyboards/tzarc",
+      "name": "keyboards-tzarc"
+    },
+    {
+      "path": "qmk_firmware/lib/python/qmk",
+      "name": "python-qmk"
+    },
+    {
+      "path": "qmk_firmware/data/xap",
+      "name": "xap-defs"
+    },
+    {
+      "path": "qmk_firmware/lib/python/qmk/xap",
+      "name": "xap-python"
+    },
+    {
+      "path": "qmk_firmware/lib/python/qmk/cli/xap",
+      "name": "xap-python-cli"
+    },
+    {
+      "path": "qmk_firmware/data/templates/xap",
+      "name": "xap-templates"
+    },
+    {
+      "path": "qmk_firmware/quantum/xap",
+      "name": "xap-qmk"
+    },
+    {
+      "path": "qmk_firmware/.build/obj_kprepublic_bm16s_default/src",
+      "name": "xap-generated-bm16s"
+    },
+    {
+      "path": "qmk_firmware/.build/obj_handwired_tzarc_djinn_rev1/src",
+      "name": "xap-generated-djinn-rev1"
+    },
+    {
+      "path": "qmk_firmware/.build/obj_handwired_tzarc_djinn_rev2/src",
+      "name": "xap-generated-djinn-rev2"
+    }
+  ],
+  "settings": {
+    "git.ignoreLimitWarning": true,
+    "files.associations": {
+      "print.h": "c"
+    }
+  }
 }

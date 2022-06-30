@@ -26,8 +26,8 @@ SRC += \
 	lock-num-OFF.qgf.c \
 	thintel15.qff.c
 
-#EEPROM_DRIVER = wear_leveling
-#WEAR_LEVELING_DRIVER = efl
+EEPROM_DRIVER = wear_leveling
+WEAR_LEVELING_DRIVER = efl
 
 #EEPROM_DRIVER = wear_leveling
 #WEAR_LEVELING_DRIVER = flash_spi
