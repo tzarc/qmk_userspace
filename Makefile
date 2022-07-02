@@ -1,8 +1,8 @@
 export ROOTDIR := $(shell pwd)
 #export PATH := /home/nickb/dev/cross-compilers/target_prefix/gcc11.1_arm/bin:$(PATH)
 #export PATH := /home/nickb/dev/cross-compilers/target_prefix/gcc11.1_avr/bin:$(PATH)
-export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH)
-#export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$(PATH)
+#export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH)
+export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$(PATH)
 #export PATH := /usr/lib/ccache:$(PATH)
 
 # Add qmk wrapper to path
@@ -19,8 +19,8 @@ $(ROOTDIR)/qmk_firmware:
 
 BOARD_DEFS := \
 	cyclone!keyboards/tzarc-cyclone!handwired/tzarc/cyclone!tzarc \
-	ghoul_rp2040!keyboards/tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/rp2040 \
-	ghoul_stm32!keyboards/tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/stm32 \
+	ghoul_rp2040!keyboards/tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/rev1/rp2040 \
+	ghoul_stm32!keyboards/tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/rev1/stm32 \
 	\
 	annepro2!keymaps/annepro2!annepro2/c18/keymaps/tzarc!tzarc \
 	bm16s!keymaps/bm16s!kprepublic/bm16s/keymaps/tzarc!tzarc \
@@ -78,13 +78,7 @@ djinn: NO_COMPILEDB = true
 djinn: djinn_rev1 djinn_rev2
 
 ghoul: NO_COMPILEDB = true
-ghoul: ghoul_stm32
-
-# Only build the RP2040 ghoul if it exists in the repo
-ifneq ($(wildcard $(ROOTDIR)/qmk_firmware/lib/pico-sdk),)
-ghoul: ghoul_rp2040
-nick: ghoul_rp2040
-endif
+ghoul: ghoul_stm32 ghoul_rp2040
 
 remove_artifacts:
 	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.uf2 "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format "$(ROOTDIR)"/compile_commands.json "$(ROOTDIR)"/qmk_firmware/compile_commands.json >/dev/null 2>&1 || true
@@ -272,4 +266,4 @@ docker-test:
 		-v $(shell readlink -f "$(ROOTDIR)/qmk_firmware"):/qmk_firmware \
 		$(DOCKER_VOLUME_LIST) \
 		qmkfm/qmk_cli:latest \
-		qmk compile -j 20 -kb tzarc/djinn/rev2 -km tzarc
+		qmk compile -j 20 -kb annepro2/c18 -km tzarc

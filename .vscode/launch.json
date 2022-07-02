@@ -25,14 +25,14 @@
       ]
     },
     {
-      "name": "Python: generate-layouts, Djinn",
+      "name": "Python: generate-keyboard-c, Ghoul/RP2040",
       "type": "python",
       "cwd": "${workspaceRoot}/qmk_firmware",
       "request": "launch",
       "args": [
-        "generate-layouts",
+        "generate-keyboard-c",
         "-kb",
-        "handwired/tzarc/djinn/rev1",
+        "handwired/tzarc/ghoul/rev1/rp2040",
         "-o",
         "-"
       ],
@@ -108,12 +108,35 @@
       "device": "STM32F405",
       "linux": {
         "BMPGDBSerialPort": "/dev/ttyACM0",
-        "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_tzarc_ghoul_stm32_default.elf",
+        "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_tzarc_ghoul_rev1_stm32_default.elf",
         "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
       },
       "windows": {
         "BMPGDBSerialPort": "COM6",
-        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_ghoul_stm32_default.elf",
+        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_ghoul_rev1_stm32_default.elf",
+        "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
+      },
+      "showDevDebugOutput": "parsed",
+      "preAttachCommands": ["set mem inaccessible-by-default off"],
+      "postAttachCommands": []
+    },
+    {
+      "name": "Black Magic Probe (Ghoul RP2040, cortex-debug)",
+      "type": "cortex-debug",
+      "request": "attach",
+      "cwd": "${workspaceRoot}/qmk_firmware",
+      "svdFile": "${workspaceRoot}/qmk_firmware/lib/pico-sdk/rp2040/hardware_regs/rp2040.svd",
+      "servertype": "bmp",
+      "interface": "swd",
+      "device": "RP2040",
+      "linux": {
+        "BMPGDBSerialPort": "/dev/ttyACM0",
+        "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_tzarc_ghoul_rev1_rp2040_default.elf",
+        "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
+      },
+      "windows": {
+        "BMPGDBSerialPort": "COM6",
+        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_ghoul_rev1_rp2040_default.elf",
         "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
       },
       "showDevDebugOutput": "parsed",

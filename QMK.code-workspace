@@ -52,22 +52,15 @@
       "name": "xap-qmk"
     },
     {
-      "path": "qmk_firmware/.build/obj_kprepublic_bm16s_default/src",
-      "name": "xap-generated-bm16s"
-    },
-    {
-      "path": "qmk_firmware/.build/obj_handwired_tzarc_djinn_rev1/src",
-      "name": "xap-generated-djinn-rev1"
-    },
-    {
-      "path": "qmk_firmware/.build/obj_handwired_tzarc_djinn_rev2/src",
-      "name": "xap-generated-djinn-rev2"
+      "path": "qmk_firmware/.build/obj_handwired_tzarc_ghoul_rev1_rp2040/src",
+      "name": "xap-generated-ghoul-rev1-rp2040"
     }
   ],
   "settings": {
     "git.ignoreLimitWarning": true,
     "files.associations": {
-      "print.h": "c"
+      "print.h": "c",
+      "xutility": "c"
     }
   }
 }

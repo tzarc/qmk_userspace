@@ -4,14 +4,10 @@
 #include "analog.h"
 #include "spi_master.h"
 
-void ui_init(void);
-void ui_task(void);
+__attribute__((weak)) void ui_init(void) {}
+__attribute__((weak)) void ui_task(void) {}
 
 void keyboard_post_init_kb(void) {
-    debug_enable   = true;
-    debug_matrix   = true;
-    debug_keyboard = true;
-
     // Enable RGB current limiter and wait for a bit before allowing RGB to continue
     setPinOutput(RGB_ENABLE_PIN);
     writePinHigh(RGB_ENABLE_PIN);

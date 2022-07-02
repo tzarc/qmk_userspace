@@ -4,18 +4,11 @@
 
 #include "config_common.h"
 
-// Change PRODUCT based on hosted MicroMod
-#define PRODUCT Ghoul_RP2040
-
 // Matrix configuration
 #define SPI_MATRIX_CHIP_SELECT_PIN GP21
 #define SPI_MATRIX_DIVISOR 16
 
 // Encoder
-#define ENCODERS_PAD_A \
-    { GP8 }
-#define ENCODERS_PAD_B \
-    { GP5 }
 #define ENCODER_PUSHBUTTON_PIN GP7
 
 // SPI Configuration
@@ -25,15 +18,18 @@
 #define SPI_MISO_PIN GP20
 
 // EEPROM configuration
+#define EXTERNAL_EEPROM_SPI_CLOCK_DIVISOR 8
 #define EXTERNAL_EEPROM_SPI_SLAVE_SELECT_PIN GP3
+#define EXTERNAL_FLASH_SPI_CLOCK_DIVISOR 8
+#define EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN GP2
 
 // RGB configuration
 #define RGB_DI_PIN GP13
 #define RGB_ENABLE_PIN GP6
 
 // ADC Configuration
-#define ADC_RESOLUTION ADC_CFGR1_RES_12BIT
-#define ADC_SATURATION ((1 << 12) - 1)
+#define ADC_RESOLUTION ? ? ? // ADC_CFGR1_RES_12BIT // TBD when RP2040 has analog support
+#define ADC_SATURATION ? ? ? // ((1 << 12) - 1) // TBD when RP2040 has analog support
 #define ADC_CURRENT_PIN GP26
 #define ADC_VOLTAGE_PIN GP27
 
