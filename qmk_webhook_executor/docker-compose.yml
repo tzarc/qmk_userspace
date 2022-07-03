@@ -22,7 +22,7 @@ services:
     environment:
       - http_proxy=http://squid:3128
       - https_proxy=http://squid:3128
-    user: "${UID}:${GID}"
+    user: "${PUID}:${PGID}"
     volumes:
       - ./data:/data
     command: redis-server --save 20 1 --appendonly yes --loglevel warning
@@ -39,8 +39,7 @@ services:
       - frontend
       - backplane
     environment:
-      - http_proxy=http://squid:3128
-      - https_proxy=http://squid:3128
+      - TARGET_REPO=qmk/qmk_firmware
 
   worker:
     build:

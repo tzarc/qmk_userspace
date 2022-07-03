@@ -21,8 +21,9 @@ RUN groupadd -g 88888 srv \
     && find /app -type f -exec chmod 644 '{}' + \
     && find /app -type f -name '*.sh' -exec chmod 755 '{}' +
 
-RUN mkdir /qmk_firmware \
-    && chown -R 88888:88888 /qmk_firmware
+RUN mkdir /__w \
+    && mkdir /__w/repo \
+    && chown -R 88888:88888 /__w
 
 USER 88888:88888
 

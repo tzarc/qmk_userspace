@@ -1,8 +1,8 @@
 export ROOTDIR := $(shell pwd)
 #export PATH := /home/nickb/dev/cross-compilers/target_prefix/gcc11.1_arm/bin:$(PATH)
 #export PATH := /home/nickb/dev/cross-compilers/target_prefix/gcc11.1_avr/bin:$(PATH)
-export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH)
-#export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$(PATH)
+#export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH)
+export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$(PATH)
 #export PATH := /usr/lib/ccache:$(PATH)
 
 # Add qmk wrapper to path

@@ -2,9 +2,6 @@
 
 set -eEuo pipefail
 
-export UID=$(id -u)
-export GID=$(id -g)
-
 abs_path() {
   pushd . >/dev/null
   if [ -d "$1" ]; then
@@ -27,6 +24,10 @@ script_dir="$(abs_path "$(dirname "$bash_script")")"
 
 [ -d "$script_dir/data" ] || mkdir -p "$script_dir/data"
 
-docker compose pull
-docker compose build
-docker compose up -d --remove-orphans "$@"
+main() {
+  PUID=$(id -u) PGID=$(id -g) docker compose pull
+  PUID=$(id -u) PGID=$(id -g) docker compose build
+  PUID=$(id -u) PGID=$(id -g) docker compose up -d --remove-orphans "$@"
+}
+
+main

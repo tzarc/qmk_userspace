@@ -5,6 +5,24 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Common layers and keys
 
+#ifdef KEYBOARD_annepro2
+#    include "annepro2.h"
+#    define BT_PAIR1 KC_AP2_BT1
+#    define BT_PAIR2 KC_AP2_BT2
+#    define BT_PAIR3 KC_AP2_BT3
+#    define BT_PAIR4 KC_AP2_BT4
+#    define BT_NPAIR KC_AP2_BT_UNPAIR
+#    define BT_USB KC_AP2_USB
+_Static_assert(SAFE_RANGE == AP2_SAFE_RANGE, "SAFE_RANGE needs to match AP2_SAFE_RANGE");
+#else
+#    define BT_PAIR1 KC_NO
+#    define BT_PAIR2 KC_NO
+#    define BT_PAIR3 KC_NO
+#    define BT_PAIR4 KC_NO
+#    define BT_NPAIR KC_NO
+#    define BT_USB KC_NO
+#endif
+
 enum { KC_CONFIG = SAFE_RANGE, TIME_RESET, TIME_EEPRST, KC_LOWER, KC_RAISE, KC_ADJUST, KC_NOMODE, KC_WIDE, KC_SCRIPT, KC_BLOCKS, KC_REGIONAL, KC_AUSSIE, KC_ZALGO, KC_WOWMODE, KC_D3MODE, KEYMAP_SAFE_RANGE };
 enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 
@@ -427,11 +445,11 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 // Adjust layer
 //                                               ┌────────────┐            ┌────────────┬────────────┬────────────┬────────────┐     ┌────────────┬────────────┬────────────┬────────────┐     ┌────────────┬────────────┬────────────┬────────────┐
 //                                               | Esc        |            | F1         | F2         | F3         | F4         |     | F5         | F6         | F7         | F8         |     | F9         | F10        | F11        | F12        |
-#define ____________TZARC_ADJUST_R1_ALPHA________ _______,                  _______,     _______,     _______,     _______,           _______,     _______,     _______,     _______,           _______,     _______,     _______,     _______
+#define ____________TZARC_ADJUST_R1_ALPHA________ _______,                  _______,     _______,     _______,     _______,           _______,    _______,     _______,     _______,           _______,     _______,     _______,     _______
 //                                               └────────────┘            └────────────┴────────────┴────────────┴────────────┘     └────────────┴────────────┴────────────┴────────────┘     └────────────┴────────────┴────────────┴────────────┘
 //                                               ┌────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────────────────┐
 //                                               | Grave      | 1          | 2          | 3          | 4          | 5          | 6          | 7          | 8          | 9          | 0          | Minus      | Equals     | Backspace              |
-#define ____________TZARC_ADJUST_R2_ALPHA________ _______,     _______,     _______,     _______,     _______,     _______,     _______,     _______,     _______,     _______,     _______,     DEBUG,       TIME_EEPRST, TIME_RESET
+#define ____________TZARC_ADJUST_R2_ALPHA________ _______,     BT_PAIR1,    BT_PAIR2,    BT_PAIR3,    BT_PAIR4,    BT_NPAIR,    BT_USB,      _______,     _______,     _______,     _______,     DEBUG,       TIME_EEPRST, TIME_RESET
 //                                               └────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────────────────┘
 //                                               ┌──────────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬──────────────────┐
 //                                               | Tab              | Q          | W          | E          | R          | T          | Y          | U          | I          | O          | P          |  [         |  ]         |  \               |
