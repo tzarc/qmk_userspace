@@ -15,6 +15,9 @@ void keyboard_post_init_kb(void) {
 
     // Init the display
     ui_init();
+
+    // Offload to the user func
+    keyboard_post_init_user();
 }
 
 void matrix_init_custom(void) {

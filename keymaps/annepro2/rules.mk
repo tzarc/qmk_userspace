@@ -1,5 +1,5 @@
 LTO_ENABLE = yes
-OPT = s
+OPT = 2
 XAP_ENABLE = no
 RAW_ENABLE = no
 CONSOLE_ENABLE = yes
