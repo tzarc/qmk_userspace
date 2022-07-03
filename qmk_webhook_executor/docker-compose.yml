@@ -22,6 +22,10 @@ services:
     environment:
       - http_proxy=http://squid:3128
       - https_proxy=http://squid:3128
+    user: "${UID}:${GID}"
+    volumes:
+      - ./data:/data
+    command: redis-server --save 20 1 --appendonly yes --loglevel warning
 
   acceptor:
     build:
@@ -50,4 +54,4 @@ services:
       - http_proxy=http://squid:3128
       - https_proxy=http://squid:3128
     deploy:
-      replicas: 4
+      replicas: 1

@@ -16,12 +16,14 @@ COPY app /app
 
 RUN groupadd -g 88888 srv \
     && useradd -u 88888 -M -N -g 88888 -s /usr/sbin/nologin -d /app srv \
-    && chown -R root:srv /app \
+    && chown -R root:88888 /app \
     && find /app -type d -exec chmod 755 '{}' + \
-    && find /app -type f -exec chmod 644 '{}' +
+    && find /app -type f -exec chmod 644 '{}' + \
+    && find /app -type f -name '*.sh' -exec chmod 755 '{}' +
+
+RUN mkdir /qmk_firmware \
+    && chown -R 88888:88888 /qmk_firmware
 
 USER 88888:88888
-
-EXPOSE 80
 
 CMD rq worker --url redis://redis

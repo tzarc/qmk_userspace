@@ -16,12 +16,12 @@ app = FastAPI(docs_url='/docs', redoc_url='/redoc')
 
 @app.get("/", include_in_schema=False)
 def base_page():
-    job = q.enqueue(execute_run, kwargs={'pr_num':17000})
+    job = q.enqueue(execute_run, kwargs={'pr_num':17534, 'target_branch':'develop'})
 
-    for n in range(5):
+    for n in range(5000):
         logger.info(f'{n} -- {job.get_status()}')
         if job.get_status() == 'finished':
             break;
-        time.sleep(1)
+        time.sleep(0.1)
 
     return HTMLResponse(content=f'<html><body>{job.result}</body></html>', status_code=200)
