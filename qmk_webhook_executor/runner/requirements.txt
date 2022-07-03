@@ -1,0 +1,4 @@
+FastAPI[all]
+uvicorn[standard]
+python-multipart
+rq
