@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -eEuo pipefail
+
+docker compose down --remove-orphans "$@"
