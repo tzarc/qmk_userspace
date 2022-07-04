@@ -29,9 +29,6 @@ async def qmk_webhook(request: Request):
     if json_blob['pull_request']['base']['repo']['full_name'] != expected_target_repo:
         return JSONResponse(content={}, status_code=403)
 
-    if json_blob['action'] != 'synchronize':
-        return {}
-
     # Set up the arguments we want to use
     invoke_args = {
         'target_repo': json_blob['pull_request']['base']['repo']['clone_url'],
@@ -41,6 +38,12 @@ async def qmk_webhook(request: Request):
         'author': json_blob['pull_request']['user']['login'],
         'title': json_blob['pull_request']['title']
     }
+
+    print(f'PR #{invoke_args["pr_num"]} ({json_blob["action"]}): {invoke_args["title"]}')
+
+    supported_operations = ['opened', 'synchronize']
+    if json_blob['action'] not in supported_operations:
+        return {}
 
     # Queue the work unit and exit
     q.enqueue(execute_run, ttl=(86400*3), kwargs=invoke_args)
