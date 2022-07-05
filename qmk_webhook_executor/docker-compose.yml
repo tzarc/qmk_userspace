@@ -40,6 +40,7 @@ services:
       - backplane
     environment:
       - TARGET_REPO=qmk/qmk_firmware
+      - IGNORED_PRS=13733 # comma-separated
 
   worker:
     build:

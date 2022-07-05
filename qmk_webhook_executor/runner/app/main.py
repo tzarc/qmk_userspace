@@ -6,11 +6,17 @@ from rq import Queue
 from redis import Redis
 from runner_lib.runner import execute_run
 
-expected_target_repo = os.getenv('TARGET_REPO')
 logger = logging.getLogger("acceptor")
 r = Redis(host='redis')
 q = Queue(connection=r)
 app = FastAPI(docs_url='/docs', redoc_url='/redoc')
+
+expected_target_repo = os.getenv('TARGET_REPO')
+ignored_prs = os.getenv('IGNORED_PRS')
+if ignored_prs is None or ignored_prs == '':
+    ignored_prs = []
+else:
+    ignored_prs = [int(s.strip()) for s in ignored_prs.split(',')]
 
 
 @app.post("/qmk-webhook", include_in_schema=False)
@@ -39,13 +45,20 @@ async def qmk_webhook(request: Request):
         'title': json_blob['pull_request']['title']
     }
 
-    print(f'PR #{invoke_args["pr_num"]} ({json_blob["action"]}): {invoke_args["title"]}')
+    ignored = ''
+    if json_blob['number'] in ignored_prs:
+        ignored = ', ignored'
+
+    print(
+        f'PR #{invoke_args["pr_num"]} ({json_blob["action"]}{ignored}): {invoke_args["title"]}')
 
     supported_operations = ['opened', 'synchronize']
     if json_blob['action'] not in supported_operations:
         return {}
 
+    if json_blob['number'] in ignored_prs:
+        return {}
+
     # Queue the work unit and exit
     q.enqueue(execute_run, ttl=(86400*3), kwargs=invoke_args)
     return {}
-
