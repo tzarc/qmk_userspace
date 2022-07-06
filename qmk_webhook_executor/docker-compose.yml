@@ -41,6 +41,7 @@ services:
     environment:
       - TARGET_REPO=qmk/qmk_firmware
       - IGNORED_PRS=13733 # comma-separated
+      - DISCORD_WEBHOOK=${DISCORD_WEBHOOK?Variable not set}
 
   worker:
     build:
@@ -53,5 +54,17 @@ services:
     environment:
       - http_proxy=http://squid:3128
       - https_proxy=http://squid:3128
+    deploy:
+      replicas: 1
+
+  uploader:
+    build:
+      context: ./runner
+      dockerfile: Dockerfile.uploader
+    restart: always
+    init: true
+    networks:
+      - frontend
+      - backplane
     deploy:
       replicas: 1

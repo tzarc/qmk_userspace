@@ -1,16 +1,14 @@
 # Copyright 2018-2022 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-3.0-or-later
 import os
-import logging
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from rq import Queue
 from redis import Redis
 from runner_lib.runner import execute_run
 
-logger = logging.getLogger("acceptor")
 r = Redis(host='redis')
-q = Queue(connection=r)
+jobs_queue = Queue('jobs', connection=r)
 app = FastAPI(docs_url='/docs', redoc_url='/redoc')
 
 expected_target_repo = os.getenv('TARGET_REPO')
@@ -39,7 +37,7 @@ async def qmk_webhook(request: Request):
 
     # Set up the arguments we want to use
     invoke_args = {
-        'target_repo': json_blob['pull_request']['base']['repo']['clone_url'],
+        'target_repo': json_blob['pull_request']['base']['repo']['full_name'],
         'target_branch': json_blob['pull_request']['base']['ref'],
         'pr_num': json_blob['number'],
         'sha1': json_blob['pull_request']['head']['sha'],
@@ -62,5 +60,5 @@ async def qmk_webhook(request: Request):
         return {}
 
     # Queue the work unit and exit
-    q.enqueue(execute_run, ttl=(86400*3), kwargs=invoke_args)
+    jobs_queue.enqueue(execute_run, ttl=(86400*3), kwargs=invoke_args)
     return {}
