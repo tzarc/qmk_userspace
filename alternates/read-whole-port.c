@@ -1,3 +1,6 @@
+// Copyright 2018-2022 Nick Brassel (@tzarc)
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Read the ports in one go
 #define MATRIX_ROW_PINS \
     { B13, B14, B15, C6, C7, C8 }

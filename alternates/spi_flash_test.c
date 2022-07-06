@@ -1,3 +1,6 @@
+// Copyright 2018-2022 Nick Brassel (@tzarc)
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 void housekeeping_task_kb(void) {
 #ifdef EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN
     static bool spiflash_tested = false;

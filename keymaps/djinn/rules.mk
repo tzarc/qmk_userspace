@@ -1,3 +1,6 @@
+# Copyright 2018-2022 Nick Brassel (@tzarc)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 DEBUG_MATRIX_SCAN_RATE_ENABLE = api
 
 #SRC += qp_rgb565_surface.c

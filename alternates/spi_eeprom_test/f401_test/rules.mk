@@ -1,3 +1,6 @@
+# Copyright 2018-2022 Nick Brassel (@tzarc)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 ## chip/board settings
 # the next two should match the directories in
 #  <chibios>/os/hal/ports/$(MCU_FAMILY)/$(MCU_SERIES)

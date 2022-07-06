@@ -1,3 +1,5 @@
+# Copyright 2018-2022 Nick Brassel (@tzarc)
+# SPDX-License-Identifier: GPL-3.0-or-later
 SRC += \
 	tzarc_common.c \
 	tzarc_eeprom.c \

@@ -1,5 +1,5 @@
 // Copyright 2018-2022 Nick Brassel (@tzarc)
-// SPDX-License-Identifier: GPL-2.0-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "quantum.h"
 
 #if (!defined(SHIFTREG_MATRIX_ROW_LATCH) || !defined(SHIFTREG_MATRIX_ROW_CLK) || !defined(SHIFTREG_MATRIX_ROW_DATA) || !defined(SHIFTREG_MATRIX_COL_LATCH) || !defined(SHIFTREG_MATRIX_COL_CLK) || !defined(SHIFTREG_MATRIX_COL_DATA))

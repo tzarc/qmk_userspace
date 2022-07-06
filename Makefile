@@ -1,5 +1,5 @@
 # Copyright 2018-2022 Nick Brassel (@tzarc)
-# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 export ROOTDIR := $(shell pwd)
 #export PATH := /home/nickb/dev/cross-compilers/target_prefix/gcc11.1_arm/bin:$(PATH)

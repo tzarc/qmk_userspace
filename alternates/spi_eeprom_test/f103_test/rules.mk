@@ -1,3 +1,6 @@
+# Copyright 2018-2022 Nick Brassel (@tzarc)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # MCU name
 MCU = STM32F103
 BOARD = STM32_F103_STM32DUINO
