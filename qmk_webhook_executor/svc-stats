@@ -1,0 +1,3 @@
+#!/bin/bash
+
+PUID=$(id -u) PGID=$(id -g) docker compose exec acceptor rq info --url redis://redis --interval 1

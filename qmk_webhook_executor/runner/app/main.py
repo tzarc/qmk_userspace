@@ -4,6 +4,7 @@ import os
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from rq import Queue
+from rq.job import Job
 from redis import Redis
 from runner_lib.runner import execute_run
 
@@ -60,5 +61,6 @@ async def qmk_webhook(request: Request):
         return {}
 
     # Queue the work unit and exit
-    jobs_queue.enqueue(execute_run, ttl=(86400*3), kwargs=invoke_args)
+    j = Job.create(execute_run, connection=r, ttl=(86400*3), timeout='3h', kwargs=invoke_args)
+    jobs_queue.enqueue_job(j)
     return {}

@@ -41,7 +41,6 @@ services:
     environment:
       - TARGET_REPO=qmk/qmk_firmware
       - IGNORED_PRS=13733 # comma-separated
-      - DISCORD_WEBHOOK=${DISCORD_WEBHOOK?Variable not set}
 
   worker:
     build:
@@ -66,5 +65,8 @@ services:
     networks:
       - frontend
       - backplane
-    deploy:
-      replicas: 1
+    environment:
+      - DISCORD_WEBHOOK=${DISCORD_WEBHOOK?Variable not set}
+      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY?Variable not set}
+      - AWS_SECRET=${AWS_SECRET?Variable not set}
+      - S3_BUCKET=${S3_BUCKET?Variable not set}
