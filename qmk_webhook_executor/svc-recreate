@@ -1,0 +1,5 @@
+#!/bin/bash
+
+[[ -z $1 ]] && echo "Specify acceptor/worker/uploader as first arg." >&2 && exit 1
+
+PUID=$(id -u) PGID=$(id -g) docker compose build $1 && PUID=$(id -u) PGID=$(id -g) docker compose up $1 -d

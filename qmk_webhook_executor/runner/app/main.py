@@ -50,8 +50,9 @@ async def qmk_webhook(request: Request):
     if json_blob['number'] in ignored_prs:
         ignored = ', ignored'
 
+    delivery_id = request.headers.get('X-GitHub-Delivery')
     print(
-        f'PR #{invoke_args["pr_num"]} ({json_blob["action"]}{ignored}): {invoke_args["title"]}')
+        f'[{delivery_id}] PR #{invoke_args["pr_num"]} ({json_blob["action"]}{ignored}): {invoke_args["title"]}')
 
     supported_operations = ['opened', 'synchronize']
     if json_blob['action'] not in supported_operations:
@@ -61,6 +62,7 @@ async def qmk_webhook(request: Request):
         return {}
 
     # Queue the work unit and exit
-    j = Job.create(execute_run, connection=r, ttl=(86400*3), timeout='3h', kwargs=invoke_args)
+    j = Job.create(execute_run, connection=r, ttl=(
+        86400*3), timeout='3h', kwargs=invoke_args)
     jobs_queue.enqueue_job(j)
     return {}

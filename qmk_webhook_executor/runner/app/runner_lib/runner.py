@@ -23,8 +23,8 @@ def execute_run(target_repo: str, target_branch: str, pr_num: int, sha1: str, au
     subprocess.call(command, shell=True)
 
     if os.path.exists(f'/__w/{sha1}.html'):
-        with open(f'/__w/{sha1}.html', 'r') as f:
-            results = f.readlines()
+        with open(f'/__w/{sha1}.html', 'rb') as f:
+            results = f.read()
             results_queue.enqueue(result_uploader, ttl=(86400*3), kwargs={
                 'target_repo': target_repo,
                 'target_branch': target_branch,
@@ -32,7 +32,7 @@ def execute_run(target_repo: str, target_branch: str, pr_num: int, sha1: str, au
                 'sha1': sha1,
                 'author': author,
                 'title': title,
-                'results': '\n'.join(results)
+                'results': results
             })
     else:
         results_queue.enqueue(result_uploader, ttl=(86400*3), kwargs={
@@ -46,12 +46,12 @@ def execute_run(target_repo: str, target_branch: str, pr_num: int, sha1: str, au
         })
 
 
-def result_uploader(target_repo: str, target_branch: str, pr_num: int, sha1: str, author: str, title: str, results: str):
+def result_uploader(target_repo: str, target_branch: str, pr_num: int, sha1: str, author: str, title: str, results: bytes):
     s3 = boto3.client('s3',
                       aws_access_key_id=os.getenv('AWS_ACCESS_KEY'),
                       aws_secret_access_key=os.getenv('AWS_SECRET'))
 
-    s3.upload_fileobj(BytesIO(bytes(results, 'utf-8')), os.getenv('S3_BUCKET'),
+    s3.upload_fileobj(BytesIO(results), os.getenv('S3_BUCKET'),
                       sha1, ExtraArgs={'ContentType': 'text/html'})
 
     print()

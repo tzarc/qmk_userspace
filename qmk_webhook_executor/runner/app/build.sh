@@ -165,7 +165,7 @@ build_keymaps() {
 
     while read target; do
         st_info "Making ${target}..."
-        { pcmd make -j$(nproc) -O ${target} 2>&1 || touch /__w/failed.$intended_sha1; } | tee -a /__w/build_output.txt
+        { pcmd make --no-print-directory -j$(nproc) -O ${target} 2>&1 || touch /__w/failed.$intended_sha1; } | tee -a /__w/build_output.txt
         if [[ -e /__w/failed.$intended_sha1 ]]; then
             retcode=1
         fi
@@ -193,6 +193,10 @@ cleanup() {
     exit $script_rc
 }
 trap cleanup EXIT HUP INT
+
+ctlchars2html() {
+    cat - | sed -e 's@/__w/repo@%QMK_FIRMWARE%@g' | ansi2html --bg=dark --palette=linux --body-only 2>/dev/null | sed -e 's@\r@@g' -e 's@\n\n@\n@g' -e 's@\n\n@\n@g' -e 's@\n\n@\n@g' -e 's@\n\n@\n@g'
+}
 
 main() {
     # Clear out files
@@ -229,7 +233,7 @@ main() {
 <html lang='en'><head>
 <meta charset="utf-8"/>
 <style type='text/css'>
-$(ansi2html --bg=dark --palette=linux --css-only 2>/dev/null)
+$(ansi2html --bg=dark --palette=linux --css-only 2>/dev/null | sed -e 's@\r@@g' -e 's@\n\n@\n@g' -e 's@\n\n@\n@g' -e 's@\n\n@\n@g' -e 's@\n\n@\n@g')
 pre { font-size: 80%; }
 h1, h2, h3, h4, h5, h6, pre { font-family: 'Iosevka Term', 'Iosevka Fixed', Consolas, Menlo, 'Courier New', monospace; }
 a { color: #FF0; font-weight: bold; }
@@ -261,8 +265,8 @@ EOF
     cat <<EOF >>/__w/${intended_sha1}.html
 <hr/>
 <pre>
-$(cat /__w/build_output.txt | ansi2html --bg=dark --palette=linux --body-only 2>/dev/null)
-$(cat /__w/failed.* | ansi2html --bg=dark --palette=linux --body-only 2>/dev/null)
+$(cat /__w/build_output.txt | ctlchars2html)
+$(cat /__w/failed.* | ctlchars2html)
 </pre>
 </body></html>
 EOF
