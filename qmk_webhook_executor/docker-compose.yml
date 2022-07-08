@@ -39,8 +39,8 @@ services:
       - frontend
       - backplane
     environment:
-      - TARGET_REPO=qmk/qmk_firmware
-      - IGNORED_PRS=13733 # comma-separated
+      - TARGET_REPO=${TARGET_REPO?Variable not set}
+      - IGNORED_PRS=${IGNORED_PRS?Variable not set} # comma-separated
 
   worker:
     build:
