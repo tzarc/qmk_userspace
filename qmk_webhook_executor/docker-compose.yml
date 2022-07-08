@@ -54,7 +54,7 @@ services:
       - http_proxy=http://squid:3128
       - https_proxy=http://squid:3128
     deploy:
-      replicas: 1
+      replicas: 4
 
   uploader:
     build:

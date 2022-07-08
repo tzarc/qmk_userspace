@@ -265,8 +265,8 @@ EOF
     cat <<EOF >>/__w/${intended_sha1}.html
 <hr/>
 <pre>
-$(cat /__w/build_output.txt | ctlchars2html)
-$(cat /__w/failed.* | ctlchars2html)
+$(cat /__w/build_output.txt | grep -v 'Leaving directory' | grep -v 'Entering directory' | ctlchars2html)
+$(cat /__w/failed.* | grep -v 'Leaving directory' | grep -v 'Entering directory' | ctlchars2html)
 </pre>
 </body></html>
 EOF
