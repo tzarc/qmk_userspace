@@ -7,6 +7,18 @@
 #include "timer.h"
 #include "print.h"
 
+/*
+void board_init(void) {
+    int f;
+    for (int i = 0; i < 10000; ++i) {
+        for (int j = 0; j < 10000; ++j) {
+            __asm__ volatile("nop\nnop\nnop\n");
+        }
+        ++f;
+    }
+}
+*/
+
 void chibi_system_halt_hook(const char* reason) {
     // re-route to QMK toolbox...
     uprintf("system halting: %s\n", reason);

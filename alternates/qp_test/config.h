@@ -13,4 +13,4 @@
 #define PRODUCT Quantum Painter Tester
 
 //#define QUANTUM_PAINTER_DEBUG
-//#define DEBUG_EEPROM_OUTPUT
+#define DEBUG_EEPROM_OUTPUT
