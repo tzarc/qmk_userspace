@@ -35,7 +35,6 @@ jobs:
 
     - name: Update QMK CLI
       run: |
-        rm bin/qmk # GitHub actions doesn't like this, use the system-wide QMK CLI instead
         python3 -m pip install --upgrade qmk
         python3 -m pip install -r qmk_firmware/requirements-dev.txt
 

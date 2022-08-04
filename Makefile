@@ -68,7 +68,7 @@ EXTRA_LINK_DEFS := \
 	users-tzarc!users/tzarc
 
 all-arm:
-	@for mcu in $(shell hjson -j $(ROOTDIR)/qmk_firmware/data/schemas/keyboard.jsonschema | jq .properties.processor.enum | grep '"' | sed -e 's@[", ]@@g' | grep -vP "(atmega|attiny|at90|unknown)" | sort | uniq | xargs echo) ; do \
+	@for mcu in $(shell python3 -m hjson.tool -j $(ROOTDIR)/qmk_firmware/data/schemas/keyboard.jsonschema | jq .properties.processor.enum | grep '"' | sed -e 's@[", ]@@g' | grep -vP "(atmega|attiny|at90|unknown)" | sort | uniq | xargs echo) ; do \
 		qmk multibuild -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2) -f MCU=$$mcu ; \
 	done
 
