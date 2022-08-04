@@ -485,7 +485,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     state = update_tri_layer_state(state, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST);
     if (last_state != state) {
 #ifndef __AVR__
-        dprintf("Layer state change: %08lX -> %08lX --- %032lb -> %032lb\n", (uint32_t)last_state, (uint32_t)state, (uint32_t)last_state, (uint32_t)state);
+        dprintf("Layer state change: %08lX -> %08lX\n", (uint32_t)last_state, (uint32_t)state);
 #endif // __AVR__
         last_state = state;
     }

@@ -11,6 +11,7 @@ if [ "$1" = "" -o "$1" != "$2" ] ; then
     [ -e lib/pico-sdk ] && rm -rf lib/pico-sdk
     [ -e lib/chibios-contrib/ext/mcux-sdk ] && rm -rf lib/chibios-contrib/ext/mcux-sdk
     make git-submodule
-    ../bin/qmk --update
+    which qmk
+    qmk --update
     make git-submodule
 fi
