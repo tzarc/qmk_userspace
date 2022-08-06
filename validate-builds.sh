@@ -9,7 +9,7 @@ qmk_firmware_dir="$(realpath "$script_dir/qmk_firmware/")" # change this once mo
 validation_output="$script_dir/validation-output"
 
 source_branch="develop"
-branch_under_test="bidirectional-endpoints-define"
+branch_under_test="remove-unused-pins"
 
 export PATH=/home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$PATH
 
@@ -23,8 +23,7 @@ append_log() {
 required_keyboard_builds() {
     pushd "$qmk_firmware_dir" >/dev/null 2>&1
 
-    echo gmmk/gmmk2/p96/ansi:via
-    echo gmmk/gmmk2/p96/iso:via
+    qmk list-keyboards | grep -P '(ploopyco|ferris)' | while read kb ; do echo "$kb:default" ; done
 
     popd >/dev/null 2>&1
 }
