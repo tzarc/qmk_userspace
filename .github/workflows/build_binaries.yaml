@@ -33,6 +33,12 @@ jobs:
         make git-submodule
         cd ..
 
+    - name: Deploy ARM toolchain
+      run: |
+        wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
+        mkdir -p gcc-arm
+        tar xf gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2 -C gcc-arm
+
     - name: Update QMK CLI
       run: |
         python3 -m pip install --upgrade qmk
@@ -40,6 +46,7 @@ jobs:
 
     - name: Build
       run: |
+        export PATH="$(pwd)/gcc-arm/bin:$PATH"
         make nick
 
     - name: 'Upload binaries'
