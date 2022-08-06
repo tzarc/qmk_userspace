@@ -84,7 +84,7 @@ djinn: djinn_rev1 djinn_rev2
 ghoul: NO_COMPILEDB = true
 ghoul: ghoul_stm32 ghoul_rp2040
 
-remove_artifacts:
+remove_artifacts: unlinks
 	rm "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.uf2 "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format "$(ROOTDIR)"/compile_commands.json "$(ROOTDIR)"/qmk_firmware/compile_commands.json >/dev/null 2>&1 || true
 
 clean: remove_artifacts

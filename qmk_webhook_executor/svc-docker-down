@@ -1,5 +1,0 @@
-#!/bin/bash
-
-set -eEuo pipefail
-
-PUID=$(id -u) PGID=$(id -g) docker compose down --remove-orphans "$@"

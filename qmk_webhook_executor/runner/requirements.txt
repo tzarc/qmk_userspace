@@ -1,6 +1,0 @@
-FastAPI[all]
-uvicorn[standard]
-python-multipart
-rq
-boto3
-discord-webhook
