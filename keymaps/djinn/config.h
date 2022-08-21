@@ -2,13 +2,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
+// Uncomment to spit out debugging info whenever an action is executed.
+//#define DEBUG_ACTION
+
 // Uncomment the following if your board uses 1.5A and 3.0A hold current fuses.
 //#define DJINN_SUPPORTS_3A_FUSE
 
 //#define QUANTUM_PAINTER_DEBUG
-#define DEBUG_EEPROM_OUTPUT
-#define WEAR_LEVELING_DEBUG_OUTPUT
-#define DEBUG_FLASH_SPI_OUTPUT
+//#define DEBUG_EEPROM_OUTPUT
+//#define WEAR_LEVELING_DEBUG_OUTPUT
+//#define DEBUG_FLASH_SPI_OUTPUT
 //#define WEAR_LEVELING_BACKING_SIZE 16384
 //#define WEAR_LEVELING_LOGICAL_SIZE 4096
 
