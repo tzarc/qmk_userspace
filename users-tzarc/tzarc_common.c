@@ -353,6 +353,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     dprint("Disabling repeat mode\n");
                 }
                 typing_mode = keycode;
+                disable_automatic_diablo3();
             }
             return false;
 
@@ -362,6 +363,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     dprint("Enabling wide mode\n");
                 }
                 typing_mode = keycode;
+                disable_automatic_diablo3();
             }
             return false;
 
@@ -371,6 +373,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     dprint("Enabling calligraphy mode\n");
                 }
                 typing_mode = keycode;
+                disable_automatic_diablo3();
             }
             return false;
 
@@ -380,6 +383,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     dprint("Enabling blocks mode\n");
                 }
                 typing_mode = keycode;
+                disable_automatic_diablo3();
             }
             return false;
 
@@ -389,6 +393,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     dprint("Enabling regional mode\n");
                 }
                 typing_mode = keycode;
+                disable_automatic_diablo3();
             }
             return false;
 
@@ -398,6 +403,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     dprint("Enabling aussie mode\n");
                 }
                 typing_mode = keycode;
+                disable_automatic_diablo3();
             }
             return false;
 
@@ -407,6 +413,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     dprint("Enabling zalgo mode\n");
                 }
                 typing_mode = keycode;
+                disable_automatic_diablo3();
             }
             return false;
 
@@ -416,6 +423,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     dprint("Enabling WoW repeat mode\n");
                 }
                 typing_mode = keycode;
+                disable_automatic_diablo3();
             }
             return false;
 

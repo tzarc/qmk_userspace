@@ -87,28 +87,44 @@ uint32_t diablo3_deferred_exec_callback(uint32_t trigger_time, void *cb_arg) {
     return (tzarc_eeprom_cfg.d3_delays[idx] * 1000) + 128 + prng() % 128;
 }
 
+void disable_automatic_diablo3_key(uint16_t kc) {
+    uint8_t idx = kc - KC_1;
+    // If this key is disabled, kill any deferred executor if it's present.
+    if (d3_desc[idx].token != INVALID_DEFERRED_TOKEN) {
+        cancel_deferred_exec_advanced(d3_execs, 4, d3_desc[idx].token);
+        d3_desc[idx].token = INVALID_DEFERRED_TOKEN;
+    }
+
+    // Release the key if it was pressed.
+    if (d3_desc[idx].pressed) {
+        unregister_code16(kc);
+        d3_desc[idx].pressed = false;
+    }
+
+    if (diablo3_key_enabled_get(kc)) {
+        diablo3_key_enabled_set(kc, false);
+        dprintf("[D3] Key repeat on %s: %s\n", key_name(kc, false), "off");
+    }
+}
+
+void disable_automatic_diablo3(void) {
+    for (uint16_t kc = KC_1; kc <= KC_4; ++kc) {
+        disable_automatic_diablo3_key(kc);
+    }
+}
+
 void matrix_scan_diablo3(void) {
     for (uint16_t kc = KC_1; kc <= KC_4; ++kc) {
-        uint8_t idx = kc - KC_1;
         if (diablo3_key_enabled_get(kc)) {
             // If this key is enabled, but we don't yet have a deferred executor running... start one.
+            uint8_t idx = kc - KC_1;
             if (d3_desc[idx].token == INVALID_DEFERRED_TOKEN) {
                 d3_desc[idx].token = defer_exec_advanced(d3_execs, 4,
                                                          (tzarc_eeprom_cfg.d3_delays[idx] * 1000) + 128 + prng() % 128, // Eventually configurable
                                                          diablo3_deferred_exec_callback, (void *)(uintptr_t)idx);
             }
         } else {
-            // If this key is disabled, kill any deferred executor if it's present.
-            if (d3_desc[idx].token != INVALID_DEFERRED_TOKEN) {
-                cancel_deferred_exec_advanced(d3_execs, 4, d3_desc[idx].token);
-                d3_desc[idx].token = INVALID_DEFERRED_TOKEN;
-            }
-
-            // Release the key if it was pressed.
-            if (d3_desc[idx].pressed) {
-                unregister_code16(kc);
-                d3_desc[idx].pressed = false;
-            }
+            disable_automatic_diablo3_key(kc);
         }
     }
 

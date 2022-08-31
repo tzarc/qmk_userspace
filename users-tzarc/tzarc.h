@@ -100,3 +100,4 @@ extern struct diablo3_config_t diablo3_config;
 void tzarc_diablo3_init(void);
 bool process_record_diablo3(uint16_t keycode, keyrecord_t *record);
 void matrix_scan_diablo3(void);
+void disable_automatic_diablo3(void);
