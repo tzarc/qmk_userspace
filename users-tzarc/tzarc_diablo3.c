@@ -41,12 +41,20 @@ bool process_record_diablo3(uint16_t keycode, keyrecord_t *record) {
         return false;
     } else {
         if (keycode == KC_ESCAPE || keycode == KC_GESC) {
-            // Cancel all repeats on <ESC>
+            // If any executors are active, capture <ESC> and prevent it from functioning.
+            // On release of <ESC>, disable all executors. Effectively skips the first <ESC>.
+            bool any_active = false;
             for (uint16_t kc = KC_1; kc <= KC_4; ++kc) {
                 if (diablo3_key_enabled_get(kc)) {
-                    diablo3_key_enabled_set(kc, false);
-                    dprintf("[D3] Key repeat on %s: %s\n", key_name(kc, false), "off");
+                    any_active = true;
+                    if (!record->event.pressed) {
+                        diablo3_key_enabled_set(kc, false);
+                        dprintf("[D3] Key repeat on %s: %s\n", key_name(kc, false), "off");
+                    }
                 }
+            }
+            if (any_active) {
+                return false;
             }
         } else {
             if (diablo3_key_enabled_get(keycode)) {
