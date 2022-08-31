@@ -24,7 +24,6 @@ bool diablo3_key_enabled_get(uint16_t keycode) {
 
 void diablo3_key_enabled_set(uint16_t keycode, bool on) {
     BITMASK_BIT_ASSIGN(diablo3_config.keys_activated, on, keycode, KC_1);
-    tzarc_eeprom_save();
 }
 
 bool process_record_diablo3(uint16_t keycode, keyrecord_t *record) {
