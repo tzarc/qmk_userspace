@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 SRC += \
 	tzarc_common.c \
+	tzarc_keynames.c \
 	tzarc_eeprom.c \
 	tzarc_rawhid.c \
 	tzarc_wow.c \
@@ -20,6 +21,7 @@ EXTRAKEY_ENABLE ?= yes
 MOUSEKEY_ENABLE ?= yes
 RAW_ENABLE ?= no
 UNICODE_ENABLE ?= yes
+DEFERRED_EXEC_ENABLE = yes
 
 VPATH += $(USER_PATH)/graphics/src
 

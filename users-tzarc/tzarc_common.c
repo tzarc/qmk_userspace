@@ -342,10 +342,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
 
         case KC_CONFIG:
-            if (record->event.pressed) {
-                config_enabled = !config_enabled;
-                dprintf("Config enabled: %s\n", config_enabled ? "true" : "false");
-            }
+            // Config enabled while pressed
+            config_enabled = record->event.pressed;
+            dprintf("Config enabled: %s\n", config_enabled ? "true" : "false");
             return false;
 
         case KC_NOMODE:
@@ -435,7 +434,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return process_record_wow(keycode, record);
         }
     } else if (typing_mode == KC_D3MODE) {
-        if ((KC_1 <= keycode) && (keycode <= KC_4)) {
+        if (((KC_1 <= keycode) && (keycode <= KC_4)) || keycode == KC_ESCAPE || keycode == KC_GESC) {
             return process_record_diablo3(keycode, record);
         }
     } else if (typing_mode == KC_WIDE) {

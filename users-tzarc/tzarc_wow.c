@@ -4,101 +4,6 @@
 #include <quantum.h>
 #include "tzarc.h"
 
-#ifndef __AVR__
-static const char* const wow_keycode_display_map[][2] = {
-    [WOW_KEY_OFFSET(KC_A)]      = {"a", "A"},
-    [WOW_KEY_OFFSET(KC_B)]      = {"b", "B"},
-    [WOW_KEY_OFFSET(KC_C)]      = {"c", "C"},
-    [WOW_KEY_OFFSET(KC_D)]      = {"d", "D"},
-    [WOW_KEY_OFFSET(KC_E)]      = {"e", "E"},
-    [WOW_KEY_OFFSET(KC_F)]      = {"f", "F"},
-    [WOW_KEY_OFFSET(KC_G)]      = {"g", "G"},
-    [WOW_KEY_OFFSET(KC_H)]      = {"h", "H"},
-    [WOW_KEY_OFFSET(KC_I)]      = {"i", "I"},
-    [WOW_KEY_OFFSET(KC_J)]      = {"j", "J"},
-    [WOW_KEY_OFFSET(KC_K)]      = {"k", "K"},
-    [WOW_KEY_OFFSET(KC_L)]      = {"l", "L"},
-    [WOW_KEY_OFFSET(KC_M)]      = {"m", "M"},
-    [WOW_KEY_OFFSET(KC_N)]      = {"n", "N"},
-    [WOW_KEY_OFFSET(KC_O)]      = {"o", "O"},
-    [WOW_KEY_OFFSET(KC_P)]      = {"p", "P"},
-    [WOW_KEY_OFFSET(KC_Q)]      = {"q", "Q"},
-    [WOW_KEY_OFFSET(KC_R)]      = {"r", "R"},
-    [WOW_KEY_OFFSET(KC_S)]      = {"s", "S"},
-    [WOW_KEY_OFFSET(KC_T)]      = {"t", "T"},
-    [WOW_KEY_OFFSET(KC_U)]      = {"u", "U"},
-    [WOW_KEY_OFFSET(KC_V)]      = {"v", "V"},
-    [WOW_KEY_OFFSET(KC_W)]      = {"w", "W"},
-    [WOW_KEY_OFFSET(KC_X)]      = {"x", "X"},
-    [WOW_KEY_OFFSET(KC_Y)]      = {"y", "Y"},
-    [WOW_KEY_OFFSET(KC_Z)]      = {"z", "Z"},
-    [WOW_KEY_OFFSET(KC_1)]      = {"1", "!"},
-    [WOW_KEY_OFFSET(KC_2)]      = {"2", "@"},
-    [WOW_KEY_OFFSET(KC_3)]      = {"3", "#"},
-    [WOW_KEY_OFFSET(KC_4)]      = {"4", "$"},
-    [WOW_KEY_OFFSET(KC_5)]      = {"5", "%"},
-    [WOW_KEY_OFFSET(KC_6)]      = {"6", "^"},
-    [WOW_KEY_OFFSET(KC_7)]      = {"7", "&"},
-    [WOW_KEY_OFFSET(KC_8)]      = {"8", "*"},
-    [WOW_KEY_OFFSET(KC_9)]      = {"9", "("},
-    [WOW_KEY_OFFSET(KC_0)]      = {"0", ")"},
-    [WOW_KEY_OFFSET(KC_ENTER)]  = {"Ent", "Ent"},
-    [WOW_KEY_OFFSET(KC_ESCAPE)] = {"Esc", "Esc"},
-    [WOW_KEY_OFFSET(KC_BSPACE)] = {"Bksp", "Bksp"},
-    [WOW_KEY_OFFSET(KC_TAB)]    = {"Tab", "Tab"},
-    [WOW_KEY_OFFSET(KC_SPACE)]  = {"Spc", "Spc"},
-    [WOW_KEY_OFFSET(KC_MINUS)]  = {"-", "_"},
-    [WOW_KEY_OFFSET(KC_EQUAL)]  = {"=", "="},
-#    if defined(QUANTUM_PAINTER)
-    [WOW_KEY_OFFSET(KC_LBRACKET)]   = {"[", "{"},
-    [WOW_KEY_OFFSET(KC_RBRACKET)]   = {"]", "}"},
-    [WOW_KEY_OFFSET(KC_BSLASH)]     = {"\\", "|"},
-    [WOW_KEY_OFFSET(KC_NONUS_HASH)] = {"#", "#"},
-    [WOW_KEY_OFFSET(KC_SCOLON)]     = {";", ":"},
-    [WOW_KEY_OFFSET(KC_QUOTE)]      = {"'", "\""},
-    [WOW_KEY_OFFSET(KC_GRAVE)]      = {"`", "~"},
-    [WOW_KEY_OFFSET(KC_COMMA)]      = {",", "<"},
-    [WOW_KEY_OFFSET(KC_DOT)]        = {".", ">"},
-    [WOW_KEY_OFFSET(KC_SLASH)]      = {"/", "?"},
-    [WOW_KEY_OFFSET(KC_CAPSLOCK)]   = {"Caps", "Caps"},
-    [WOW_KEY_OFFSET(KC_F1)]         = {"F1", "F1"},
-    [WOW_KEY_OFFSET(KC_F2)]         = {"F2", "F2"},
-    [WOW_KEY_OFFSET(KC_F3)]         = {"F3", "F3"},
-    [WOW_KEY_OFFSET(KC_F4)]         = {"F4", "F4"},
-    [WOW_KEY_OFFSET(KC_F5)]         = {"F5", "F5"},
-    [WOW_KEY_OFFSET(KC_F6)]         = {"F6", "F6"},
-    [WOW_KEY_OFFSET(KC_F7)]         = {"F7", "F7"},
-    [WOW_KEY_OFFSET(KC_F8)]         = {"F8", "F8"},
-    [WOW_KEY_OFFSET(KC_F9)]         = {"F9", "F9"},
-    [WOW_KEY_OFFSET(KC_F10)]        = {"F10", "F10"},
-    [WOW_KEY_OFFSET(KC_F11)]        = {"F11", "F11"},
-    [WOW_KEY_OFFSET(KC_F12)]        = {"F12", "F12"},
-    [WOW_KEY_OFFSET(KC_PSCREEN)]    = {"PScr", "PScr"},
-    [WOW_KEY_OFFSET(KC_SCROLLLOCK)] = {"ScrL", "ScrL"},
-    [WOW_KEY_OFFSET(KC_PAUSE)]      = {"Paus", "Paus"},
-    [WOW_KEY_OFFSET(KC_INSERT)]     = {"Ins", "Ins"},
-    [WOW_KEY_OFFSET(KC_HOME)]       = {"Home", "Home"},
-    [WOW_KEY_OFFSET(KC_PGUP)]       = {"PgUp", "PgUp"},
-    [WOW_KEY_OFFSET(KC_DELETE)]     = {"Del", "Del"},
-    [WOW_KEY_OFFSET(KC_END)]        = {"End", "End"},
-    [WOW_KEY_OFFSET(KC_PGDOWN)]     = {"PgDn", "PgDn"},
-    [WOW_KEY_OFFSET(KC_RIGHT)]      = {"Rght", "Rght"},
-    [WOW_KEY_OFFSET(KC_LEFT)]       = {"Left", "Left"},
-    [WOW_KEY_OFFSET(KC_DOWN)]       = {"Up", "Up"},
-    [WOW_KEY_OFFSET(KC_UP)]         = {"Down", "Down"},
-    [WOW_KEY_OFFSET(KC_NUMLOCK)]    = {"NumL", "NumL"},
-#    endif // defined(QUANTUM_PAINTER)
-};
-
-const char* wow_key_char(uint16_t keycode) {
-    return wow_keycode_display_map[WOW_KEY_OFFSET(keycode)][0];
-}
-#else
-const char* wow_key_char(uint16_t keycode) {
-    return "Unknown";
-}
-#endif // __AVR__
-
 struct wow_config_t wow_config;
 
 bool wow_key_enabled_get(uint16_t keycode) {
@@ -154,7 +59,7 @@ bool process_record_wow(uint16_t keycode, keyrecord_t* record) {
             // Toggle the enabled flag for this key
             bool new_state = !wow_key_enabled_get(keycode);
             wow_key_enabled_set(keycode, new_state);
-            dprintf("Key repeat on %s: %s\n", wow_key_char(keycode), new_state ? "on" : "off");
+            dprintf("[WoW] Key repeat on %s: %s\n", key_name(keycode, false), new_state ? "on" : "off");
         }
         return false;
     } else {

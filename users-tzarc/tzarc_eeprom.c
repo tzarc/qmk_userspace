@@ -35,8 +35,8 @@ static uint8_t tzarc_eeprom_calculate_magic(struct tzarc_eeprom_cfg_t *cfg) {
         magic += cfg->wow_enabled[i];
     }
 
-    for (size_t i = 0; i < sizeof(cfg->d3_enabled); ++i) {
-        magic += cfg->d3_enabled[i];
+    for (size_t i = 0; i < sizeof(cfg->d3_delays); ++i) {
+        magic += ((uint8_t *)cfg->d3_delays)[i];
     }
 
     return magic;

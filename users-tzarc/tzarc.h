@@ -25,7 +25,8 @@ extern uint16_t repeat_mode;
 
 void tzarc_common_init(void);
 
-uint8_t prng(void);
+uint8_t     prng(void);
+const char *key_name(uint16_t keycode, bool shifted);
 
 bool process_record_keymap(uint16_t keycode, keyrecord_t *record);
 bool process_record_user(uint16_t keycode, keyrecord_t *record);
@@ -51,10 +52,10 @@ layer_state_t layer_state_set_user(layer_state_t state);
 #define TZARC_EEPROM_MAGIC_SEED (uint8_t)((uint8_t)__TIME__[0] + (uint8_t)__TIME__[1] + (uint8_t)__TIME__[3] + (uint8_t)__TIME__[4] + (uint8_t)__TIME__[6] + (uint8_t)__TIME__[7]) // HH:MM::SS
 
 __attribute__((packed)) struct tzarc_eeprom_cfg_t {
-    uint8_t magic1;
-    uint8_t wow_enabled[BITMASK_BYTES_REQUIRED(WOW_KEY_MAX, WOW_KEY_MIN)];
-    uint8_t d3_enabled[BITMASK_BYTES_REQUIRED(KC_4, KC_1)];
-    uint8_t magic2;
+    uint8_t  magic1;
+    uint8_t  wow_enabled[BITMASK_BYTES_REQUIRED(WOW_KEY_MAX, WOW_KEY_MIN)];
+    uint16_t d3_delays[4]; // KC_1 ... KC_4
+    uint8_t  magic2;
 };
 
 extern struct tzarc_eeprom_cfg_t tzarc_eeprom_cfg;
@@ -91,7 +92,7 @@ void matrix_scan_wow(void);
 // Diablo III
 
 struct diablo3_config_t {
-    bool dummy;
+    uint8_t keys_activated[1]; // 4 bits required for KC_1 ... KC_4
 };
 
 extern struct diablo3_config_t diablo3_config;
