@@ -1,32 +1,19 @@
-// Copyright 2018-2022 Nick Brassel (@tzarc)
-// SPDX-License-Identifier: GPL-3.0-or-later
-#include <string.h>
-#include <stdlib.h>
-#include <utf8.h>
-#include <qp.h>
-#include <qp_rgb565_surface.h>
-#include <qp_internal.h>
-#include <qp_fallback.h>
-#include <qp_utils.h>
+// Copyright 2021 Nick Brassel (@tzarc)
+// SPDX-License-Identifier: GPL-2.0-or-later
 
-#ifdef PROTOCOL_CHIBIOS
-#    include <ch.h>
-#    if !defined(CH_CFG_USE_MEMCORE) || CH_CFG_USE_MEMCORE == FALSE
-#        error ChibiOS is configured without a memory allocator. Your keyboard may have set `#define CH_CFG_USE_MEMCORE FALSE`, which is incompatible with this debounce algorithm.
-#    endif
-#endif
+#include "color.h"
+#include "qp_rgb565_surface.h"
+
+#define BYTE_SWAP(x) (((((uint16_t)(x)) >> 8) & 0x00FF) | ((((uint16_t)(x)) << 8) & 0xFF00))
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Definitions
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Common
 
 // Device definition
-typedef struct qmk_rgb565_surface_device_t {
-    struct painter_driver_t qp_driver; // must be first, so it can be cast from the painter_device_t* type
+typedef struct rgb565_surface_painter_device_t {
+    struct painter_driver_t base; // must be first, so it can be cast to/from the painter_device_t* type
 
-    // Geometry and buffer
-    uint16_t  width;
-    uint16_t  height;
+    // The target buffer
     uint16_t *buffer;
 
     // Manually manage the viewport for streaming pixel data to the display
@@ -38,365 +25,183 @@ typedef struct qmk_rgb565_surface_device_t {
     // Current write location to the display when streaming pixel data
     uint16_t pixdata_x;
     uint16_t pixdata_y;
-} qmk_rgb565_surface_device_t;
+
+    // Maintain a dirty region so we can stream only what we need
+    uint16_t dirty_l;
+    uint16_t dirty_t;
+    uint16_t dirty_r;
+    uint16_t dirty_b;
+
+} rgb565_surface_painter_device_t;
+
+// Driver storage
+rgb565_surface_painter_device_t surface_drivers[RGB565_SURFACE_NUM_DEVICES] = {0};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Helpers
-//
-// NOTE: The variables in this section are intentionally outside a stack frame. They are able to be defined with larger
-//       sizes than the normal stack frames would allow, and as such need to be external.
-//
-//       **** DO NOT refactor this and decide to place the variables inside the function calling them -- you will ****
-//       **** very likely get artifacts rendered to the screen as a result.                                       ****
-//
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Static buffer to contain a generated color palette
-#if QUANTUM_PAINTER_SUPPORTS_256_PALETTE
-static qp_pixel_color_t hsv_lookup_table[256];
-static uint16_t         rgb565_palette[256];
-#else
-static qp_pixel_color_t hsv_lookup_table[16];
-static uint16_t         rgb565_palette[16];
-#endif
-
-#define BYTE_SWAP(x) (((((uint16_t)(x)) >> 8) & 0x00FF) | ((((uint16_t)(x)) << 8) & 0xFF00))
-
-// Color conversion to RGB565
-static inline uint16_t rgb_to_rgb565(uint8_t r, uint8_t g, uint8_t b) {
-    uint16_t rgb565 = (((uint16_t)r) >> 3) << 11 | (((uint16_t)g) >> 2) << 5 | (((uint16_t)b) >> 3);
-    return BYTE_SWAP(rgb565);
-}
-
-// Color conversion to RGB565
-static inline uint16_t hsv_to_rgb565(uint8_t hue, uint8_t sat, uint8_t val) {
-    RGB rgb = hsv_to_rgb_nocie((HSV){hue, sat, val});
-    return rgb_to_rgb565(rgb.r, rgb.g, rgb.b);
-}
-
-static inline void increment_pixdata_location(qmk_rgb565_surface_device_t *surf) {
+static inline void increment_pixdata_location(rgb565_surface_painter_device_t *surface) {
     // Increment the X-position
-    surf->pixdata_x++;
+    surface->pixdata_x++;
 
     // If the x-coord has gone past the right-side edge, loop it back around and increment the y-coord
-    if (surf->pixdata_x > surf->viewport_r) {
-        surf->pixdata_x = surf->viewport_l;
-        surf->pixdata_y++;
+    if (surface->pixdata_x > surface->viewport_r) {
+        surface->pixdata_x = surface->viewport_l;
+        surface->pixdata_y++;
     }
 
     // If the y-coord has gone past the bottom, loop it back to the top
-    if (surf->pixdata_y > surf->viewport_b) {
-        surf->pixdata_y = surf->viewport_t;
+    if (surface->pixdata_y > surface->viewport_b) {
+        surface->pixdata_y = surface->viewport_t;
     }
 }
 
-static inline void setpixel(qmk_rgb565_surface_device_t *surf, uint16_t x, uint16_t y, uint16_t color) {
-    surf->buffer[y * surf->width + x] = color;
+static inline void setpixel(rgb565_surface_painter_device_t *surface, uint16_t x, uint16_t y, uint16_t rgb565) {
+    surface->buffer[y * surface->base.panel_width + x] = rgb565;
 }
 
-static inline void append_pixel(qmk_rgb565_surface_device_t *surf, uint16_t pixel) {
-    setpixel(surf, surf->pixdata_x, surf->pixdata_y, pixel);
-    increment_pixdata_location(surf);
+static inline void append_pixel(rgb565_surface_painter_device_t *surface, uint16_t rgb565) {
+    setpixel(surface, surface->pixdata_x, surface->pixdata_y, rgb565);
+    increment_pixdata_location(surface);
 }
 
-static inline void stream_pixdata(qmk_rgb565_surface_device_t *surf, const uint16_t *data, uint32_t native_pixel_count) {
+static inline void stream_pixdata(rgb565_surface_painter_device_t *surface, const uint16_t *data, uint32_t native_pixel_count) {
     for (uint32_t pixel_counter = 0; pixel_counter < native_pixel_count; ++pixel_counter) {
-        append_pixel(surf, data[pixel_counter]);
+        append_pixel(surface, data[pixel_counter]);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Palette / Monochrome-format image rendering
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// API methods
 
-// Palette renderer
-static inline void stream_palette_pixdata_impl(qmk_rgb565_surface_device_t *surf, const uint16_t *const rgb565_palette, uint8_t bits_per_pixel, uint32_t pixel_count, const void *const pixel_data, uint32_t byte_count) {
-    const uint8_t  pixel_bitmask    = (1 << bits_per_pixel) - 1;
-    const uint8_t  pixels_per_byte  = 8 / bits_per_pixel;
-    const uint8_t *pixdata          = (const uint8_t *)pixel_data;
-    uint32_t       remaining_pixels = pixel_count; // don't try to derive from byte_count, we may not use an entire byte
-
-    // Transmit each block of pixels
-    while (remaining_pixels > 0) {
-        for (uint16_t p = 0; p < pixel_count; p += pixels_per_byte) {
-            uint8_t pixval      = *pixdata;
-            uint8_t loop_pixels = remaining_pixels < pixels_per_byte ? remaining_pixels : pixels_per_byte;
-            for (uint8_t q = 0; q < loop_pixels; ++q) {
-                append_pixel(surf, rgb565_palette[pixval & pixel_bitmask]);
-            }
-            ++pixdata;
-            remaining_pixels -= loop_pixels;
-        }
-    }
-}
-
-// Recolored renderer
-static inline void stream_palette_pixdata(qmk_rgb565_surface_device_t *surf, const uint8_t *const rgb_palette, uint8_t bits_per_pixel, uint32_t pixel_count, const void *const pixel_data, uint32_t byte_count) {
-    // Generate the color lookup table
-    uint16_t items = 1 << bits_per_pixel; // number of items we need to interpolate
-    for (uint16_t i = 0; i < items; ++i) {
-        rgb565_palette[i] = hsv_to_rgb565(rgb_palette[i * 3 + 0], rgb_palette[i * 3 + 1], rgb_palette[i * 3 + 2]);
-    }
-
-    // Transmit each block of pixels
-    stream_palette_pixdata_impl(surf, rgb565_palette, bits_per_pixel, pixel_count, pixel_data, byte_count);
-}
-
-// Recolored renderer
-static inline void stream_mono_pixdata_recolor(qmk_rgb565_surface_device_t *surf, uint8_t bits_per_pixel, uint32_t pixel_count, const void *const pixel_data, uint32_t byte_count, int16_t hue_fg, int16_t sat_fg, int16_t val_fg, int16_t hue_bg, int16_t sat_bg, int16_t val_bg) {
-    // Memoize the last batch of colours so we're not regenerating the palette if we're not changing anything
-    static uint8_t last_bits_per_pixel = UINT8_MAX;
-    static int16_t last_hue_fg         = INT16_MIN;
-    static int16_t last_sat_fg         = INT16_MIN;
-    static int16_t last_val_fg         = INT16_MIN;
-    static int16_t last_hue_bg         = INT16_MIN;
-    static int16_t last_sat_bg         = INT16_MIN;
-    static int16_t last_val_bg         = INT16_MIN;
-
-    // Regenerate the palette only if the inputs have changed
-    if (last_bits_per_pixel != bits_per_pixel || last_hue_fg != hue_fg || last_sat_fg != sat_fg || last_val_fg != val_fg || last_hue_bg != hue_bg || last_sat_bg != sat_bg || last_val_bg != val_bg) {
-        last_bits_per_pixel = bits_per_pixel;
-        last_hue_fg         = hue_fg;
-        last_sat_fg         = sat_fg;
-        last_val_fg         = val_fg;
-        last_hue_bg         = hue_bg;
-        last_sat_bg         = sat_bg;
-        last_val_bg         = val_bg;
-
-        // Generate the color lookup table
-        uint16_t items = 1 << bits_per_pixel; // number of items we need to interpolate
-        qp_interpolate_palette(hsv_lookup_table, items, (qp_pixel_color_t){.hsv888 = {.h = hue_fg, .s = sat_fg, .v = val_fg}}, (qp_pixel_color_t){.hsv888 = {.h = hue_bg, .s = sat_bg, .v = val_bg}});
-        for (uint16_t i = 0; i < items; ++i) {
-            rgb565_palette[i] = hsv_to_rgb565(hsv_lookup_table[i].hsv888.h, hsv_lookup_table[i].hsv888.s, hsv_lookup_table[i].hsv888.v);
-        }
-    }
-
-    // Transmit each block of pixels
-    stream_palette_pixdata_impl(surf, rgb565_palette, bits_per_pixel, pixel_count, pixel_data, byte_count);
-}
-
-// Uncompressed image drawing helper
-static bool drawimage_uncompressed_impl(qmk_rgb565_surface_device_t *surf, painter_image_format_t image_format, uint8_t image_bpp, const uint8_t *pixel_data, uint32_t byte_count, int32_t width, int32_t height, const uint8_t *palette_data, uint8_t hue_fg, uint8_t sat_fg, uint8_t val_fg, uint8_t hue_bg, uint8_t sat_bg, uint8_t val_bg) {
-    // Stream data to the LCD
-    if (image_format == IMAGE_FORMAT_RAW || image_format == IMAGE_FORMAT_RGB565) {
-        // The pixel data is in the correct format already -- send it directly to the device
-        stream_pixdata(surf, (const uint16_t *)pixel_data, width * height);
-    } else if (image_format == IMAGE_FORMAT_GRAYSCALE) {
-        // Supplied pixel data is in 4bpp monochrome -- decode it to the equivalent pixel data
-        stream_mono_pixdata_recolor(surf, image_bpp, width * height, pixel_data, byte_count, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
-    } else if (image_format == IMAGE_FORMAT_PALETTE) {
-        // Supplied pixel data is in 1bpp monochrome -- decode it to the equivalent pixel data
-        stream_palette_pixdata(surf, palette_data, image_bpp, width * height, pixel_data, byte_count);
-    }
-
-    return true;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Initialization
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+// Initialisation
 bool qp_rgb565_surface_init(painter_device_t device, painter_rotation_t rotation) {
-    (void)rotation; // no rotation supported.
-    qmk_rgb565_surface_device_t *surf = (qmk_rgb565_surface_device_t *)device;
-    if (surf->buffer) {
-        return true;
-    }
+    struct painter_driver_t         *driver  = (struct painter_driver_t *)device;
+    rgb565_surface_painter_device_t *surface = (rgb565_surface_painter_device_t *)driver;
 
-    uint16_t *buffer = (uint16_t *)malloc(surf->width * surf->height * sizeof(uint16_t));
-    if (!buffer) {
-        return false;
-    }
+    // Clear out the buffer.
+    memset(surface->buffer, 0, driver->panel_width * driver->panel_height * driver->native_bits_per_pixel / 8);
 
-    surf->buffer = buffer;
-    memset(surf->buffer, 0, surf->width * surf->height * sizeof(uint16_t));
     return true;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Operations
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-bool qp_rgb565_surface_clear(painter_device_t device) {
-    qmk_rgb565_surface_device_t *surf = (qmk_rgb565_surface_device_t *)device;
-    if (!surf->buffer) {
-        return false;
-    }
-
-    memset(surf->buffer, 0, sizeof(surf->width * surf->height * sizeof(uint16_t)));
-    return true;
-}
-
+// Power control
 bool qp_rgb565_surface_power(painter_device_t device, bool power_on) {
+    // No-op.
     return true;
 }
 
-bool qp_rgb565_surface_pixdata(painter_device_t device, const void *pixel_data, uint32_t native_pixel_count) {
-    qmk_rgb565_surface_device_t *surf = (qmk_rgb565_surface_device_t *)device;
-    if (!surf->buffer) {
-        return false;
-    }
-
-    const uint16_t *data = (const uint16_t *)pixel_data;
-    stream_pixdata(surf, data, native_pixel_count);
+// Screen clear
+bool qp_rgb565_surface_clear(painter_device_t device) {
+    struct painter_driver_t *driver = (struct painter_driver_t *)device;
+    driver->driver_vtable->init(device, driver->rotation); // Re-init the surface
     return true;
 }
 
+// Screen flush
+bool qp_rgb565_surface_flush(painter_device_t device) {
+    // TODO: Clear the dirty region
+    return true;
+}
+
+// Viewport to draw to
 bool qp_rgb565_surface_viewport(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom) {
-    qmk_rgb565_surface_device_t *surf = (qmk_rgb565_surface_device_t *)device;
-    if (!surf->buffer) {
-        return false;
-    }
+    struct painter_driver_t         *driver  = (struct painter_driver_t *)device;
+    rgb565_surface_painter_device_t *surface = (rgb565_surface_painter_device_t *)driver;
 
     // Set the viewport locations
-    surf->viewport_l = left;
-    surf->viewport_t = top;
-    surf->viewport_r = right;
-    surf->viewport_b = bottom;
+    surface->viewport_l = left;
+    surface->viewport_t = top;
+    surface->viewport_r = right;
+    surface->viewport_b = bottom;
 
     // Reset the write location to the top left
-    surf->pixdata_x = left;
-    surf->pixdata_y = top;
+    surface->pixdata_x = left;
+    surface->pixdata_y = top;
     return true;
 }
 
-bool qp_rgb565_surface_setpixel(painter_device_t device, uint16_t x, uint16_t y, uint8_t hue, uint8_t sat, uint8_t val) {
-    qmk_rgb565_surface_device_t *surf = (qmk_rgb565_surface_device_t *)device;
-    if (!surf->buffer) {
-        return false;
-    }
-
-    setpixel(surf, x, y, hsv_to_rgb565(hue, sat, val));
+// Stream pixel data to the current write position in GRAM
+bool qp_rgb565_surface_pixdata(painter_device_t device, const void *pixel_data, uint32_t native_pixel_count) {
+    struct painter_driver_t         *driver  = (struct painter_driver_t *)device;
+    rgb565_surface_painter_device_t *surface = (rgb565_surface_painter_device_t *)driver;
+    stream_pixdata(surface, (const uint16_t *)pixel_data, native_pixel_count);
     return true;
 }
 
-// Draw an image
-bool qp_rgb565_surface_drawimage(painter_device_t device, uint16_t x, uint16_t y, const painter_image_descriptor_t *image, uint8_t hue, uint8_t sat, uint8_t val) {
-    qmk_rgb565_surface_device_t *surf = (qmk_rgb565_surface_device_t *)device;
-    if (!surf->buffer) {
-        return false;
+// Pixel colour conversion
+bool qp_rgb565_surface_palette_convert_rgb565_swapped(painter_device_t device, int16_t palette_size, qp_pixel_t *palette) {
+    for (int16_t i = 0; i < palette_size; ++i) {
+        RGB      rgb      = hsv_to_rgb_nocie((HSV){palette[i].hsv888.h, palette[i].hsv888.s, palette[i].hsv888.v});
+        uint16_t rgb565   = (((uint16_t)rgb.r) >> 3) << 11 | (((uint16_t)rgb.g) >> 2) << 5 | (((uint16_t)rgb.b) >> 3);
+        palette[i].rgb565 = BYTE_SWAP(rgb565);
     }
-
-    // Configure where we're rendering to
-    qp_rgb565_surface_viewport(device, x, y, x + image->width - 1, y + image->height - 1);
-
-    bool ret = false;
-    if (image->compression == IMAGE_UNCOMPRESSED) {
-        const painter_raw_image_descriptor_t *raw_image_desc = (const painter_raw_image_descriptor_t *)image;
-        ret                                                  = drawimage_uncompressed_impl(surf, image->image_format, image->image_bpp, raw_image_desc->image_data, raw_image_desc->byte_count, image->width, image->height, raw_image_desc->image_palette, hue, sat, val, hue, sat, 0);
-    }
-
-    return ret;
+    return true;
 }
 
-int16_t qp_rgb565_surface_drawtext(painter_device_t device, uint16_t x, uint16_t y, painter_font_t font, const char *str, uint8_t hue_fg, uint8_t sat_fg, uint8_t val_fg, uint8_t hue_bg, uint8_t sat_bg, uint8_t val_bg) {
-    qmk_rgb565_surface_device_t *surf = (qmk_rgb565_surface_device_t *)device;
-    if (!surf->buffer) {
-        return false;
+// Append pixels to the target location, keyed by the pixel index
+bool qp_rgb565_surface_append_pixels_rgb565(painter_device_t device, uint8_t *target_buffer, qp_pixel_t *palette, uint32_t pixel_offset, uint32_t pixel_count, uint8_t *palette_indices) {
+    uint16_t *buf = (uint16_t *)target_buffer;
+    for (uint32_t i = 0; i < pixel_count; ++i) {
+        buf[pixel_offset + i] = palette[palette_indices[i]].rgb565;
     }
-
-    const painter_raw_font_descriptor_t *fdesc = (const painter_raw_font_descriptor_t *)font;
-
-    const char *c = str;
-    while (*c) {
-        int32_t code_point = 0;
-        c                  = decode_utf8(c, &code_point);
-
-        if (code_point >= 0) {
-            if (code_point >= 0x20 && code_point < 0x7F) {
-                if (fdesc->ascii_glyph_definitions != NULL) {
-                    // Search the font's ascii table
-                    uint8_t                                  index      = code_point - 0x20;
-                    const painter_font_ascii_glyph_offset_t *glyph_desc = &fdesc->ascii_glyph_definitions[index];
-                    uint16_t                                 byte_count = 0;
-                    if (code_point < 0x7E) {
-                        byte_count = (glyph_desc + 1)->offset - glyph_desc->offset;
-                    } else if (code_point == 0x7E) {
-#ifdef UNICODE_ENABLE
-                        // Unicode glyphs directly follow ascii glyphs, so we take the first's offset
-                        if (fdesc->unicode_glyph_count > 0) {
-                            byte_count = fdesc->unicode_glyph_definitions[0].offset - glyph_desc->offset;
-                        } else {
-                            byte_count = fdesc->byte_count - glyph_desc->offset;
-                        }
-#else  // UNICODE_ENABLE
-                        byte_count = fdesc->byte_count - glyph_desc->offset;
-#endif // UNICODE_ENABLE
-                    }
-
-                    qp_rgb565_surface_viewport(surf, x, y, x + glyph_desc->width - 1, y + font->glyph_height - 1);
-                    drawimage_uncompressed_impl(surf, font->image_format, font->image_bpp, &fdesc->image_data[glyph_desc->offset], byte_count, glyph_desc->width, font->glyph_height, fdesc->image_palette, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
-                    x += glyph_desc->width;
-                }
-            }
-#ifdef UNICODE_ENABLE
-            else {
-                // Search the font's unicode table
-                if (fdesc->unicode_glyph_definitions != NULL) {
-                    for (uint16_t index = 0; index < fdesc->unicode_glyph_count; ++index) {
-                        const painter_font_unicode_glyph_offset_t *glyph_desc = &fdesc->unicode_glyph_definitions[index];
-                        if (glyph_desc->unicode_glyph == code_point) {
-                            uint16_t byte_count = (index == fdesc->unicode_glyph_count - 1) ? (fdesc->byte_count - glyph_desc->offset) : ((glyph_desc + 1)->offset - glyph_desc->offset);
-                            qp_rgb565_surface_viewport(surf, x, y, x + glyph_desc->width - 1, y + font->glyph_height - 1);
-                            drawimage_uncompressed_impl(surf, font->image_format, font->image_bpp, &fdesc->image_data[glyph_desc->offset], byte_count, glyph_desc->width, font->glyph_height, fdesc->image_palette, hue_fg, sat_fg, val_fg, hue_bg, sat_bg, val_bg);
-                            x += glyph_desc->width;
-                        }
-                    }
-                }
-            }
-#endif // UNICODE_ENABLE
-        }
-    }
-
-    return (int16_t)x;
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Device creation
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 // Driver vtable
-static const struct painter_driver_vtable_t driver_vtable = {
-    .init      = qp_rgb565_surface_init,
-    .clear     = qp_rgb565_surface_clear,
-    .power     = qp_rgb565_surface_power,
-    .pixdata   = qp_rgb565_surface_pixdata,
-    .viewport  = qp_rgb565_surface_viewport,
-    .setpixel  = qp_rgb565_surface_setpixel,
-    .line      = qp_fallback_line,
-    .rect      = qp_fallback_rect,
-    .circle    = qp_fallback_circle,
-    .ellipse   = qp_fallback_ellipse,
-    .drawimage = qp_rgb565_surface_drawimage,
-    .drawtext  = qp_rgb565_surface_drawtext,
+
+static bool qp_rgb565_surface_comms_init(painter_device_t device) {
+    return true;
+}
+static bool qp_rgb565_surface_comms_start(painter_device_t device) {
+    return true;
+}
+static void qp_rgb565_surface_comms_stop(painter_device_t device) {}
+uint32_t    qp_rgb565_surface_comms_send(painter_device_t device, const void *data, uint32_t byte_count) {
+       return byte_count;
+}
+
+struct painter_comms_vtable_t rgb565_surface_driver_comms_vtable = {.comms_init = qp_rgb565_surface_comms_init, .comms_start = qp_rgb565_surface_comms_start, .comms_stop = qp_rgb565_surface_comms_stop, .comms_send = qp_rgb565_surface_comms_send};
+
+const struct painter_driver_vtable_t rgb565_surface_driver_vtable = {
+    .init            = qp_rgb565_surface_init,
+    .power           = qp_rgb565_surface_power,
+    .clear           = qp_rgb565_surface_clear,
+    .flush           = qp_rgb565_surface_flush,
+    .pixdata         = qp_rgb565_surface_pixdata,
+    .viewport        = qp_rgb565_surface_viewport,
+    .palette_convert = qp_rgb565_surface_palette_convert_rgb565_swapped,
+    .append_pixels   = qp_rgb565_surface_append_pixels_rgb565,
 };
 
-// Driver storage
-static qmk_rgb565_surface_device_t driver = {0};
-
-// Factory function for creating a handle to the ILI9341 device
-painter_device_t qp_rgb565_surface_make_device(uint16_t width, uint16_t height) {
-    // Skip creation if we've got a zero-pixel width or height
-    if (width == 0 || height == 0) {
-        return NULL;
+// Factory function for creating a handle to an rgb565 surface
+painter_device_t qp_make_rgb565_surface(uint16_t panel_width, uint16_t panel_height, void *buffer) {
+    for (uint32_t i = 0; i < RGB565_SURFACE_NUM_DEVICES; ++i) {
+        rgb565_surface_painter_device_t *driver = &surface_drivers[i];
+        if (!driver->base.driver_vtable) {
+            driver->base.driver_vtable         = &rgb565_surface_driver_vtable;
+            driver->base.comms_vtable          = &rgb565_surface_driver_comms_vtable;
+            driver->base.native_bits_per_pixel = 16; // RGB565
+            driver->base.panel_width           = panel_width;
+            driver->base.panel_height          = panel_height;
+            driver->base.rotation              = QP_ROTATION_0;
+            driver->base.offset_x              = 0;
+            driver->base.offset_y              = 0;
+            driver->buffer                     = (uint16_t *)buffer;
+            return (painter_device_t)driver;
+        }
     }
-
-    // Skip adding a new surface if we've already allocated it.
-    if (driver.width != 0 || driver.height != 0) {
-        return NULL;
-    }
-
-    driver.qp_driver.driver_vtable = &driver_vtable;
-    driver.width                   = width;
-    driver.height                  = height;
-    return (painter_device_t)&driver;
+    return NULL;
 }
 
-const void *qp_rgb565_surface_get_buffer_ptr(painter_device_t device) {
-    qmk_rgb565_surface_device_t *surf = (qmk_rgb565_surface_device_t *)device;
-    return surf->buffer;
-}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Drawing routine to copy out the dirty region and send it to another device
 
-uint32_t qp_rgb565_surface_get_pixel_count(painter_device_t device) {
-    qmk_rgb565_surface_device_t *surf = (qmk_rgb565_surface_device_t *)device;
-    return ((uint32_t)surf->width) * surf->height;
+bool qp_rgb565_surface_draw(painter_device_t surface, painter_device_t display, uint16_t x, uint16_t y) {
+    // TODO: Use the dirty region instead of drawing the whole thing.
+
+    struct painter_driver_t         *surface_driver = (struct painter_driver_t *)surface;
+    rgb565_surface_painter_device_t *surface_handle = (rgb565_surface_painter_device_t *)surface_driver;
+    return qp_viewport(display, x, y, x + surface_handle->base.panel_width - 1, y + surface_handle->base.panel_height - 1) && qp_pixdata(display, surface_handle->buffer, ((uint32_t)surface_handle->base.panel_width) * surface_handle->base.panel_height);
 }

@@ -4,6 +4,7 @@
 #include "theme_djinn_default.h"
 
 #include "tzarc.h"
+#include "qp_rgb565_surface.h"
 
 //----------------------------------------------------------
 // Key map
@@ -89,7 +90,23 @@ const char *current_layer_name(void) {
 //----------------------------------------------------------
 // Overrides
 
+//#define TEST_FRAMEBUFFER
+#ifdef TEST_FRAMEBUFFER
+#    include "thintel15.qff.h"
+#    define FRAMEBUFFER_W 240
+#    define FRAMEBUFFER_H 32
+static uint16_t              surface_buffer[FRAMEBUFFER_W * FRAMEBUFFER_H];
+static painter_device_t      surface;
+static painter_font_handle_t thintel;
+#endif // TEST_FRAMEBUFFER
+
 void keyboard_post_init_keymap(void) {
+#ifdef TEST_FRAMEBUFFER
+    surface = qp_make_rgb565_surface(FRAMEBUFFER_W, FRAMEBUFFER_H, surface_buffer);
+    qp_init(surface, QP_ROTATION_0);
+    thintel = qp_load_font_mem(font_thintel15);
+#endif // TEST_FRAMEBUFFER
+
     // Initialise the theme
     theme_init();
 
@@ -103,6 +120,18 @@ void housekeeping_task_keymap(void) {
 
     // Data sync from master to slave
     theme_state_sync();
+
+#ifdef TEST_FRAMEBUFFER
+    uint16_t last_redraw = 0;
+    if (timer_elapsed(last_redraw) > 10) {
+        last_redraw = timer_read();
+        qp_rect(surface, 0, 0, FRAMEBUFFER_W - 1, FRAMEBUFFER_H - 1, (timer_read() >> 7) % 256, 255, 255, true);
+        char buf[32];
+        sprintf(buf, "%d", (int)timer_read32());
+        qp_drawtext_recolor(surface, 1, 1, thintel, buf, (timer_read() >> 7) % 256, 128, 128, (timer_read() >> 7) % 256, 255, 255);
+        qp_rgb565_surface_draw(surface, lcd, 0, 0);
+    }
+#endif // TEST_FRAMEBUFFER
 }
 
 //----------------------------------------------------------

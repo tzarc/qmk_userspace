@@ -3,7 +3,7 @@
 
 DEBUG_MATRIX_SCAN_RATE_ENABLE = api
 
-#SRC += qp_rgb565_surface.c
+SRC += qp_rgb565_surface.c
 
 LUA_ENABLE = yes
 MOUSEKEY_ENABLE = yes
