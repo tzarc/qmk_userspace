@@ -61,7 +61,8 @@
     "files.associations": {
       "print.h": "c",
       "xutility": "c",
-      "types.h": "c"
+      "types.h": "c",
+      "qp_rgb565_surface.h": "c"
     }
   }
 }
