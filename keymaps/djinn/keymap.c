@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include QMK_KEYBOARD_H
 #include "theme_djinn_default.h"
-
 #include "tzarc.h"
 #include "qp_rgb565_surface.h"
 
@@ -90,28 +89,13 @@ const char *current_layer_name(void) {
 //----------------------------------------------------------
 // Overrides
 
-#define TEST_FRAMEBUFFER
-#ifdef TEST_FRAMEBUFFER
-#    include "thintel15.qff.h"
-#    define FRAMEBUFFER_W 240
-#    define FRAMEBUFFER_H 240
-static uint16_t              surface_buffer[FRAMEBUFFER_W * FRAMEBUFFER_H];
-static painter_device_t      surface;
-static painter_font_handle_t thintel;
-#endif // TEST_FRAMEBUFFER
-
 void keyboard_post_init_keymap(void) {
-#ifdef TEST_FRAMEBUFFER
-    surface = qp_make_rgb565_surface(FRAMEBUFFER_W, FRAMEBUFFER_H, surface_buffer);
-    qp_init(surface, QP_ROTATION_0);
-    thintel = qp_load_font_mem(font_thintel15);
-#endif // TEST_FRAMEBUFFER
-
     // Initialise the theme
     theme_init();
 
     void keyboard_post_init_display(void);
     keyboard_post_init_display();
+    rgb_matrix_disable_noeeprom();
 }
 
 void housekeeping_task_keymap(void) {
@@ -120,75 +104,7 @@ void housekeeping_task_keymap(void) {
 
     // Data sync from master to slave
     theme_state_sync();
-
-#ifdef TEST_FRAMEBUFFER
-    static uint16_t last_redraw = 0;
-    if (timer_elapsed(last_redraw) > 5) {
-        last_redraw = timer_read();
-        qp_rect(surface, 0, 0, FRAMEBUFFER_W / 4 - 1, FRAMEBUFFER_H / 6 - 1, (timer_read() >> 7) % 256, 255, 255, true);
-        char buf[32];
-        sprintf(buf, "%d", (int)timer_read32());
-        qp_drawtext_recolor(surface, 1, 1, thintel, buf, 255, 0, 0, (timer_read() >> 7) % 256, 255, 255);
-        qp_rgb565_surface_draw(surface, lcd, 0, 0);
-        qp_flush(lcd);
-    }
-#endif // TEST_FRAMEBUFFER
 }
-
-//----------------------------------------------------------
-// Lua
-
-#ifdef LUA_ENABLE
-#    include <quantum.h>
-#    include <lua.h>
-#    include <lualib.h>
-#    include <lauxlib.h>
-
-lua_State *L                 = 0;
-bool       lua_test_executed = false;
-
-static int dprint_wrapper(lua_State *L) {
-    const char *arg = luaL_checkstring(L, 1); // first arg is what we want to print
-    (void)arg;
-    dprintf("%s\n", arg);
-    return 0;
-}
-
-void test_lua(void) {
-    if (!lua_test_executed && timer_read32() > 15000) {
-        lua_test_executed = true;
-
-        L = luaL_newstate();
-        luaL_openlibs(L);
-
-        lua_newtable(L);                                             // new table
-        lua_pushnumber(L, 1);                                        // table index
-        lua_pushstring(L, "This is a test from executing lua code"); // value
-        lua_rawset(L, -3);                                           // set tbl[1]='This is a test from executing lua code'
-
-        // Set the "blah" global table to the newly-created table
-        lua_setglobal(L, "blah");
-
-        lua_pushcfunction(L, &dprint_wrapper);
-        lua_setglobal(L, "dprint");
-
-        // now we can use blah[1] == 'This is a test from executing lua code'
-
-        const char *code = "dprint(blah[1])"; // should debug print "This is a test from executing lua code" in QMK Toolbox
-        if (luaL_loadstring(L, code) == LUA_OK) {
-            if (lua_pcall(L, 0, 1, 0) == LUA_OK) {
-                lua_pop(L, lua_gettop(L));
-            } else {
-                dprint("Failed lua_pcall\n");
-            }
-        } else {
-            dprint("Failed luaL_loadstring\n");
-        }
-
-        lua_close(L);
-    }
-}
-#endif // LUA_ENABLE
 
 #ifdef DEBUG_EEPROM_OUTPUT
 
@@ -225,7 +141,7 @@ void matrix_scan_keymap(void) {
 #    ifdef WEAR_LEVELING_ENABLE
     static uint32_t last_wear_leveling_init = 0;
     if (now - last_wear_leveling_init > 30000) {
-        dprint("init'ing wear-leveling\n");
+        dprint("init'ing wear-leveling to simulate power reset\n");
         last_wear_leveling_init = now;
         wear_leveling_init();
     }

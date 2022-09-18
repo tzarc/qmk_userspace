@@ -62,7 +62,20 @@
       "print.h": "c",
       "xutility": "c",
       "types.h": "c",
-      "qp_rgb565_surface.h": "c"
+      "qp_rgb565_surface.h": "c",
+      "deque": "c",
+      "forward_list": "c",
+      "list": "c",
+      "string": "c",
+      "unordered_map": "c",
+      "unordered_set": "c",
+      "vector": "c",
+      "any": "c",
+      "system_error": "c",
+      "variant": "c",
+      "stdint.h": "c",
+      "debug.h": "c",
+      "ranges": "c"
     }
   }
 }
