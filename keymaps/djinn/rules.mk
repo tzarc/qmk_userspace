@@ -3,7 +3,7 @@
 
 DEBUG_MATRIX_SCAN_RATE_ENABLE = api
 
-SRC += qp_rgb565_surface.c
+QUANTUM_PAINTER_DRIVERS += rgb565_surface
 
 LUA_ENABLE = yes
 MOUSEKEY_ENABLE = yes
