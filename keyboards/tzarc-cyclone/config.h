@@ -11,9 +11,8 @@
 #define VENDOR_ID 0xF055
 #define PRODUCT_ID 0x4919
 #define DEVICE_VER 0x0001
-#define MANUFACTURER QMK
-#define PRODUCT Cyclone
-#define DESCRIPTION Cyclone Gamepad
+#define MANUFACTURER "Tzarc"
+#define PRODUCT "Cyclone"
 
 // STM32L082's have 6kB EEPROM
 #define STM32_ONBOARD_EEPROM_SIZE (6 * 1024)
@@ -81,10 +80,10 @@
 #define PIN_WS2812_3V3 A2
 
 /* WS2812 configuration */
+#define RGB_MATRIX_LED_COUNT 15
 #ifdef WS2812
 // Common
 #    define RGB_DI_PIN PIN_WS2812_3V3
-#    define RGBLED_NUM 15
 // Bitbang
 #    define NOP_FUDGE 0.5 // default of 0.4 gives flickering
 // PWM
@@ -103,7 +102,7 @@
 
 /* RGB matrix configuration */
 #ifdef RGB_MATRIX_ENABLE
-#    define DRIVER_LED_TOTAL RGBLED_NUM
+#    define RGBLED_NUM RGB_MATRIX_LED_COUNT
 #    define RGB_MATRIX_MAXIMUM_BRIGHTNESS 160
 #    define RGB_MATRIX_KEYPRESSES
 #    define RGB_MATRIX_FRAMEBUFFER_EFFECTS

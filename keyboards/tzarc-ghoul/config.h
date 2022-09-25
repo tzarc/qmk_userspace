@@ -14,5 +14,4 @@
 #define EXTERNAL_EEPROM_PAGE_SIZE 64 // it's FRAM, so it doesn't actually matter, this just sets the RAM buffer
 
 // RGB configuration
-#define RGBLED_NUM 40
-#define DRIVER_LED_TOTAL 40
+#define RGB_MATRIX_LED_COUNT 40

@@ -123,35 +123,35 @@ void keyboard_post_init_user(void) {
     keyboard_post_init_keymap();
 }
 
+#ifdef UNICODE_ENABLE
 typedef uint32_t (*translator_function_t)(bool is_shifted, uint32_t keycode);
 
-#define DEFINE_UNICODE_RANGE_TRANSLATOR(translator_name, lower_alpha, upper_alpha, zero_glyph, number_one, space_glyph) \
-    static inline uint32_t translator_name(bool is_shifted, uint32_t keycode) {                                         \
-        switch (keycode) {                                                                                              \
-            case KC_A ... KC_Z:                                                                                         \
-                return (is_shifted ? upper_alpha : lower_alpha) + keycode - KC_A;                                       \
-            case KC_0:                                                                                                  \
-                return zero_glyph;                                                                                      \
-            case KC_1 ... KC_9:                                                                                         \
-                return (number_one + keycode - KC_1);                                                                   \
-            case KC_SPACE:                                                                                              \
-                return space_glyph;                                                                                     \
-        }                                                                                                               \
-        return keycode;                                                                                                 \
-    }
+#    define DEFINE_UNICODE_RANGE_TRANSLATOR(translator_name, lower_alpha, upper_alpha, zero_glyph, number_one, space_glyph) \
+        static inline uint32_t translator_name(bool is_shifted, uint32_t keycode) {                                         \
+            switch (keycode) {                                                                                              \
+                case KC_A ... KC_Z:                                                                                         \
+                    return (is_shifted ? upper_alpha : lower_alpha) + keycode - KC_A;                                       \
+                case KC_0:                                                                                                  \
+                    return zero_glyph;                                                                                      \
+                case KC_1 ... KC_9:                                                                                         \
+                    return (number_one + keycode - KC_1);                                                                   \
+                case KC_SPACE:                                                                                              \
+                    return space_glyph;                                                                                     \
+            }                                                                                                               \
+            return keycode;                                                                                                 \
+        }
 
-#define DEFINE_UNICODE_LUT_TRANSLATOR(translator_name, ...)                     \
-    static inline uint32_t translator_name(bool is_shifted, uint32_t keycode) { \
-        static const uint32_t translation[] PROGMEM = {__VA_ARGS__};            \
-        uint32_t              ret                   = keycode;                  \
-        if ((keycode - KC_A) < (sizeof(translation) / sizeof(uint32_t))) {      \
-            ret = pgm_read_dword(&translation[keycode - KC_A]);                 \
-        }                                                                       \
-        return ret;                                                             \
-    }
+#    define DEFINE_UNICODE_LUT_TRANSLATOR(translator_name, ...)                     \
+        static inline uint32_t translator_name(bool is_shifted, uint32_t keycode) { \
+            static const uint32_t translation[] PROGMEM = {__VA_ARGS__};            \
+            uint32_t              ret                   = keycode;                  \
+            if ((keycode - KC_A) < (sizeof(translation) / sizeof(uint32_t))) {      \
+                ret = pgm_read_dword(&translation[keycode - KC_A]);                 \
+            }                                                                       \
+            return ret;                                                             \
+        }
 
 bool process_record_glyph_replacement(uint16_t keycode, keyrecord_t *record, translator_function_t translator) {
-#ifdef UNICODE_ENABLE
     uint8_t temp_mod   = get_mods();
     uint8_t temp_osm   = get_oneshot_mods();
     bool    is_shifted = (temp_mod | temp_osm) & MOD_MASK_SHIFT;
@@ -176,7 +176,6 @@ bool process_record_glyph_replacement(uint16_t keycode, keyrecord_t *record, tra
             return false;
         }
     }
-#endif
     return process_record_keymap(keycode, record);
 }
 
@@ -185,7 +184,7 @@ DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_script, 0x1D4EA, 0x1D4D
 DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_boxes, 0x1F170, 0x1F170, '0', '1', 0x2002);
 DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_regional, 0x1F1E6, 0x1F1E6, '0', '1', 0x2003);
 
-#ifndef __AVR__
+#    ifndef __AVR__
 DEFINE_UNICODE_LUT_TRANSLATOR(unicode_lut_translator_aussie,
                               0x0250, // a
                               'q',    // b
@@ -290,7 +289,8 @@ bool process_record_zalgo(uint16_t keycode, keyrecord_t *record) {
     }
     return process_record_keymap(keycode, record);
 }
-#endif // __AVR__
+#    endif // __AVR__
+#endif     // UNICODE_ENABLE
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t reset_key_timer  = 0;
@@ -357,6 +357,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
 
+#ifdef UNICODE_ENABLE
         case KC_WIDE:
             if (record->event.pressed) {
                 if (typing_mode != KC_WIDE) {
@@ -416,6 +417,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 disable_automatic_diablo3();
             }
             return false;
+#endif // UNICODE_ENABLE
 
         case KC_WOWMODE:
             if (record->event.pressed) {
@@ -445,7 +447,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         if (((KC_1 <= keycode) && (keycode <= KC_4)) || keycode == KC_ESCAPE || keycode == KC_GESC) {
             return process_record_diablo3(keycode, record);
         }
-    } else if (typing_mode == KC_WIDE) {
+    }
+#ifdef UNICODE_ENABLE
+    else if (typing_mode == KC_WIDE) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
             return process_record_glyph_replacement(keycode, record, unicode_range_translator_wide);
         }
@@ -465,13 +469,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
         }
     }
-#ifndef __AVR__
+#    ifndef __AVR__
     else if (typing_mode == KC_AUSSIE) {
         return process_record_aussie(keycode, record);
     } else if (typing_mode == KC_ZALGO) {
         return process_record_zalgo(keycode, record);
     }
-#endif // __AVR__
+#    endif // __AVR__
+#endif     // UNICODE_ENABLE
 
     return process_record_keymap(keycode, record);
 }
