@@ -28,7 +28,7 @@ void keyboard_post_init_kb(void) {
     debug_matrix   = true;
     debug_keyboard = true;
 
-    lcd = qp_st7789_make_spi_device(240, 320, DISPLAY_CS_PIN, DISPLAY_DC_PIN, DISPLAY_RST_PIN, 4, 3);
+    lcd = qp_st7789_make_spi_device(240, 320, DISPLAY_CS_PIN, DISPLAY_DC_PIN, DISPLAY_RST_PIN, 8, 3);
     qp_init(lcd, QP_ROTATION_0);
     qp_rect(lcd, 0, 0, 239, 319, 0, 255, 255, true);
     return;

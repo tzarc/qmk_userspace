@@ -4,11 +4,12 @@
 #MCU = STM32L412
 #BOOTLOADER = stm32-dfu
 
-MCU = STM32F411
+MCU = STM32F401
 BOOTLOADER = tinyuf2
-BOARD = BLACKPILL_STM32_F411
+BOARD = BLACKPILL_STM32_F401
 
 EEPROM_DRIVER = transient
+#EEPROM_DRIVER = spi
 
 # Build Options
 #   change yes to no to disable
@@ -32,7 +33,6 @@ FAUXCLICKY_ENABLE = no      # Use buzzer to emulate clicky switches
 QUANTUM_PAINTER_ENABLE = yes
 QUANTUM_PAINTER_DRIVERS = st7789_spi
 QUANTUM_PAINTER_LVGL_INTEGRATION = yes
-#QUANTUM_PAINTER_LVGL_ONLY = yes
 
 LTO_ENABLE = yes
 OPT = 1
