@@ -28,7 +28,11 @@ void keyboard_post_init_kb(void) {
     debug_matrix   = true;
     debug_keyboard = true;
 
+#ifdef QUANTUM_PAINTER_ILI9341_ENABLE
+    lcd = qp_ili9341_make_spi_device(240, 320, DISPLAY_CS_PIN, DISPLAY_DC_PIN, DISPLAY_RST_PIN, 8, 3);
+#else // QUANTUM_PAINTER_ST7789_ENABLE
     lcd = qp_st7789_make_spi_device(240, 320, DISPLAY_CS_PIN, DISPLAY_DC_PIN, DISPLAY_RST_PIN, 8, 3);
+#endif
     qp_init(lcd, QP_ROTATION_0);
     qp_rect(lcd, 0, 0, 239, 319, 0, 255, 255, true);
     return;
@@ -67,3 +71,30 @@ void lv_example_arc_2(void) {
     lv_anim_set_values(&a, 0, 100);
     lv_anim_start(&a);
 }
+
+/*
+#include "qp_internal.h"
+#include "qp_comms_spi.h"
+void cycle_spi_config(void) {
+    struct painter_driver_t*               driver     = (struct painter_driver_t*)lcd;
+    struct qp_comms_spi_dc_reset_config_t* spi_config = (struct qp_comms_spi_dc_reset_config_t*)driver->comms_config;
+
+    spi_config->spi_config.divisor <<= 1;
+    if (spi_config->spi_config.divisor > 256) {
+        spi_config->spi_config.divisor = 2;
+        spi_config->spi_config.mode    = (spi_config->spi_config.mode + 1) % 4;
+    }
+
+    dprintf("New SPI config -- mode=%d, divisor=%d\n", (int)spi_config->spi_config.mode, (int)spi_config->spi_config.divisor);
+    qp_init(lcd, QP_ROTATION_0);
+    qp_rect(lcd, 0, 0, 239, 319, 0, 255, 255, true);
+}
+
+void housekeeping_task_user(void) {
+    static uint32_t last_check = 0;
+    if (timer_elapsed32(last_check) > 5000) {
+        last_check = timer_read32();
+        cycle_spi_config();
+    }
+}
+*/
