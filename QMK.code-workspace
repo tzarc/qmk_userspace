@@ -58,5 +58,11 @@
   ],
   "settings": {
     "git.ignoreLimitWarning": true,
+    "files.associations": {
+      "deferred_exec.h": "c",
+      "lvgl.h": "c",
+      "lv_conf.h": "c",
+      "ostream": "c"
+    },
   }
 }

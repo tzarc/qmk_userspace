@@ -4,7 +4,7 @@
 export ROOTDIR := $(shell pwd)
 #export PATH := /home/nickb/dev/cross-compilers/target_prefix/gcc11.1_arm/bin:$(PATH)
 #export PATH := /home/nickb/dev/cross-compilers/target_prefix/gcc11.1_avr/bin:$(PATH)
-#export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10.3-2021.10/bin:$(PATH)
+export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10.3-2021.10/bin:$(PATH)
 #export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH)
 #export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$(PATH)
 #export PATH := /usr/lib/ccache:$(PATH)
@@ -60,7 +60,8 @@ BOARD_DEFS := \
 	l151x8xxA!alternates/l151x8xxA!l151x8xxA!reset \
 	f072_shiftreg!alternates/f072_shiftreg!f072_shiftreg!default \
 	l412_shiftreg!alternates/l412_shiftreg!l412_shiftreg!default \
-	qp_test!alternates/qp_test!qp_test!default!qp_test/stm32l412kb
+	qp_test!alternates/qp_test!qp_test!default!qp_test \
+	lvgl_test!alternates/lvgl_test!lvgl_test!default!lvgl_test
 
 EXTRA_LINK_DEFS := \
 	layouts/layout-tkl_ansi!layouts/community/tkl_ansi/tzarc \

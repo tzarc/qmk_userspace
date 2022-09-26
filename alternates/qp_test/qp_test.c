@@ -4,9 +4,7 @@
 #include <quantum.h>
 #include <debug.h>
 #include <qp.h>
-#include <qp_ili9163.h>
 #include <qp_st7789.h>
-#include <qp_ssd1351.h>
 
 // Test assets
 #include "graphics/test-image.qgf.c"
@@ -14,17 +12,27 @@
 #include "graphics/loading.qgf.c"
 #include "graphics/thintel.qff.c"
 
-painter_device_t ili9163;
-painter_device_t st7789;
-painter_device_t ssd1351;
+/*
+void board_init(void) {
+    // Add a long delay during bootup to allow for debugger attachment
+    int f;
+    for (int i = 0; i < 10000; ++i) {
+        for (int j = 0; j < 10000; ++j) {
+            __asm__ volatile("nop\nnop\nnop\n");
+        }
+        ++f;
+    }
+}
+*/
 
+painter_device_t       st7789;
 painter_image_handle_t test_image;
 painter_image_handle_t test_anim;
 painter_image_handle_t loading;
 
 painter_font_handle_t thintel;
 
-static uint32_t delayed_test(uint32_t trigger_time, void *cb_arg) {
+static uint32_t delayed_test(uint32_t trigger_time, void* cb_arg) {
     uint16_t        timeout = (uint16_t)(uintptr_t)cb_arg;
     static uint32_t last    = 0;
     uint32_t        now     = timer_read32();
@@ -48,7 +56,7 @@ void init_and_clear(painter_device_t device, painter_rotation_t rotation) {
     qp_rect(device, 0, 0, width - 1, height - 1, 0, 0, 0, true);
 }
 
-void draw_test(painter_device_t device, const char *name, uint32_t now) {
+void draw_test(painter_device_t device, const char* name, uint32_t now) {
     uint16_t width;
     uint16_t height;
     qp_get_geometry(device, &width, &height, NULL, NULL, NULL);
@@ -83,8 +91,8 @@ void keyboard_post_init_kb(void) {
     debug_matrix   = true;
     debug_keyboard = true;
 
-    defer_exec(3000, delayed_test, (void *)(uint16_t)3000);
-    defer_exec(2900, delayed_test, (void *)(uint16_t)2900);
+    defer_exec(3000, delayed_test, (void*)(uint16_t)3000);
+    defer_exec(2900, delayed_test, (void*)(uint16_t)2900);
 
     test_image = qp_load_image_mem(gfx_test_image);
     test_anim  = qp_load_image_mem(gfx_test_anim);
@@ -92,14 +100,8 @@ void keyboard_post_init_kb(void) {
 
     thintel = qp_load_font_mem(font_thintel);
 
-    ili9163 = qp_ili9163_make_spi_device(128, 128, DISPLAY_CS_PIN_1_44_INCH_LCD_ILI9163, DISPLAY_DC_PIN, DISPLAY_RST_PIN_1_44_INCH_LCD_ILI9163, 4, 0);
-    init_and_clear(ili9163, QP_ROTATION_90);
-
-    st7789 = qp_st7789_make_spi_device(240, 240, DISPLAY_CS_PIN_1_3_INCH_LCD_ST7789, DISPLAY_DC_PIN, DISPLAY_RST_PIN_1_3_INCH_LCD_ST7789, 2, 3);
-    init_and_clear(st7789, QP_ROTATION_270);
-
-    ssd1351 = qp_ssd1351_make_spi_device(128, 128, DISPLAY_CS_PIN_1_5_INCH_OLED_SSD1351, DISPLAY_DC_PIN, DISPLAY_RST_PIN_1_5_INCH_OLED_SSD1351, 8, 0);
-    init_and_clear(ssd1351, QP_ROTATION_180);
+    st7789 = qp_st7789_make_spi_device(240, 320, DISPLAY_CS_PIN_2_0_INCH_LCD_ST7789, DISPLAY_DC_PIN, DISPLAY_RST_PIN_2_0_INCH_LCD_ST7789, 2, 3);
+    init_and_clear(st7789, QP_ROTATION_0);
 
     keyboard_post_init_user();
 }
@@ -109,26 +111,102 @@ void matrix_scan_kb(void) {
     uint32_t        now       = timer_read32();
     if (TIMER_DIFF_32(now, last_scan) >= 3000) {
         last_scan = now;
-        draw_test(ili9163, "ILI9163", now);
         draw_test(st7789, "ST7789", now);
-        draw_test(ssd1351, "SSD1351", now);
 
         static bool animating = false;
         if (!animating) {
             animating = true;
             if (test_anim) {
-                qp_animate(ili9163, 0, 0, test_anim);
                 qp_animate(st7789, 0, 0, test_anim);
-                qp_animate(ssd1351, 0, 0, test_anim);
             }
 
             if (loading) {
-                qp_animate(ili9163, 0, 8, loading);
                 qp_animate(st7789, 0, 8, loading);
-                qp_animate(ssd1351, 0, 8, loading);
             }
         }
     }
 
     matrix_scan_user();
 }
+
+void chibi_system_halt_hook(const char* reason) {
+    // re-route to QMK toolbox...
+    uprintf("system halting: %s\n", reason);
+}
+
+void chibi_system_trace_hook(void* tep) {
+    // re-route to QMK toolbox...
+    uprintf("trace\n");
+}
+
+void chibi_debug_check_hook(const char* func, const char* condition, int value) {
+    // re-route to QMK toolbox...
+    uprintf("%s debug check failure: (%s) == %s\n", func, condition, value ? "true" : "false");
+    // ...and hard-loop fail
+    while (1) {
+    }
+}
+
+void chibi_debug_assert_hook(const char* func, const char* condition, int value, const char* reason) {
+    // re-route to QMK toolbox...
+    uprintf("%s debug assert (%s) failure: (%s) == %s\n", func, reason, condition, value ? "true" : "false");
+    // ...and hard-loop fail
+    while (1) {
+    }
+}
+
+#ifdef DEBUG_EEPROM_OUTPUT
+
+#    ifdef WEAR_LEVELING_ENABLE
+#        include "wear_leveling.h"
+#    endif // WEAR_LEVELING_ENABLE
+
+uint8_t prng(void) {
+    static uint8_t s = 0xAA, a = 0;
+    s ^= s << 3;
+    s ^= s >> 5;
+    s ^= a++ >> 2;
+    return s;
+}
+
+void keyboard_post_init_user(void) {
+    debug_enable = true;
+}
+
+void matrix_scan_user(void) {
+    static uint32_t last_eeprom_access = 0;
+    uint32_t        now                = timer_read32();
+    if (now - last_eeprom_access > 5000) {
+        dprint("reading eeprom\n");
+        last_eeprom_access = now;
+
+        union {
+            uint8_t  bytes[4];
+            uint32_t raw;
+        } tmp;
+        extern uint8_t prng(void);
+        tmp.bytes[0] = prng();
+        tmp.bytes[1] = prng();
+        tmp.bytes[2] = prng();
+        tmp.bytes[3] = prng();
+
+        eeconfig_update_user(tmp.raw);
+        uint32_t value = eeconfig_read_user();
+        if (value != tmp.raw) {
+            dprint("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+            dprint("!! EEPROM readback mismatch!\n");
+            dprint("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+        }
+    }
+
+#    ifdef WEAR_LEVELING_ENABLE
+    static uint32_t last_wear_leveling_init = 0;
+    if (now - last_wear_leveling_init > 30000) {
+        dprint("init'ing wear-leveling\n");
+        last_wear_leveling_init = now;
+        wear_leveling_init();
+    }
+#    endif // WEAR_LEVELING_ENABLE
+}
+
+#endif // DEBUG_EEPROM_OUTPUT
