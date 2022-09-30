@@ -3,7 +3,10 @@
 #include QMK_KEYBOARD_H
 #include "theme_djinn_default.h"
 #include "tzarc.h"
+#include "qp.h"
 #include "qp_rgb565_surface.h"
+//#include "qp_lvgl.h"
+//#include "ui.h"
 
 //----------------------------------------------------------
 // Key map
@@ -16,7 +19,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         ____________TZARC_7x4_BASE_R3_L__________,                                            ____________TZARC_7x4_BASE_R3_R__________,
         ____________TZARC_7x4_BASE_R4_L__________,                                            ____________TZARC_7x4_BASE_R4_R__________,
                      KC_LGUI, KC_LOWER,  KC_SPC,  KC_CONFIG,                         KC_CONFIG,  KC_SPC,  KC_RAISE,  KC_LALT,
-                                                           RGB_RMOD,          RGB_MOD,
+                                                           TZ_ENC1P,          TZ_ENC2P,
                                 KC_UP,                                                                 KC_UP,
                        KC_LEFT, KC_NLCK, KC_RIGHT,                                            KC_LEFT, KC_NLCK, KC_RIGHT,
                                 KC_DOWN,                                                               KC_DOWN
@@ -62,10 +65,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 // clang-format off
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
-    [LAYER_BASE]   = { ENCODER_CCW_CW(KC_MS_WH_UP, KC_MS_WH_DOWN), ENCODER_CCW_CW(KC_VOLD, KC_VOLU)  },
-    [LAYER_LOWER]  = { ENCODER_CCW_CW(RGB_HUD, RGB_HUI),           ENCODER_CCW_CW(RGB_SAD, RGB_SAI)  },
-    [LAYER_RAISE]  = { ENCODER_CCW_CW(RGB_VAD, RGB_VAI),           ENCODER_CCW_CW(RGB_SPD, RGB_SPI)  },
-    [LAYER_ADJUST] = { ENCODER_CCW_CW(RGB_RMOD, RGB_MOD),          ENCODER_CCW_CW(KC_LEFT, KC_RIGHT) },
+    [LAYER_BASE]   = { ENCODER_CCW_CW(TZ_ENC1L, TZ_ENC1R), ENCODER_CCW_CW(TZ_ENC2L, TZ_ENC2R) },
+    [LAYER_LOWER]  = { ENCODER_CCW_CW(RGB_HUD, RGB_HUI),   ENCODER_CCW_CW(RGB_SAD, RGB_SAI)   },
+    [LAYER_RAISE]  = { ENCODER_CCW_CW(RGB_VAD, RGB_VAI),   ENCODER_CCW_CW(RGB_SPD, RGB_SPI)   },
+    [LAYER_ADJUST] = { ENCODER_CCW_CW(RGB_RMOD, RGB_MOD),  ENCODER_CCW_CW(KC_LEFT, KC_RIGHT)  },
 };
 // clang-format on
 
@@ -96,6 +99,45 @@ void keyboard_post_init_keymap(void) {
     void keyboard_post_init_display(void);
     keyboard_post_init_display();
     rgb_matrix_disable_noeeprom();
+
+    // qp_lvgl_attach(lcd);
+    // ui_init();
+}
+
+bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case TZ_ENC1P:
+            if (record->event.pressed) {
+                rgb_matrix_step();
+            }
+            return false;
+        case TZ_ENC1L:
+            if (record->event.pressed) {
+                tap_code16(KC_MS_WH_UP);
+            }
+            return false;
+        case TZ_ENC1R:
+            if (record->event.pressed) {
+                tap_code16(KC_MS_WH_DOWN);
+            }
+            return false;
+        case TZ_ENC2P:
+            if (record->event.pressed) {
+                rgb_matrix_step_reverse();
+            }
+            return false;
+        case TZ_ENC2L:
+            if (record->event.pressed) {
+                tap_code16_delay(KC_VOLU, 2);
+            }
+            return false;
+        case TZ_ENC2R:
+            if (record->event.pressed) {
+                tap_code16_delay(KC_VOLD, 2);
+            }
+            return false;
+    }
+    return true;
 }
 
 void housekeeping_task_keymap(void) {

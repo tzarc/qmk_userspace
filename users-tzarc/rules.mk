@@ -44,3 +44,12 @@ else ifeq ($(strip $(PLATFORM_KEY)),avr)
 		DEBUG_MATRIX_SCAN_RATE_ENABLE = no
 	endif
 endif
+
+ifneq ("$(wildcard $(LIB_PATH)/lvgl)","")
+
+#	ifeq ($(strip $(QUANTUM_PAINTER_LVGL_INTEGRATION)),yes)
+#		VPATH += $(USER_PATH)/screens/diablo3
+#		SRC += ui.c ui_helpers.c ui_img_d3_png.c
+#	endif
+
+endif

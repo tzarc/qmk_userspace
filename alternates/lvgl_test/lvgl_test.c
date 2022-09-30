@@ -4,7 +4,6 @@
 #include <quantum.h>
 #include <debug.h>
 #include <qp.h>
-#include <qp_lvgl.h>
 
 /*
 void board_init(void) {
@@ -28,14 +27,18 @@ void keyboard_post_init_kb(void) {
     debug_matrix   = true;
     debug_keyboard = true;
 
+    setPinOutput(DISPLAY_CS_PIN);
+    setPinOutput(DISPLAY_DC_PIN);
+    setPinOutput(DISPLAY_RST_PIN);
+
 #ifdef QUANTUM_PAINTER_ILI9341_ENABLE
-    lcd = qp_ili9341_make_spi_device(240, 320, DISPLAY_CS_PIN, DISPLAY_DC_PIN, DISPLAY_RST_PIN, 8, 3);
+    lcd = qp_ili9341_make_spi_device(240, 320, DISPLAY_CS_PIN, DISPLAY_DC_PIN, DISPLAY_RST_PIN, 4, 0);
 #else // QUANTUM_PAINTER_ST7789_ENABLE
-    lcd = qp_st7789_make_spi_device(240, 320, DISPLAY_CS_PIN, DISPLAY_DC_PIN, DISPLAY_RST_PIN, 8, 3);
+    lcd = qp_st7789_make_spi_device(240, 320, DISPLAY_CS_PIN, DISPLAY_DC_PIN, DISPLAY_RST_PIN, 4, 0);
 #endif
     qp_init(lcd, QP_ROTATION_0);
     qp_rect(lcd, 0, 0, 239, 319, 0, 255, 255, true);
-    return;
+    // return;
 
     if (qp_lvgl_attach(lcd)) {
         lv_example_arc_2();
