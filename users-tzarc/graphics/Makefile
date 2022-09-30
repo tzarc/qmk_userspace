@@ -3,7 +3,7 @@
 ################################################################################################################################################################
 # Generated files
 
-QMK_BIN := ../../bin/qmk
+QMK_BIN := qmk
 USER_PATH := .
 GENERATED_OUTPUT := ./src
 
@@ -13,6 +13,19 @@ clean:
 	rm -rf "$(GENERATED_OUTPUT)"
 
 distclean: clean
+
+################################################################################################################################################################
+# Game images
+
+generated-files: $(GENERATED_OUTPUT)/diablo3.qgf.h $(GENERATED_OUTPUT)/wow.qgf.h
+
+$(GENERATED_OUTPUT)/diablo3.qgf.h: $(USER_PATH)/Makefile $(USER_PATH)/diablo3.png
+	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
+	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/diablo3.png -o $(GENERATED_OUTPUT) -f pal16
+
+$(GENERATED_OUTPUT)/wow.qgf.h: $(USER_PATH)/Makefile $(USER_PATH)/wow.png
+	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
+	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/wow.png -o $(GENERATED_OUTPUT) -f pal16
 
 ################################################################################################################################################################
 # Fonts
@@ -111,7 +124,7 @@ $(GENERATED_OUTPUT)/hannover23.qff.h: $(GENERATED_OUTPUT)/hannover23.png
 # Key lock images
 
 LOCK_IMAGE_FORMAT := mono4
-DJINN_GRAPHICS_PATH := ../../tzarc-djinn/graphics
+DJINN_GRAPHICS_PATH := ../../keyboards/tzarc-djinn-OLD/graphics
 
 generated-files: $(GENERATED_OUTPUT)/lock-caps-ON.qgf.h $(GENERATED_OUTPUT)/lock-caps-OFF.qgf.h
 

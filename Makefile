@@ -112,6 +112,9 @@ links: format_prereq extra-links
 git-submodule: qmk_firmware
 	+$(MAKE) -C "$(ROOTDIR)/qmk_firmware" git-submodule
 
+graphics:
+	+$(MAKE) -C "$(ROOTDIR)/users-tzarc/graphics"
+
 define handle_link_entry
 link_source_$1 := $$(word 1,$$(subst !, ,$1))
 link_target_$1 := $$(word 2,$$(subst !, ,$1))
