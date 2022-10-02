@@ -81,6 +81,7 @@
 
 /* WS2812 configuration */
 #define RGB_MATRIX_LED_COUNT 15
+#define DRIVER_LED_TOTAL 15
 #ifdef WS2812
 // Common
 #    define RGB_DI_PIN PIN_WS2812_3V3
