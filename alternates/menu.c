@@ -30,7 +30,7 @@ typedef enum _menu_input_t {
 
 typedef struct _menu_entry_t {
     menu_flags_t flags;
-    const char * text;
+    const char  *text;
     union {
         struct {
             struct _menu_entry_t *children;
@@ -89,7 +89,9 @@ static bool menu_handler_rgbenabled(menu_input_t input) {
     }
 }
 
-void display_handler_rgbenabled(char *text_buffer, size_t buffer_len) { snprintf_(text_buffer, buffer_len - 1, "%s", rgb_matrix_is_enabled() ? "on" : "off"); }
+void display_handler_rgbenabled(char *text_buffer, size_t buffer_len) {
+    snprintf_(text_buffer, buffer_len - 1, "%s", rgb_matrix_is_enabled() ? "on" : "off");
+}
 
 static bool menu_handler_rgbmode(menu_input_t input) {
     switch (input) {
@@ -104,7 +106,9 @@ static bool menu_handler_rgbmode(menu_input_t input) {
     }
 }
 
-void display_handler_rgbmode(char *text_buffer, size_t buffer_len) { snprintf_(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_mode()); }
+void display_handler_rgbmode(char *text_buffer, size_t buffer_len) {
+    snprintf_(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_mode());
+}
 
 static bool menu_handler_rgbhue(menu_input_t input) {
     switch (input) {
@@ -119,7 +123,9 @@ static bool menu_handler_rgbhue(menu_input_t input) {
     }
 }
 
-void display_handler_rgbhue(char *text_buffer, size_t buffer_len) { snprintf_(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_hue()); }
+void display_handler_rgbhue(char *text_buffer, size_t buffer_len) {
+    snprintf_(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_hue());
+}
 
 static bool menu_handler_rgbsat(menu_input_t input) {
     switch (input) {
@@ -134,7 +140,9 @@ static bool menu_handler_rgbsat(menu_input_t input) {
     }
 }
 
-void display_handler_rgbsat(char *text_buffer, size_t buffer_len) { snprintf_(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_sat()); }
+void display_handler_rgbsat(char *text_buffer, size_t buffer_len) {
+    snprintf_(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_sat());
+}
 
 static bool menu_handler_rgbval(menu_input_t input) {
     switch (input) {
@@ -149,7 +157,9 @@ static bool menu_handler_rgbval(menu_input_t input) {
     }
 }
 
-void display_handler_rgbval(char *text_buffer, size_t buffer_len) { snprintf_(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_val()); }
+void display_handler_rgbval(char *text_buffer, size_t buffer_len) {
+    snprintf_(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_val());
+}
 
 static bool menu_handler_rgbspeed(menu_input_t input) {
     switch (input) {
@@ -164,7 +174,9 @@ static bool menu_handler_rgbspeed(menu_input_t input) {
     }
 }
 
-void display_handler_rgbspeed(char *text_buffer, size_t buffer_len) { snprintf_(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_speed()); }
+void display_handler_rgbspeed(char *text_buffer, size_t buffer_len) {
+    snprintf_(text_buffer, buffer_len - 1, "%d", (int)rgb_matrix_get_speed());
+}
 
 menu_entry_t rgb_entries[] = {
     {
@@ -247,7 +259,9 @@ menu_entry_t *get_current_menu(void) {
     return entry;
 }
 
-menu_entry_t *get_selected_menu_item(void) { return &(get_current_menu()->parent.children[state.selected_child]); }
+menu_entry_t *get_selected_menu_item(void) {
+    return &(get_current_menu()->parent.children[state.selected_child]);
+}
 
 bool menu_handle_input(menu_input_t input) {
     menu_entry_t *menu     = get_current_menu();

@@ -1,3 +1,6 @@
+// Copyright 2018-2022 Nick Brassel (@tzarc)
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //#define TEST_FRAMEBUFFER
 #ifdef TEST_FRAMEBUFFER
 #    include "thintel15.qff.h"
@@ -30,36 +33,37 @@ void housekeeping_task_keymap(void) {
         // All bars are vertically spaced by 10px, 20px high each
 
         // Start with a black background
-        qp_rect(surface, 0, 0, FRAMEBUFFER_W-1, FRAMEBUFFER_H-1, 0, 0, 0, true);
+        qp_rect(surface, 0, 0, FRAMEBUFFER_W - 1, FRAMEBUFFER_H - 1, 0, 0, 0, true);
 
         // Draw hue
-        qp_line(surface, 0, 17, FRAMEBUFFER_W-1, 17, 0, 0, 96);
-        qp_rect(surface, 0, 18, FRAMEBUFFER_W-1, 47, 0, 0, 32, true);
-        qp_line(surface, 0, 48, FRAMEBUFFER_W-1, 48, 0, 0, 96);
-        for(uint8_t i = 0; i < 200; ++i) {
-            qp_line(surface, 20+i, 20, 20+i, 40, ((uint16_t)i*255)/200, 255, 255);q
+        qp_line(surface, 0, 17, FRAMEBUFFER_W - 1, 17, 0, 0, 96);
+        qp_rect(surface, 0, 18, FRAMEBUFFER_W - 1, 47, 0, 0, 32, true);
+        qp_line(surface, 0, 48, FRAMEBUFFER_W - 1, 48, 0, 0, 96);
+        for (uint8_t i = 0; i < 200; ++i) {
+            qp_line(surface, 20 + i, 20, 20 + i, 40, ((uint16_t)i * 255) / 200, 255, 255);
+            q
         }
-        uint16_t xpos = (last_hue*200) / 255;
-        for(uint8_t i = 0; i < 6; ++i) {
-            qp_line(surface, 20+xpos-i, 41+i, 20+xpos+i, 41+i, 255, 0, 255);
+        uint16_t xpos = (last_hue * 200) / 255;
+        for (uint8_t i = 0; i < 6; ++i) {
+            qp_line(surface, 20 + xpos - i, 41 + i, 20 + xpos + i, 41 + i, 255, 0, 255);
         }
 
         // Draw saturation
-        for(uint8_t i = 0; i < 200; ++i) {
-            qp_line(surface, 20+i, 50, 20+i, 70, last_hue, ((uint16_t)i*255)/200, last_val);
+        for (uint8_t i = 0; i < 200; ++i) {
+            qp_line(surface, 20 + i, 50, 20 + i, 70, last_hue, ((uint16_t)i * 255) / 200, last_val);
         }
-        xpos = (last_sat*200) / 255;
-        for(uint8_t i = 0; i < 6; ++i) {
-            qp_line(surface, 20+xpos-i, 71+i, 20+xpos+i, 71+i, 255, 0, 255);
+        xpos = (last_sat * 200) / 255;
+        for (uint8_t i = 0; i < 6; ++i) {
+            qp_line(surface, 20 + xpos - i, 71 + i, 20 + xpos + i, 71 + i, 255, 0, 255);
         }
 
         // Draw value
-        for(uint8_t i = 0; i < 200; ++i) {
-            qp_line(surface, 20+i, 80, 20+i, 100, last_hue, last_sat, ((uint16_t)i*255)/200);
+        for (uint8_t i = 0; i < 200; ++i) {
+            qp_line(surface, 20 + i, 80, 20 + i, 100, last_hue, last_sat, ((uint16_t)i * 255) / 200);
         }
-        xpos = (last_val*200) / 255;
-        for(uint8_t i = 0; i < 6; ++i) {
-            qp_line(surface, 20+xpos-i, 101+i, 20+xpos+i, 101+i, 255, 0, 255);
+        xpos = (last_val * 200) / 255;
+        for (uint8_t i = 0; i < 6; ++i) {
+            qp_line(surface, 20 + xpos - i, 101 + i, 20 + xpos + i, 101 + i, 255, 0, 255);
         }
 
         qp_rgb565_surface_draw(surface, lcd, 0, 0);

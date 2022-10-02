@@ -21,11 +21,11 @@ generated-files: $(GENERATED_OUTPUT)/diablo3.qgf.h $(GENERATED_OUTPUT)/wow.qgf.h
 
 $(GENERATED_OUTPUT)/diablo3.qgf.h: $(USER_PATH)/Makefile $(USER_PATH)/diablo3.png
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/diablo3.png -o $(GENERATED_OUTPUT) -f pal16
+	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/diablo3.png -o $(GENERATED_OUTPUT) -f pal256
 
 $(GENERATED_OUTPUT)/wow.qgf.h: $(USER_PATH)/Makefile $(USER_PATH)/wow.png
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/wow.png -o $(GENERATED_OUTPUT) -f pal16
+	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/wow.png -o $(GENERATED_OUTPUT) -f pal256
 
 ################################################################################################################################################################
 # Game fonts
@@ -34,21 +34,21 @@ generated-files: $(GENERATED_OUTPUT)/avqest12.qff.h
 
 $(GENERATED_OUTPUT)/avqest12.png: $(USER_PATH)/Makefile $(USER_PATH)/AvQest.ttf
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-make-font-image --font $(USER_PATH)/AvQest.ttf --size 12 -o $(GENERATED_OUTPUT)/avqest12.png --no-ascii --unicode-glyphs "0123456789.OfRep"
+	$(QMK_BIN) painter-make-font-image --font $(USER_PATH)/AvQest.ttf --size 12 -o $(GENERATED_OUTPUT)/avqest12.png # --no-ascii --unicode-glyphs "0123456789.OfRep"
 
 $(GENERATED_OUTPUT)/avqest12.qff.h: $(GENERATED_OUTPUT)/avqest12.png
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-font-image --input $(GENERATED_OUTPUT)/avqest12.png -f mono4 --no-ascii --unicode-glyphs "0123456789.OfRep"
+	$(QMK_BIN) painter-convert-font-image --input $(GENERATED_OUTPUT)/avqest12.png -f mono4 # --no-ascii --unicode-glyphs "0123456789.OfRep"
 
-generated-files: $(GENERATED_OUTPUT)/avqest18.qff.h
+generated-files: $(GENERATED_OUTPUT)/avqest20.qff.h
 
-$(GENERATED_OUTPUT)/avqest18.png: $(USER_PATH)/Makefile $(USER_PATH)/AvQest.ttf
+$(GENERATED_OUTPUT)/avqest20.png: $(USER_PATH)/Makefile $(USER_PATH)/AvQest.ttf
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-make-font-image --font $(USER_PATH)/AvQest.ttf --size 18 -o $(GENERATED_OUTPUT)/avqest18.png --no-ascii --unicode-glyphs "0123456789.OfRep"
+	$(QMK_BIN) painter-make-font-image --font $(USER_PATH)/AvQest.ttf --size 20 -o $(GENERATED_OUTPUT)/avqest20.png # --no-ascii --unicode-glyphs "0123456789.OfRep"
 
-$(GENERATED_OUTPUT)/avqest18.qff.h: $(GENERATED_OUTPUT)/avqest18.png
+$(GENERATED_OUTPUT)/avqest20.qff.h: $(GENERATED_OUTPUT)/avqest20.png
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-font-image --input $(GENERATED_OUTPUT)/avqest18.png -f mono4 --no-ascii --unicode-glyphs "0123456789.OfRep"
+	$(QMK_BIN) painter-convert-font-image --input $(GENERATED_OUTPUT)/avqest20.png -f mono4 # --no-ascii --unicode-glyphs "0123456789.OfRep"
 
 ################################################################################################################################################################
 # Fonts

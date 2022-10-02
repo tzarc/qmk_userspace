@@ -27,10 +27,10 @@ static inline void sdClear(SerialDriver* driver) {
 }
 
 static SerialConfig sdcfg = {
-    (SERIAL_USART_SPEED),  // speed - mandatory
-    (SERIAL_USART_CR1),    // CR1
-    (SERIAL_USART_CR2),    // CR2
-    (SERIAL_USART_CR3)     // CR3
+    (SERIAL_USART_SPEED), // speed - mandatory
+    (SERIAL_USART_CR1),   // CR1
+    (SERIAL_USART_CR2),   // CR2
+    (SERIAL_USART_CR3)    // CR3
 };
 
 void handle_soft_serial_slave(void);
@@ -67,7 +67,7 @@ void usart_master_init(void) {
     usart_init();
 
 #if defined(SERIAL_USART_PIN_SWAP)
-    sdcfg.cr2 |= USART_CR2_SWAP;  // master has swapped TX/RX pins
+    sdcfg.cr2 |= USART_CR2_SWAP; // master has swapped TX/RX pins
 #endif
 
     sdStart(&SERIAL_USART_DRIVER, &sdcfg);
@@ -82,12 +82,16 @@ void usart_slave_init(void) {
     chThdCreateStatic(waSlaveThread, sizeof(waSlaveThread), HIGHPRIO, SlaveThread, NULL);
 }
 
-void soft_serial_initiator_init(void) { usart_master_init(); }
+void soft_serial_initiator_init(void) {
+    usart_master_init();
+}
 
-void soft_serial_target_init(void) { usart_slave_init(); }
+void soft_serial_target_init(void) {
+    usart_slave_init();
+}
 
 void handle_soft_serial_slave(void) {
-    uint8_t                   sstd_index = sdGet(&SERIAL_USART_DRIVER);  // first chunk is always transaction id
+    uint8_t                   sstd_index = sdGet(&SERIAL_USART_DRIVER); // first chunk is always transaction id
     split_transaction_desc_t* trans      = &split_transaction_table[sstd_index];
 
     // Always write back the sstd_index as part of a basic handshake
@@ -128,7 +132,7 @@ int soft_serial_transaction(int index) {
     split_transaction_desc_t* trans = &split_transaction_table[sstd_index];
     msg_t                     res   = 0;
 
-    if (!trans->status) return TRANSACTION_TYPE_ERROR;  // not registered
+    if (!trans->status) return TRANSACTION_TYPE_ERROR; // not registered
 
     sdClear(&SERIAL_USART_DRIVER);
 

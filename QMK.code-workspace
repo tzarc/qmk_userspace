@@ -62,7 +62,9 @@
       "deferred_exec.h": "c",
       "lvgl.h": "c",
       "lv_conf.h": "c",
-      "ostream": "c"
+      "ostream": "c",
+      "wear_leveling.h": "c",
+      "qp.h": "c"
     },
   }
 }

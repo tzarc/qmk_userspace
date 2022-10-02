@@ -27,7 +27,7 @@ struct stream_t {
 };
 
 typedef struct memory_stream_t {
-    stream_t base;
+    stream_t                base;
     uint8_t STREAM_MEM_PTR *buffer;
     int                     length;
     int                     position;
@@ -36,15 +36,15 @@ typedef struct memory_stream_t {
 #ifdef RLE_HAS_FILE_IO
 typedef struct file_stream_t {
     stream_t base;
-    FILE *   file;
+    FILE    *file;
 } file_stream_t;
-#endif  // RLE_HAS_FILE_IO
+#endif // RLE_HAS_FILE_IO
 
 memory_stream_t make_memory_stream(void STREAM_MEM_PTR *buffer, int length);
 
 #ifdef RLE_HAS_FILE_IO
 file_stream_t make_file_stream(FILE *f);
-#endif  // RLE_HAS_FILE_IO
+#endif // RLE_HAS_FILE_IO
 
 #define stream_get(stream) (((stream_t *)(&(stream)))->get((stream_t *)(&(stream))))
 #define stream_put(stream, c) (((stream_t *)(&(stream)))->put((stream_t *)(&(stream)), (c)))

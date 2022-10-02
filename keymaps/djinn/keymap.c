@@ -4,7 +4,7 @@
 #include "theme_djinn_default.h"
 #include "tzarc.h"
 #include "qp.h"
-#include "qp_rgb565_surface.h"
+//#include "qp_rgb565_surface.h"
 //#include "qp_lvgl.h"
 //#include "ui.h"
 
@@ -146,6 +146,84 @@ void housekeeping_task_keymap(void) {
 
     // Data sync from master to slave
     theme_state_sync();
+}
+
+#define draw_ui_user theme_draw_ui_user
+#include "theme_djinn_default.c"
+#undef draw_ui_user
+
+#include "diablo3.qgf.c"
+#include "avqest12.qff.c"
+#include "avqest20.qff.c"
+
+void draw_ui_user(bool force_redraw) {
+    uint16_t lcd_width;
+    uint16_t lcd_height;
+    qp_get_geometry(lcd, &lcd_width, &lcd_height, NULL, NULL, NULL);
+
+    // Redraw a black screen if we've changed typing mode
+    static uint32_t last_mode  = 0;
+    static bool     logo_drawn = false;
+    if (last_mode != typing_mode) {
+        last_mode    = typing_mode;
+        logo_drawn   = false;
+        force_redraw = true;
+        qp_rect(lcd, 0, 0, lcd_width - 1, lcd_height - 1, 0, 0, 0, true);
+    }
+
+    if (is_keyboard_left() && typing_mode == KC_D3MODE) {
+        static const int              x_offsets[4]  = {-90, -30, 30, 90};
+        const char                   *time_strs[4]  = {"11.1", "21.5", "39.2", "47.3"};
+        static painter_image_handle_t diablo3_logo  = NULL;
+        static painter_font_handle_t  avqest12_font = NULL;
+        static painter_font_handle_t  avqest20_font = NULL;
+        if (!diablo3_logo) {
+            diablo3_logo = qp_load_image_mem(gfx_diablo3);
+        }
+        if (!avqest12_font) {
+            avqest12_font = qp_load_font_mem(font_avqest12);
+        }
+        if (!avqest20_font) {
+            avqest20_font = qp_load_font_mem(font_avqest20);
+        }
+
+        // Draw the D3 logo if it hasn't been drawn already
+        if (!logo_drawn) {
+            qp_drawimage(lcd, 0, 0, diablo3_logo);
+
+            qp_circle(lcd, (lcd_width / 2) + x_offsets[0], lcd_height - 1 - avqest20_font->line_height - 30, 26, 0, 0, 255, true);
+            qp_circle(lcd, (lcd_width / 2) + x_offsets[1], lcd_height - 1 - avqest20_font->line_height - 30, 26, 0, 0, 255, true);
+            qp_circle(lcd, (lcd_width / 2) + x_offsets[2], lcd_height - 1 - avqest20_font->line_height - 30, 26, 0, 0, 255, true);
+            qp_circle(lcd, (lcd_width / 2) + x_offsets[3], lcd_height - 1 - avqest20_font->line_height - 30, 26, 0, 0, 255, true);
+
+            qp_drawtext(lcd, (lcd_width / 2) + x_offsets[0] - (qp_textwidth(avqest20_font, "1") / 2), lcd_height - 1 - avqest20_font->line_height, avqest20_font, "1");
+            qp_drawtext(lcd, (lcd_width / 2) + x_offsets[1] - (qp_textwidth(avqest20_font, "2") / 2), lcd_height - 1 - avqest20_font->line_height, avqest20_font, "2");
+            qp_drawtext(lcd, (lcd_width / 2) + x_offsets[2] - (qp_textwidth(avqest20_font, "3") / 2), lcd_height - 1 - avqest20_font->line_height, avqest20_font, "3");
+            qp_drawtext(lcd, (lcd_width / 2) + x_offsets[3] - (qp_textwidth(avqest20_font, "4") / 2), lcd_height - 1 - avqest20_font->line_height, avqest20_font, "4");
+
+            logo_drawn = true;
+        }
+
+        // Set up the display items
+        static uint32_t last_redraw = 0;
+        if (timer_elapsed32(last_redraw) > 25) {
+            last_redraw = timer_read32();
+
+            qp_circle(lcd, (lcd_width / 2) + x_offsets[0], lcd_height - 1 - avqest20_font->line_height - 30, 24, 0, 255, 255, true);
+            qp_circle(lcd, (lcd_width / 2) + x_offsets[1], lcd_height - 1 - avqest20_font->line_height - 30, 24, 60, 255, 255, true);
+            qp_circle(lcd, (lcd_width / 2) + x_offsets[2], lcd_height - 1 - avqest20_font->line_height - 30, 24, 0, 255, 255, true);
+            qp_circle(lcd, (lcd_width / 2) + x_offsets[3], lcd_height - 1 - avqest20_font->line_height - 30, 24, 0, 255, 255, true);
+
+            qp_drawtext_recolor(lcd, (lcd_width / 2) + x_offsets[0] - (qp_textwidth(avqest20_font, time_strs[0]) / 2), lcd_height - 1 - avqest20_font->line_height - 30 - (avqest20_font->line_height / 2) + 2, avqest20_font, time_strs[0], 0, 0, 255, 0, 255, 255);
+            qp_drawtext_recolor(lcd, (lcd_width / 2) + x_offsets[1] - (qp_textwidth(avqest20_font, time_strs[1]) / 2), lcd_height - 1 - avqest20_font->line_height - 30 - (avqest20_font->line_height / 2) + 2, avqest20_font, time_strs[1], 60, 0, 255, 60, 255, 255);
+            qp_drawtext_recolor(lcd, (lcd_width / 2) + x_offsets[2] - (qp_textwidth(avqest20_font, time_strs[2]) / 2), lcd_height - 1 - avqest20_font->line_height - 30 - (avqest20_font->line_height / 2) + 2, avqest20_font, time_strs[2], 0, 0, 255, 0, 255, 255);
+            qp_drawtext_recolor(lcd, (lcd_width / 2) + x_offsets[3] - (qp_textwidth(avqest20_font, time_strs[3]) / 2), lcd_height - 1 - avqest20_font->line_height - 30 - (avqest20_font->line_height / 2) + 2, avqest20_font, time_strs[3], 0, 0, 255, 0, 255, 255);
+        }
+    } else {
+        theme_draw_ui_user(force_redraw);
+    }
+
+    force_redraw = false;
 }
 
 #ifdef DEBUG_EEPROM_OUTPUT

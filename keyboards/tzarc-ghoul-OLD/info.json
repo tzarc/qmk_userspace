@@ -13,9 +13,7 @@
     "extrakey": true,
     "nkro": true,
     "quantum_painter": true,
-    "rgb_matrix": true,
-    "unicode": false,
-    "wpm": true
+    "rgb_matrix": true
   },
   "matrix_pins": {
     "rows": ["NO_PIN","NO_PIN","NO_PIN","NO_PIN","NO_PIN","NO_PIN"],

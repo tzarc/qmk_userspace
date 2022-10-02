@@ -3,7 +3,7 @@
 
 DEBUG_MATRIX_SCAN_RATE_ENABLE = api
 
-QUANTUM_PAINTER_DRIVERS += rgb565_surface
+#QUANTUM_PAINTER_DRIVERS += rgb565_surface
 #QUANTUM_PAINTER_LVGL_INTEGRATION = yes
 
 LUA_ENABLE = yes
@@ -20,7 +20,6 @@ AUDIO_ENABLE = no
 
 VPATH += keyboards/tzarc/djinn/graphics
 SRC += \
-	theme_djinn_default.c \
 	djinn.qgf.c \
 	lock-caps-ON.qgf.c \
 	lock-scrl-ON.qgf.c \

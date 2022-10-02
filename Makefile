@@ -23,8 +23,6 @@ $(ROOTDIR)/qmk_firmware:
 
 BOARD_DEFS := \
 	cyclone!keyboards/tzarc-cyclone!handwired/tzarc/cyclone!tzarc \
-	ghoul_rp2040!keyboards/tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/rev1/rp2040 \
-	ghoul_stm32!keyboards/tzarc-ghoul!handwired/tzarc/ghoul!default!handwired/tzarc/ghoul/rev1/stm32 \
 	\
 	annepro2!keymaps/annepro2!annepro2/c18/keymaps/tzarc!tzarc \
 	bm16s!keymaps/bm16s!kprepublic/bm16s/keymaps/tzarc!tzarc \
@@ -33,6 +31,8 @@ BOARD_DEFS := \
 	ctrl!keymaps/ctrl!massdrop/ctrl/keymaps/tzarc!tzarc \
 	djinn_rev1!keymaps/djinn!tzarc/djinn/rev1/keymaps/tzarc!tzarc \
 	djinn_rev2!keymaps/djinn!tzarc/djinn/rev2/keymaps/tzarc!tzarc \
+	ghoul_stm32!keymaps/ghoul!tzarc/ghoul/rev1/stm32/keymaps/tzarc!tzarc \
+	ghoul_rp2040!keymaps/ghoul!tzarc/ghoul/rev1/rp2040/keymaps/tzarc!tzarc \
 	geekboards!keymaps/geekboards-macropad_v2!geekboards/macropad_v2/keymaps/tzarc!tzarc \
 	iris!keymaps/iris_rev4!keebio/iris/rev4/keymaps/tzarc!tzarc \
 	luddite!keymaps/luddite!40percentclub/luddite/keymaps/tzarc!tzarc \
@@ -98,14 +98,24 @@ format_prereq: qmk_firmware
 	@ln -sf $(ROOTDIR)/qmk_firmware/.clang-format $(ROOTDIR)/.clang-format
 
 format: format_prereq
-	@for file in $$(find $(ROOTDIR)/qmk_firmware/keyboards/tzarc \( -iname '*.c' -or -iname '*.h' -or -iname '*.cpp' -or -iname '*.hpp' \) ) ; do \
-		[ -f "$$file" ] && echo "\e[38;5;14mclang-format'ing: $$file\e[0m" ; \
-		[ -f "$$file" ] && clang-format -i "$$file" >/dev/null 2>&1 || true ; \
-		[ -f "$$file" ] && echo "\e[38;5;14mdos2unix'ing: $$file\e[0m" ; \
-		[ -f "$$file" ] && dos2unix "$$file" >/dev/null 2>&1 ; \
-		[ -f "$$file" ] && echo "\e[38;5;14mchmod'ing: $$file\e[0m" ; \
-		[ -f "$$file" ] && chmod -x "$$file" >/dev/null 2>&1 ; \
+	@for file in $$({ find $(ROOTDIR)/qmk_firmware/keyboards/tzarc \( -iname '*.c' -or -iname '*.h' -or -iname '*.cpp' -or -iname '*.hpp' \) ; git ls-files | grep -P '\.(c|cpp|h|hpp)$$' ; } | grep -vP 'conf\.h' | grep -vP 'board.h' | sort | uniq) ; do \
+		if [ -f "$$file" ] ; then \
+			echo -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
+			clang-format -i "$$file" >/dev/null 2>&1 || true ; \
+			ex -s +"bufdo wq" "$$file" >/dev/null 2>&1 || true ; \
+			dos2unix "$$file" >/dev/null 2>&1 ; \
+			chmod -x "$$file" >/dev/null 2>&1 ; \
+		fi ; \
 	done
+	@for file in $$({ find $(ROOTDIR)/qmk_firmware/keyboards/tzarc \( -iname '*.mk' -or -iname 'Makefile*' \) ; git ls-files | grep -P '^(Makefile.*|.*\.mk)$$' ; } | sort | uniq) ; do \
+		if [ -f "$$file" ] ; then \
+			echo -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
+			ex -s +"bufdo wq" "$$file" >/dev/null 2>&1 || true ; \
+			dos2unix "$$file" >/dev/null 2>&1 ; \
+			chmod -x "$$file" >/dev/null 2>&1 ; \
+		fi ; \
+	done
+	@./check-license.sh
 
 links: format_prereq extra-links
 
@@ -126,7 +136,7 @@ DOCKER_VOLUME_LIST += -v $$(shell readlink -f "$$(link_source_$1)"):/qmk_firmwar
 extra-links: link_$$(link_source_$1)
 link_$$(link_source_$1): qmk_firmware
 	@if [ ! -L "$(ROOTDIR)/qmk_firmware/$$(link_target_$1)" ] ; then \
-		echo "\e[38;5;14mSymlinking: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
+		echo -e "\e[38;5;14mSymlinking: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
 		ln -sf $(ROOTDIR)/$$(link_source_$1) $(ROOTDIR)/qmk_firmware/$$(link_target_$1) ; \
 	fi
 
@@ -135,23 +145,9 @@ distclean: unlink_$$(link_source_$1)
 unlinks: unlink_$$(link_source_$1)
 unlink_$$(link_source_$1): qmk_firmware
 	@if [ -L "$(ROOTDIR)/qmk_firmware/$$(link_target_$1)" ] ; then \
-		echo "\e[38;5;14mRemoving symlink: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
+		echo -e "\e[38;5;14mRemoving symlink: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
 		rm $(ROOTDIR)/qmk_firmware/$$(link_target_$1) || true; \
 	fi
-
-format: format_$$(link_source_$1)
-format_$$(link_source_$1): format_prereq
-	@for file in $$(link_files_$1) ; do \
-		[ -f "$$$$file" ] && echo "\e[38;5;14mclang-format'ing: $$$$file\e[0m" ; \
-		[ -f "$$$$file" ] && clang-format -i "$$$$file" >/dev/null 2>&1 || true ; \
-	done ; \
-	for file in $$(link_files_all_$1) ; do \
-		[ -f "$$$$file" ] && echo "\e[38;5;14mdos2unix'ing: $$$$file\e[0m" ; \
-		[ -f "$$$$file" ] && dos2unix "$$$$file" >/dev/null 2>&1 ; \
-		[ -f "$$$$file" ] && echo "\e[38;5;14mchmod'ing: $$$$file\e[0m" ; \
-		[ -f "$$$$file" ] && chmod -x "$$$$file" >/dev/null 2>&1 ; \
-	done
-
 endef
 
 $(foreach link_entry,$(EXTRA_LINK_DEFS),$(eval $(call handle_link_entry,$(link_entry))))
@@ -173,7 +169,7 @@ board_files_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f \( -name
 board_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f | sort)
 
 bin_$$(board_name_$1): board_link_$$(board_name_$1)
-	@echo "\e[38;5;14mBuilding: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
+	@echo -e "\e[38;5;14mBuilding: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	+@cd "$(ROOTDIR)/qmk_firmware" \
 		&& { [ -z "$$(NO_COMPILEDB)" ] && qmk generate-compilation-database -kb $$(board_qmk_$1) -km $$(board_keymap_$1) || true; } \
 		&& { \
@@ -189,44 +185,30 @@ bin_$$(board_name_$1): board_link_$$(board_name_$1)
 		|| true
 
 tidy_$$(board_name_$1): bin_$$(board_name_$1)
-	@echo "\e[38;5;14mRunning clang-tidy on: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
+	@echo -e "\e[38;5;14mRunning clang-tidy on: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	@rm -f "$$(ROOTDIR)/clang-tidy_$$(board_name_$1).log" || true
 	cd "$(ROOTDIR)/qmk_firmware" \
 		&& $(CLANG_TIDY) -p . keyboards drivers quantum tmk_core -j9 -checks '$(CLANG_TIDY_CHECKS)' > "$$(ROOTDIR)/clang-tidy_$$(board_name_$1).log" 2>&1 \
 		|| true
 
 db_$$(board_name_$1): board_link_$$(board_name_$1)
-	@echo "\e[38;5;14mCreating compiledb for: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
+	@echo -e "\e[38;5;14mCreating compiledb for: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	cd "$(ROOTDIR)/qmk_firmware" \
 		&& $$(MAKE) distclean \
 		&& qmk generate-compilation-database -kb $$(board_qmk_$1) -km $$(board_keymap_$1)
 	@cp $$(ROOTDIR)/qmk_firmware/compile_commands.json $$(ROOTDIR) || true
 
 flash_$$(board_name_$1): bin_$$(board_name_$1)
-	@echo "\e[38;5;14mFlashing: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
+	@echo -e "\e[38;5;14mFlashing: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	cd "$(ROOTDIR)/qmk_firmware" \
 		&& qmk flash -kb $$(board_qmk_$1) -km $$(board_keymap_$1)
-
-format_$$(board_name_$1): format_prereq
-	@for file in $$(board_files_$1) ; do \
-		[ -f "$$$$file" ] && echo "\e[38;5;14mclang-format'ing: $$$$file\e[0m" ; \
-		[ -f "$$$$file" ] && clang-format -i "$$$$file" >/dev/null 2>&1 || true ; \
-	done
-	@for file in $$(board_files_all_$1) ; do \
-		[ -f "$$$$file" ] && echo "\e[38;5;14mdos2unix'ing: $$$$file\e[0m" ; \
-		[ -f "$$$$file" ] && dos2unix "$$$$file" >/dev/null 2>&1 ; \
-		[ -f "$$$$file" ] && echo "\e[38;5;14mchmod'ing: $$$$file\e[0m" ; \
-		[ -f "$$$$file" ] && chmod -x "$$$$file" >/dev/null 2>&1 ; \
-	done
-
-format: format_$$(board_name_$1)
 
 $$(board_name_$1): bin_$$(board_name_$1)
 bin: bin_$$(board_name_$1)
 
 board_link_$$(board_name_$1): extra-links
 	@if [ ! -L "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ] ; then \
-		echo "\e[38;5;14mSymlinking: $$(board_source_$1) -> $$(board_target_$1)\e[0m" ; \
+		echo -e "\e[38;5;14mSymlinking: $$(board_source_$1) -> $$(board_target_$1)\e[0m" ; \
 		if [ ! -d "$$(shell dirname "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)")" ] ; then \
 			mkdir -p "$$(shell dirname "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)")" ; \
 		fi ; \
@@ -238,7 +220,7 @@ DOCKER_VOLUME_LIST += -v $$(shell readlink -f "$$(board_source_$1)"):/qmk_firmwa
 
 board_unlink_$$(board_name_$1):
 	@if [ -L "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ] ; then \
-		echo "\e[38;5;14mRemoving symlink: $$(board_target_$1)\e[0m" ; \
+		echo -e "\e[38;5;14mRemoving symlink: $$(board_target_$1)\e[0m" ; \
 		rm "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" || true; \
 	fi
 

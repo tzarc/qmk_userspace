@@ -102,4 +102,4 @@ file_stream_t make_file_stream(FILE *f) {
     };
     return stream;
 }
-#endif  // RLE_HAS_FILE_IO
+#endif // RLE_HAS_FILE_IO

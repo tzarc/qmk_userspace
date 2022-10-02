@@ -21,7 +21,7 @@
 // Common functionality
 
 extern bool     config_enabled;
-extern uint16_t repeat_mode;
+extern uint16_t typing_mode;
 
 void tzarc_common_init(void);
 

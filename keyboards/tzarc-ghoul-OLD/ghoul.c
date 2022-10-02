@@ -4,17 +4,11 @@
 #include "analog.h"
 #include "spi_master.h"
 
-__attribute__((weak)) void ui_init(void) {}
-__attribute__((weak)) void ui_task(void) {}
-
 void keyboard_post_init_kb(void) {
     // Enable RGB current limiter and wait for a bit before allowing RGB to continue
     setPinOutput(RGB_ENABLE_PIN);
     writePinHigh(RGB_ENABLE_PIN);
     wait_ms(20);
-
-    // Init the display
-    ui_init();
 
     // Offload to the user func
     keyboard_post_init_user();
@@ -47,8 +41,4 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
         memcpy(current_matrix, temp_matrix, sizeof(temp_matrix));
     }
     return changed;
-}
-
-void housekeeping_task_kb(void) {
-    ui_task();
 }

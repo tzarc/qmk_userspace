@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright 2018-2022 Nick Brassel (@tzarc)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 this_script="$(readlink -f "${BASH_SOURCE[0]}")"
 script_dir="$(readlink -f "$(dirname "$this_script")")"

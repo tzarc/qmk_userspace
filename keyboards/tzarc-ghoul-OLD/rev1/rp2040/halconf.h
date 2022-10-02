@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
-#include_next "board.h"
+//#define HAL_USE_ADC TRUE
+#define HAL_USE_SPI TRUE
 
-#ifdef BOARD_OTG_NOVBUSSENS
-#undef BOARD_OTG_NOVBUSSENS
-#endif
+#include_next <halconf.h>

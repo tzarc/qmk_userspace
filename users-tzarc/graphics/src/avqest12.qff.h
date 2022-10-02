@@ -8,4 +8,4 @@
 #include <qp.h>
 
 extern const uint32_t font_avqest12_length;
-extern const uint8_t  font_avqest12[384];
+extern const uint8_t  font_avqest12[1849];

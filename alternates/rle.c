@@ -84,4 +84,4 @@ bool rle_encode(stream_t *in_stream, stream_t *out_stream) {
     }
     return true;
 }
-#endif  // RLE_ENCODER
+#endif // RLE_ENCODER
