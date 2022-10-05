@@ -93,7 +93,7 @@ bool process_record_wow(uint16_t keycode, keyrecord_t* record) {
         return false;
     }
 
-    return process_record_keymap(keycode, record);
+    return true;
 }
 
 void matrix_scan_wow(void) {

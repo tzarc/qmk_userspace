@@ -20,8 +20,27 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Common functionality
 
-extern bool     config_enabled;
-extern uint16_t typing_mode;
+#define TYPING_MODE_LIST(XM)                             \
+    /* Text glyph replacement modes */                   \
+    XM(MODE_NORMAL, KC_ESC, case KC_GESC:, "normal")     \
+    XM(MODE_WIDE, KC_1, /* dummy */, "wide")             \
+    XM(MODE_SCRIPT, KC_2, /* dummy */, "calligraphy")    \
+    XM(MODE_BLOCKS, KC_3, /* dummy */, "blocks")         \
+    XM(MODE_REGIONAL, KC_4, /* dummy */, "regional")     \
+    XM(MODE_AUSSIE, KC_5, /* dummy */, "Aussie")         \
+    XM(MODE_ZALGO, KC_6, /* dummy */, "Zalgo")           \
+    /* Game-specific modes */                            \
+    XM(MODE_WOW, KC_W, /* dummy */, "World of Warcraft") \
+    XM(MODE_D3, KC_D, /* dummy */, "Diablo 3")
+
+typedef enum typing_mode_t {
+#define XM(mode, keycode, extra, name) mode,
+    TYPING_MODE_LIST(XM)
+#undef XM
+} typing_mode_t;
+
+extern bool          config_enabled;
+extern typing_mode_t typing_mode;
 
 void tzarc_common_init(void);
 
@@ -30,6 +49,7 @@ const char *key_name(uint16_t keycode, bool shifted);
 
 bool process_record_keymap(uint16_t keycode, keyrecord_t *record);
 bool process_record_user(uint16_t keycode, keyrecord_t *record);
+bool process_record_unicode(uint16_t keycode, keyrecord_t *record);
 
 void matrix_scan_keymap(void);
 void matrix_scan_user(void);

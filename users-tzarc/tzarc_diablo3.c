@@ -65,7 +65,7 @@ bool process_record_diablo3(uint16_t keycode, keyrecord_t *record) {
     }
 
     // If we get here, fallback to normal key functionality.
-    return process_record_keymap(keycode, record);
+    return true;
 }
 
 uint32_t diablo3_deferred_exec_callback(uint32_t trigger_time, void *cb_arg) {

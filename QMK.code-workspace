@@ -64,7 +64,9 @@
       "lv_conf.h": "c",
       "ostream": "c",
       "wear_leveling.h": "c",
-      "qp.h": "c"
+      "qp.h": "c",
+      "compare": "c",
+      "keychron_common.h": "c"
     },
   }
 }
