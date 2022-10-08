@@ -8,6 +8,27 @@
 void register_unicode(uint32_t hex);
 #define tap_unicode_glyph register_unicode
 
+#ifdef UNICODE_ENABLE
+const char *unicode_mode_name(enum unicode_input_modes mode) {
+    switch (mode) {
+        case UC_MAC:
+            return "macOS";
+        case UC_LNX:
+            return "Linux";
+        case UC_WIN:
+            return "Windows";
+        case UC_BSD:
+            return "BSD";
+        case UC_WINC:
+            return "WinCompose";
+        case UC_EMACS:
+            return "Emacs";
+        default:
+            return "unknown";
+    }
+}
+#endif
+
 void tap_code16_nomods(uint8_t kc) {
     uint8_t temp_mod = get_mods();
     clear_mods();
@@ -66,7 +87,7 @@ bool process_record_glyph_replacement(uint16_t keycode, keyrecord_t *record, tra
             return false;
         } else if (KC_1 <= keycode && keycode <= KC_0) {
             if (is_shifted) { // skip shifted numbers, so that we can still use symbols etc.
-                return process_record_keymap(keycode, record);
+                return true;
             }
             if (record->event.pressed) {
                 tap_unicode_glyph(translator(is_shifted, keycode));
@@ -79,7 +100,7 @@ bool process_record_glyph_replacement(uint16_t keycode, keyrecord_t *record, tra
             return false;
         }
     }
-    return process_record_keymap(keycode, record);
+    return true;
 }
 
 DEFINE_UNICODE_RANGE_TRANSLATOR(unicode_range_translator_wide, 0xFF41, 0xFF21, 0xFF10, 0xFF11, 0x2003);
@@ -172,7 +193,7 @@ bool process_record_aussie(uint16_t keycode, keyrecord_t *record) {
         tap_code16_nomods(KC_LEFT);
         return false;
     }
-    return process_record_keymap(keycode, record);
+    return true;
 }
 
 bool process_record_zalgo(uint16_t keycode, keyrecord_t *record) {
@@ -189,7 +210,7 @@ bool process_record_zalgo(uint16_t keycode, keyrecord_t *record) {
             return false;
         }
     }
-    return process_record_keymap(keycode, record);
+    return true;
 }
 
 bool process_record_unicode(uint16_t keycode, keyrecord_t *record) {
@@ -212,8 +233,7 @@ bool process_record_unicode(uint16_t keycode, keyrecord_t *record) {
                 return false;
             }
         }
-    }
-    else if (typing_mode == MODE_AUSSIE) {
+    } else if (typing_mode == MODE_AUSSIE) {
         return process_record_aussie(keycode, record);
     } else if (typing_mode == MODE_ZALGO) {
         return process_record_zalgo(keycode, record);

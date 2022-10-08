@@ -39,6 +39,11 @@ typedef enum typing_mode_t {
 #undef XM
 } typing_mode_t;
 
+#ifdef UNICODE_ENABLE
+extern const char *unicode_mode_name(enum unicode_input_modes mode);
+#endif
+extern const char *typing_mode_name(typing_mode_t mode);
+
 extern bool          config_enabled;
 extern typing_mode_t typing_mode;
 

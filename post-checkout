@@ -14,5 +14,6 @@ if [ "$1" = "" -o "$1" != "$2" ] ; then
     make git-submodule
     which qmk
     qmk --update
+    /home/nickb/.local/.dot-tz/venv_qmk/bin/python3 -m pip install -r /home/nickb/qmk_build/qmk_firmware/requirements.txt
     make git-submodule
 fi

@@ -65,7 +65,7 @@ bool process_record_wow(uint16_t keycode, keyrecord_t* record) {
     } else {
         // Fallback to the normal key if not enabled
         if (!wow_key_enabled_get(keycode)) {
-            return process_record_keymap(keycode, record);
+            return true;
         }
 
         uint32_t now = timer_read32();

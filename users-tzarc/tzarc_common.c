@@ -38,6 +38,17 @@ bool get_tapping_force_hold(uint16_t keycode, keyrecord_t *record) {
     }
 }
 
+const char *typing_mode_name(typing_mode_t mode) {
+    switch (mode) {
+#define XM(mode, keycode, extra, name) \
+    case (mode):                       \
+        return name;
+        TYPING_MODE_LIST(XM)
+#undef XM
+    }
+    return "unknown";
+}
+
 uint8_t prng(void) {
     static uint8_t s = 0xAA, a = 0;
     s ^= s << 3;
@@ -157,13 +168,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     if (typing_mode == MODE_WOW) {
         if ((WOW_KEY_MIN <= keycode) && (keycode <= WOW_KEY_MAX)) {
-            if(!process_record_wow(keycode, record)) {
+            if (!process_record_wow(keycode, record)) {
                 return false;
             }
         }
     } else if (typing_mode == MODE_D3) {
         if (((KC_1 <= keycode) && (keycode <= KC_4)) || keycode == KC_ESCAPE || keycode == KC_GESC) {
-            if(!process_record_diablo3(keycode, record)) {
+            if (!process_record_diablo3(keycode, record)) {
                 return false;
             }
         }
