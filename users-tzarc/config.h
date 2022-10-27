@@ -27,18 +27,14 @@
 #define TAPPING_FORCE_HOLD_PER_KEY
 
 // Pre-define the amount of space to use for userspace EEPROM
-#define TZARC_EEPROM_ALLOCATION 32
+#define EECONFIG_USER_DATA_SIZE 32
+#define EECONFIG_USER_DATA_VERSION ((uint32_t)__TIME__[0] + (uint32_t)__TIME__[1] + (uint32_t)__TIME__[3] + (uint32_t)__TIME__[4] + (uint32_t)__TIME__[6] + (uint32_t)__TIME__[7]) // HH:MM::SS
 
 #if !defined(VIA_ENABLE)
 // Modify the RAW usage page and id
 #    define RAW_USAGE_PAGE 0xFF9C
 #    define RAW_USAGE_ID 0x02
 #endif
-
-// If we ever decide we're going to use VIA, then make sure we're not going to collide with any of the EEPROM settings for userspace.
-// Completely incompatible with the change in RAW usage page and ID.
-#define VIA_EEPROM_MAGIC_ADDR (EECONFIG_SIZE + TZARC_EEPROM_ALLOCATION + 1)
-#define DYNAMIC_KEYMAP_EEPROM_START (EECONFIG_SIZE + TZARC_EEPROM_ALLOCATION + 1)
 
 // Ensure transient EEPROM has enough space
 #ifdef EEPROM_TRANSIENT

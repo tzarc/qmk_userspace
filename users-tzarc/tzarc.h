@@ -73,25 +73,20 @@ layer_state_t layer_state_set_user(layer_state_t state);
 #define BITMASK_BIT_GET(array, n, first) (((array)[BITMASK_BYTE_INDEX((n), (first))] & (1 << BITMASK_BIT_INDEX((n), (first)))) ? 1 : 0)
 #define BITMASK_BIT_ASSIGN(array, value, n, first) (value ? BITMASK_BIT_SET((array), (n), (first)) : BITMASK_BIT_CLEAR((array), (n), (first)))
 
-#define TZARC_EEPROM_LOCATION ((uint8_t *)EECONFIG_SIZE)
-#define TZARC_EEPROM_MAGIC_SEED (uint8_t)((uint8_t)__TIME__[0] + (uint8_t)__TIME__[1] + (uint8_t)__TIME__[3] + (uint8_t)__TIME__[4] + (uint8_t)__TIME__[6] + (uint8_t)__TIME__[7]) // HH:MM::SS
-
 __attribute__((packed)) struct tzarc_eeprom_cfg_t {
-    uint8_t  magic1;
     uint8_t  wow_enabled[BITMASK_BYTES_REQUIRED(WOW_KEY_MAX, WOW_KEY_MIN)];
     uint16_t d3_delays[4]; // KC_1 ... KC_4
-    uint8_t  magic2;
 };
 
 extern struct tzarc_eeprom_cfg_t tzarc_eeprom_cfg;
 
-// Make sure if/when we ever use VIA we have a block of settings that still fits
-static_assert(sizeof(struct tzarc_eeprom_cfg_t) <= TZARC_EEPROM_ALLOCATION, "EEPROM settings greater than TZARC_EEPROM_ALLOCATION, need to change users/tzarc/config.h");
+// Make sure the data block we allocate actually matches the size of EEPROM used
+_Static_assert(sizeof(struct tzarc_eeprom_cfg_t) <= (EECONFIG_USER_DATA_SIZE), "sizeof(struct tzarc_eeprom_cfg_t) needs to be <= EECONFIG_USER_DATA_SIZE");
 
 void tzarc_eeprom_init(void);
 void tzarc_eeprom_reset(void);
-void tzarc_eeprom_save(void);
-void tzarc_eeprom_load(void);
+void tzarc_eeprom_mark_dirty(void);
+void tzarc_eeprom_task(void);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // WoW

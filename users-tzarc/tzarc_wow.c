@@ -10,8 +10,10 @@ bool wow_key_enabled_get(uint16_t keycode) {
     return BITMASK_BIT_GET(tzarc_eeprom_cfg.wow_enabled, keycode, WOW_KEY_MIN);
 }
 void wow_key_enabled_set(uint16_t keycode, bool on) {
-    BITMASK_BIT_ASSIGN(tzarc_eeprom_cfg.wow_enabled, on, keycode, WOW_KEY_MIN);
-    tzarc_eeprom_save();
+    if (wow_key_enabled_get(keycode) != on) {
+        BITMASK_BIT_ASSIGN(tzarc_eeprom_cfg.wow_enabled, on, keycode, WOW_KEY_MIN);
+        tzarc_eeprom_mark_dirty();
+    }
 }
 
 bool wow_key_keydown_get(uint16_t keycode) {

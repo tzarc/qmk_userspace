@@ -104,7 +104,6 @@ void keyboard_post_init_user(void) {
     tzarc_eeprom_init();
     tzarc_wow_init();
     tzarc_diablo3_init();
-    tzarc_eeprom_load();
     keyboard_post_init_keymap();
 }
 
@@ -208,4 +207,5 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 
 void housekeeping_task_user(void) {
     housekeeping_task_keymap();
+    tzarc_eeprom_task();
 }
