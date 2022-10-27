@@ -38,6 +38,7 @@
 // If we ever decide we're going to use VIA, then make sure we're not going to collide with any of the EEPROM settings for userspace.
 // Completely incompatible with the change in RAW usage page and ID.
 #define VIA_EEPROM_MAGIC_ADDR (EECONFIG_SIZE + TZARC_EEPROM_ALLOCATION + 1)
+#define DYNAMIC_KEYMAP_EEPROM_START (EECONFIG_SIZE + TZARC_EEPROM_ALLOCATION + 1)
 
 // Ensure transient EEPROM has enough space
 #ifdef EEPROM_TRANSIENT
