@@ -39,7 +39,7 @@ bool process_record_diablo3(uint16_t keycode, keyrecord_t *record) {
         // No-op, under normal circumstances.
         return false;
     } else {
-        if (keycode == KC_ESCAPE || keycode == KC_GESC) {
+        if (keycode == KC_ESCAPE || keycode == QK_GESC) {
             // If any executors are active, capture <ESC> and prevent it from functioning.
             // On release of <ESC>, disable all executors. Effectively skips the first <ESC>.
             bool any_active = false;

@@ -22,7 +22,7 @@
 
 #define TYPING_MODE_LIST(XM)                             \
     /* Text glyph replacement modes */                   \
-    XM(MODE_NORMAL, KC_ESC, case KC_GESC:, "normal")     \
+    XM(MODE_NORMAL, KC_ESC, case QK_GESC:, "normal")     \
     XM(MODE_WIDE, KC_1, /* dummy */, "wide")             \
     XM(MODE_SCRIPT, KC_2, /* dummy */, "calligraphy")    \
     XM(MODE_BLOCKS, KC_3, /* dummy */, "blocks")         \

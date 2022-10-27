@@ -41,6 +41,7 @@ BOARD_DEFS := \
 	one2mini!keymaps/one2mini!ducky/one2mini/1861st/keymaps/tzarc!tzarc \
 	sat75!keymaps/sat75!cannonkeys/satisfaction75/rev1/keymaps/tzarc!tzarc \
 	\
+	disco_f723!alternates/disco_f723!handwired/onekey/disco_f723!reset \
 	onekey_h743!alternates/nucleo144_h743zi!handwired/onekey/nucleo144_h743zi!reset \
 	onekey_l152!alternates/nucleo64_l152re!handwired/onekey/nucleo64_l152re!reset \
 	onekey_g431!alternates/nucleo64_g431rb!handwired/onekey/nucleo64_g431rb!reset \

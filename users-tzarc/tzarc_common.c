@@ -173,7 +173,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
         }
     } else if (typing_mode == MODE_D3) {
-        if (((KC_1 <= keycode) && (keycode <= KC_4)) || keycode == KC_ESCAPE || keycode == KC_GESC) {
+        if (((KC_1 <= keycode) && (keycode <= KC_4)) || keycode == KC_ESCAPE || keycode == QK_GESC) {
             if (!process_record_diablo3(keycode, record)) {
                 return false;
             }

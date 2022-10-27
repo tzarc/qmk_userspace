@@ -56,6 +56,14 @@
       "name": "xap-qmk"
     },
     {
+      "path": "qmk_firmware/.build/obj_kprepublic_bm16s/src",
+      "name": "xap-generated-kprepublic-bm16s"
+    },
+    {
+      "path": "qmk_firmware/.build/obj_kprepublic_bm16s_tzarc/src",
+      "name": "xap-generated-kprepublic-bm16s_tzarc"
+    },
+    {
       "path": "qmk_firmware/.build/obj_tzarc_ghoul_rev1_rp2040/src",
       "name": "xap-generated-ghoul-rev1-rp2040"
     },
@@ -75,7 +83,9 @@
       "qp.h": "c",
       "compare": "c",
       "keychron_common.h": "c",
-      "i2c_master.h": "c"
+      "i2c_master.h": "c",
+      "usb_util.h": "c",
+      "board.h": "c"
     },
   }
 }
