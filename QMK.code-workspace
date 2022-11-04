@@ -73,6 +73,7 @@
     }
   ],
   "settings": {
+    "python.defaultInterpreterPath":"/home/nickb/.local/venv_qmk/bin/python3",
     "git.ignoreLimitWarning": true,
     "files.associations": {
       "deferred_exec.h": "c",
@@ -85,7 +86,10 @@
       "keychron_common.h": "c",
       "i2c_master.h": "c",
       "usb_util.h": "c",
-      "board.h": "c"
+      "board.h": "c",
+      "typeinfo": "c",
+      "thintel15.qff.h": "c",
+      "proggytiny.qff.h": "c"
     },
   }
 }

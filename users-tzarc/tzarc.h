@@ -94,6 +94,7 @@ void tzarc_eeprom_task(void);
 #define WOW_KEY_OFFSET(kc) ((kc) - (WOW_KEY_MIN))
 #define WOW_BUTTON_COUNT (WOW_KEY_OFFSET(WOW_KEY_MAX) + 1)
 
+#ifdef GAME_MODES_ENABLE
 struct wow_config_t {
     uint8_t  keydown[BITMASK_BYTES_REQUIRED(WOW_KEY_MAX, WOW_KEY_MIN)];
     uint8_t  released[BITMASK_BYTES_REQUIRED(WOW_KEY_MAX, WOW_KEY_MIN)];
@@ -107,10 +108,12 @@ extern struct wow_config_t wow_config;
 void tzarc_wow_init(void);
 bool process_record_wow(uint16_t keycode, keyrecord_t *record);
 void matrix_scan_wow(void);
+#endif // GAME_MODES_ENABLE
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Diablo III
 
+#ifdef GAME_MODES_ENABLE
 struct diablo3_config_t {
     uint8_t keys_activated[1]; // 4 bits required for KC_1 ... KC_4
 };
@@ -121,3 +124,4 @@ void tzarc_diablo3_init(void);
 bool process_record_diablo3(uint16_t keycode, keyrecord_t *record);
 void matrix_scan_diablo3(void);
 void disable_automatic_diablo3(void);
+#endif // GAME_MODES_ENABLE

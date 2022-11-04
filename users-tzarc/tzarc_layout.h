@@ -172,7 +172,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 // Adjust layer
 //                                               ┌─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────┐
 //                                               | Esc         | 1           | 2           | 3           | 4           | 5           |
-#define ____________TZARC_6x4_ADJUST_R1_L________ _______,      KC_CLCK,      KC_NLCK,      KC_SLCK,      _______,      _______
+#define ____________TZARC_6x4_ADJUST_R1_L________ _______,      KC_CAPS,      KC_NUM,       KC_SCRL,      _______,      _______
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | Tab         | Q           | W           | E           | R           | T           |
 #define ____________TZARC_6x4_ADJUST_R2_L________ KC_MUTE,      KC_VOLU,      KC_MSTP,      KC_MPLY,      KC_MPRV,      KC_MNXT
@@ -288,7 +288,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 // Nav cluster:
 //                                               ┌────────────┬────────────┬────────────┐
 //                                               | PrintScr   | ScrlLock   | PauseBrk   |
-#define ____________TZARC_BASE_R1_NAV____________ KC_PSCR,     KC_SLCK,     KC_PAUS
+#define ____________TZARC_BASE_R1_NAV____________ KC_PSCR,     KC_SCRL,     KC_PAUS
 //                                               └────────────┴────────────┴────────────┘
 //                                               ┌────────────┬────────────┬────────────┐
 //                                               | Insert     | Home       | PageUp     |

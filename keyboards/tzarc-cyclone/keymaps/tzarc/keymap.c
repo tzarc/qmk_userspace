@@ -12,11 +12,11 @@ const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_GRAVE,  KC_1,    KC_2,    KC_3,      KC_4,    KC_5,    KC_6,    KC_7,
         KC_TAB,    KC_Q,    KC_W,    KC_E,      KC_R,    KC_T,    KC_Y,
         KC_CAPS,   KC_A,    KC_S,    KC_D,      KC_F,    KC_G,    KC_H,       RGB_VAI,
-        KC_LSHIFT, KC_Z,    KC_X,    KC_C,      KC_V,    KC_B,            RGB_HUI, RGB_MOD,
-        KC_LCTRL,  KC_LGUI, KC_LALT,       KC_SPACE,          MO(1),          RGB_VAD
+        KC_LSFT,   KC_Z,    KC_X,    KC_C,      KC_V,    KC_B,            RGB_HUI, RGB_MOD,
+        KC_LCTL,   KC_LGUI, KC_LALT,       KC_SPACE,          MO(1),          RGB_VAD
     ),
     [1] = LAYOUT_cyclone(\
-        RGB_TOG,   RGB_MOD, KC_NO,   KC_NO,     KC_NO,   DEBUG,   RESET,   EEP_RST,
+        RGB_TOG,   RGB_MOD, KC_NO,   KC_NO,     KC_NO,   DB_TOGG, TIME_EEPRST, TIME_RESET,
         RGB_HUI,   RGB_HUD, RGB_SAI, RGB_SAD,   RGB_VAI, RGB_VAD, RGB_SPI, RGB_SPD,
         KC_NO,              KC_NO,   KC_NO,     KC_NO,   KC_NO,            KC_NO,
         KC_NO,     KC_NO,   KC_NO,   KC_NO,     KC_NO,   KC_NO,   KC_NO,   KC_NO,

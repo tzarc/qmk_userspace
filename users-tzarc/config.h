@@ -9,7 +9,7 @@
 #define LAYER_STATE_8BIT
 
 // Unicode modes available for use
-#define UNICODE_SELECTED_MODES UC_MAC, UC_LNX, UC_WINC
+#define UNICODE_SELECTED_MODES UNICODE_MODE_MACOS, UNICODE_MODE_LINUX, UNICODE_MODE_WINCOMPOSE
 
 // Handle per-key tapping timing
 #ifdef TAPPING_TERM

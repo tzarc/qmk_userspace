@@ -5,8 +5,6 @@ SRC += \
 	tzarc_keynames.c \
 	tzarc_eeprom.c \
 	tzarc_unicode.c \
-	tzarc_wow.c \
-	tzarc_diablo3.c \
 	tzarc_screen.c
 
 TOP_SYMBOLS = yes

@@ -80,15 +80,17 @@ void tzarc_common_init(void) {
 
 void eeconfig_init_user(void) {
 #ifdef UNICODE_ENABLE
-    set_unicode_input_mode(UC_WINC);
+    set_unicode_input_mode(UNICODE_MODE_WINCOMPOSE);
 #endif
     tzarc_eeprom_reset();
     eeconfig_init_keymap();
 }
 
-int8_t tzarc_sendchar(uint8_t c) {
-    // TBD: hook
+__attribute__((weak)) void tzarc_sendchar_hook(uint8_t c) {}
 
+int8_t tzarc_sendchar(uint8_t c) {
+    // Forward to any sort of UI, if needed.
+    tzarc_sendchar_hook(c);
     // This sends it through to console output by default.
     extern int8_t sendchar(uint8_t c);
     return sendchar(c);
@@ -102,8 +104,10 @@ void keyboard_pre_init_user(void) {
 void keyboard_post_init_user(void) {
     tzarc_common_init();
     tzarc_eeprom_init();
+#ifdef GAME_MODES_ENABLE
     tzarc_wow_init();
     tzarc_diablo3_init();
+#endif // GAME_MODES_ENABLE
     keyboard_post_init_keymap();
 }
 
@@ -165,6 +169,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
 #endif // UNICODE_ENABLE
 
+#ifdef GAME_MODES_ENABLE
     if (typing_mode == MODE_WOW) {
         if ((WOW_KEY_MIN <= keycode) && (keycode <= WOW_KEY_MAX)) {
             if (!process_record_wow(keycode, record)) {
@@ -178,16 +183,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
         }
     }
+#endif // GAME_MODES_ENABLE
 
     return process_record_keymap(keycode, record);
 }
 
 void matrix_scan_user(void) {
+#ifdef GAME_MODES_ENABLE
     if (typing_mode == MODE_WOW) {
         matrix_scan_wow();
     } else if (typing_mode == MODE_D3) {
         matrix_scan_diablo3();
     }
+#endif // GAME_MODES_ENABLE
 
     matrix_scan_keymap();
 }

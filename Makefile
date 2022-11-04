@@ -8,6 +8,8 @@ export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10.3-2021.10/bin:$(PATH)
 #export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH)
 #export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$(PATH)
 #export PATH := /usr/lib/ccache:$(PATH)
+export PATH := /home/nickb/qmk-stuff/qmk_toolchains/arm/bin:$(PATH)
+export PATH := /home/nickb/qmk-stuff/qmk_toolchains/avr/bin:$(PATH)
 
 # Add qmk wrapper to path
 export PATH := $(ROOTDIR)/bin:$(PATH)
@@ -67,6 +69,7 @@ BOARD_DEFS := \
 EXTRA_LINK_DEFS := \
 	layouts/layout-tkl_ansi!layouts/community/tkl_ansi/tzarc \
 	layouts/layout-60_ansi!layouts/community/60_ansi/tzarc \
+	layouts/layout-ortho_4x4!layouts/community/ortho_4x4/tzarc \
 	users-tzarc!users/tzarc
 
 all-arm:
@@ -103,14 +106,6 @@ format: format_prereq
 		if [ -f "$$file" ] ; then \
 			echo -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
 			clang-format -i "$$file" >/dev/null 2>&1 || true ; \
-			ex -s +"bufdo wq" "$$file" >/dev/null 2>&1 || true ; \
-			dos2unix "$$file" >/dev/null 2>&1 ; \
-			chmod -x "$$file" >/dev/null 2>&1 ; \
-		fi ; \
-	done
-	@for file in $$({ find $(ROOTDIR)/qmk_firmware/keyboards/tzarc \( -iname '*.mk' -or -iname 'Makefile*' \) ; git ls-files | grep -P '^(Makefile.*|.*\.mk)$$' ; } | sort | uniq) ; do \
-		if [ -f "$$file" ] ; then \
-			echo -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
 			ex -s +"bufdo wq" "$$file" >/dev/null 2>&1 || true ; \
 			dos2unix "$$file" >/dev/null 2>&1 ; \
 			chmod -x "$$file" >/dev/null 2>&1 ; \

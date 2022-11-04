@@ -21,7 +21,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                      KC_LGUI, KC_LOWER,  KC_SPC,  CHANGEMODE,                       CHANGEMODE,  KC_SPC,  KC_RAISE,  KC_LALT,
                                                            TZ_ENC1P,          TZ_ENC2P,
                                 KC_UP,                                                                 KC_UP,
-                       KC_LEFT, KC_NLCK, KC_RIGHT,                                            KC_LEFT, KC_NLCK, KC_RIGHT,
+                       KC_LEFT, KC_NUM,  KC_RIGHT,                                            KC_LEFT, KC_NUM,  KC_RIGHT,
                                 KC_DOWN,                                                               KC_DOWN
     ),
     [LAYER_LOWER] = LAYOUT_all_wrapper(

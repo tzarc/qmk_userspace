@@ -6,15 +6,13 @@
 
 #include "tzarc.h"
 
-// #define TZARC_EEPROM_DEBUGGING
-
-struct tzarc_eeprom_cfg_t tzarc_eeprom_cfg;
-EECONFIG_DEBOUNCE_HELPER(tzarc_eeprom, EECONFIG_USER_DATABLOCK, tzarc_eeprom_cfg);
+#define TZARC_EEPROM_DEBUGGING
 
 #ifdef TZARC_EEPROM_DEBUGGING
 static inline void dump_config(const char *name, struct tzarc_eeprom_cfg_t *cfg) {
     dprintf("config %s:\n", name);
     uint8_t *p = (uint8_t *)cfg;
+    (void)p;
     for (int i = 0; i < sizeof(struct tzarc_eeprom_cfg_t); ++i) {
         if (i % 8 == 0) {
             dprint("| ");
@@ -24,6 +22,19 @@ static inline void dump_config(const char *name, struct tzarc_eeprom_cfg_t *cfg)
     dprint("|\n");
 }
 #endif
+
+struct tzarc_eeprom_cfg_t tzarc_eeprom_cfg;
+EECONFIG_DEBOUNCE_HELPER_CHECKED(tzarc_eeprom, EECONFIG_USER_DATABLOCK, tzarc_eeprom_cfg);
+bool eeconfig_check_valid_tzarc_eeprom(void) {
+    return eeprom_read_dword(EECONFIG_USER) == (EECONFIG_USER_DATA_VERSION);
+}
+void eeconfig_post_flush_tzarc_eeprom(void) {
+    eeprom_update_dword(EECONFIG_USER, (EECONFIG_USER_DATA_VERSION));
+
+#ifdef TZARC_EEPROM_DEBUGGING
+    dump_config("flush", &tzarc_eeprom_cfg);
+#endif
+}
 
 void tzarc_eeprom_init(void) {
     eeconfig_init_tzarc_eeprom();
@@ -35,7 +46,7 @@ void tzarc_eeprom_init(void) {
 
 void tzarc_eeprom_reset(void) {
     memset(&tzarc_eeprom_cfg, 0, sizeof(tzarc_eeprom_cfg));
-    eeconfig_flag_tzarc_eeprom(true);
+    eeconfig_flush_tzarc_eeprom(true);
 
 #ifdef TZARC_EEPROM_DEBUGGING
     dump_config("reset", &tzarc_eeprom_cfg);
@@ -44,6 +55,10 @@ void tzarc_eeprom_reset(void) {
 
 void tzarc_eeprom_mark_dirty(void) {
     eeconfig_flag_tzarc_eeprom(true);
+
+#ifdef TZARC_EEPROM_DEBUGGING
+    dump_config("dirty", &tzarc_eeprom_cfg);
+#endif
 }
 
 void tzarc_eeprom_task(void) {

@@ -51,6 +51,19 @@ $(GENERATED_OUTPUT)/avqest20.qff.h: $(GENERATED_OUTPUT)/avqest20.png
 	$(QMK_BIN) painter-convert-font-image --input $(GENERATED_OUTPUT)/avqest20.png -f mono4 # --no-ascii --unicode-glyphs "0123456789.OfRep"
 
 ################################################################################################################################################################
+# Fixed-width fonts
+
+generated-files: $(GENERATED_OUTPUT)/proggytiny.qff.h
+
+$(GENERATED_OUTPUT)/proggytiny.png: $(USER_PATH)/Makefile $(USER_PATH)/ProggyTiny.ttf
+	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
+	$(QMK_BIN) painter-make-font-image --font $(USER_PATH)/ProggyTiny.ttf --size 13 -o $(GENERATED_OUTPUT)/proggytiny.png
+
+$(GENERATED_OUTPUT)/proggytiny.qff.h: $(GENERATED_OUTPUT)/proggytiny.png
+	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
+	$(QMK_BIN) painter-convert-font-image --input $(GENERATED_OUTPUT)/proggytiny.png -f mono4
+
+################################################################################################################################################################
 # Fonts
 
 generated-files: $(GENERATED_OUTPUT)/balthasar.qff.h

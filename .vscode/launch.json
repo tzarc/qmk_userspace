@@ -25,6 +25,32 @@
       ]
     },
     {
+      "name": "Python: json2c, Ghoul/RP2040",
+      "type": "python",
+      "cwd": "${workspaceRoot}",
+      "request": "launch",
+      "args": [
+        "json2c",
+        "ghoul-stm32-encodermap.json",
+        "-o",
+        "-"
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+        },
+        "program": "/home/nickb/.local/venv_qmk/bin/qmk"
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
       "name": "Python: generate-keyboard-c, Ghoul/RP2040",
       "type": "python",
       "cwd": "${workspaceRoot}/qmk_firmware",
@@ -39,9 +65,9 @@
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/qmk_venv/bin/python3"
+          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
         },
-        "program": "/home/nickb/.local/qmk_venv/bin/qmk"
+        "program": "/home/nickb/.local/venv_qmk/bin/qmk"
       },
       "windows": {
         "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",

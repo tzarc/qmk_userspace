@@ -6,8 +6,10 @@
 #include "avqest12.qff.c"
 #include "avqest20.qff.c"
 #include "thintel15.qff.h"
+#include "proggytiny.qff.c"
 
 static painter_font_handle_t thintel;
+static painter_font_handle_t proggytiny;
 
 void draw_screen_diablo3(bool force_redraw) {
     uint16_t display_width;
@@ -56,6 +58,43 @@ void draw_screen_diablo3(bool force_redraw) {
     }
 }
 
+#define NUM_LOG_LINES 10
+#define MAX_LOG_LINE 43
+
+static bool    needs_redraw  = false;
+static uint8_t log_write_idx = 0;
+static char    loglines[NUM_LOG_LINES][MAX_LOG_LINE + 2];
+static char   *logline_ptrs[NUM_LOG_LINES];
+
+void tzarc_sendchar_hook(uint8_t c) {
+    static bool first_setup = false;
+    if (!first_setup) {
+        memset(loglines, 0, sizeof(loglines));
+        for (int i = 0; i < NUM_LOG_LINES; ++i) {
+            logline_ptrs[i] = loglines[i];
+        }
+        first_setup = true;
+    }
+
+    if (c == '\n') {
+        logline_ptrs[NUM_LOG_LINES - 1][log_write_idx] = 0;
+        char *tmp                                      = logline_ptrs[0];
+        for (int i = 0; i < NUM_LOG_LINES - 1; ++i) {
+            logline_ptrs[i] = logline_ptrs[i + 1];
+        }
+        logline_ptrs[NUM_LOG_LINES - 1]    = tmp;
+        log_write_idx                      = 0;
+        logline_ptrs[NUM_LOG_LINES - 1][0] = 0;
+        needs_redraw                       = true;
+    } else if (log_write_idx >= (MAX_LOG_LINE)) {
+        // Ignore.
+    } else {
+        logline_ptrs[NUM_LOG_LINES - 1][log_write_idx++] = c;
+        logline_ptrs[NUM_LOG_LINES - 1][log_write_idx]   = 0;
+        needs_redraw                                     = true;
+    }
+}
+
 void draw_screen(bool force_redraw) {
     uint16_t display_width;
     uint16_t display_height;
@@ -63,6 +102,9 @@ void draw_screen(bool force_redraw) {
 
     if (!thintel) {
         thintel = qp_load_font_mem(font_thintel15);
+    }
+    if (!proggytiny) {
+        proggytiny = qp_load_font_mem(font_proggytiny);
     }
 
     // Redraw a black screen if we've changed typing mode
@@ -94,8 +136,6 @@ void draw_screen(bool force_redraw) {
         static uint16_t last_hue = 0xFFFF;
         uint16_t        curr_hue = rgb_matrix_get_hue();
         if (last_hue != curr_hue || force_redraw || redraw_mode) {
-            last_hue = curr_hue;
-
             static int max_mode_w = 0;
             snprintf(buf, sizeof(buf), "mode: %s", typing_mode_name(typing_mode));
 
@@ -112,7 +152,7 @@ void draw_screen(bool force_redraw) {
 
         static uint8_t last_unicode_mode = 0xFF;
         uint8_t        curr_unicode_mode = get_unicode_input_mode();
-        if (last_unicode_mode != curr_unicode_mode || force_redraw) {
+        if (last_hue != curr_hue || last_unicode_mode != curr_unicode_mode || force_redraw) {
             last_unicode_mode = curr_unicode_mode;
 
             static int max_unicode_w = 0;
@@ -126,5 +166,22 @@ void draw_screen(bool force_redraw) {
             qp_drawtext_recolor(display_panel, display_width - 16 - w, ypos, thintel, buf, curr_hue, 255, 255, curr_hue, 255, 0);
             qp_rect(display_panel, display_width - 1 - 16 - w, ypos, display_width - 1 - 16 - max_unicode_w - 1, ypos + thintel->line_height, 0, 0, 0, true);
         }
+
+        static uint32_t last_log_redraw = 0;
+        if (last_hue != curr_hue || force_redraw || (needs_redraw && timer_elapsed32(last_log_redraw) > 50)) {
+            static int16_t max_line_width = 0;
+            for (int i = 0; i < NUM_LOG_LINES - 1; ++i) {
+                int16_t line_width = qp_drawtext_recolor(display_panel, 12, display_height - (NUM_LOG_LINES - i - 1) * proggytiny->line_height, proggytiny, logline_ptrs[i], curr_hue, 255, 255, curr_hue, 255, 0);
+                if (max_line_width <= line_width) {
+                    max_line_width = line_width;
+                } else {
+                    qp_rect(display_panel, 12 + line_width, display_height - (NUM_LOG_LINES - i - 1) * proggytiny->line_height, 12 + max_line_width, display_height - (NUM_LOG_LINES - i - 2) * proggytiny->line_height, 0, 0, 0, true);
+                }
+            }
+            last_log_redraw = timer_read32();
+            needs_redraw    = false;
+        }
+
+        last_hue = curr_hue;
     }
 }

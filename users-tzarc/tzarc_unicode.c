@@ -11,17 +11,17 @@ void register_unicode(uint32_t hex);
 #ifdef UNICODE_ENABLE
 const char *unicode_mode_name(enum unicode_input_modes mode) {
     switch (mode) {
-        case UC_MAC:
+        case UNICODE_MODE_MACOS:
             return "macOS";
-        case UC_LNX:
+        case UNICODE_MODE_LINUX:
             return "Linux";
-        case UC_WIN:
+        case UNICODE_MODE_WINDOWS:
             return "Windows";
-        case UC_BSD:
+        case UNICODE_MODE_BSD:
             return "BSD";
-        case UC_WINC:
+        case UNICODE_MODE_WINCOMPOSE:
             return "WinCompose";
-        case UC_EMACS:
+        case UNICODE_MODE_EMACS:
             return "Emacs";
         default:
             return "unknown";
@@ -171,9 +171,9 @@ bool process_record_aussie(uint16_t keycode, keyrecord_t *record) {
         tap_code16_nomods(KC_HOME);
         return false;
     } else if (record->event.pressed && keycode == KC_BSPC) {
-        tap_code16_nomods(KC_DELT);
+        tap_code16_nomods(KC_DEL);
         return false;
-    } else if (record->event.pressed && keycode == KC_DELT) {
+    } else if (record->event.pressed && keycode == KC_DEL) {
         tap_code16_nomods(KC_BSPC);
         return false;
     } else if (record->event.pressed && keycode == KC_QUOT) {

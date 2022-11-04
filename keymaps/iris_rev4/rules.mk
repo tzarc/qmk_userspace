@@ -8,3 +8,5 @@ LTO_ENABLE = yes
 OPT = s
 
 CONSOLE_ENABLE = yes
+
+GAME_MODES_ENABLE = no
