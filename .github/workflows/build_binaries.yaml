@@ -14,7 +14,7 @@ jobs:
     if: github.repository == 'tzarc/qmk_build'
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
@@ -50,7 +50,7 @@ jobs:
         make nick
 
     - name: 'Upload binaries'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Artifacts
         path: |
