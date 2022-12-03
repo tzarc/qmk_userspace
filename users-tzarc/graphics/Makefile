@@ -63,6 +63,16 @@ $(GENERATED_OUTPUT)/proggytiny.qff.h: $(GENERATED_OUTPUT)/proggytiny.png
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
 	$(QMK_BIN) painter-convert-font-image --input $(GENERATED_OUTPUT)/proggytiny.png -f mono4
 
+generated-files: $(GENERATED_OUTPUT)/everex_5x8.qff.h
+
+$(GENERATED_OUTPUT)/everex_5x8.png: $(USER_PATH)/Makefile $(USER_PATH)/Px437_EverexME_5x8.ttf
+	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
+	$(QMK_BIN) painter-make-font-image --font $(USER_PATH)/Px437_EverexME_5x8.ttf --size 8 -o $(GENERATED_OUTPUT)/everex_5x8.png
+
+$(GENERATED_OUTPUT)/everex_5x8.qff.h: $(GENERATED_OUTPUT)/everex_5x8.png
+	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
+	$(QMK_BIN) painter-convert-font-image --input $(GENERATED_OUTPUT)/everex_5x8.png -f mono4
+
 ################################################################################################################################################################
 # Fonts
 

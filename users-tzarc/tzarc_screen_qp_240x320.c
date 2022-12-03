@@ -6,10 +6,10 @@
 #include "avqest12.qff.c"
 #include "avqest20.qff.c"
 #include "thintel15.qff.h"
-#include "proggytiny.qff.c"
+#include "everex_5x8.qff.c"
 
 static painter_font_handle_t thintel;
-static painter_font_handle_t proggytiny;
+static painter_font_handle_t everex_5x8;
 
 void draw_screen_diablo3(bool force_redraw) {
     uint16_t display_width;
@@ -103,8 +103,8 @@ void draw_screen(bool force_redraw) {
     if (!thintel) {
         thintel = qp_load_font_mem(font_thintel15);
     }
-    if (!proggytiny) {
-        proggytiny = qp_load_font_mem(font_proggytiny);
+    if (!everex_5x8) {
+        everex_5x8 = qp_load_font_mem(font_everex_5x8);
     }
 
     // Redraw a black screen if we've changed typing mode
@@ -171,11 +171,11 @@ void draw_screen(bool force_redraw) {
         if (last_hue != curr_hue || force_redraw || (needs_redraw && timer_elapsed32(last_log_redraw) > 50)) {
             static int16_t max_line_width = 0;
             for (int i = 0; i < NUM_LOG_LINES - 1; ++i) {
-                int16_t line_width = qp_drawtext_recolor(display_panel, 12, display_height - (NUM_LOG_LINES - i - 1) * proggytiny->line_height, proggytiny, logline_ptrs[i], curr_hue, 255, 255, curr_hue, 255, 0);
+                int16_t line_width = qp_drawtext_recolor(display_panel, 12, display_height - (NUM_LOG_LINES - i - 1) * everex_5x8->line_height, everex_5x8, logline_ptrs[i], curr_hue, 255, 255, curr_hue, 255, 0);
                 if (max_line_width <= line_width) {
                     max_line_width = line_width;
                 } else {
-                    qp_rect(display_panel, 12 + line_width, display_height - (NUM_LOG_LINES - i - 1) * proggytiny->line_height, 12 + max_line_width, display_height - (NUM_LOG_LINES - i - 2) * proggytiny->line_height, 0, 0, 0, true);
+                    qp_rect(display_panel, 12 + line_width, display_height - (NUM_LOG_LINES - i - 1) * everex_5x8->line_height, 12 + max_line_width, display_height - (NUM_LOG_LINES - i - 2) * everex_5x8->line_height, 0, 0, 0, true);
                 }
             }
             last_log_redraw = timer_read32();
