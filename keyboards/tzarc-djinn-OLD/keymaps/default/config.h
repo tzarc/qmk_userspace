@@ -1,5 +1,5 @@
 // Copyright 2018-2022 Nick Brassel (@tzarc)
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
 // Uncomment the following if your board uses 1.5A and 3.0A hold current fuses.

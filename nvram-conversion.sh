@@ -1,6 +1,6 @@
 #!/bin/bash
 # Copyright 2018-2022 Nick Brassel (@tzarc)
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 umask 022
 
@@ -87,7 +87,7 @@ do_stuff() {
 
     cat <<__EOF__ >>platforms/nvram.h
 // Copyright 2018-2022 Nick Brassel (@tzarc)
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
 void nvram_read_block(uint32_t addr, void *buf, size_t len);
@@ -108,7 +108,7 @@ __EOF__
 
     cat <<__EOF__ >>platforms/nvram.c
 // Copyright 2018-2022 Nick Brassel (@tzarc)
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "eeprom.h"
 

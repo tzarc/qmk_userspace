@@ -1,5 +1,5 @@
 // Copyright 2018-2022 Nick Brassel (@tzarc)
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 void housekeeping_task_kb(void) {
     // Go into low-scan interrupt-based mode if we haven't had any matrix activity in the last 5 seconds

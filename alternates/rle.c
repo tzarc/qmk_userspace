@@ -1,5 +1,5 @@
 // Copyright 2018-2022 Nick Brassel (@tzarc)
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: GPL-2.0-or-later
 #include "rle.h"
 
 bool rle_decode(stream_t *in_stream, stream_t *out_stream) {

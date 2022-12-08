@@ -1,6 +1,6 @@
 #!/bin/bash
 # Copyright 2018-2022 Nick Brassel (@tzarc)
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 docker build -t qmk_develop_build_runner:latest .
 

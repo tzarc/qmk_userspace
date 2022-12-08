@@ -1,5 +1,5 @@
 // Copyright 2018-2022 Nick Brassel (@tzarc)
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: GPL-2.0-or-later
 #include <qp.h>
 #include "tzarc.h"
 #include "diablo3.qgf.c"
