@@ -134,12 +134,12 @@
       "device": "STM32F405",
       "linux": {
         "BMPGDBSerialPort": "/dev/ttyACM0",
-        "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_tzarc_ghoul_rev1_stm32_default.elf",
+        "executable": "${workspaceRoot}/qmk_firmware/.build/tzarc_ghoul_rev1_stm32_tzarc.elf",
         "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
       },
       "windows": {
-        "BMPGDBSerialPort": "COM6",
-        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_ghoul_rev1_stm32_default.elf",
+        "BMPGDBSerialPort": "COM4",
+        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\tzarc_ghoul_rev1_stm32_tzarc.elf",
         "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
       },
       "showDevDebugOutput": "parsed",

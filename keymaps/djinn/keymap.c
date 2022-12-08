@@ -4,9 +4,9 @@
 #include "theme_djinn_default.h"
 #include "tzarc.h"
 #include "qp.h"
-//#include "qp_rgb565_surface.h"
-//#include "qp_lvgl.h"
-//#include "ui.h"
+// #include "qp_rgb565_surface.h"
+// #include "qp_lvgl.h"
+// #include "ui.h"
 
 //----------------------------------------------------------
 // Key map

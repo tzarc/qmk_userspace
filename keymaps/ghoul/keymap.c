@@ -62,6 +62,11 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
 };
 
 void keyboard_post_init_keymap(void) {
+    // debug_enable   = true;
+    // debug_matrix   = true;
+    // debug_keyboard = true;
+    // debug_mouse    = true;
+
     // Init the display
     ui_init();
 }

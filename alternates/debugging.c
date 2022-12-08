@@ -28,8 +28,8 @@ typedef enum {
 static uint16_t debug_buffer_location = 0;
 static char     debug_buffer[512]     = {0};
 static void     append_debug_char(char c) {
-        debug_buffer[debug_buffer_location] = c;
-        debug_buffer_location               = (debug_buffer_location + 1) % sizeof(debug_buffer);
+    debug_buffer[debug_buffer_location] = c;
+    debug_buffer_location               = (debug_buffer_location + 1) % sizeof(debug_buffer);
 }
 
 static void exception_dump(char *s) {

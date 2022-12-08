@@ -4,7 +4,7 @@
 
 #include "config_common.h"
 
-//#define EARLY_INIT_PERFORM_BOOTLOADER_JUMP TRUE
+// #define EARLY_INIT_PERFORM_BOOTLOADER_JUMP TRUE
 
 #define MATRIX_ROW_PINS \
     { B5 }

@@ -21,7 +21,7 @@
 /* key matrix size */
 #define MATRIX_ROWS 8
 #define MATRIX_COLS 8
-//#define DIODE_DIRECTION CUSTOM_MATRIX
+// #define DIODE_DIRECTION CUSTOM_MATRIX
 
 /* Bootmagic lite definitions */
 #define BOOTMAGIC_LITE_ROW 2
@@ -128,17 +128,17 @@
  */
 
 /* disable debug print */
-//#define NO_DEBUG
+// #define NO_DEBUG
 
 /* disable print */
-//#define NO_PRINT
+// #define NO_PRINT
 
 /* disable action features */
-//#define NO_ACTION_LAYER
-//#define NO_ACTION_TAPPING
-//#define NO_ACTION_ONESHOT
-//#define NO_ACTION_MACRO
-//#define NO_ACTION_FUNCTION
+// #define NO_ACTION_LAYER
+// #define NO_ACTION_TAPPING
+// #define NO_ACTION_ONESHOT
+// #define NO_ACTION_MACRO
+// #define NO_ACTION_FUNCTION
 
 /* ChibiOS hooks to reroute errors to QMK toolbox */
 #define chDbgCheck(c)                                                                                   \

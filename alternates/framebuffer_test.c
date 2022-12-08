@@ -1,7 +1,7 @@
 // Copyright 2018-2022 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-//#define TEST_FRAMEBUFFER
+// #define TEST_FRAMEBUFFER
 #ifdef TEST_FRAMEBUFFER
 #    include "thintel15.qff.h"
 #    define FRAMEBUFFER_W 240

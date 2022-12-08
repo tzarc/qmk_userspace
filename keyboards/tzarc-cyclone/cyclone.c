@@ -193,15 +193,15 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 
 uint8_t last_led_usb_state = 0xFF;
 void    oled_task_user(void) {
-       // Host Keyboard LED Status
+    // Host Keyboard LED Status
     uint8_t led_usb_state = host_keyboard_leds();
     if (last_led_usb_state != led_usb_state) {
-           last_led_usb_state = led_usb_state;
-           oled_write_ln_P(led_usb_state & (1 << USB_LED_NUM_LOCK) ? PSTR("NUM  ") : PSTR("     "), false);
-           oled_advance_page(true);
-           oled_write_ln_P(led_usb_state & (1 << USB_LED_CAPS_LOCK) ? PSTR("CAP  ") : PSTR("     "), false);
-           oled_advance_page(true);
-           oled_write_ln_P(led_usb_state & (1 << USB_LED_SCROLL_LOCK) ? PSTR("SCR  ") : PSTR("     "), false);
+        last_led_usb_state = led_usb_state;
+        oled_write_ln_P(led_usb_state & (1 << USB_LED_NUM_LOCK) ? PSTR("NUM  ") : PSTR("     "), false);
+        oled_advance_page(true);
+        oled_write_ln_P(led_usb_state & (1 << USB_LED_CAPS_LOCK) ? PSTR("CAP  ") : PSTR("     "), false);
+        oled_advance_page(true);
+        oled_write_ln_P(led_usb_state & (1 << USB_LED_SCROLL_LOCK) ? PSTR("SCR  ") : PSTR("     "), false);
     }
 }
 #endif // defined(OLED_DRIVER_ENABLE) && !defined(QUANTUM_PAINTER_ENABLE)
@@ -209,14 +209,14 @@ void    oled_task_user(void) {
 #ifdef QWIIC_MICRO_OLED_ENABLE
 uint8_t last_led_usb_state = 0xFF;
 void    draw_ui(void) {
-       uint8_t led_usb_state = host_keyboard_leds();
-       if (last_led_usb_state != led_usb_state) {
-           last_led_usb_state = led_usb_state;
-           draw_string(2, 2, led_usb_state & (1 << USB_LED_NUM_LOCK) ? PSTR("NUM  ") : PSTR("     "), PIXEL_ON, NORM, 0);
-           draw_string(2, 12, led_usb_state & (1 << USB_LED_CAPS_LOCK) ? PSTR("CAPS") : PSTR("     "), PIXEL_ON, NORM, 0);
-           draw_string(2, 22, led_usb_state & (1 << USB_LED_SCROLL_LOCK) ? PSTR("SCRL") : PSTR("     "), PIXEL_ON, NORM, 0);
+    uint8_t led_usb_state = host_keyboard_leds();
+    if (last_led_usb_state != led_usb_state) {
+        last_led_usb_state = led_usb_state;
+        draw_string(2, 2, led_usb_state & (1 << USB_LED_NUM_LOCK) ? PSTR("NUM  ") : PSTR("     "), PIXEL_ON, NORM, 0);
+        draw_string(2, 12, led_usb_state & (1 << USB_LED_CAPS_LOCK) ? PSTR("CAPS") : PSTR("     "), PIXEL_ON, NORM, 0);
+        draw_string(2, 22, led_usb_state & (1 << USB_LED_SCROLL_LOCK) ? PSTR("SCRL") : PSTR("     "), PIXEL_ON, NORM, 0);
     }
-       send_buffer();
+    send_buffer();
 }
 #endif // QWIIC_MICRO_OLED_ENABLE
 
