@@ -5,10 +5,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "(gdb) Launch wear_leveling_8byte",
+      "name": "(gdb) Launch encoder_split_no_left",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/qmk_firmware/.build/test/wear_leveling_8byte.elf",
+      "program": "${workspaceFolder}/qmk_firmware/.build/test/encoder_split_no_left.elf",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}/qmk_firmware/.build/test",

@@ -17,15 +17,6 @@
 #endif // TAPPING_TERM
 #define TAPPING_TERM 120
 
-#define RETRO_TAPPING
-#define TAPPING_TERM_PER_KEY
-#define PERMISSIVE_HOLD
-#define PERMISSIVE_HOLD_PER_KEY
-#define IGNORE_MOD_TAP_INTERRUPT
-#define IGNORE_MOD_TAP_INTERRUPT_PER_KEY
-#define TAPPING_FORCE_HOLD
-#define TAPPING_FORCE_HOLD_PER_KEY
-
 // Pre-define the amount of space to use for userspace EEPROM
 #define EECONFIG_USER_DATA_SIZE 32
 #define EECONFIG_USER_DATA_VERSION ((uint32_t)__TIME__[0] + (uint32_t)__TIME__[1] + (uint32_t)__TIME__[3] + (uint32_t)__TIME__[4] + (uint32_t)__TIME__[6] + (uint32_t)__TIME__[7]) // HH:MM::SS

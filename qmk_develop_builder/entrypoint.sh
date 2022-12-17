@@ -205,7 +205,7 @@ $(cat /home/qmk/qmk_build_all.log | ctlchars2html)
 <pre>
 Prebuilt binaries:
 $(cd /home/qmk/qmk_firmware/ >/dev/null 2>&1; for f in $(ls *.hex *.bin *.uf2 2>/dev/null) ; do
-    echo "<a href='$f'>$f</a>"
+    echo "<a href='https://qmk.tzarc.io/$f'>$f</a> [<a href='qmk:https://qmk.tzarc.io/$f'>toolbox</a>]"
 done)
 </pre>
 </div>
