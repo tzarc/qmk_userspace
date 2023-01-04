@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2018-2022 Nick Brassel (@tzarc)
+# Copyright 2018-2023 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 exitcode=0
@@ -17,8 +17,8 @@ git ls-files | grep '\(Makefile.*\|Dockerfile.*\|\.\(c\|cpp\|h\|hpp\|mk\|sh\|py\
 done
 
 git grep '\(#\|//\|::\) Copyright.*tzarc' | cut -d: -f1 | while read file ; do
-    #sed -i 's%^\(#\|//\|::\) Copyright.*tzarc.*$%\1 Copyright 2018-'$(date +%Y)' Nick Brassel (@tzarc)%g' $file
-    sed -i 's%^\(#\|//\|::\) Copyright.*tzarc.*$%\1 Copyright 2018-2022 Nick Brassel (@tzarc)%g' $file
+    sed -i 's%^\(#\|//\|::\) Copyright.*tzarc.*$%\1 Copyright 2018-'$(date +%Y)' Nick Brassel (@tzarc)%g' $file
+    #sed -i 's%^\(#\|//\|::\) Copyright.*tzarc.*$%\1 Copyright 2018-2023 Nick Brassel (@tzarc)%g' $file
     sed -i 's%^\(#\|//\|::\) SPDX-License-Identifier.*$%\1 SPDX-License-Identifier: GPL-2.0-or-later%g' $file
 done
 
