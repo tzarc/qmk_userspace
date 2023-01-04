@@ -58,9 +58,36 @@
       "args": [
         "generate-keyboard-c",
         "-kb",
-        "handwired/tzarc/ghoul/rev1/rp2040",
+        "tzarc/ghoul/rev1/rp2040",
         "-o",
         "-"
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+        },
+        "program": "/home/nickb/.local/venv_qmk/bin/qmk"
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
+      "name": "Python: generate-compilation-database, Ghoul/RP2040/tzarc",
+      "type": "python",
+      "cwd": "${workspaceRoot}/qmk_firmware",
+      "request": "launch",
+      "args": [
+        "generate-compilation-database",
+        "-kb",
+        "tzarc/ghoul/rev1/rp2040",
+        "-km",
+        "tzarc"
       ],
       "console": "integratedTerminal",
       "linux": {

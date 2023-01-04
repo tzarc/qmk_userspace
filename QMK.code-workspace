@@ -56,6 +56,14 @@
       "name": "xap-qmk"
     },
     {
+      "path": "qmk_firmware/.build/obj_kprepublic_bm60hsrgb_poker_rev2/src",
+      "name": "xap-generated-kprepublic-bm60hsrgb_poker_rev2"
+    },
+    {
+      "path": "qmk_firmware/.build/obj_kprepublic_bm60hsrgb_poker_rev2_tzarc/src",
+      "name": "xap-generated-kprepublic-bm60hsrgb_poker_rev2_tzarc"
+    },
+    {
       "path": "qmk_firmware/.build/obj_kprepublic_bm16s/src",
       "name": "xap-generated-kprepublic-bm16s"
     },
@@ -89,7 +97,15 @@
       "board.h": "c",
       "typeinfo": "c",
       "thintel15.qff.h": "c",
-      "proggytiny.qff.h": "c"
+      "proggytiny.qff.h": "c",
+      "functional": "c",
+      "tzarc.h": "c",
+      "quantum.h": "c",
+      "platform_deps.h": "c",
+      "keymap.h": "c",
+      "debug.h": "c",
+      "print.h": "c",
+      "_print.h": "c"
     },
   }
 }

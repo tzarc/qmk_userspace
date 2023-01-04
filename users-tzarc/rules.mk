@@ -52,3 +52,5 @@ ifneq ("$(wildcard $(LIB_PATH)/lvgl)","")
 #	endif
 
 endif
+
+#QUANTUM_PAINTER_DRIVERS += surface
