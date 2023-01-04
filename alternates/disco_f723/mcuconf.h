@@ -63,7 +63,7 @@
 #define STM32_MCO1SEL                       STM32_MCO1SEL_HSI
 #define STM32_MCO1PRE                       STM32_MCO1PRE_DIV1
 #define STM32_MCO2SEL                       STM32_MCO2SEL_SYSCLK
-#define STM32_MCO2PRE                       STM32_MCO2PRE_DIV4
+#define STM32_MCO2PRE                       STM32_MCO2PRE_DIV1
 #define STM32_TIMPRE_ENABLE                 FALSE
 #define STM32_I2SSRC                        STM32_I2SSRC_OFF
 #define STM32_PLLI2SN_VALUE                 192

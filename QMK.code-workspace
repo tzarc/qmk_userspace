@@ -105,7 +105,8 @@
       "keymap.h": "c",
       "debug.h": "c",
       "print.h": "c",
-      "_print.h": "c"
+      "_print.h": "c",
+      "stm32f723xx.h": "c"
     },
   }
 }

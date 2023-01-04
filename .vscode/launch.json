@@ -105,6 +105,24 @@
       }
     },
     {
+      "name": "ST-Link (handwired/onekey F723 reset keymap, cortex-debug)",
+      "type": "cortex-debug",
+      "request": "attach",
+      "cwd": "${workspaceRoot}/qmk_firmware",
+      "servertype": "stutil",
+      "device": "STM32F723",
+      "linux": {
+        "svdFile": "${workspaceRoot}/svd/STM32F7x3.svd",
+        "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_onekey_disco_f723_reset.elf",
+        "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
+      },
+      "windows": {
+        "svdFile": "${workspaceRoot}\\svd\\STM32F7x3.svd",
+        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_onekey_disco_f723_reset.elf",
+        "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
+      },
+    },
+    {
       "name": "Black Magic Probe (Djinn G474 default keymap, cortex-debug)",
       "type": "cortex-debug",
       "request": "attach",
