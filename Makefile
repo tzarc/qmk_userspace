@@ -14,7 +14,7 @@ export PATH := /home/nickb/qmk-stuff/qmk_toolchains/avr/bin:$(PATH)
 # Add qmk wrapper to path
 export PATH := $(ROOTDIR)/bin:$(PATH)
 
-export CLANG_TIDY := $(shell find /usr/lib/llvm* -name 'run-clang-tidy.py')
+export CLANG_TIDY := $(shell find /usr/lib/llvm* -name 'run-clang-tidy.py' 2>/dev/null)
 export CLANG_TIDY_CHECKS := *,-clang-diagnostic-error,-llvm-include-order,-cppcoreguidelines-avoid-non-const-global-variables,-hicpp-braces-around-statements,-readability-braces-around-statements,-google-readability-braces-around-statements,-llvm-header-guard,-bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,-clang-diagnostic-ignored-attributes,-clang-diagnostic-unknown-attributes,-misc-unused-parameters,-hicpp-signed-bitwise,-llvmlibc*,-hicpp-uppercase-literal-suffix,-readability-uppercase-literal-suffix,-hicpp-no-assembler
 export CLANG_TIDY_HEADER_FILTER := .*
 
@@ -102,15 +102,15 @@ format_prereq: qmk_firmware
 	@ln -sf $(ROOTDIR)/qmk_firmware/.clang-format $(ROOTDIR)/.clang-format
 
 format: format_prereq
-	@for file in $$({ find $(ROOTDIR)/qmk_firmware/keyboards/tzarc \( -iname '*.c' -or -iname '*.h' -or -iname '*.cpp' -or -iname '*.hpp' \) ; git ls-files | grep -P '\.(c|cpp|h|hpp)$$' ; } | grep -vP 'conf\.h' | grep -vP 'board.h' | sort | uniq) ; do \
-		if [ -f "$$file" ] ; then \
-			echo -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
-			clang-format -i "$$file" >/dev/null 2>&1 || true ; \
-			ex -s +"bufdo wq" "$$file" >/dev/null 2>&1 || true ; \
-			dos2unix "$$file" >/dev/null 2>&1 ; \
-			chmod -x "$$file" >/dev/null 2>&1 ; \
-		fi ; \
-	done
+#	@for file in $$({ find $(ROOTDIR)/qmk_firmware/keyboards/tzarc \( -iname '*.c' -or -iname '*.h' -or -iname '*.cpp' -or -iname '*.hpp' \) ; git ls-files | grep -P '\.(c|cpp|h|hpp)$$' ; } | grep -vP 'conf\.h' | grep -vP 'board.h' | sort | uniq) ; do \
+#		if [ -f "$$file" ] ; then \
+#			echo -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
+#			clang-format -i "$$file" >/dev/null 2>&1 || true ; \
+#			ex -s +"bufdo wq" "$$file" >/dev/null 2>&1 || true ; \
+#			dos2unix "$$file" >/dev/null 2>&1 ; \
+#			chmod -x "$$file" >/dev/null 2>&1 ; \
+#		fi ; \
+#	done
 	@./check-license.sh
 
 links: format_prereq extra-links

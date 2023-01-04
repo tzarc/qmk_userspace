@@ -106,7 +106,8 @@
       "debug.h": "c",
       "print.h": "c",
       "_print.h": "c",
-      "stm32f723xx.h": "c"
+      "stm32f723xx.h": "c",
+      "dynamic_keymap.h": "c"
     },
   }
 }
