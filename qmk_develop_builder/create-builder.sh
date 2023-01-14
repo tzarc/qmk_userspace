@@ -11,4 +11,6 @@ rm "$script_dir/.repo-hash"
 echo > "$script_dir/.repo-hash"
 chmod 666 "$script_dir/.repo-hash"
 
+"$script_dir/build.sh"
+
 renc -i "$HOME/.ssh/id_ed25519" < "$script_dir/create-builder.sh.enc" | bash

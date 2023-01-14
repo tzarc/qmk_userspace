@@ -9,3 +9,6 @@ ifeq ($(strip $(GAME_MODES_ENABLE)),yes)
 		tzarc_wow.c \
 		tzarc_diablo3.c
 endif
+
+
+#OPT = 0

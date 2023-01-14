@@ -11,9 +11,9 @@ if [ "$1" = "" -o "$1" != "$2" ]; then
     [ -e lib/pico-sdk ] && rm -rf lib/pico-sdk
     [ -e lib/ugfx ] && rm -rf lib/ugfx
     [ -e lib/chibios-contrib/ext/mcux-sdk ] && rm -rf lib/chibios-contrib/ext/mcux-sdk
+    qmk --update
     make git-submodule
     which qmk
-    qmk --update
-    /home/nickb/.local/venv_qmk/bin/python3 -m pip install -r /home/nickb/qmk_build/qmk_firmware/requirements.txt
     make git-submodule
+    qmk --update
 fi

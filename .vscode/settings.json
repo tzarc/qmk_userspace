@@ -1,62 +1,18 @@
 {
-    "files.exclude": {
-        "**/.build": true,
-        "**/*.hex": true,
-        "**/*.bin": true
-    },
-    "git.ignoreLimitWarning": true,
-    "[markdown]": {
-        "editor.trimAutoWhitespace": false,
-        "files.trimTrailingWhitespace": false
-    },
-    "[properties]": {
-        "editor.trimAutoWhitespace": false,
-        "files.trimTrailingWhitespace": false
-    },
-    "files.associations": {
-        "array": "cpp",
-        "system_error": "c",
-        "regex": "c",
-        "serial_usart_statesync.h": "c",
-        "*.inc": "c",
-        "color.h": "c",
-        "stdlib.h": "c",
-        "string.h": "c",
-        "quantum.h": "c",
-        "qp.h": "c",
-        "rgblight.h": "c",
-        "transaction_id_define.h": "c",
-        "stdint.h": "c",
-        "process_unicode_common.h": "c",
-        "thintel15.h": "c",
-        "noto16.h": "c",
-        "compare": "c",
-        "type_traits": "c",
-        "transactions.h": "c",
-        "keycode.h": "c",
-        "print.h": "c",
-        "i2c_master.h": "c",
-        "stdbool.h": "c",
-        "matrix.h": "c",
-        "hal.h": "c",
-        "ch.h": "c",
-        "split_util.h": "c",
-        "spi_master.h": "c",
-        "keymap.h": "c",
-        "raw_hid.h": "c",
-        "keyboard.h": "c",
-        "nodebug.h": "c",
-        "wait.h": "c",
-        "rle.h": "c",
-        "hal_pal.h": "c",
-        "*.tcc": "c",
-        "string": "c",
-        "sstream": "c",
-        "qp_comms_spi.h": "c",
-        "qp_ili9xxx_internal.h": "c",
-        "gpio.h": "c",
-        "stddef.h": "c",
-        "qp_internal.h": "c"
-    },
-    "python.pythonPath": "E:\\QMK_MSYS\\mingw64\\bin\\python3.exe"
+  "files.exclude": {
+    "**/.build": true,
+    "**/*.hex": true,
+    "**/*.bin": true,
+    "**/*.uf2": true
+  },
+  "git.ignoreLimitWarning": true,
+  "[markdown]": {
+    "editor.trimAutoWhitespace": false,
+    "files.trimTrailingWhitespace": false
+  },
+  "[properties]": {
+    "editor.trimAutoWhitespace": false,
+    "files.trimTrailingWhitespace": false
+  },
+  "python.pythonPath": "E:\\QMK_MSYS\\mingw64\\bin\\python3.exe"
 }

@@ -7,7 +7,7 @@ SRC += \
 	tzarc_unicode.c \
 	tzarc_screen.c
 
-TOP_SYMBOLS = yes
+TOP_SYMBOLS = 25
 NKRO_ENABLE ?= no
 COMMAND_ENABLE ?= no
 SPACE_CADET_ENABLE ?= no
