@@ -37,3 +37,5 @@
 #    undef DEBOUNCE
 #endif
 #define DEBOUNCE 12
+
+#include "enable_all_rgb_effects.h"

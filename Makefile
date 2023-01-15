@@ -73,9 +73,8 @@ EXTRA_LINK_DEFS := \
 	users-tzarc!users/tzarc
 
 all-arm:
-	@for mcu in $(shell python3 -m hjson.tool -j $(ROOTDIR)/qmk_firmware/data/schemas/keyboard.jsonschema | jq .properties.processor.enum | grep '"' | sed -e 's@[", ]@@g' | grep -vP "(atmega|attiny|at90|unknown)" | sort | uniq | xargs echo) ; do \
-		qmk multibuild -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2) -f MCU=$$mcu ; \
-	done
+	qmk mass-compile -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2) -f protocol=ChibiOS
+	qmk mass-compile -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2) -f protocol=arm_atsam
 
 all: NO_COMPILEDB = true
 all: bin
@@ -121,6 +120,21 @@ git-submodule: qmk_firmware
 graphics:
 	+$(MAKE) -C "$(ROOTDIR)/users-tzarc/graphics"
 
+$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h: rgb_effects
+
+rgb_effects:
+	@echo '// Copyright 2018-2023 Nick Brassel (@tzarc)' > "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
+	@echo '// SPDX-License-Identifier: GPL-2.0-or-later' >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
+	@echo '#pragma once' >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
+	@echo >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
+	@echo '#ifdef RGB_MATRIX_ENABLE' >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
+	@grep -h '^#\s*ifdef\sENABLE_' "$(ROOTDIR)/qmk_firmware/quantum/rgb_matrix"/*.h "$(ROOTDIR)/qmk_firmware/quantum/rgb_matrix"/*/*.h | sed -e 's@#\s*ifdef\s*@#define @g' | sort | uniq >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
+	@echo '#endif // RGB_MATRIX_ENABLE' >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
+	@echo >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
+	@echo '#ifdef RGBLIGHT_ENABLE' >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
+	@grep -h '^#\s*ifdef\s*RGBLIGHT_EFFECT' "$(ROOTDIR)/qmk_firmware/quantum/rgblight"/*.h | sed -e 's@#\s*ifdef\s*@#define @g' | sort | uniq >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
+	@echo '#endif // RGBLIGHT_ENABLE' >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
+
 define handle_link_entry
 link_source_$1 := $$(word 1,$$(subst !, ,$1))
 link_target_$1 := $$(word 2,$$(subst !, ,$1))
@@ -164,7 +178,7 @@ board_file_$1 := $$(shell echo $$(board_qmk_$1) | sed -e 's@/@_@g' -e 's@:@_@g')
 board_files_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f \( -name '*.h' -or -name '*.c' \) -and -not -name '*conf.h' -and -not -name 'board.c' -and -not -name 'board.h' | sort)
 board_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f | sort)
 
-bin_$$(board_name_$1): board_link_$$(board_name_$1)
+bin_$$(board_name_$1): board_link_$$(board_name_$1) rgb_effects
 	@echo -e "\e[38;5;14mBuilding: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	+@cd "$(ROOTDIR)/qmk_firmware" \
 		&& { [ -z "$$(NO_COMPILEDB)" ] && qmk generate-compilation-database -kb $$(board_qmk_$1) -km $$(board_keymap_$1) || true; } \
