@@ -128,11 +128,11 @@ rgb_effects:
 	@echo '#pragma once' >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
 	@echo >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
 	@echo '#ifdef RGB_MATRIX_ENABLE' >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
-	@grep -h '^#\s*ifdef\sENABLE_' "$(ROOTDIR)/qmk_firmware/quantum/rgb_matrix"/*.h "$(ROOTDIR)/qmk_firmware/quantum/rgb_matrix"/*/*.h | sed -e 's@#\s*ifdef\s*@#define @g' | sort | uniq >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
+	@grep -h '^#\s*ifdef\sENABLE_' "$(ROOTDIR)/qmk_firmware/quantum/rgb_matrix"/*.h "$(ROOTDIR)/qmk_firmware/quantum/rgb_matrix"/*/*.h | sed -e 's@#\s*ifdef\s*@#    define @g' | sort | uniq >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
 	@echo '#endif // RGB_MATRIX_ENABLE' >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
 	@echo >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
 	@echo '#ifdef RGBLIGHT_ENABLE' >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
-	@grep -h '^#\s*ifdef\s*RGBLIGHT_EFFECT' "$(ROOTDIR)/qmk_firmware/quantum/rgblight"/*.h | sed -e 's@#\s*ifdef\s*@#define @g' | sort | uniq >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
+	@grep -h '^#\s*ifdef\s*RGBLIGHT_EFFECT' "$(ROOTDIR)/qmk_firmware/quantum/rgblight"/*.h | sed -e 's@#\s*ifdef\s*@#    define @g' | sort | uniq >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
 	@echo '#endif // RGBLIGHT_ENABLE' >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
 
 define handle_link_entry

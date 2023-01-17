@@ -2,6 +2,7 @@
   "manufacturer": "Tzarc",
   "keyboard_name": "Quantum Painter Tester",
   "processor": "STM32F401",
+  "board": "BLACKPILL_STM32_F401",
   "bootloader": "tinyuf2",
   "bootmagic": {
     "enabled": true
