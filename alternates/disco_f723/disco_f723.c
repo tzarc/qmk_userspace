@@ -4,13 +4,13 @@
 #include <stm32f723xx.h>
 #include <quantum.h>
 
-#if !defined  (USB_HS_PHYC_TUNE_VALUE)
-#define USB_HS_PHYC_TUNE_VALUE        0x00000F13U /*!< Value of USB HS PHY Tune */
-#endif /* USB_HS_PHYC_TUNE_VALUE */
+#if !defined(USB_HS_PHYC_TUNE_VALUE)
+#    define USB_HS_PHYC_TUNE_VALUE 0x00000F13U /*!< Value of USB HS PHY Tune */
+#endif                                         /* USB_HS_PHYC_TUNE_VALUE */
 
 void board_init(void) {
     uint32_t count = 0;
-    while(++count < 2500000) {
+    while (++count < 2500000) {
         __NOP();
     }
 
@@ -29,7 +29,7 @@ void board_init(void) {
         if (++count > 250000) {
             break;
         }
-        //chSysPolledDelayX(10);
+        // chSysPolledDelayX(10);
     }
 
     // Enable PLL for 25MHz HSE

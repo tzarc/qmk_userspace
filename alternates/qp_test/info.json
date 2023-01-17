@@ -1,0 +1,33 @@
+{
+  "manufacturer": "Tzarc",
+  "keyboard_name": "Quantum Painter Tester",
+  "processor": "STM32F401",
+  "bootloader": "tinyuf2",
+  "bootmagic": {
+    "enabled": true
+  },
+  "build": {
+    "lto": true
+  },
+  "features": {
+    "audio": false,
+    "backlight": false,
+    "command": false,
+    "console": true,
+    "extrakey": true,
+    "midi": false,
+    "nkro": true,
+    "quantum_painter": true,
+    "rgb_matrix": false,
+    "rgblight": false
+  },
+  "diode_direction": "COL2ROW",
+  "mouse_key": {
+    "enabled": false
+  },
+  "usb": {
+    "device_version": "0.0.1",
+    "pid": "0xCAFE",
+    "vid": "0xFEED"
+  }
+}

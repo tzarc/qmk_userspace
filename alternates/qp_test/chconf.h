@@ -3,20 +3,6 @@
 
 #pragma once
 
-//#define CH_CFG_ST_TIMEDELTA 0
-#define CH_CFG_ST_RESOLUTION 16
-#define CH_CFG_ST_FREQUENCY 10000
-//#define CH_CFG_INTERVALS_SIZE 64
-
-//#define CH_CFG_USE_TM                       FALSE
-//#define CH_DBG_STATISTICS                   FALSE
-#define CH_DBG_SYSTEM_STATE_CHECK           TRUE
-#define CH_DBG_ENABLE_CHECKS                TRUE
-#define CH_DBG_ENABLE_ASSERTS               TRUE
-//#define CH_DBG_TRACE_MASK                   CH_DBG_TRACE_MASK_ALL
-//#define CH_DBG_TRACE_BUFFER_SIZE            512
-#define CH_DBG_ENABLE_STACK_CHECK           TRUE
-
 #include_next <chconf.h>
 
 #undef CH_CFG_SYSTEM_HALT_HOOK

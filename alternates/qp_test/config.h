@@ -3,24 +3,13 @@
 
 #pragma once
 
+// Matrix config
 #define MATRIX_ROWS 1
 #define MATRIX_COLS 1
-
-#define VENDOR_ID 0xFEED
-#define PRODUCT_ID 0xCAFE
-#define DEVICE_VER 0x0001
-#define MANUFACTURER "Tzarc"
-#define PRODUCT "Quantum Painter Tester"
-
-// Matrix config
 #define MATRIX_ROW_PINS \
     { C14 }
 #define MATRIX_COL_PINS \
     { C15 }
-#define DIODE_DIRECTION COL2ROW
-
-// General config
-#define EEPROM_I2C_24LC128
 
 // I2C config
 #define I2C_DRIVER I2CD1
@@ -43,6 +32,10 @@
 #define SPI_MISO_PIN A6
 #define SPI_MISO_PAL_MODE 5
 
+// QP config
+#define QUANTUM_PAINTER_CONCURRENT_ANIMATIONS 8
+#define QUANTUM_PAINTER_LOAD_FONTS_TO_RAM TRUE
+
 // Display common config
 #define DISPLAY_DC_PIN B0
 
@@ -50,10 +43,8 @@
 #define DISPLAY_CS_PIN_2_0_INCH_LCD_ST7789 A4
 #define DISPLAY_RST_PIN_2_0_INCH_LCD_ST7789 A3
 
-#define QUANTUM_PAINTER_CONCURRENT_ANIMATIONS 8
-#define QUANTUM_PAINTER_LOAD_FONTS_TO_RAM TRUE
-
+// Debugging output
 #define DEBUG_EEPROM_OUTPUT
 #define WEAR_LEVELING_DEBUG_OUTPUT
 #define DEBUG_FLASH_SPI_OUTPUT
-// #define QUANTUM_PAINTER_DEBUG
+#define QUANTUM_PAINTER_DEBUG

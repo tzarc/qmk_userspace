@@ -101,15 +101,15 @@ format_prereq: qmk_firmware
 	@ln -sf $(ROOTDIR)/qmk_firmware/.clang-format $(ROOTDIR)/.clang-format
 
 format: format_prereq
-#	@for file in $$({ find $(ROOTDIR)/qmk_firmware/keyboards/tzarc \( -iname '*.c' -or -iname '*.h' -or -iname '*.cpp' -or -iname '*.hpp' \) ; git ls-files | grep -P '\.(c|cpp|h|hpp)$$' ; } | grep -vP 'conf\.h' | grep -vP 'board.h' | sort | uniq) ; do \
-#		if [ -f "$$file" ] ; then \
-#			echo -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
-#			clang-format -i "$$file" >/dev/null 2>&1 || true ; \
-#			ex -s +"bufdo wq" "$$file" >/dev/null 2>&1 || true ; \
-#			dos2unix "$$file" >/dev/null 2>&1 ; \
-#			chmod -x "$$file" >/dev/null 2>&1 ; \
-#		fi ; \
-#	done
+	@for file in $$({ find $(ROOTDIR)/qmk_firmware/keyboards/tzarc \( -iname '*.c' -or -iname '*.h' -or -iname '*.cpp' -or -iname '*.hpp' \) ; git ls-files | grep -P '\.(c|cpp|h|hpp)$$' ; } | grep -vP 'conf\.h' | grep -vP 'board.h' | sort | uniq) ; do \
+		if [ -f "$$file" ] ; then \
+			echo -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
+			clang-format -i "$$file" >/dev/null 2>&1 || true ; \
+			ex -s +"bufdo wq" "$$file" >/dev/null 2>&1 || true ; \
+			dos2unix "$$file" >/dev/null 2>&1 ; \
+			chmod -x "$$file" >/dev/null 2>&1 ; \
+		fi ; \
+	done
 	@./check-license.sh
 
 links: format_prereq extra-links
