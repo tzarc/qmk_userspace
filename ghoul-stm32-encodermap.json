@@ -22,5 +22,11 @@
     ],
     "macros": [
         ["aaa"]
-    ]
+    ],
+    "config": {
+        "features": {
+            "encoder": true,
+            "encoder_map": true
+        }
+    }
 }

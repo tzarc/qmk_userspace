@@ -25,6 +25,31 @@
       ]
     },
     {
+      "name": "Python: lint, handwired/onekey/nucleo_f446re",
+      "type": "python",
+      "cwd": "${workspaceRoot}",
+      "request": "launch",
+      "args": [
+        "lint",
+        "-kb",
+        "handwired/onekey/nucleo_f446re",
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+        },
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
       "name": "Python: json2c, Ghoul/RP2040",
       "type": "python",
       "cwd": "${workspaceRoot}",
@@ -40,7 +65,7 @@
         "env": {
           "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
         },
-        "program": "/home/nickb/.local/venv_qmk/bin/qmk"
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },
       "windows": {
         "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
@@ -67,7 +92,7 @@
         "env": {
           "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
         },
-        "program": "/home/nickb/.local/venv_qmk/bin/qmk"
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },
       "windows": {
         "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
@@ -94,7 +119,7 @@
         "env": {
           "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
         },
-        "program": "/home/nickb/.local/venv_qmk/bin/qmk"
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },
       "windows": {
         "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",

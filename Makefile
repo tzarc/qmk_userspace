@@ -244,7 +244,8 @@ $(foreach board_entry,$(BOARD_DEFS),$(eval $(call handle_board_entry,$(board_ent
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CONTAINER_PREAMBLE := export HOME="/tmp"; export PYTHONUSERBASE="/tmp/python"; export PATH="\$$PYTHONUSERBASE/bin:\$$PATH"; python3 -m pip install -r requirements-dev.txt
+#CONTAINER_PREAMBLE := export HOME="/tmp"; export PYTHONUSERBASE="/tmp/python"; export PATH="\$$PYTHONUSERBASE/bin:\$$PATH"; python3 -m pip install --upgrade pip; python3 -m pip install -r requirements-dev.txt
+CONTAINER_PREAMBLE := export HOME="/tmp"; python3 -m pip install --upgrade pip; python3 -m pip install -r requirements-dev.txt
 
 format-core:
 	cd $(ROOTDIR)/qmk_firmware \
