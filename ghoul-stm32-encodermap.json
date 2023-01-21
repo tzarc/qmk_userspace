@@ -17,8 +17,8 @@
         ]
     ],
     "encoders": [
-        [ ["RGB_HUI", "RGB_HUD"] ],
-        [ ["RGB_HUI", "RGB_HUD"] ]
+        [ { "ccw": "RGB_HUI", "cw": "RGB_HUD" } ],
+        [ { "cw": "RGB_HUI", "ccw": "RGB_HUD" } ]
     ],
     "macros": [
         ["aaa"]
