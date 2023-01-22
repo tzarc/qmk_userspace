@@ -50,6 +50,33 @@
       }
     },
     {
+      "name": "Python: pytest, qmk.tests.test_qmk_keymap.test_generate_c_pytest_has_template",
+      "type": "python",
+      "cwd": "${workspaceRoot}/qmk_firmware",
+      "request": "launch",
+      "args": [
+        "-v",
+        "-t",
+        "lib/python",
+        "qmk.tests.test_qmk_keymap.test_generate_c_pytest_has_template"
+      ],
+      "subProcess": true,
+      "console": "integratedTerminal",
+      "linux": {
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+        },
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/nose2"
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\nose2.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
       "name": "Python: c2json, Ghoul/RP2040/default",
       "type": "python",
       "cwd": "${workspaceRoot}/qmk_firmware",
