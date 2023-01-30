@@ -26,7 +26,8 @@ void board_init(void) {
 */
 
 painter_device_t st7789;
-painter_device_t sh1106;
+painter_device_t sh1106_spi;
+painter_device_t sh1106_i2c;
 
 painter_image_handle_t test_image;
 painter_image_handle_t test_anim;
@@ -56,6 +57,7 @@ void init_and_clear(painter_device_t device, painter_rotation_t rotation) {
 
     qp_init(device, rotation);
     qp_rect(device, 0, 0, width - 1, height - 1, 0, 0, 0, true);
+    qp_flush(device);
 }
 
 void draw_test(painter_device_t device, const char* name, uint32_t now) {
@@ -79,13 +81,17 @@ void draw_test(painter_device_t device, const char* name, uint32_t now) {
     qp_rect(device, xpos, ypos, 119, ypos + thintel->line_height, 0, 0, 0, true);
     ypos += thintel->line_height;
 
-    xpos = qp_drawtext_recolor(device, 0, ypos, thintel, buf2, hue, 255, 255, hue, 255, 0);
-    qp_rect(device, xpos, ypos, width - 1, ypos + thintel->line_height, 0, 0, 0, true);
-    ypos += thintel->line_height;
+    if (ypos + thintel->line_height <= height) {
+        xpos = qp_drawtext_recolor(device, 0, ypos, thintel, buf2, hue, 255, 255, hue, 255, 0);
+        qp_rect(device, xpos, ypos, width - 1, ypos + thintel->line_height, 0, 0, 0, true);
+        ypos += thintel->line_height;
+    }
 
-    xpos = qp_drawtext_recolor(device, 0, ypos, thintel, buf3, hue, 255, 255, hue, 255, 0);
-    qp_rect(device, xpos, ypos, width - 1, ypos + thintel->line_height, 0, 0, 0, true);
-    ypos += thintel->line_height;
+    if (ypos + thintel->line_height <= height) {
+        xpos = qp_drawtext_recolor(device, 0, ypos, thintel, buf3, hue, 255, 255, hue, 255, 0);
+        qp_rect(device, xpos, ypos, width - 1, ypos + thintel->line_height, 0, 0, 0, true);
+        ypos += thintel->line_height;
+    }
 
     qp_flush(device);
 }
@@ -95,7 +101,7 @@ void keyboard_post_init_kb(void) {
     debug_matrix   = true;
     debug_keyboard = true;
 
-    wait_ms(15000);
+    // wait_ms(15000);
 
     defer_exec(3000, delayed_test, (void*)(uint16_t)3000);
     defer_exec(2900, delayed_test, (void*)(uint16_t)2900);
@@ -106,11 +112,14 @@ void keyboard_post_init_kb(void) {
 
     thintel = qp_load_font_mem(font_thintel);
 
-    st7789 = qp_st7789_make_spi_device(240, 320, DISPLAY_CS_PIN_2_0_INCH_LCD_ST7789, DISPLAY_DC_PIN, DISPLAY_RST_PIN_2_0_INCH_LCD_ST7789, 2, 3);
-    init_and_clear(st7789, QP_ROTATION_0);
+    //st7789 = qp_st7789_make_spi_device(240, 320, DISPLAY_CS_PIN_2_0_INCH_LCD_ST7789, DISPLAY_DC_PIN, DISPLAY_RST_PIN_2_0_INCH_LCD_ST7789, 2, 3);
+    //init_and_clear(st7789, QP_ROTATION_0);
 
-    sh1106 = qp_sh1106_make_spi_device(DISPLAY_CS_PIN_0_96_INCH_OLED_SH1106, DISPLAY_DC_PIN, DISPLAY_RST_PIN_0_96_INCH_OLED_SH1106, 16, 0);
-    init_and_clear(sh1106, QP_ROTATION_0);
+    sh1106_spi = qp_sh1106_make_spi_device(DISPLAY_CS_PIN_0_96_INCH_OLED_SH1106, DISPLAY_DC_PIN, DISPLAY_RST_PIN_0_96_INCH_OLED_SH1106, 16, 0);
+    init_and_clear(sh1106_spi, QP_ROTATION_180);
+
+    //sh1106_i2c = qp_sh1106_make_i2c_device(0x3C);
+    //init_and_clear(sh1106_i2c, QP_ROTATION_0);
 
     keyboard_post_init_user();
 }
@@ -121,24 +130,36 @@ void matrix_scan_kb(void) {
     if (TIMER_DIFF_32(now, last_scan) >= 3000) {
         last_scan = now;
         draw_test(st7789, "ST7789", now);
-        // draw_test(sh1106, "SH1106", now);
+
+        static painter_rotation_t p = QP_ROTATION_0;
+        p = (p + 1) % 4;
+        init_and_clear(sh1106_spi, p);
+
+        draw_test(sh1106_spi, "SH1106(SPI)", now);
+        draw_test(sh1106_i2c, "SH1106(I2C)", now);
 
         static bool animating = false;
         if (!animating) {
             animating = true;
             if (test_anim) {
-                qp_animate(st7789, 120, 0, test_anim);
-                qp_animate(sh1106, 120, 0, test_anim);
+                qp_animate(st7789, 100, 0, test_anim);
+                //qp_animate(sh1106_spi, 100, 0, test_anim);
+                //qp_animate(sh1106_i2c, 100, 0, test_anim);
             }
 
             if (loading) {
                 qp_animate(st7789, 0, 3 * thintel->line_height, loading);
-
-                if ((3 * thintel->line_height) + loading->height <= 64) {
-                    qp_animate(sh1106, 0, 3 * thintel->line_height, loading);
-                }
+                //qp_animate(sh1106_spi, 0, 3 * thintel->line_height, loading);
+                //qp_animate(sh1106_i2c, 0, 3 * thintel->line_height, loading);
             }
         }
+    }
+
+    static uint32_t last_flush = 0;
+    if (TIMER_DIFF_32(now, last_flush) > 0) {
+        last_flush = now;
+        qp_flush(sh1106_spi);
+        qp_flush(sh1106_i2c);
     }
 
     matrix_scan_user();

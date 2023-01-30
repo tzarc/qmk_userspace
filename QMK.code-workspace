@@ -8,6 +8,14 @@
       "name": "qmk-docs"
     },
     {
+      "path": "qmk_firmware/quantum/painter",
+      "name": "quantum-painter"
+    },
+    {
+      "path": "qmk_firmware/drivers/painter",
+      "name": "drivers-painter"
+    },
+    {
       "path": "qmk_firmware/quantum/wear_leveling",
       "name": "quantum-wear_leveling"
     },
@@ -83,5 +91,6 @@
   "settings": {
     "python.defaultInterpreterPath":"/home/nickb/.local/pipx/venvs/qmk/bin/python3",
     "git.ignoreLimitWarning": true,
+    "cortex-debug.variableUseNaturalFormat": true,
   }
 }

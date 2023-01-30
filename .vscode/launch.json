@@ -205,6 +205,29 @@
       },
     },
     {
+      "name": "Black Magic Probe (qp_test, cortex-debug)",
+      "type": "cortex-debug",
+      "request": "attach",
+      "cwd": "${workspaceRoot}/qmk_firmware",
+      "svdFile": "${workspaceRoot}/svd/STM32F401.svd",
+      "servertype": "bmp",
+      "interface": "swd",
+      "device": "STM32F401",
+      "linux": {
+        "BMPGDBSerialPort": "/dev/ttyACM0",
+        "executable": "${workspaceRoot}/qmk_firmware/.build/qp_test_default.elf",
+        "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
+      },
+      "windows": {
+        "BMPGDBSerialPort": "COM4",
+        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\qp_test_default.elf",
+        "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
+      },
+      "showDevDebugOutput": "parsed",
+      "preAttachCommands": ["set mem inaccessible-by-default off"],
+      "postAttachCommands": []
+    },
+    {
       "name": "Black Magic Probe (Djinn G474 default keymap, cortex-debug)",
       "type": "cortex-debug",
       "request": "attach",
@@ -219,7 +242,7 @@
         "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
       },
       "windows": {
-        "BMPGDBSerialPort": "COM5",
+        "BMPGDBSerialPort": "COM4",
         "executable": "${workspaceRoot}\\qmk_firmware\\.build\\tzarc_djinn_rev1_default.elf",
         "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
       },

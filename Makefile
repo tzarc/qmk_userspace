@@ -4,12 +4,12 @@
 export ROOTDIR := $(shell pwd)
 #export PATH := /home/nickb/dev/cross-compilers/target_prefix/gcc11.1_arm/bin:$(PATH)
 #export PATH := /home/nickb/dev/cross-compilers/target_prefix/gcc11.1_avr/bin:$(PATH)
-export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10.3-2021.10/bin:$(PATH)
-#export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH)
+#export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10.3-2021.10/bin:$(PATH)
+export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH)
 #export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$(PATH)
 #export PATH := /usr/lib/ccache:$(PATH)
-export PATH := /home/nickb/qmk-stuff/qmk_toolchains/arm/bin:$(PATH)
-export PATH := /home/nickb/qmk-stuff/qmk_toolchains/avr/bin:$(PATH)
+#export PATH := /home/nickb/qmk-stuff/qmk_toolchains/arm/bin:$(PATH)
+#export PATH := /home/nickb/qmk-stuff/qmk_toolchains/avr/bin:$(PATH)
 
 # Add qmk wrapper to path
 export PATH := $(ROOTDIR)/bin:$(PATH)
@@ -245,20 +245,20 @@ $(foreach board_entry,$(BOARD_DEFS),$(eval $(call handle_board_entry,$(board_ent
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #CONTAINER_PREAMBLE := export HOME="/tmp"; export PYTHONUSERBASE="/tmp/python"; export PATH="\$$PYTHONUSERBASE/bin:\$$PATH"; python3 -m pip install --upgrade pip; python3 -m pip install -r requirements-dev.txt
-CONTAINER_PREAMBLE := export HOME="/tmp"; python3 -m pip install --upgrade pip; python3 -m pip install -r requirements-dev.txt
+CONTAINER_PREAMBLE := export HOME="/tmp"; export PATH="/tmp/.local/bin:\$$PATH"; python3 -m pip install --upgrade pip; python3 -m pip install -r requirements-dev.txt
 
 format-core:
 	cd $(ROOTDIR)/qmk_firmware \
-		&& ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk format-c --core-only -a" \
+		&& RUNTIME=docker ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk format-c --core-only -a" \
 		&& qmk format-python -a
 
 pytest:
 	cd $(ROOTDIR)/qmk_firmware \
-		&& ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk pytest"
+		&& RUNTIME=docker ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk pytest"
 
 container-shell:
 	cd $(ROOTDIR)/qmk_firmware \
-		&& ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); exec bash"
+		&& RUNTIME=docker ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); exec bash"
 
 docker-test:
 	@docker run --rm \
