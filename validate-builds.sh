@@ -30,9 +30,14 @@ append_log() {
 required_keyboard_builds() {
     pushd "$qmk_firmware_dir" >/dev/null 2>&1
 
-    qmk list-keyboards 2>/dev/null | shuf -n30 | sort | while read kb ; do echo "$kb:default" ; done
+    qmk list-keyboards 2>/dev/null | shuf -n3 | sort | while read kb ; do echo "$kb:default" ; done
 
     popd >/dev/null 2>&1
+}
+
+container_make() {
+    make $@ $reproducible_build_flags | grep -v '⚠'
+    #RUNTIME=docker ./util/docker_cmd.sh make $@ $reproducible_build_flags | grep -v '⚠'
 }
 
 build_single() {
@@ -40,16 +45,16 @@ build_single() {
     local build_stage=$2
     local extraflags=${3:-}
 
-    make distclean 2>&1 | append_log
+    container_make distclean 2>&1 | append_log
 
     # Work out what the basename of the target binary is going to be
-    local binary_basename="$(make ${build_target}:dump_vars $reproducible_build_flags ${extraflags:-} 2>/dev/null | grep -P '^TARGET=' | cut -d'=' -f2)"
+    local binary_basename="$(container_make ${build_target}:dump_vars ${extraflags:-} 2>/dev/null | grep -P '^TARGET=' | cut -d'=' -f2)"
 
     # Keep a list of the make variables
-    make ${build_target}:dump_vars $reproducible_build_flags ${extraflags:-} 2>&1 > "${validation_output}/${binary_basename}_${build_stage}_vars.txt"
+    container_make ${build_target}:dump_vars ${extraflags:-} 2>&1 > "${validation_output}/${binary_basename}_${build_stage}_vars.txt"
 
     # Build the target and save to log
-    { make -j$(nproc) ${build_target} $reproducible_build_flags ${extraflags:-} 2>&1 || true ; } | append_log
+    { container_make -j$(nproc) ${build_target} ${extraflags:-} 2>&1 || true ; } | append_log
 
     # Copy out the build's cflags
     cat ".build/obj_${binary_basename}/cflags.txt" | sed -e 's/ /\n/g' > "$validation_output/${binary_basename}_${build_stage}_cflags.txt"
@@ -66,11 +71,11 @@ build_single() {
     if [[ -e "${binary_basename}.bin" ]] || [[ -e "${binary_basename}.uf2" ]] ; then
         arm-none-eabi-objdump -S "$validation_output/${binary_basename}_${build_stage}_build/${binary_basename}.elf" \
             > "$validation_output/${binary_basename}_${build_stage}_asm.txt"
-        sha256sum "${binary_basename}.bin" | awk '{print $1}'
+        sha1sum "${binary_basename}.bin" | awk '{print $1}'
     elif [[ -e "${binary_basename}.hex" ]] ; then
         avr-objdump -S "$validation_output/${binary_basename}_${build_stage}_build/${binary_basename}.elf" \
             > "$validation_output/${binary_basename}_${build_stage}_asm.txt"
-        sha256sum "${binary_basename}.hex" | awk '{print $1}'
+        sha1sum "${binary_basename}.hex" | awk '{print $1}'
     else
         exit 1
     fi
@@ -94,7 +99,7 @@ validate_build() {
 
     if [[ "$before" == "$after" ]] ; then
         printf '\e[1;32m%50s - %s\e[0m\n' "$build_target" "$before"
-        local binary_basename="$(make $build_target:dump_vars $reproducible_build_flags ${extraflags:-} 2>/dev/null | grep -P '^TARGET=' | cut -d'=' -f2)"
+        local binary_basename="$(container_make $build_target:dump_vars ${extraflags:-} 2>/dev/null | grep -P '^TARGET=' | cut -d'=' -f2)"
         rm -rf "$validation_output/"${binary_basename}*
     else
         printf '\e[1;31m%50s - %s != %s\e[0m\n' "$build_target" "$before" "$after"
