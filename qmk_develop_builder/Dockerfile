@@ -7,7 +7,7 @@ FROM qmkfm/base_container:latest
 ENV PATH="/home/qmk/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 RUN apt-get update \
-    && apt-get install -y awscli curl gawk nano
+    && apt-get install -y awscli curl gawk nano rsync
 
 #RUN dnf install -y \
 #    arm-none-eabi-binutils-cs \
@@ -48,8 +48,8 @@ WORKDIR /home/qmk
 
 RUN python3 -m pip install -U pip wheel \
     && python3 -m pip install -U qmk milc \
-    && git clone --depth=5 -b develop https://github.com/qmk/qmk_firmware /home/qmk/qmk_firmware \
-    && cd /home/qmk/qmk_firmware \
+    && git clone --depth=5 -b develop https://github.com/qmk/qmk_firmware /home/qmk/repo \
+    && cd /home/qmk/repo \
     && git checkout develop \
     && git pull --depth=5 --ff-only \
     && make git-submodule

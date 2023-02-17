@@ -5,6 +5,8 @@
 this_script="$(readlink -f "${BASH_SOURCE[0]}")"
 script_dir="$(readlink -f "$(dirname "$this_script")")"
 
+docker stop qmk_develop_runner || true
+docker kill qmk_develop_runner || true
 docker rm qmk_develop_runner || true
 
 rm "$script_dir/.repo-hash"
@@ -14,3 +16,6 @@ chmod 666 "$script_dir/.repo-hash"
 "$script_dir/build.sh"
 
 renc -i "$HOME/.ssh/id_ed25519" < "$script_dir/create-builder.sh.enc" | bash
+
+docker start qmk_develop_runner
+docker ps -a

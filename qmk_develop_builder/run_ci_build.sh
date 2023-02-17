@@ -8,12 +8,13 @@ abs_path() { python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "$
 
 this_script=$(abs_path "${BASH_SOURCE[@]}")
 script_dir=$(dirname "$this_script")
-qmk_firmware=$(abs_path "$script_dir/qmk_firmware")
+qmk_firmware="/qmk_firmware"
 qmk_builddir="$qmk_firmware/.build"
 
 FILTER=""
 
 [[ -d "$qmk_builddir" ]] || mkdir -p "$qmk_builddir"
+qmk config user.qmk_home="$qmk_firmware"
 qmk clean -a
 MAKEFLAGS="-O --no-print-directory" qmk mass-compile -j$(( 2 * $(nproc) + 1 )) $FILTER | tee "$script_dir/build.log"
 MAKEFLAGS="-O --no-print-directory" qmk mass-compile -j$(( 2 * $(nproc) + 1 )) -km via $FILTER | tee -a "$script_dir/build.log"
