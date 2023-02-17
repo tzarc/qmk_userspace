@@ -35,10 +35,3 @@
 #undef RGBLIGHT_EFFECT_RGB_TEST
 #undef RGBLIGHT_EFFECT_ALTERNATING
 #undef RGBLIGHT_EFFECT_TWINKLE
-
-// The iris files can't cope without encoder definitions, but we explicitly disable encoders in rules.mk.
-// Hack to prevent the base files from choking.
-#ifndef __ASSEMBLER__
-#    include <stdbool.h>
-bool encoder_update_user(uint8_t index, bool clockwise);
-#endif // __ASSEMBLER__
