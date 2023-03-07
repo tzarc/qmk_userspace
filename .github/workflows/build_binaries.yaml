@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     container: qmkfm/base_container
 
     if: github.repository == 'tzarc/qmk_build'
