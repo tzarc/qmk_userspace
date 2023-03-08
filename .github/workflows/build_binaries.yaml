@@ -1,6 +1,7 @@
 name: Build Binaries
 
 on:
+  workflow_dispatch:
   push:
     branches:
     - master
@@ -51,7 +52,7 @@ jobs:
     - name: Build
       run: |
         export PATH="$(pwd)/gcc-arm/bin:$PATH"
-        make -j -O nick
+        make nick
 
     - name: 'Upload binaries'
       uses: actions/upload-artifact@v3
