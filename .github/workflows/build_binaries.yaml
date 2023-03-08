@@ -18,11 +18,11 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Deploy ARM toolchain
-      run: |
-        wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
-        mkdir -p gcc-arm
-        tar xf gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2 -C gcc-arm --strip-components=1
+#    - name: Deploy ARM toolchain
+#      run: |
+#        wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
+#        mkdir -p gcc-arm
+#        tar xf gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2 -C gcc-arm --strip-components=1
 
     - name: Deploy QMK Firmware
       run: |
