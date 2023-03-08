@@ -13,7 +13,6 @@
 #    define BT_PAIR4 KC_AP2_BT4
 #    define BT_NPAIR KC_AP2_BT_UNPAIR
 #    define BT_USB KC_AP2_USB
-_Static_assert(SAFE_RANGE == AP2_SAFE_RANGE, "SAFE_RANGE needs to match AP2_SAFE_RANGE");
 #else
 #    define BT_PAIR1 KC_NO
 #    define BT_PAIR2 KC_NO
@@ -24,7 +23,7 @@ _Static_assert(SAFE_RANGE == AP2_SAFE_RANGE, "SAFE_RANGE needs to match AP2_SAFE
 #endif
 
 enum {
-    CHANGEMODE = SAFE_RANGE, // from normal QMK
+    CHANGEMODE = QK_USER_0, // from normal QMK
     TIME_RESET,
     TIME_EEPRST,
     TZ_ENC_FIRST,

@@ -51,7 +51,7 @@ jobs:
     - name: Build
       run: |
         export PATH="$(pwd)/gcc-arm/bin:$PATH"
-        make nick
+        make -j -O nick
 
     - name: 'Upload binaries'
       uses: actions/upload-artifact@v3

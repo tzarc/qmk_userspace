@@ -121,7 +121,8 @@ get_qmk() {
         git checkout develop
         git pull --ff-only
         make git-submodule
-        rsync -aP --delete /home/qmk/repo/ /qmk_firmware/ || true
+        rm -rf /qmk_firmware/* /qmk_firmware/.* 2>/dev/null || true
+        rsync -avvP --delete /home/qmk/repo/ /qmk_firmware || true
         git config --global --add safe.directory /qmk_firmware
     } 2>&1 > /home/qmk/qmk_get.log
 }

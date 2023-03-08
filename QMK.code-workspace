@@ -92,5 +92,21 @@
     "python.defaultInterpreterPath":"/home/nickb/.local/pipx/venvs/qmk/bin/python3",
     "git.ignoreLimitWarning": true,
     "cortex-debug.variableUseNaturalFormat": true,
+    "cSpell.words": [
+      "Brassel",
+      "Chibi",
+      "chibios",
+      "comms",
+      "Configurator",
+      "keymap",
+      "keymaps",
+      "LVGL",
+      "OLED",
+      "PIXDATA",
+      "QMK's",
+      "stdlayout",
+      "tzarc",
+      "USBPD"
+    ],
   }
 }
