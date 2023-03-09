@@ -52,7 +52,7 @@ jobs:
     - name: Build
       run: |
         export PATH="$(pwd)/gcc-arm/bin:$PATH"
-        make nick
+        make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) -O nick
 
     - name: 'Upload binaries'
       uses: actions/upload-artifact@v3
