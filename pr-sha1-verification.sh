@@ -52,6 +52,7 @@ fi
 cleanup() {
     errcho "Cleaning up..."
     cd "$script_dir"
+    bash
     while [[ -n "$(mount | grep " $build_dir ")" ]]; do
         errcho "Waiting for $build_dir to unmount..."
         sleep 1
@@ -67,6 +68,7 @@ build_targets() {
     pushd "$pr_dir" >/dev/null 2>&1
     git diff --name-only $TARGET_BRANCH | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' | sort | uniq
     popd >/dev/null 2>&1
+    #echo takashiski/namecard2x4/rev2
 }
 
 build_one() {
@@ -77,7 +79,11 @@ build_one() {
 }
 
 strip_calls() {
-    cat - | sed -e 's@call\s\+0x[0-9a-fA-F]*@call 0x????@g' -e 's@jmp\s\+0x[0-9a-fA-F]*@jmp 0x????@g'
+    cat - | sed \
+        -e 's@call\s\+0x[0-9a-fA-F]\+@call 0x????@g' \
+        -e 's@jmp\s\+0x[0-9a-fA-F]\+@jmp 0x????@g' \
+        -e 's@lds\s\+r[0-9]\+,\s*0x[0-9a-fA-F]\+@lds r??, 0x????@g' \
+        -e 's@sts\s\+0x[0-9a-fA-F]\+,\s*r[0-9]\+@sts 0x????, r??@g'
 }
 
 main() {
