@@ -48,19 +48,22 @@ if [[ -z "${TARGET_PR_NUMBER:-}" ]]; then
 fi
 
 # Set up the build directory
-[[ -d "$build_dir" ]] || mkdir -p "$build_dir"
 cleanup() {
-    errcho "Cleaning up..."
     cd "$script_dir"
-    bash
+    if [[ -d "$build_dir" ]]; then
+        echo "Dropping into a shell for extra processing during cleanup..."
+        bash
+    fi
     while [[ -n "$(mount | grep " $build_dir ")" ]]; do
         errcho "Waiting for $build_dir to unmount..."
         sleep 1
         sudo umount "$build_dir" || true
         sleep 1
     done
-    sleep 1
-    rm -rf --one-file-system "$build_dir"
+    if [[ -d "$build_dir" ]]; then
+        sleep 1
+        rm -rf --one-file-system "$build_dir"
+    fi
 }
 trap cleanup EXIT
 
@@ -68,7 +71,7 @@ build_targets() {
     pushd "$pr_dir" >/dev/null 2>&1
     git diff --name-only $TARGET_BRANCH | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' | sort | uniq
     popd >/dev/null 2>&1
-    #echo takashiski/namecard2x4/rev2
+    #echo takashiski/namecard2x4/rev1 takashiski/namecard2x4/rev2
 }
 
 build_one() {
@@ -87,6 +90,8 @@ strip_calls() {
 }
 
 main() {
+    cleanup
+    [[ -d "$build_dir" ]] || mkdir -p "$build_dir"
     sudo mount -t tmpfs tmpfs "$build_dir"
     cd "$build_dir"
 
@@ -142,6 +147,8 @@ main() {
     done
 
     # Testing!
+    cd "$script_dir"
+    echo "Entering shell so that extra investigation can occur..."
     bash
 }
 
