@@ -37,10 +37,12 @@ BOARD_DEFS := \
 	ghoul_rp2040!keymaps/ghoul!tzarc/ghoul/rev1/rp2040/keymaps/tzarc!tzarc \
 	geekboards!keymaps/geekboards-macropad_v2!geekboards/macropad_v2/keymaps/tzarc!tzarc \
 	iris!keymaps/iris_rev4!keebio/iris/rev4/keymaps/tzarc!tzarc \
+	jj40!keymaps/jj40!kprepublic/jj40/keymaps/tzarc!tzarc \
 	luddite!keymaps/luddite!40percentclub/luddite/keymaps/tzarc!tzarc \
 	mysterium-dad!keymaps/mysterium-dad!coseyfannitutti/mysterium/keymaps/dad!dad \
 	mysterium-nick!keymaps/mysterium!coseyfannitutti/mysterium/keymaps/tzarc!tzarc \
 	one2mini!keymaps/one2mini!ducky/one2mini/1861st/keymaps/tzarc!tzarc \
+	planck!keymaps/planck!planck/rev6_drop/keymaps/tzarc!tzarc \
 	sat75!keymaps/sat75!cannonkeys/satisfaction75/rev1/keymaps/tzarc!tzarc \
 	\
 	disco_f723!alternates/disco_f723!handwired/onekey/disco_f723!reset \
@@ -70,6 +72,7 @@ EXTRA_LINK_DEFS := \
 	layouts/layout-tkl_ansi!layouts/community/tkl_ansi/tzarc \
 	layouts/layout-60_ansi!layouts/community/60_ansi/tzarc \
 	layouts/layout-ortho_4x4!layouts/community/ortho_4x4/tzarc \
+	layouts/layout-ortho_4x12!layouts/community/ortho_4x12/tzarc \
 	users-tzarc!users/tzarc
 
 all-arm:
@@ -80,7 +83,7 @@ all: NO_COMPILEDB = true
 all: bin
 
 nick: NO_COMPILEDB = true
-nick: annepro2 bm16s bm60 chocopad ctrl cyclone djinn geekboards ghoul iris luddite mysterium-nick one2mini sat75
+nick: annepro2 bm16s bm60 chocopad ctrl cyclone djinn geekboards ghoul iris jj40 luddite mysterium-nick one2mini planck sat75
 
 djinn: NO_COMPILEDB = true
 djinn: djinn_rev1 djinn_rev2
