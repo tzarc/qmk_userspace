@@ -1,6 +1,6 @@
 # Copyright 2018-2023 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
-FROM qmkfm/base_container:latest
+FROM ghcr.io/qmk/qmk_base_container:latest
 
 #FROM fedora:latest
 
