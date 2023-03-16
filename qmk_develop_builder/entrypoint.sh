@@ -34,7 +34,7 @@ clear_s3_bucket() {
     aws s3 rm --recursive s3://${AWS_BUCKET}/
     aws s3 ls s3://${AWS_BUCKET}/
 
-    cd /qmk_firmware
+        cd /home/qmk/qmk_firmware
     cat << EOF > /home/qmk/in_progress.html
 <!DOCTYPE html>
 <html lang='en'><head>
@@ -61,8 +61,8 @@ EOF
 }
 
 upload_binaries() {
-    aws s3 cp /qmk_firmware/ s3://${AWS_BUCKET}/ --recursive --exclude '*' --include '*.bin' --include '*.uf2' --include '*.hex' --exclude '*/*'
-    aws s3 cp /qmk_firmware/.build/ s3://${AWS_BUCKET}/ --recursive --exclude '*' --include 'failed.*.html' --exclude '*/*'
+    aws s3 cp /home/qmk/qmk_firmware/ s3://${AWS_BUCKET}/ --recursive --exclude '*' --include '*.bin' --include '*.uf2' --include '*.hex' --exclude '*/*'
+    aws s3 cp /home/qmk/qmk_firmware/.build/ s3://${AWS_BUCKET}/ --recursive --exclude '*' --include 'failed.*.html' --exclude '*/*'
     aws s3 cp /home/qmk/index.html s3://${AWS_BUCKET}/
     aws s3 ls s3://${AWS_BUCKET}/
 }
@@ -79,7 +79,7 @@ discord_text() {
         local num_successes=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(OK)\]' | wc -l)
         local num_warnings=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(WARNINGS)\]' | wc -l)
         local num_failures=$(cat /home/qmk/qmk_build_all.log | grep -E '\[(ERRORS)\]' | wc -l)
-        echo "qmk_firmware, develop @ \`$(cd /qmk_firmware && git log -n1 --format=format:%H)\`"
+        echo "qmk_firmware, develop @ \`$(cd /home/qmk/qmk_firmware && git log -n1 --format=format:%H)\`"
         echo "Prebuilt firmware at https://qmk.tzarc.io/"
         echo "Successful: **${num_successes}**, warnings: **${num_warnings}**, errors: **${num_failures}**"
         echo '```'
@@ -117,24 +117,21 @@ ctlchars2html() {
 
 get_qmk() {
     {
-        cd /home/qmk/repo
+        cd /home/qmk/qmk_firmware
         git checkout develop
         git pull --ff-only
         make git-submodule
-        rm -rf /qmk_firmware/* /qmk_firmware/.* 2>/dev/null || true
-        rsync -avvP --delete /home/qmk/repo/ /qmk_firmware || true
-        git config --global --add safe.directory /qmk_firmware
     } 2>&1 > /home/qmk/qmk_get.log
 }
 
 build_qmk() {
     {
-        cd /qmk_firmware
+        cd /home/qmk/qmk_firmware
         env -i HOME="$HOME" PATH="/home/qmk/.local/bin:/usr/local/bin:/usr/bin:/bin" TERM="linux" PWD="${PWD:-}" /home/qmk/run_ci_build.sh | sort || true
     } 2>&1 > /home/qmk/qmk_build_all.log
 
 #    {
-#        cd /qmk_firmware
+#        cd /home/qmk/qmk_firmware
 #        { qmk list-keyboards | grep handwired/onekey | while read kb ; do fmake ${kb}:all 2>&1 ; done | grep Making ; } || true
 #    } 2>&1 > /home/qmk/qmk_build_onekey.log
 }
@@ -155,7 +152,7 @@ summary() {
 failure_output() {
     echo "<h3>Failure logs:</h3>"
 
-    { ls -1 /qmk_firmware/.build/failed* 2>/dev/null || true ; } | sort | while read failure ; do
+    { ls -1 /home/qmk/qmk_firmware/.build/failed* 2>/dev/null || true ; } | sort | while read failure ; do
         echo "<hr/>"
         echo "<h3>$(echo $failure | rev | cut -d. -f1 | rev)</h3>"
         echo "<pre>"
@@ -166,7 +163,7 @@ failure_output() {
 
 make_index_html() {
     {
-        cd /qmk_firmware
+        cd /home/qmk/qmk_firmware
         cat << EOF > /home/qmk/index.html
 <!DOCTYPE html>
 <html lang='en'><head>
@@ -207,7 +204,7 @@ $(cat /home/qmk/qmk_build_all.log | ctlchars2html)
 <div style='position:absolute; right:0; top:0; padding: 1em; border-left: 1px solid #666; border-bottom: 1px solid #666' class="f9 b9">
 <pre>
 Prebuilt binaries:
-$(cd /qmk_firmware/ >/dev/null 2>&1; for f in $(ls *.hex *.bin *.uf2 2>/dev/null) ; do
+$(cd /home/qmk/qmk_firmware/ >/dev/null 2>&1; for f in $(ls *.hex *.bin *.uf2 2>/dev/null) ; do
     echo "<a href='https://qmk.tzarc.io/$f'>$f</a> [<a href='qmk:https://qmk.tzarc.io/$f'>toolbox</a>]"
 done)
 </pre>
@@ -231,7 +228,7 @@ get_qmk >/dev/null 2>&1
 
 if [[ "${1:-}" != "--shell" ]] ; then
 
-    cd /qmk_firmware
+    cd /home/qmk/qmk_firmware
 
     hash_file="/home/qmk/.repo-hash"
     old_hash=$(cat "$hash_file" || true)
