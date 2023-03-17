@@ -51,7 +51,7 @@ fi
 cleanup() {
     cd "$script_dir"
     if [[ -d "$build_dir" ]]; then
-        echo "Dropping into a shell for extra processing during cleanup..."
+        echo "Entering shell so that extra investigation can occur..."
         bash
     fi
     while [[ -n "$(mount | grep " $build_dir ")" ]]; do
@@ -145,11 +145,6 @@ main() {
             arm-none-eabi-objdump $objdump_params "$pr_dir/.build/$elf_file" | strip_calls > "$build_dir/$elf_file.pr.dis"
         fi
     done
-
-    # Testing!
-    cd "$script_dir"
-    echo "Entering shell so that extra investigation can occur..."
-    bash
 }
 
 ########################################################################################################################
