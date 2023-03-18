@@ -12,8 +12,8 @@ permissions:
 jobs:
   build:
     name: Build
-    runs-on: self-hosted
-    #runs-on: ubuntu-latest
+    #runs-on: self-hosted
+    runs-on: ubuntu-latest
     container: qmkfm/base_container
 
     if: github.repository == 'tzarc/qmk_build'
