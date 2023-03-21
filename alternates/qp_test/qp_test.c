@@ -112,28 +112,29 @@ void keyboard_post_init_kb(void) {
 
     thintel = qp_load_font_mem(font_thintel);
 
-    //st7789 = qp_st7789_make_spi_device(240, 320, DISPLAY_CS_PIN_2_0_INCH_LCD_ST7789, DISPLAY_DC_PIN, DISPLAY_RST_PIN_2_0_INCH_LCD_ST7789, 2, 3);
-    //init_and_clear(st7789, QP_ROTATION_0);
+    st7789 = qp_st7789_make_spi_device(240, 320, DISPLAY_CS_PIN_2_0_INCH_LCD_ST7789, DISPLAY_DC_PIN, DISPLAY_RST_PIN_2_0_INCH_LCD_ST7789, 2, 3);
+    init_and_clear(st7789, QP_ROTATION_0);
 
     sh1106_spi = qp_sh1106_make_spi_device(DISPLAY_CS_PIN_0_96_INCH_OLED_SH1106, DISPLAY_DC_PIN, DISPLAY_RST_PIN_0_96_INCH_OLED_SH1106, 16, 0);
     init_and_clear(sh1106_spi, QP_ROTATION_180);
 
-    //sh1106_i2c = qp_sh1106_make_i2c_device(0x3C);
-    //init_and_clear(sh1106_i2c, QP_ROTATION_0);
+    sh1106_i2c = qp_sh1106_make_i2c_device(0x3C);
+    init_and_clear(sh1106_i2c, QP_ROTATION_0);
 
     keyboard_post_init_user();
 }
 
-void matrix_scan_kb(void) {
+void housekeeping_task_kb(void) {
     static uint32_t last_scan = 0;
     uint32_t        now       = timer_read32();
-    if (TIMER_DIFF_32(now, last_scan) >= 3000) {
+    if (TIMER_DIFF_32(now, last_scan) >= 1000) {
         last_scan = now;
         draw_test(st7789, "ST7789", now);
 
         static painter_rotation_t p = QP_ROTATION_0;
-        p = (p + 1) % 4;
+        p                           = (p + 1) % 4;
         init_and_clear(sh1106_spi, p);
+        init_and_clear(sh1106_i2c, p);
 
         draw_test(sh1106_spi, "SH1106(SPI)", now);
         draw_test(sh1106_i2c, "SH1106(I2C)", now);
@@ -143,52 +144,19 @@ void matrix_scan_kb(void) {
             animating = true;
             if (test_anim) {
                 qp_animate(st7789, 100, 0, test_anim);
-                //qp_animate(sh1106_spi, 100, 0, test_anim);
-                //qp_animate(sh1106_i2c, 100, 0, test_anim);
+                qp_animate(sh1106_spi, 100, 0, test_anim);
+                qp_animate(sh1106_i2c, 100, 0, test_anim);
             }
 
             if (loading) {
                 qp_animate(st7789, 0, 3 * thintel->line_height, loading);
-                //qp_animate(sh1106_spi, 0, 3 * thintel->line_height, loading);
-                //qp_animate(sh1106_i2c, 0, 3 * thintel->line_height, loading);
+                qp_animate(sh1106_spi, 0, 3 * thintel->line_height, loading);
+                qp_animate(sh1106_i2c, 0, 3 * thintel->line_height, loading);
             }
         }
     }
 
-    static uint32_t last_flush = 0;
-    if (TIMER_DIFF_32(now, last_flush) > 0) {
-        last_flush = now;
-        qp_flush(sh1106_spi);
-        qp_flush(sh1106_i2c);
-    }
-
-    matrix_scan_user();
-}
-
-void chibi_system_halt_hook(const char* reason) {
-    // re-route to QMK toolbox...
-    uprintf("system halting: %s\n", reason);
-}
-
-void chibi_system_trace_hook(void* tep) {
-    // re-route to QMK toolbox...
-    uprintf("trace\n");
-}
-
-void chibi_debug_check_hook(const char* func, const char* condition, int value) {
-    // re-route to QMK toolbox...
-    uprintf("%s debug check failure: (%s) == %s\n", func, condition, value ? "true" : "false");
-    // ...and hard-loop fail
-    while (1) {
-    }
-}
-
-void chibi_debug_assert_hook(const char* func, const char* condition, int value, const char* reason) {
-    // re-route to QMK toolbox...
-    uprintf("%s debug assert (%s) failure: (%s) == %s\n", func, reason, condition, value ? "true" : "false");
-    // ...and hard-loop fail
-    while (1) {
-    }
+    housekeeping_task_user();
 }
 
 #ifdef DEBUG_EEPROM_OUTPUT

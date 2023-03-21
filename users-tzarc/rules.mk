@@ -7,6 +7,10 @@ SRC += \
 	tzarc_unicode.c \
 	tzarc_screen.c
 
+# Ensure file listings are generated
+# cat .build/obj_tzarc_djinn_rev2_tzarc/tzarc_unicode.i | sed -e 's@^#.*@@g' -e 's@^\s*//.*@@g' -e '/^\s*$/d' | clang-format
+OPT_DEFS += -save-temps=obj
+
 TOP_SYMBOLS = 25
 NKRO_ENABLE ?= no
 COMMAND_ENABLE = no

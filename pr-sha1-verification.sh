@@ -69,16 +69,25 @@ trap cleanup EXIT
 
 build_targets() {
     pushd "$pr_dir" >/dev/null 2>&1
-    git diff --name-only $TARGET_BRANCH | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' | sort | uniq
+
+    # Auto-determined from modified files in diff
+    git diff --name-only $TARGET_BRANCH | grep -P '^keyboards' | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' -e 's@$@:default@g' | sort | uniq
+
+    # Generated from features present in boards
+    #qmk find -f 'features.quantum_painter=true' | sort | uniq
+    #qmk find -km apa102
+
+    # Explicit board names
+    #echo takashiski/namecard2x4/rev1:default takashiski/namecard2x4/rev2:default
+
     popd >/dev/null 2>&1
-    #echo takashiski/namecard2x4/rev1 takashiski/namecard2x4/rev2
 }
 
 build_one() {
     local target=$1
     echo $target
     [[ -d .build ]] || mkdir .build
-    make ${target}:default $reproducible_build_flags 2>&1 | grep -v '⚠' > .build/$(echo $target | sed -e 's@/@_@g').log 2>&1
+    make ${target} $reproducible_build_flags 2>&1 | grep -v '⚠' > .build/$(echo $target | sed -e 's@/@_@g').log 2>&1
 }
 
 strip_calls() {
@@ -101,6 +110,7 @@ main() {
     # Clone the base repo
     rsync -qaP "$script_dir/qmk_firmware/" "$base_dir/"
     cd "$base_dir"
+    make distclean
     rm .git/hooks/*
     git remote set-url origin "$QMK_FIRMWARE_REPO"
     git checkout "$TARGET_BRANCH"
@@ -131,7 +141,9 @@ main() {
     { ls -1 *.hex *.bin *.uf2 2>/dev/null || true ; } | sort | xargs sha1sum > "$build_dir/sha1sums_pr.txt"
 
     # Work out the diff's between the two target builds
-    diff -u "$build_dir/sha1sums_base.txt" "$build_dir/sha1sums_pr.txt" || true
+    echo '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
+    diff -yW 200 --suppress-common-lines "$build_dir/sha1sums_base.txt" "$build_dir/sha1sums_pr.txt" || true
+    echo '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
 
     elf_files=$( (diff "$build_dir/sha1sums_base.txt" "$build_dir/sha1sums_pr.txt" || true) | awk '/(hex|bin|uf2)/ {print $3}' | sort | uniq | sed -e 's@\(hex\|bin\|uf2\)@elf@g' || true)
 

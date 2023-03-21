@@ -5,14 +5,9 @@
     "**/*.bin": true,
     "**/*.uf2": true
   },
-  "git.ignoreLimitWarning": true,
   "[markdown]": {
+    "files.trimFinalNewlines": false,
     "editor.trimAutoWhitespace": false,
-    "files.trimTrailingWhitespace": false
-  },
-  "[properties]": {
-    "editor.trimAutoWhitespace": false,
-    "files.trimTrailingWhitespace": false
-  },
-  "python.pythonPath": "E:\\QMK_MSYS\\mingw64\\bin\\python3.exe"
+    "files.trimTrailingWhitespace": false,
+  }
 }
