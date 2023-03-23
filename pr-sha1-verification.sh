@@ -12,7 +12,7 @@ script_dir="$(realpath "$(dirname "$this_script")")"
 build_dir="$script_dir/sha1_verification"
 
 QMK_FIRMWARE_REPO=https://github.com/qmk/qmk_firmware.git
-reproducible_build_flags="COMMAND_ENABLE=no SKIP_VERSION=yes"
+reproducible_build_flags="COMMAND_ENABLE=no SKIP_VERSION=yes KEEP_INTERMEDIATES=yes"
 
 errcho() { echo "$@" 1>&2; }
 havecmd() { command command type "${1}" >/dev/null 2>&1 || return 1; }
@@ -139,6 +139,13 @@ main() {
     make git-submodule
     env_parallel -j $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) build_one ::: $targets
     { ls -1 *.hex *.bin *.uf2 2>/dev/null || true ; } | sort | xargs sha1sum > "$build_dir/sha1sums_pr.txt"
+
+    local differences=$( (diff -yW 200 --suppress-common-lines "$build_dir/sha1sums_base.txt" "$build_dir/sha1sums_pr.txt" || true) | awk '{print $2}' | sed -e 's@\.\(hex\|bin\|uf2\)$@@g' | xargs echo )
+    for difference in $differences ; do
+        find "$base_dir/.build/obj_$difference" "$pr_dir/.build/obj_$difference" -type f -name '*.i' | while read file ; do
+            cat "$file" | sed -e 's@^#.*@@g' -e 's@^\s*//.*@@g' -e '/^\s*$/d' | clang-format > "$file.formatted"
+        done
+    done
 
     # Work out the diff's between the two target builds
     echo '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
