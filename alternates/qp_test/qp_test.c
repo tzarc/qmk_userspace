@@ -49,6 +49,47 @@ static uint32_t delayed_test(uint32_t trigger_time, void* cb_arg) {
     last = now;
     return timeout;
 }
+/*
+typedef struct {
+    int idx;
+    uint16_t l;
+    uint16_t t;
+    uint16_t r;
+    uint16_t b;
+    bool filled;
+} rect_t;
+static rect_t rects[] = {
+    {.idx = 0, .l = 0, .t = 0, .r = 63, .b = 31, .filled = true},
+    {.idx = 1, .l = 64, .t = 0, .r = 127, .b = 31, .filled = false},
+    {.idx = 2, .l = 0, .t = 32, .r = 63, .b = 63, .filled = true},
+    {.idx = 3, .l = 64, .t = 32, .r = 127, .b = 63, .filled = false},
+};
+static uint32_t block_draw(uint32_t trigger_time, void* cb_arg) {
+    rect_t *r = (rect_t*)cb_arg;
+    dprintf("Drawing rect %d\n", r->idx);
+    qp_rect(sh1106_spi, r->l, r->t, r->r, r->b, 0, 0, r->filled ? 255 : 0, true);
+    qp_flush(sh1106_spi);
+    r->filled = !r->filled;
+    return 100;
+}
+
+typedef struct render_state_t {
+    uint16_t position;
+} render_state_t;
+static render_state_t render_state = {0};
+static uint32_t renderer(uint32_t trigger_time, void* cb_arg) {
+    render_state_t* state = (render_state_t*)cb_arg;
+    qp_rect(sh1106_spi, 0, 0, 127, 63, 0, 0, 0, true);
+    qp_rect(sh1106_spi, state->position, 0, state->position, 63, 0, 0, 255, true);
+    qp_rect(sh1106_i2c, 0, 0, 127, 63, 0, 0, 0, true);
+    qp_rect(sh1106_i2c, state->position, 0, state->position, 63, 0, 0, 255, true);
+    state->position++;
+    if (state->position > 127) {
+        state->position = 0;
+    }
+    return 100;
+}
+*/
 
 void init_and_clear(painter_device_t device, painter_rotation_t rotation) {
     uint16_t width;
@@ -57,7 +98,12 @@ void init_and_clear(painter_device_t device, painter_rotation_t rotation) {
 
     qp_init(device, rotation);
     qp_rect(device, 0, 0, width - 1, height - 1, 0, 0, 0, true);
-    qp_flush(device);
+
+//    for(int i =0; i < ARRAY_SIZE(rects); ++i) {
+//        defer_exec(100 + i, block_draw, &rects[i]);
+//    }
+
+//    defer_exec(100, renderer, &render_state);
 }
 
 void draw_test(painter_device_t device, const char* name, uint32_t now) {
@@ -92,8 +138,6 @@ void draw_test(painter_device_t device, const char* name, uint32_t now) {
         qp_rect(device, xpos, ypos, width - 1, ypos + thintel->line_height, 0, 0, 0, true);
         ypos += thintel->line_height;
     }
-
-    qp_flush(device);
 }
 
 void keyboard_post_init_kb(void) {
@@ -101,7 +145,7 @@ void keyboard_post_init_kb(void) {
     debug_matrix   = true;
     debug_keyboard = true;
 
-    // wait_ms(15000);
+    //wait_ms(10000);
 
     defer_exec(3000, delayed_test, (void*)(uint16_t)3000);
     defer_exec(2900, delayed_test, (void*)(uint16_t)2900);
@@ -115,11 +159,11 @@ void keyboard_post_init_kb(void) {
     st7789 = qp_st7789_make_spi_device(240, 320, DISPLAY_CS_PIN_2_0_INCH_LCD_ST7789, DISPLAY_DC_PIN, DISPLAY_RST_PIN_2_0_INCH_LCD_ST7789, 2, 3);
     init_and_clear(st7789, QP_ROTATION_0);
 
-    sh1106_spi = qp_sh1106_make_spi_device(DISPLAY_CS_PIN_0_96_INCH_OLED_SH1106, DISPLAY_DC_PIN, DISPLAY_RST_PIN_0_96_INCH_OLED_SH1106, 16, 0);
+    sh1106_spi = qp_sh1106_make_spi_device(DISPLAY_CS_PIN_0_96_INCH_OLED_SH1106, DISPLAY_DC_PIN, DISPLAY_RST_PIN_0_96_INCH_OLED_SH1106, 2, 0);
     init_and_clear(sh1106_spi, QP_ROTATION_180);
 
     sh1106_i2c = qp_sh1106_make_i2c_device(0x3C);
-    init_and_clear(sh1106_i2c, QP_ROTATION_0);
+    init_and_clear(sh1106_i2c, QP_ROTATION_180);
 
     keyboard_post_init_user();
 }
@@ -131,10 +175,10 @@ void housekeeping_task_kb(void) {
         last_scan = now;
         draw_test(st7789, "ST7789", now);
 
-        static painter_rotation_t p = QP_ROTATION_0;
-        p                           = (p + 1) % 4;
-        init_and_clear(sh1106_spi, p);
-        init_and_clear(sh1106_i2c, p);
+        //static painter_rotation_t p = QP_ROTATION_0;
+        //p                           = (p + 1) % 4;
+        //init_and_clear(sh1106_spi, p);
+        //init_and_clear(sh1106_i2c, p);
 
         draw_test(sh1106_spi, "SH1106(SPI)", now);
         draw_test(sh1106_i2c, "SH1106(I2C)", now);
