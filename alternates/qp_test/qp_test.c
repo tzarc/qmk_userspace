@@ -159,11 +159,11 @@ void keyboard_post_init_kb(void) {
     st7789 = qp_st7789_make_spi_device(240, 320, DISPLAY_CS_PIN_2_0_INCH_LCD_ST7789, DISPLAY_DC_PIN, DISPLAY_RST_PIN_2_0_INCH_LCD_ST7789, 2, 3);
     init_and_clear(st7789, QP_ROTATION_0);
 
-    sh1106_spi = qp_sh1106_make_spi_device(DISPLAY_CS_PIN_0_96_INCH_OLED_SH1106, DISPLAY_DC_PIN, DISPLAY_RST_PIN_0_96_INCH_OLED_SH1106, 2, 0);
-    init_and_clear(sh1106_spi, QP_ROTATION_180);
+    sh1106_spi = qp_sh1106_make_spi_device(128, 64, DISPLAY_CS_PIN_0_96_INCH_OLED_SH1106, DISPLAY_DC_PIN, DISPLAY_RST_PIN_0_96_INCH_OLED_SH1106, 2, 0);
+    init_and_clear(sh1106_spi, QP_ROTATION_90);
 
-    sh1106_i2c = qp_sh1106_make_i2c_device(0x3C);
-    init_and_clear(sh1106_i2c, QP_ROTATION_180);
+    sh1106_i2c = qp_sh1106_make_i2c_device(128, 64, 0x3C);
+    init_and_clear(sh1106_i2c, QP_ROTATION_270);
 
     keyboard_post_init_user();
 }
