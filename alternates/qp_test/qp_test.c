@@ -99,11 +99,11 @@ void init_and_clear(painter_device_t device, painter_rotation_t rotation) {
     qp_init(device, rotation);
     qp_rect(device, 0, 0, width - 1, height - 1, 0, 0, 0, true);
 
-//    for(int i =0; i < ARRAY_SIZE(rects); ++i) {
-//        defer_exec(100 + i, block_draw, &rects[i]);
-//    }
+    //    for(int i =0; i < ARRAY_SIZE(rects); ++i) {
+    //        defer_exec(100 + i, block_draw, &rects[i]);
+    //    }
 
-//    defer_exec(100, renderer, &render_state);
+    //    defer_exec(100, renderer, &render_state);
 }
 
 void draw_test(painter_device_t device, const char* name, uint32_t now) {
@@ -145,7 +145,7 @@ void keyboard_post_init_kb(void) {
     debug_matrix   = true;
     debug_keyboard = true;
 
-    //wait_ms(10000);
+    // wait_ms(10000);
 
     defer_exec(3000, delayed_test, (void*)(uint16_t)3000);
     defer_exec(2900, delayed_test, (void*)(uint16_t)2900);
@@ -175,10 +175,10 @@ void housekeeping_task_kb(void) {
         last_scan = now;
         draw_test(st7789, "ST7789", now);
 
-        //static painter_rotation_t p = QP_ROTATION_0;
-        //p                           = (p + 1) % 4;
-        //init_and_clear(sh1106_spi, p);
-        //init_and_clear(sh1106_i2c, p);
+        // static painter_rotation_t p = QP_ROTATION_0;
+        // p                           = (p + 1) % 4;
+        // init_and_clear(sh1106_spi, p);
+        // init_and_clear(sh1106_i2c, p);
 
         draw_test(sh1106_spi, "SH1106(SPI)", now);
         draw_test(sh1106_i2c, "SH1106(I2C)", now);
