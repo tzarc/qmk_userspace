@@ -133,6 +133,34 @@
       }
     },
     {
+      "name": "Python: convert test.gif",
+      "type": "python",
+      "cwd": "${workspaceRoot}",
+      "request": "launch",
+      "args": [
+        "painter-convert-graphics",
+        "-f",
+        "mono2",
+        "-i",
+        "test.gif",
+        "-v"
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+        },
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
       "name": "Python: generate-keyboard-c, Ghoul/RP2040",
       "type": "python",
       "cwd": "${workspaceRoot}/qmk_firmware",
