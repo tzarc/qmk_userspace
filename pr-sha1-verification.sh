@@ -12,7 +12,7 @@ script_dir="$(realpath "$(dirname "$this_script")")"
 build_dir="$script_dir/sha1_verification"
 
 QMK_FIRMWARE_REPO=https://github.com/qmk/qmk_firmware.git
-reproducible_build_flags="COMMAND_ENABLE=no SKIP_VERSION=yes KEEP_INTERMEDIATES=yes"
+reproducible_build_flags="-e COMMAND_ENABLE=no -e SKIP_VERSION=yes -e KEEP_INTERMEDIATES=yes"
 
 errcho() { echo "$@" 1>&2; }
 havecmd() { command command type "${1}" >/dev/null 2>&1 || return 1; }
@@ -21,6 +21,11 @@ usage() {
     errcho "  --pr <PR number>  The PR number to check"
     errcho "  --branch <branch> The branch to check against (default: develop)"
     exit 1
+}
+
+pcmd() {
+    echo -e "\e[38;5;203mExecuting:\e[38;5;131m $@\e[0m"
+    "$@"
 }
 
 unset TARGET_PR_NUMBER
@@ -80,6 +85,9 @@ build_targets() {
     # Explicit board names
     #echo takashiski/namecard2x4/rev1:default takashiski/namecard2x4/rev2:default
 
+    # Random selection of 100 of all boards
+    #qmk find | shuf | head -n100
+
     popd >/dev/null 2>&1
 }
 
@@ -108,36 +116,36 @@ main() {
     export pr_dir="$build_dir/qmk_firmware_pr"
 
     # Clone the base repo
-    rsync -qaP "$script_dir/qmk_firmware/" "$base_dir/"
+    pcmd rsync -qaP "$script_dir/qmk_firmware/" "$base_dir/"
     cd "$base_dir"
-    make distclean
-    rm .git/hooks/*
-    git remote set-url origin "$QMK_FIRMWARE_REPO"
-    git checkout "$TARGET_BRANCH"
-    git fetch origin "$TARGET_BRANCH"
-    git pull --ff-only
-    make git-submodule
+    pcmd make distclean
+    pcmd rm .git/hooks/*
+    pcmd git remote set-url origin "$QMK_FIRMWARE_REPO"
+    pcmd git checkout "$TARGET_BRANCH"
+    pcmd git fetch origin "$TARGET_BRANCH"
+    pcmd git pull --ff-only
+    pcmd make git-submodule
 
     # Fetch the PR
-    rsync -qaP --delete "$base_dir/" "$pr_dir/"
+    pcmd rsync -qaP --delete "$base_dir/" "$pr_dir/"
     cd "$pr_dir"
-    git fetch origin pull/"$TARGET_PR_NUMBER"/head:pr/"$TARGET_PR_NUMBER"
-    git checkout -b target_pr pr/"$TARGET_PR_NUMBER"
-    git merge --no-edit --quiet $TARGET_BRANCH
+    pcmd git fetch origin pull/"$TARGET_PR_NUMBER"/head:pr/"$TARGET_PR_NUMBER"
+    pcmd git checkout -b target_pr pr/"$TARGET_PR_NUMBER"
+    pcmd git merge --no-edit --quiet $TARGET_BRANCH
 
     # Generate the list of targets
-    targets=$(build_targets | xargs echo)
+    targets=$(build_targets | sort | uniq | xargs echo)
 
     # Build the base repo
     cd "$base_dir"
-    make git-submodule
-    env_parallel -j $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) build_one ::: $targets
+    pcmd make git-submodule
+    pcmd qmk mass-compile -c -j $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) $reproducible_build_flags $targets
     { ls -1 *.hex *.bin *.uf2 2>/dev/null || true ; } | sort | xargs sha1sum > "$build_dir/sha1sums_base.txt"
 
     # Build the target PR repo
     cd "$pr_dir"
-    make git-submodule
-    env_parallel -j $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) build_one ::: $targets
+    pcmd make git-submodule
+    pcmd qmk mass-compile -c -j $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) $reproducible_build_flags $targets
     { ls -1 *.hex *.bin *.uf2 2>/dev/null || true ; } | sort | xargs sha1sum > "$build_dir/sha1sums_pr.txt"
 
     local differences=$( (diff -yW 200 --suppress-common-lines "$build_dir/sha1sums_base.txt" "$build_dir/sha1sums_pr.txt" || true) | awk '{print $2}' | sed -e 's@\.\(hex\|bin\|uf2\)$@@g' | xargs echo )
