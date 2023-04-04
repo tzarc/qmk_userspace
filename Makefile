@@ -151,6 +151,9 @@ link_$$(link_source_$1): qmk_firmware
 	@if [ ! -L "$(ROOTDIR)/qmk_firmware/$$(link_target_$1)" ] ; then \
 		echo -e "\e[38;5;14mSymlinking: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
 		ln -sf $(ROOTDIR)/$$(link_source_$1) $(ROOTDIR)/qmk_firmware/$$(link_target_$1) ; \
+		if [ -z "$$(grep -P '^$$(link_target_$1)$$$$' $(ROOTDIR)/qmk_firmware/.git/info/exclude 2>/dev/null)" ] ; then \
+			echo $$(link_target_$1) >> $(ROOTDIR)/qmk_firmware/.git/info/exclude ; \
+		fi ; \
 	fi
 
 clean: unlink_$$(link_source_$1)
@@ -160,6 +163,7 @@ unlink_$$(link_source_$1): qmk_firmware
 	@if [ -L "$(ROOTDIR)/qmk_firmware/$$(link_target_$1)" ] ; then \
 		echo -e "\e[38;5;14mRemoving symlink: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
 		rm $(ROOTDIR)/qmk_firmware/$$(link_target_$1) || true; \
+		sed -i "\@^$$(link_target_$1)@d" $(ROOTDIR)/qmk_firmware/.git/info/exclude; \
 	fi
 endef
 
@@ -226,6 +230,9 @@ board_link_$$(board_name_$1): extra-links
 			mkdir -p "$$(shell dirname "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)")" ; \
 		fi ; \
 		ln -sf "$$(ROOTDIR)/$$(board_source_$1)" "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ; \
+		if [ -z "$$(grep -P '^keyboards/$$(board_target_$1)$$$$' $(ROOTDIR)/qmk_firmware/.git/info/exclude 2>/dev/null)" ] ; then \
+			echo keyboards/$$(board_target_$1) >> $(ROOTDIR)/qmk_firmware/.git/info/exclude ; \
+		fi ; \
 	fi
 	@touch $$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)
 
@@ -235,6 +242,7 @@ board_unlink_$$(board_name_$1):
 	@if [ -L "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ] ; then \
 		echo -e "\e[38;5;14mRemoving symlink: $$(board_target_$1)\e[0m" ; \
 		rm "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" || true; \
+		sed -i "\@^keyboards/$$(board_target_$1)@d" $(ROOTDIR)/qmk_firmware/.git/info/exclude; \
 	fi
 
 links: board_link_$$(board_name_$1)
