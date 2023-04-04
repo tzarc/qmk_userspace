@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright 2018-2023 Nick Brassel (@tzarc)
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 base_rev=$1
 target_rev=$2
