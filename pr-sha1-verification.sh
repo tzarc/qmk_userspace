@@ -4,8 +4,6 @@
 
 umask 022
 
-source `which env_parallel.bash`
-
 set -eEuo pipefail
 this_script="$(realpath "${BASH_SOURCE[0]}")"
 script_dir="$(realpath "$(dirname "$this_script")")"
@@ -76,7 +74,7 @@ build_targets() {
     pushd "$pr_dir" >/dev/null 2>&1
 
     # Auto-determined from modified files in diff
-    git diff --name-only $TARGET_BRANCH | grep -P '^keyboards' | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' | while read kb ; do if [ -e "keyboards/$kb/rules.mk" ] ; then echo "${kb}:default" ; fi ; done | sort | uniq
+    git diff --name-only $TARGET_BRANCH | grep -P '^keyboards' | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' | while read kb; do if [ -e "keyboards/$kb/rules.mk" ]; then echo "${kb}:default"; fi; done | sort | uniq
 
     # Generated from features present in boards
     #qmk find -f 'features.quantum_painter=true' | sort | uniq
@@ -95,7 +93,7 @@ build_one() {
     local target=$1
     echo $target
     [[ -d .build ]] || mkdir .build
-    make ${target} $reproducible_build_flags 2>&1 | grep -v '⚠' > .build/$(echo $target | sed -e 's@/@_@g').log 2>&1
+    make ${target} $reproducible_build_flags 2>&1 | grep -v '⚠' >.build/$(echo $target | sed -e 's@/@_@g').log 2>&1
 }
 
 strip_calls() {
@@ -140,18 +138,18 @@ main() {
     cd "$base_dir"
     pcmd make git-submodule
     pcmd qmk mass-compile -c -j $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) $reproducible_build_flags $targets
-    { ls -1 *.hex *.bin *.uf2 2>/dev/null || true ; } | sort | xargs sha1sum > "$build_dir/sha1sums_base.txt"
+    { ls -1 *.hex *.bin *.uf2 2>/dev/null || true; } | sort | xargs sha1sum >"$build_dir/sha1sums_base.txt"
 
     # Build the target PR repo
     cd "$pr_dir"
     pcmd make git-submodule
     pcmd qmk mass-compile -c -j $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) $reproducible_build_flags $targets
-    { ls -1 *.hex *.bin *.uf2 2>/dev/null || true ; } | sort | xargs sha1sum > "$build_dir/sha1sums_pr.txt"
+    { ls -1 *.hex *.bin *.uf2 2>/dev/null || true; } | sort | xargs sha1sum >"$build_dir/sha1sums_pr.txt"
 
-    local differences=$( (diff -yW 200 --suppress-common-lines "$build_dir/sha1sums_base.txt" "$build_dir/sha1sums_pr.txt" || true) | awk '{print $2}' | sed -e 's@\.\(hex\|bin\|uf2\)$@@g' | xargs echo )
-    for difference in $differences ; do
-        find "$base_dir/.build/obj_$difference" "$pr_dir/.build/obj_$difference" -type f -name '*.i' | while read file ; do
-            cat "$file" | sed -e 's@^#.*@@g' -e 's@^\s*//.*@@g' -e '/^\s*$/d' | clang-format > "$file.formatted"
+    local differences=$( (diff -yW 200 --suppress-common-lines "$build_dir/sha1sums_base.txt" "$build_dir/sha1sums_pr.txt" || true) | awk '{print $2}' | sed -e 's@\.\(hex\|bin\|uf2\)$@@g' | xargs echo)
+    for difference in $differences; do
+        find "$base_dir/.build/obj_$difference" "$pr_dir/.build/obj_$difference" -type f -name '*.i' | while read file; do
+            cat "$file" | sed -e 's@^#.*@@g' -e 's@^\s*//.*@@g' -e '/^\s*$/d' | clang-format >"$file.formatted"
         done
     done
 
@@ -169,13 +167,13 @@ main() {
     elf_files=$( (diff "$build_dir/sha1sums_base.txt" "$build_dir/sha1sums_pr.txt" || true) | awk '/(hex|bin|uf2)/ {print $3}' | sort | uniq | sed -e 's@\(hex\|bin\|uf2\)@elf@g' || true)
 
     objdump_params="-dS --no-addresses --no-show-raw-insn"
-    for elf_file in $elf_files ; do
-        if [[ -n "$(file "$pr_dir/.build/$elf_file" | grep AVR)" ]] ; then
-            avr-objdump $objdump_params "$base_dir/.build/$elf_file" | strip_calls > "$build_dir/$elf_file.base.dis"
-            avr-objdump $objdump_params "$pr_dir/.build/$elf_file" | strip_calls > "$build_dir/$elf_file.pr.dis"
+    for elf_file in $elf_files; do
+        if [[ -n "$(file "$pr_dir/.build/$elf_file" | grep AVR)" ]]; then
+            avr-objdump $objdump_params "$base_dir/.build/$elf_file" | strip_calls >"$build_dir/$elf_file.base.dis"
+            avr-objdump $objdump_params "$pr_dir/.build/$elf_file" | strip_calls >"$build_dir/$elf_file.pr.dis"
         else
-            arm-none-eabi-objdump $objdump_params "$base_dir/.build/$elf_file" | strip_calls > "$build_dir/$elf_file.base.dis"
-            arm-none-eabi-objdump $objdump_params "$pr_dir/.build/$elf_file" | strip_calls > "$build_dir/$elf_file.pr.dis"
+            arm-none-eabi-objdump $objdump_params "$base_dir/.build/$elf_file" | strip_calls >"$build_dir/$elf_file.base.dis"
+            arm-none-eabi-objdump $objdump_params "$pr_dir/.build/$elf_file" | strip_calls >"$build_dir/$elf_file.pr.dis"
         fi
     done
 }
