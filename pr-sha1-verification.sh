@@ -12,6 +12,8 @@ build_dir="$script_dir/sha1_verification"
 QMK_FIRMWARE_REPO=https://github.com/qmk/qmk_firmware.git
 reproducible_build_flags="-e COMMAND_ENABLE=no -e SKIP_VERSION=yes -e KEEP_INTERMEDIATES=yes"
 
+export RUNTIME=docker
+
 errcho() { echo "$@" 1>&2; }
 havecmd() { command command type "${1}" >/dev/null 2>&1 || return 1; }
 usage() {
@@ -137,13 +139,13 @@ main() {
     # Build the base repo
     cd "$base_dir"
     pcmd make git-submodule
-    pcmd qmk mass-compile -c -j $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) $reproducible_build_flags $targets
+    pcmd ./util/docker_cmd.sh qmk mass-compile -c -j $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) $reproducible_build_flags $targets
     { ls -1 *.hex *.bin *.uf2 2>/dev/null || true; } | sort | xargs sha1sum >"$build_dir/sha1sums_base.txt"
 
     # Build the target PR repo
     cd "$pr_dir"
     pcmd make git-submodule
-    pcmd qmk mass-compile -c -j $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) $reproducible_build_flags $targets
+    pcmd ./util/docker_cmd.sh qmk mass-compile -c -j $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) $reproducible_build_flags $targets
     { ls -1 *.hex *.bin *.uf2 2>/dev/null || true; } | sort | xargs sha1sum >"$build_dir/sha1sums_pr.txt"
 
     local differences=$( (diff -yW 200 --suppress-common-lines "$build_dir/sha1sums_base.txt" "$build_dir/sha1sums_pr.txt" || true) | awk '{print $2}' | sed -e 's@\.\(hex\|bin\|uf2\)$@@g' | xargs echo)
