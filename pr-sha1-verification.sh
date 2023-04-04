@@ -76,7 +76,7 @@ build_targets() {
     pushd "$pr_dir" >/dev/null 2>&1
 
     # Auto-determined from modified files in diff
-    git diff --name-only $TARGET_BRANCH | grep -P '^keyboards' | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' -e 's@$@:default@g' | sort | uniq
+    git diff --name-only $TARGET_BRANCH | grep -P '^keyboards' | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' | while read kb ; do if [ -e "keyboards/$kb/rules.mk" ] ; then echo "${kb}:default" ; fi ; done | sort | uniq
 
     # Generated from features present in boards
     #qmk find -f 'features.quantum_painter=true' | sort | uniq
