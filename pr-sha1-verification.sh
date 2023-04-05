@@ -10,9 +10,10 @@ script_dir="$(realpath "$(dirname "$this_script")")"
 build_dir="$script_dir/sha1_verification"
 
 QMK_FIRMWARE_REPO=https://github.com/qmk/qmk_firmware.git
-reproducible_build_flags="-e COMMAND_ENABLE=no -e SKIP_VERSION=yes -e KEEP_INTERMEDIATES=yes"
+reproducible_build_flags="-e COMMAND_ENABLE=no -e SKIP_VERSION=yes -e KEEP_INTERMEDIATES=yes -e USE_CCACHE=no"
 
 export RUNTIME=docker
+export NCPUS=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null)
 
 errcho() { echo "$@" 1>&2; }
 havecmd() { command command type "${1}" >/dev/null 2>&1 || return 1; }
@@ -28,6 +29,7 @@ pcmd() {
     "$@"
 }
 
+unset DOCKER_PREFIX
 unset TARGET_PR_NUMBER
 TARGET_BRANCH="develop"
 while [[ -n "${1:-}" ]]; do
@@ -38,6 +40,13 @@ while [[ -n "${1:-}" ]]; do
         ;;
     --branch)
         TARGET_BRANCH="$2"
+        shift
+        ;;
+    --docker)
+        DOCKER_PREFIX="./util/docker_cmd.sh"
+        ;;
+    -j)
+        export NCPUS="$2"
         shift
         ;;
     *) errcho "Unknown argument: $1" ;;
@@ -116,7 +125,7 @@ main() {
     export pr_dir="$build_dir/qmk_firmware_pr"
 
     # Clone the base repo
-    pcmd rsync -qaP "$script_dir/qmk_firmware/" "$base_dir/"
+    pcmd rsync -qaP --exclude='.build' "$script_dir/qmk_firmware/" "$base_dir/"
     cd "$base_dir"
     pcmd make distclean
     pcmd rm .git/hooks/*
@@ -139,13 +148,13 @@ main() {
     # Build the base repo
     cd "$base_dir"
     pcmd make git-submodule
-    pcmd ./util/docker_cmd.sh qmk mass-compile -c -j $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) $reproducible_build_flags $targets
+    pcmd ${DOCKER_PREFIX:-} qmk mass-compile -c -j $NCPUS $reproducible_build_flags $targets
     { ls -1 *.hex *.bin *.uf2 2>/dev/null || true; } | sort | xargs sha1sum >"$build_dir/sha1sums_base.txt"
 
     # Build the target PR repo
     cd "$pr_dir"
     pcmd make git-submodule
-    pcmd ./util/docker_cmd.sh qmk mass-compile -c -j $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) $reproducible_build_flags $targets
+    pcmd ${DOCKER_PREFIX:-} qmk mass-compile -c -j $NCPUS $reproducible_build_flags $targets
     { ls -1 *.hex *.bin *.uf2 2>/dev/null || true; } | sort | xargs sha1sum >"$build_dir/sha1sums_pr.txt"
 
     local differences=$( (diff -yW 200 --suppress-common-lines "$build_dir/sha1sums_base.txt" "$build_dir/sha1sums_pr.txt" || true) | awk '{print $2}' | sed -e 's@\.\(hex\|bin\|uf2\)$@@g' | xargs echo)
