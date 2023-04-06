@@ -29,11 +29,15 @@ pcmd() {
     "$@"
 }
 
+unset USE_RAMDISK
 unset DOCKER_PREFIX
 unset TARGET_PR_NUMBER
 TARGET_BRANCH="develop"
 while [[ -n "${1:-}" ]]; do
     case "$1" in
+    --ramdisk)
+        USE_RAMDISK=1
+        ;;
     --pr)
         TARGET_PR_NUMBER="$2"
         shift
@@ -49,7 +53,9 @@ while [[ -n "${1:-}" ]]; do
         export NCPUS="$2"
         shift
         ;;
-    *) errcho "Unknown argument: $1" ;;
+    *)
+        errcho "Unknown argument: $1"
+        ;;
     esac
     shift
 done
@@ -68,12 +74,14 @@ cleanup() {
         echo "Entering shell so that extra investigation can occur..."
         bash
     fi
-    while [[ -n "$(mount | grep " $build_dir ")" ]]; do
-        errcho "Waiting for $build_dir to unmount..."
-        sleep 1
-        sudo umount "$build_dir" || true
-        sleep 1
-    done
+    if [[ -n "${USE_RAMDISK:-}" ]]; then
+        while [[ -n "$(mount | grep " $build_dir ")" ]]; do
+            errcho "Waiting for $build_dir to unmount..."
+            sleep 1
+            sudo umount "$build_dir" || true
+            sleep 1
+        done
+    fi
     if [[ -d "$build_dir" ]]; then
         sleep 1
         rm -rf --one-file-system "$build_dir"
@@ -118,7 +126,9 @@ strip_calls() {
 main() {
     cleanup
     [[ -d "$build_dir" ]] || mkdir -p "$build_dir"
-    sudo mount -t tmpfs tmpfs "$build_dir"
+    if [[ -n "${USE_RAMDISK:-}" ]]; then
+        sudo mount -t tmpfs tmpfs "$build_dir"
+    fi
     cd "$build_dir"
 
     export base_dir="$build_dir/qmk_firmware_base"
