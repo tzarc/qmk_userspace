@@ -84,7 +84,7 @@
 #define DRIVER_LED_TOTAL 15
 #ifdef WS2812
 // Common
-#    define RGB_DI_PIN PIN_WS2812_3V3
+#    define WS2812_DI_PIN PIN_WS2812_3V3
 // Bitbang
 #    define NOP_FUDGE 0.5 // default of 0.4 gives flickering
 // PWM
