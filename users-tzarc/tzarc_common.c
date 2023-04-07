@@ -158,10 +158,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return process_record_keymap(keycode, record);
 }
 
-#if __has_include("basic_profiling.h")
-#    include "basic_profiling.h"
-#endif // __has_include("basic_profiling.h")
-
 void matrix_scan_user(void) {
 #ifdef GAME_MODES_ENABLE
     if (typing_mode == MODE_WOW) {
@@ -171,11 +167,7 @@ void matrix_scan_user(void) {
     }
 #endif // GAME_MODES_ENABLE
 
-    // #if __has_include("basic_profiling.h")
-    //     PROFILE_CALL(1000, matrix_scan_keymap());
-    // #else
     matrix_scan_keymap();
-    // #endif // __has_include("basic_profiling.h")
 }
 
 layer_state_t layer_state_set_user(layer_state_t state) {
