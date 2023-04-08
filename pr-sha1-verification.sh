@@ -94,8 +94,7 @@ build_targets() {
 
     # Auto-determined from modified files in diff, will traverse the children and pick out child boards too
     pcmd git diff --name-only $TARGET_BRANCH | grep -P '^keyboards' | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' | while read kb; do
-        find "keyboards/$kb" \( -name 'rules.mk' -or -name 'info.json' \) -and -not -path '*/keymaps/*' | while read rules; do
-            echo "$rules" >&2
+        find "keyboards/$kb" \( -name 'rules.mk' \) -and -not -path '*/keymaps/*' | while read rules; do
             kb=$(dirname "$rules" | sed -e 's@^keyboards/@@g')
             echo "${kb}:default";
         done
