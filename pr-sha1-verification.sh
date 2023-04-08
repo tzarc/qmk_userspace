@@ -92,8 +92,14 @@ trap cleanup EXIT
 build_targets() {
     pushd "$pr_dir" >/dev/null 2>&1
 
-    # Auto-determined from modified files in diff
-    git diff --name-only $TARGET_BRANCH | grep -P '^keyboards' | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' | while read kb; do if [ -e "keyboards/$kb/rules.mk" ]; then echo "${kb}:default"; fi; done | sort | uniq
+    # Auto-determined from modified files in diff, will traverse the children and pick out child boards too
+    git diff --name-only $TARGET_BRANCH | grep -P '^keyboards' | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' | while read kb; do
+        find "keyboards/$kb" -name 'rules.mk' -and -not -path '*/keymaps/*' | while read rules; do
+            echo "$rules" >&2
+            kb=$(dirname "$rules" | sed -e 's@^keyboards/@@g')
+            echo "${kb}:default";
+        done
+    done | sort | uniq
 
     # Generated from features present in boards
     #qmk find -f 'features.quantum_painter=true' | sort | uniq
@@ -158,7 +164,7 @@ main() {
     # Build the base repo
     cd "$base_dir"
     pcmd make git-submodule
-    pcmd ${DOCKER_PREFIX:-} qmk mass-compile -c -j $NCPUS $reproducible_build_flags $targets
+    pcmd ${DOCKER_PREFIX:-} qmk mass-compile -c -j $NCPUS $reproducible_build_flags $targets || true # No need to fail if the base branch is broken
     { ls -1 *.hex *.bin *.uf2 2>/dev/null || true; } | sort | xargs sha1sum >"$build_dir/sha1sums_base.txt"
 
     # Build the target PR repo
