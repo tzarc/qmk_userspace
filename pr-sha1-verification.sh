@@ -25,7 +25,7 @@ usage() {
 }
 
 pcmd() {
-    echo -e "\e[38;5;203mExecuting:\e[38;5;131m $@\e[0m"
+    errcho -e "\e[38;5;203mExecuting:\e[38;5;131m $@\e[0m"
     "$@"
 }
 
@@ -93,8 +93,8 @@ build_targets() {
     pushd "$pr_dir" >/dev/null 2>&1
 
     # Auto-determined from modified files in diff, will traverse the children and pick out child boards too
-    git diff --name-only $TARGET_BRANCH | grep -P '^keyboards' | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' | while read kb; do
-        find "keyboards/$kb" -name 'rules.mk' -and -not -path '*/keymaps/*' | while read rules; do
+    pcmd git diff --name-only $TARGET_BRANCH | grep -P '^keyboards' | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' | while read kb; do
+        find "keyboards/$kb" \( -name 'rules.mk' -or -name 'info.json' \) -and -not -path '*/keymaps/*' | while read rules; do
             echo "$rules" >&2
             kb=$(dirname "$rules" | sed -e 's@^keyboards/@@g')
             echo "${kb}:default";
@@ -160,6 +160,13 @@ main() {
 
     # Generate the list of targets
     targets=$(build_targets | sort | uniq | xargs echo)
+
+    if [[ -z "${targets:-}" ]]; then
+        errcho "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+        errcho "@@ No targets found in diff! @@"
+        errcho "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+        exit 1
+    fi
 
     # Build the base repo
     cd "$base_dir"
