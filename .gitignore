@@ -10,6 +10,7 @@ PR-*.patchbuild.log
 /.project
 compile_commands.json
 chibios-upgrade-output
+.cache
 .DS_Store
 ._*
 .vscode/.cortex-debug*

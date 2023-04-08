@@ -170,13 +170,13 @@ main() {
     # Build the base repo
     cd "$base_dir"
     pcmd make git-submodule
-    pcmd ${DOCKER_PREFIX:-} qmk mass-compile -c -j $NCPUS $reproducible_build_flags $targets || true # No need to fail if the base branch is broken
+    { pcmd ${DOCKER_PREFIX:-} qmk mass-compile -c -j $NCPUS $reproducible_build_flags $targets || true ; } | tee "$build_dir/mass_compile_base.log"
     { ls -1 *.hex *.bin *.uf2 2>/dev/null || true; } | sort | xargs sha1sum >"$build_dir/sha1sums_base.txt"
 
     # Build the target PR repo
     cd "$pr_dir"
     pcmd make git-submodule
-    pcmd ${DOCKER_PREFIX:-} qmk mass-compile -c -j $NCPUS $reproducible_build_flags $targets
+    { pcmd ${DOCKER_PREFIX:-} qmk mass-compile -c -j $NCPUS $reproducible_build_flags $targets || true ; } | tee "$build_dir/mass_compile_pr.log"
     { ls -1 *.hex *.bin *.uf2 2>/dev/null || true; } | sort | xargs sha1sum >"$build_dir/sha1sums_pr.txt"
 
     local differences=$( (diff -yW 200 --suppress-common-lines "$build_dir/sha1sums_base.txt" "$build_dir/sha1sums_pr.txt" || true) | awk '{print $2}' | sed -e 's@\.\(hex\|bin\|uf2\)$@@g' | xargs echo)
@@ -186,7 +186,20 @@ main() {
         done
     done
 
+    echo
+    echo '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
+    echo '@@ Listing builds that failed on the base revision:           @@'
+    echo '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
+    cat "$build_dir/mass_compile_base.log" | grep ERR
+
+    echo
+    echo '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
+    echo '@@ Listing builds that failed on the PR:                      @@'
+    echo '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
+    cat "$build_dir/mass_compile_pr.log" | grep ERR
+
     # Work out the diff's between the two target builds
+    echo
     echo '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
     echo '@@ Listing builds that differ between the base and target PR: @@'
     echo '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
