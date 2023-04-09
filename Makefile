@@ -92,7 +92,7 @@ ghoul: NO_COMPILEDB = true
 ghoul: ghoul_stm32 ghoul_rp2040
 
 remove_artifacts: unlinks
-	rm -rf "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.uf2 "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format "$(ROOTDIR)"/compile_commands.json "$(ROOTDIR)"/.cache "$(ROOTDIR)"/qmk_firmware/compile_commands.json >/dev/null 2>&1 || true
+	rm -rf "$(ROOTDIR)"/*.bin "$(ROOTDIR)"/*.hex "$(ROOTDIR)"/*.uf2 "$(ROOTDIR)"/*.dump "$(ROOTDIR)"/.clang-format "$(ROOTDIR)"/compile_commands.json "$(ROOTDIR)"/.cache "$(ROOTDIR)"/qmk_firmware/.cache "$(ROOTDIR)"/qmk_firmware/compile_commands.json >/dev/null 2>&1 || true
 
 clean: remove_artifacts
 	+$(MAKE) -C "$(ROOTDIR)/qmk_firmware" clean || true
