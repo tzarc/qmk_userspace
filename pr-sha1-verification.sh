@@ -190,13 +190,13 @@ main() {
     echo '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
     echo '@@ Listing builds that failed on the base revision:           @@'
     echo '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
-    cat "$build_dir/mass_compile_base.log" | grep ERR
+    { cat "$build_dir/mass_compile_base.log" | grep ERR ; } || true
 
     echo
     echo '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
     echo '@@ Listing builds that failed on the PR:                      @@'
     echo '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
-    cat "$build_dir/mass_compile_pr.log" | grep ERR
+    { cat "$build_dir/mass_compile_pr.log" | grep ERR ; } || true
 
     # Work out the diff's between the two target builds
     echo
