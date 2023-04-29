@@ -16,3 +16,4 @@ chibios-upgrade-output
 .vscode/.cortex-debug*
 validation-output
 sha1_verification
+users-tzarc/qmk_version.h

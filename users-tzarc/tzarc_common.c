@@ -118,6 +118,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #define XM(mode, keycode, extra, name)                  \
     case (keycode):                                     \
         extra {                                         \
+            disable_automatic_diablo3();                \
             if (record->event.pressed) {                \
                 if (typing_mode != (mode)) {            \
                     dprint("Enabling " name " mode\n"); \
@@ -141,16 +142,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 #ifdef GAME_MODES_ENABLE
     if (typing_mode == MODE_WOW) {
-        if ((WOW_KEY_MIN <= keycode) && (keycode <= WOW_KEY_MAX)) {
-            if (!process_record_wow(keycode, record)) {
-                return false;
-            }
+        if (!process_record_wow(keycode, record)) {
+            return false;
         }
     } else if (typing_mode == MODE_D3) {
-        if (((KC_1 <= keycode) && (keycode <= KC_4)) || keycode == KC_ESCAPE || keycode == QK_GESC) {
-            if (!process_record_diablo3(keycode, record)) {
-                return false;
-            }
+        if (!process_record_diablo3(keycode, record)) {
+            return false;
         }
     }
 #endif // GAME_MODES_ENABLE

@@ -25,6 +25,7 @@ MOUSEKEY_ENABLE ?= yes
 RAW_ENABLE ?= no
 UNICODE_ENABLE ?= yes
 DEFERRED_EXEC_ENABLE = yes
+GAME_MODES_ENABLE ?= yes
 
 VPATH += $(USER_PATH)/graphics/src
 
@@ -57,4 +58,14 @@ ifneq ("$(wildcard $(LIB_PATH)/lvgl)","")
 
 endif
 
-#QUANTUM_PAINTER_DRIVERS += surface
+QUANTUM_PAINTER_DRIVERS += surface
+
+ifeq ($(strip $(GAME_MODES_ENABLE)),yes)
+	OPT_DEFS += -DGAME_MODES_ENABLE
+
+	SRC += \
+		tzarc_wow.c \
+		tzarc_diablo3.c
+endif
+
+#OPT = 0

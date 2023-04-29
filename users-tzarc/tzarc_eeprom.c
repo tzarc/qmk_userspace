@@ -10,7 +10,7 @@
 
 #ifdef TZARC_EEPROM_DEBUGGING
 static inline void dump_config(const char *name, struct tzarc_eeprom_cfg_t *cfg) {
-    dprintf("config %s:\n", name);
+    dprintf("EEPROM config %s:\n", name);
     uint8_t *p = (uint8_t *)cfg;
     (void)p;
     for (int i = 0; i < sizeof(struct tzarc_eeprom_cfg_t); ++i) {

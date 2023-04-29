@@ -29,7 +29,7 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
 
     // Read from SPI the matrix
     spi_start(SPI_MATRIX_CHIP_SELECT_PIN, false, 0, SPI_MATRIX_DIVISOR);
-    spi_receive((uint8_t*)temp_matrix, MATRIX_SHIFT_REGISTER_COUNT * sizeof(matrix_row_t));
+    spi_receive((uint8_t *)temp_matrix, MATRIX_SHIFT_REGISTER_COUNT * sizeof(matrix_row_t));
     spi_stop();
 
     // Read from the encoder pushbutton

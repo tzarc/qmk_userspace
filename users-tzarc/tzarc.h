@@ -74,8 +74,8 @@ layer_state_t layer_state_set_user(layer_state_t state);
 #define BITMASK_BIT_ASSIGN(array, value, n, first) (value ? BITMASK_BIT_SET((array), (n), (first)) : BITMASK_BIT_CLEAR((array), (n), (first)))
 
 __attribute__((packed)) struct tzarc_eeprom_cfg_t {
-    uint8_t  wow_enabled[BITMASK_BYTES_REQUIRED(WOW_KEY_MAX, WOW_KEY_MIN)];
-    uint16_t d3_delays[4]; // KC_1 ... KC_4
+    uint8_t wow_enabled[BITMASK_BYTES_REQUIRED(WOW_KEY_MAX, WOW_KEY_MIN)];
+    uint8_t d3_enabled[BITMASK_BYTES_REQUIRED(KC_4, KC_1)];
 };
 
 extern struct tzarc_eeprom_cfg_t tzarc_eeprom_cfg;
@@ -114,14 +114,28 @@ void matrix_scan_wow(void);
 // Diablo III
 
 #ifdef GAME_MODES_ENABLE
-struct diablo3_config_t {
-    uint8_t keys_activated[1]; // 4 bits required for KC_1 ... KC_4
+
+struct diablo3_runtime_t {
+    uint32_t last_config_press;
+    bool     config_mode;
+    uint8_t  config_selection;
+    struct d3_desc_ {
+        deferred_token token;
+        bool           pressed;
+    } key_desc[4];
 };
 
-extern struct diablo3_config_t diablo3_config;
+#    define DIABLO_3_CONFIG_PRESS_DELTA 250
+
+extern struct diablo3_config_t  diablo3_config;
+extern struct diablo3_runtime_t diablo3_runtime;
 
 void tzarc_diablo3_init(void);
 bool process_record_diablo3(uint16_t keycode, keyrecord_t *record);
 void matrix_scan_diablo3(void);
+
+bool diablo3_key_enabled_get(uint16_t keycode);
+bool diablo3_automatic_running(void);
+void enable_automatic_diablo3(void);
 void disable_automatic_diablo3(void);
 #endif // GAME_MODES_ENABLE

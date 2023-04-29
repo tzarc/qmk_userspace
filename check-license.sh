@@ -7,12 +7,14 @@ exitcode=0
 max_search_lines=4
 
 git ls-files | grep '\(Makefile.*\|Dockerfile.*\|\.\(c\|cpp\|h\|hpp\|mk\|sh\|py\|cmd\)\)$' | grep -v 'board\.\(c\|h\|mk\)$' | grep -v '\(ch\|hal\|mcu\)conf\.h$' | grep -v '\.\(qgf\|qff\)\.\(c\|h\)$' | while read file ; do
-    if [[ -z "$(cat "$file" | head -n${max_search_lines} | grep "Copyright.*tzarc")" ]] ; then
-        echo "Missing license header: $file"
-        exitcode=1
-    elif [[ -z "$(cat "$file" | head -n${max_search_lines} | grep "SPDX-License-Identifier")" ]] ; then
-        echo "Missing license identifier: $file"
-        exitcode=1
+    if [[ -e "$file" ]] ; then
+        if [[ -z "$(cat "$file" | head -n${max_search_lines} | grep "Copyright.*tzarc")" ]] ; then
+            echo "Missing license header: $file"
+            exitcode=1
+        elif [[ -z "$(cat "$file" | head -n${max_search_lines} | grep "SPDX-License-Identifier")" ]] ; then
+            echo "Missing license identifier: $file"
+            exitcode=1
+        fi
     fi
 done
 

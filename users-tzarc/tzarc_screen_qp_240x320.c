@@ -1,60 +1,118 @@
 // Copyright 2018-2023 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include <qp.h>
+#include "painter/generic/qp_surface.h"
+#include "qp_internal_formats.h"
 #include "tzarc.h"
 #include "diablo3.qgf.c"
-#include "avqest12.qff.c"
-#include "avqest20.qff.c"
+#include "avqest.qff.c"
 #include "thintel15.qff.h"
 #include "everex_5x8.qff.c"
 
-static painter_font_handle_t thintel;
-static painter_font_handle_t everex_5x8;
+#define D3_SURFACE_WIDTH 240
+#define D3_SURFACE_HEIGHT 80
+static uint8_t               d3_framebuffer[SURFACE_REQUIRED_BUFFER_BYTE_SIZE(D3_SURFACE_WIDTH, D3_SURFACE_HEIGHT, 16)];
+static painter_device_t      d3_surface = NULL;
+static painter_font_handle_t thintel    = NULL;
+static painter_font_handle_t everex_5x8 = NULL;
 
 void draw_screen_diablo3(bool force_redraw) {
-    uint16_t display_width;
-    uint16_t display_height;
-    qp_get_geometry(display_panel, &display_width, &display_height, NULL, NULL, NULL);
+    static uint16_t display_width;
+    static uint16_t display_height;
+    static bool     geometry_retrieved = false;
+    if (!geometry_retrieved) {
+        qp_get_geometry(display_panel, &display_width, &display_height, NULL, NULL, NULL);
+        geometry_retrieved = true;
+    }
 
-    static const int              x_offsets[4]  = {-90, -30, 30, 90};
-    const char                   *time_strs[4]  = {"11.1", "21.5", "39.2", "47.3"};
-    static painter_image_handle_t diablo3_logo  = NULL;
-    static painter_font_handle_t  avqest12_font = NULL;
-    static painter_font_handle_t  avqest20_font = NULL;
+    static const int              x_offsets[4] = {-90, -30, 30, 90};
+    static painter_image_handle_t diablo3_logo = NULL;
+    static painter_font_handle_t  avqest_font  = NULL;
+    if (!d3_surface) {
+        d3_surface = qp_make_rgb565_surface(D3_SURFACE_WIDTH, D3_SURFACE_HEIGHT, d3_framebuffer);
+        qp_init(d3_surface, QP_ROTATION_0);
+    }
     if (!diablo3_logo) {
         diablo3_logo = qp_load_image_mem(gfx_diablo3);
     }
-    if (!avqest12_font) {
-        avqest12_font = qp_load_font_mem(font_avqest12);
-    }
-    if (!avqest20_font) {
-        avqest20_font = qp_load_font_mem(font_avqest20);
+    if (!avqest_font) {
+        avqest_font = qp_load_font_mem(font_avqest);
     }
 
     // Draw the D3 logo if it hasn't been drawn already
     if (force_redraw) {
         qp_drawimage(display_panel, 0, 0, diablo3_logo);
-
-        qp_circle(display_panel, (display_width / 2) + x_offsets[0], display_height - 1 - avqest20_font->line_height - 30, 26, 0, 0, 255, true);
-        qp_circle(display_panel, (display_width / 2) + x_offsets[1], display_height - 1 - avqest20_font->line_height - 30, 26, 0, 0, 255, true);
-        qp_circle(display_panel, (display_width / 2) + x_offsets[2], display_height - 1 - avqest20_font->line_height - 30, 26, 0, 0, 255, true);
-        qp_circle(display_panel, (display_width / 2) + x_offsets[3], display_height - 1 - avqest20_font->line_height - 30, 26, 0, 0, 255, true);
     }
 
     // Set up the display items
-    static uint32_t last_redraw = 0;
-    if (timer_elapsed32(last_redraw) > 25) {
-        last_redraw = timer_read32();
+    static struct tzarc_eeprom_cfg_t last_eeprom_cfg      = {0};
+    static struct diablo3_runtime_t  last_diablo3_runtime = {0};
+    static bool                      last_active_state    = false;
+    bool                             active_state         = diablo3_automatic_running();
+    bool                             should_redraw        = force_redraw                                    // If we want to force
+                         || last_active_state != active_state                                               // If the active state changed
+                         || (memcmp(&last_eeprom_cfg, &tzarc_eeprom_cfg, sizeof(tzarc_eeprom_cfg)) != 0)    // If the eeprom state changed
+                         || (memcmp(&diablo3_runtime, &last_diablo3_runtime, sizeof(diablo3_runtime)) != 0) // If the runtime state changed
+        ;
 
-        qp_circle(display_panel, (display_width / 2) + x_offsets[0], display_height - 1 - avqest20_font->line_height - 30, 24, 0, 255, 255, true);
-        qp_circle(display_panel, (display_width / 2) + x_offsets[1], display_height - 1 - avqest20_font->line_height - 30, 24, 60, 255, 255, true);
-        qp_circle(display_panel, (display_width / 2) + x_offsets[2], display_height - 1 - avqest20_font->line_height - 30, 24, 0, 255, 255, true);
-        qp_circle(display_panel, (display_width / 2) + x_offsets[3], display_height - 1 - avqest20_font->line_height - 30, 24, 0, 255, 255, true);
+    if (should_redraw) {
+        // Save last state
+        last_active_state = active_state;
+        memcpy(&last_eeprom_cfg, &tzarc_eeprom_cfg, sizeof(tzarc_eeprom_cfg));
+        memcpy(&last_diablo3_runtime, &diablo3_runtime, sizeof(diablo3_runtime));
 
-        qp_drawtext_recolor(display_panel, (display_width / 2) + x_offsets[0] - (qp_textwidth(avqest20_font, time_strs[0]) / 2), display_height - 1 - avqest20_font->line_height - 30 - (avqest20_font->line_height / 2) + 2, avqest20_font, time_strs[0], 0, 0, 255, 0, 255, 255);
-        qp_drawtext_recolor(display_panel, (display_width / 2) + x_offsets[1] - (qp_textwidth(avqest20_font, time_strs[1]) / 2), display_height - 1 - avqest20_font->line_height - 30 - (avqest20_font->line_height / 2) + 2, avqest20_font, time_strs[1], 60, 0, 255, 60, 255, 255);
-        qp_drawtext_recolor(display_panel, (display_width / 2) + x_offsets[2] - (qp_textwidth(avqest20_font, time_strs[2]) / 2), display_height - 1 - avqest20_font->line_height - 30 - (avqest20_font->line_height / 2) + 2, avqest20_font, time_strs[2], 0, 0, 255, 0, 255, 255);
-        qp_drawtext_recolor(display_panel, (display_width / 2) + x_offsets[3] - (qp_textwidth(avqest20_font, time_strs[3]) / 2), display_height - 1 - avqest20_font->line_height - 30 - (avqest20_font->line_height / 2) + 2, avqest20_font, time_strs[3], 0, 0, 255, 0, 255, 255);
+        // Clear the on/off or config marker line
+        qp_rect(d3_surface, 0, D3_SURFACE_HEIGHT - 30, D3_SURFACE_WIDTH - 1, D3_SURFACE_HEIGHT - 1, 0, 0, 0, true);
+
+        if (diablo3_runtime.config_mode) {
+            // Draw the selection marker
+            qp_circle(d3_surface, (D3_SURFACE_WIDTH / 2) + x_offsets[diablo3_runtime.config_selection], D3_SURFACE_HEIGHT - 12, 8, 0, 0, 255, true);
+        } else {
+            // Draw the on/off state
+            uint16_t hue = diablo3_automatic_running() ? 80 : 0;
+
+            qp_circle(d3_surface, 30, D3_SURFACE_HEIGHT - 12, 10, hue, 255, 160, true);
+            qp_circle(d3_surface, D3_SURFACE_WIDTH - 1 - 30, D3_SURFACE_HEIGHT - 12, 10, hue, 255, 160, true);
+            qp_rect(d3_surface, 30, D3_SURFACE_HEIGHT - 12 - 10, D3_SURFACE_WIDTH - 1 - 30, D3_SURFACE_HEIGHT - 12 + 10, hue, 255, 160, true);
+
+            qp_circle(d3_surface, 30, D3_SURFACE_HEIGHT - 12, 8, hue, 255, 80, true);
+            qp_circle(d3_surface, D3_SURFACE_WIDTH - 1 - 30, D3_SURFACE_HEIGHT - 12, 8, hue, 255, 80, true);
+            qp_rect(d3_surface, 30, D3_SURFACE_HEIGHT - 12 - 8, D3_SURFACE_WIDTH - 1 - 30, D3_SURFACE_HEIGHT - 12 + 8, hue, 255, 80, true);
+        }
+
+        // Draw the enabled circles
+        for (int i = 0; i < 4; ++i) {
+            char       str[2]  = {'1' + i, '\0'};
+            uint16_t   keycode = KC_1 + i;
+            bool       enabled = diablo3_key_enabled_get(keycode);
+            bool       pressed = diablo3_runtime.key_desc[i].pressed;
+            qp_pixel_t ol, fg, bg;
+            if (pressed) {
+                ol = (qp_pixel_t){.hsv888 = {.h = 80, .s = 0, .v = 255}};
+                fg = (qp_pixel_t){.hsv888 = {.h = 80, .s = 0, .v = 255}};
+                bg = (qp_pixel_t){.hsv888 = {.h = 80, .s = 255, .v = 160}};
+            } else if (enabled) {
+                ol = (qp_pixel_t){.hsv888 = {.h = 80, .s = 255, .v = 160}};
+                fg = (qp_pixel_t){.hsv888 = {.h = 80, .s = 0, .v = 255}};
+                bg = (qp_pixel_t){.hsv888 = {.h = 80, .s = 255, .v = 80}};
+            } else {
+                ol = (qp_pixel_t){.hsv888 = {.h = 0, .s = 255, .v = 160}};
+                fg = (qp_pixel_t){.hsv888 = {.h = 0, .s = 0, .v = 255}};
+                bg = (qp_pixel_t){.hsv888 = {.h = 0, .s = 255, .v = 80}};
+            }
+
+#define UNPACK_HSV(col) (col).hsv888.h, (col).hsv888.s, (col).hsv888.v
+
+            // Outline
+            qp_circle(d3_surface, (D3_SURFACE_WIDTH / 2) + x_offsets[i], D3_SURFACE_HEIGHT - 1 - avqest_font->line_height - 21, 26, UNPACK_HSV(ol), true);
+            // Inner
+            qp_circle(d3_surface, (D3_SURFACE_WIDTH / 2) + x_offsets[i], D3_SURFACE_HEIGHT - 1 - avqest_font->line_height - 21, 24, UNPACK_HSV(bg), true);
+            // Text
+            qp_drawtext_recolor(d3_surface, (D3_SURFACE_WIDTH / 2) + x_offsets[i] - (qp_textwidth(avqest_font, str) / 2), D3_SURFACE_HEIGHT - 1 - avqest_font->line_height - 21 - (avqest_font->line_height / 2) + 2, avqest_font, str, UNPACK_HSV(fg), UNPACK_HSV(bg));
+        }
+
+        // Copy the surface to the display
+        qp_surface_draw(d3_surface, display_panel, 0, display_height - D3_SURFACE_HEIGHT, true);
     }
 }
 
@@ -96,9 +154,13 @@ void tzarc_sendchar_hook(uint8_t c) {
 }
 
 void draw_screen(bool force_redraw) {
-    uint16_t display_width;
-    uint16_t display_height;
-    qp_get_geometry(display_panel, &display_width, &display_height, NULL, NULL, NULL);
+    static uint16_t display_width;
+    static uint16_t display_height;
+    static bool     geometry_retrieved = false;
+    if (!geometry_retrieved) {
+        qp_get_geometry(display_panel, &display_width, &display_height, NULL, NULL, NULL);
+        geometry_retrieved = true;
+    }
 
     if (!thintel) {
         thintel = qp_load_font_mem(font_thintel15);

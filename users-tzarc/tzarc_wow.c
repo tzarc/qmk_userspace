@@ -56,6 +56,11 @@ void tzarc_wow_init(void) {
 }
 
 bool process_record_wow(uint16_t keycode, keyrecord_t* record) {
+    // If it's keys we don't care about, exit.
+    if (keycode < (WOW_KEY_MIN) || (WOW_KEY_MAX) < keycode) {
+        return true;
+    }
+
     if (config_enabled) {
         if (!record->event.pressed) {
             // Toggle the enabled flag for this key
