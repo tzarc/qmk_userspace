@@ -11,6 +11,7 @@
 #include "graphics/test-anim.qgf.c"
 #include "graphics/loading.qgf.c"
 #include "graphics/thintel.qff.c"
+#include "graphics/ianhan-BitmapFonts-32X32-FA-QFF.qff.c"
 
 /*
 void board_init(void) {
@@ -34,6 +35,7 @@ painter_image_handle_t test_anim;
 painter_image_handle_t loading;
 
 painter_font_handle_t thintel;
+painter_font_handle_t bmpfont;
 
 static uint32_t delayed_test(uint32_t trigger_time, void* cb_arg) {
     uint16_t        timeout = (uint16_t)(uintptr_t)cb_arg;
@@ -42,6 +44,10 @@ static uint32_t delayed_test(uint32_t trigger_time, void* cb_arg) {
 
     if (!thintel) {
         thintel = qp_load_font_mem(font_thintel);
+    }
+
+    if (!bmpfont) {
+        bmpfont = qp_load_font_mem(font_ianhan_BitmapFonts_32X32_FA_QFF);
     }
 
     dprintf("AHOY THERE MATEY @ %d: %d, delta = %d, font = %s\n", (int)timeout, (int)now, (int)(now - last), thintel != NULL ? "loaded" : "failed");
@@ -138,6 +144,10 @@ void draw_test(painter_device_t device, const char* name, uint32_t now) {
         qp_rect(device, xpos, ypos, width - 1, ypos + thintel->line_height, 0, 0, 0, true);
         ypos += thintel->line_height;
     }
+
+    char buf4[32];
+    sprintf(buf4, "%d", (int)now);
+    qp_drawtext(device, 0, 3 * thintel->line_height + loading->height, bmpfont, buf4);
 }
 
 void keyboard_post_init_kb(void) {

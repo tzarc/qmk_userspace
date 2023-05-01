@@ -34,11 +34,11 @@ generated-files: $(GENERATED_OUTPUT)/avqest.qff.h
 
 $(GENERATED_OUTPUT)/avqest.png: $(USER_PATH)/Makefile $(USER_PATH)/AvQest.ttf
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-make-font-image --font $(USER_PATH)/AvQest.ttf --size 32 -o $(GENERATED_OUTPUT)/avqest.png # --no-ascii --unicode-glyphs "1234.Ofn"
+	$(QMK_BIN) painter-make-font-image --font $(USER_PATH)/AvQest.ttf --size 40 -o $(GENERATED_OUTPUT)/avqest.png --no-ascii --unicode-glyphs "1234"
 
 $(GENERATED_OUTPUT)/avqest.qff.h: $(GENERATED_OUTPUT)/avqest.png
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-font-image --input $(GENERATED_OUTPUT)/avqest.png -f mono4 # --no-ascii --unicode-glyphs "1234.Ofn"
+	$(QMK_BIN) painter-convert-font-image --input $(GENERATED_OUTPUT)/avqest.png -f mono4 --no-ascii --unicode-glyphs "1234"
 
 ################################################################################################################################################################
 # Fixed-width fonts

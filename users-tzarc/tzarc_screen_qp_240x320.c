@@ -108,11 +108,11 @@ void draw_screen_diablo3(bool force_redraw) {
             // Inner
             qp_circle(d3_surface, (D3_SURFACE_WIDTH / 2) + x_offsets[i], D3_SURFACE_HEIGHT - 1 - avqest_font->line_height - 21, 24, UNPACK_HSV(bg), true);
             // Text
-            qp_drawtext_recolor(d3_surface, (D3_SURFACE_WIDTH / 2) + x_offsets[i] - (qp_textwidth(avqest_font, str) / 2), D3_SURFACE_HEIGHT - 1 - avqest_font->line_height - 21 - (avqest_font->line_height / 2) + 2, avqest_font, str, UNPACK_HSV(fg), UNPACK_HSV(bg));
+            qp_drawtext_recolor(d3_surface, (D3_SURFACE_WIDTH / 2) + x_offsets[i] - (qp_textwidth(avqest_font, str) / 2), D3_SURFACE_HEIGHT - 1 - avqest_font->line_height - 21 - (avqest_font->line_height / 2), avqest_font, str, UNPACK_HSV(fg), UNPACK_HSV(bg));
         }
 
         // Copy the surface to the display
-        qp_surface_draw(d3_surface, display_panel, 0, display_height - D3_SURFACE_HEIGHT, true);
+        qp_surface_draw(d3_surface, display_panel, 0, display_height - D3_SURFACE_HEIGHT, false);
     }
 }
 

@@ -66,3 +66,8 @@ $$(basename $$(target_$(subst :,_,$1))).qgf.c: makefile.graphics $$(target_$(sub
 endef
 
 $(foreach gfx_entry,$(GRAPHICS_LIST),$(eval $(call handle_graphics,$(gfx_entry))))
+
+all: graphics/ianhan-BitmapFonts-32X32-FA-QFF.qff.h
+
+graphics/ianhan-BitmapFonts-32X32-FA-QFF.qff.h:
+	qmk painter-convert-font-image --input graphics/ianhan-BitmapFonts-32X32-FA-QFF.png -f pal16 --no-ascii --unicode-glyphs "0123456789"

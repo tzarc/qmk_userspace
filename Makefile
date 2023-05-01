@@ -122,6 +122,7 @@ git-submodule: qmk_firmware
 
 graphics:
 	+$(MAKE) -C "$(ROOTDIR)/users-tzarc/graphics"
+	+$(MAKE) -C "$(ROOTDIR)/alternates/qp_test" -f makefile.graphics
 
 $(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h: rgb_effects
 
