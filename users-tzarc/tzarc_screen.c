@@ -18,7 +18,7 @@
         } while (0)
 
 // Pull in the userspace screen drawing functions
-#    include "tzarc_screen_qp_240x320.c"
+#    include "tzarc_screen_qp_240x320.inl"
 
 // Actual draw "hook"
 void draw_ui_user(bool force_redraw) {
