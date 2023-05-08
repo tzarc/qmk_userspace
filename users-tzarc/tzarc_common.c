@@ -3,6 +3,8 @@
 #include <string.h>
 #include <quantum.h>
 #include <process_unicode_common.h>
+#include "hal_trng.h"
+#include "hal_trng_lld.h"
 #include "tzarc.h"
 
 bool          config_enabled;
@@ -19,12 +21,63 @@ const char *typing_mode_name(typing_mode_t mode) {
     return "unknown";
 }
 
-uint8_t prng(void) {
+#ifdef HAL_USE_TRNG
+static bool rng_initialized = false;
+static void rng_init(void) {
+    if (!rng_initialized) {
+        rng_initialized = true;
+        trngStart(&TRNGD1, NULL);
+    }
+}
+bool rng_generate(void *buf, size_t n) {
+    rng_init();
+    trngStart(&TRNGD1, NULL);
+    bool err = trngGenerate(&TRNGD1, n, (uint8_t *)buf);
+    trngStop(&TRNGD1);
+    return err;
+}
+uint8_t prng8(void) {
+    uint8_t ret;
+    rng_generate(&ret, sizeof(ret));
+    return ret;
+}
+uint16_t prng16(void) {
+    uint16_t ret;
+    rng_generate(&ret, sizeof(ret));
+    return ret;
+}
+uint32_t prng32(void) {
+    uint32_t ret;
+    rng_generate(&ret, sizeof(ret));
+    return ret;
+}
+#else  // HAL_USE_TRNG
+uint8_t prng8(void) {
     static uint8_t s = 0xAA, a = 0;
     s ^= s << 3;
     s ^= s >> 5;
     s ^= a++ >> 2;
     return s;
+}
+uint16_t prng16(void) {
+    return prng8() | (((uint16_t)prng8()) << 8);
+}
+uint32_t prng32(void) {
+    return prng16() | (((uint32_t)prng16()) << 16);
+}
+#endif // HAL_USE_TRNG
+
+uint32_t prng(uint32_t min, uint32_t max) {
+    if (min > max) {
+        uint32_t tmp = min;
+        min          = max;
+        max          = tmp;
+    }
+    uint32_t range = max - min;
+    if (range == 0) {
+        return min;
+    }
+    return min + (prng32() % range);
 }
 
 __attribute__((weak)) void eeconfig_init_keymap(void) {}
@@ -76,7 +129,7 @@ void keyboard_post_init_user(void) {
     tzarc_eeprom_init();
 #ifdef GAME_MODES_ENABLE
     tzarc_wow_init();
-    tzarc_diablo3_init();
+    tzarc_diablo_init();
 #endif // GAME_MODES_ENABLE
     keyboard_post_init_keymap();
 }
@@ -118,7 +171,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #define XM(mode, keycode, extra, name)                  \
     case (keycode):                                     \
         extra {                                         \
-            disable_automatic_diablo3();                \
+            diablo_automatic_stop();                    \
             if (record->event.pressed) {                \
                 if (typing_mode != (mode)) {            \
                     dprint("Enabling " name " mode\n"); \
@@ -145,8 +198,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         if (!process_record_wow(keycode, record)) {
             return false;
         }
-    } else if (typing_mode == MODE_D3) {
-        if (!process_record_diablo3(keycode, record)) {
+    } else if (typing_mode == MODE_DIABLO) {
+        if (!process_record_diablo(keycode, record)) {
             return false;
         }
     }
@@ -159,8 +212,8 @@ void matrix_scan_user(void) {
 #ifdef GAME_MODES_ENABLE
     if (typing_mode == MODE_WOW) {
         matrix_scan_wow();
-    } else if (typing_mode == MODE_D3) {
-        matrix_scan_diablo3();
+    } else if (typing_mode == MODE_DIABLO) {
+        matrix_scan_diablo();
     }
 #endif // GAME_MODES_ENABLE
 

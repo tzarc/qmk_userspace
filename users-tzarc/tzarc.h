@@ -3,6 +3,7 @@
 #pragma once
 #include <assert.h>
 #include <quantum.h>
+#include <stdint.h>
 #include "tzarc_layout.h"
 
 #ifndef __cplusplus
@@ -16,6 +17,9 @@
 // See keycode.h
 #define WOW_KEY_MIN (KC_A)
 #define WOW_KEY_MAX (KC_EQUAL)
+
+#define DIABLO_KEYCODES KC_Q, KC_1, KC_2, KC_3, KC_4
+#define DIABLO_NUM_KEYS (sizeof((uint8_t[]){DIABLO_KEYCODES}) / sizeof(uint8_t))
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Common functionality
@@ -31,7 +35,7 @@
     XM(MODE_ZALGO, KC_6, /* dummy */, "Zalgo")           \
     /* Game-specific modes */                            \
     XM(MODE_WOW, KC_W, /* dummy */, "World of Warcraft") \
-    XM(MODE_D3, KC_D, /* dummy */, "Diablo 3")
+    XM(MODE_DIABLO, KC_D, /* dummy */, "Diablo")
 
 typedef enum typing_mode_t {
 #define XM(mode, keycode, extra, name) mode,
@@ -49,7 +53,10 @@ extern typing_mode_t typing_mode;
 
 void tzarc_common_init(void);
 
-uint8_t     prng(void);
+uint32_t    prng(uint32_t min, uint32_t max);
+uint8_t     prng8(void);
+uint16_t    prng16(void);
+uint32_t    prng32(void);
 const char *key_name(uint16_t keycode, bool shifted);
 
 bool process_record_keymap(uint16_t keycode, keyrecord_t *record);
@@ -75,7 +82,7 @@ layer_state_t layer_state_set_user(layer_state_t state);
 
 __attribute__((packed)) struct tzarc_eeprom_cfg_t {
     uint8_t wow_enabled[BITMASK_BYTES_REQUIRED(WOW_KEY_MAX, WOW_KEY_MIN)];
-    uint8_t d3_enabled[BITMASK_BYTES_REQUIRED(KC_4, KC_1)];
+    uint8_t diablo_enabled_keys; // 1 bit per key, DIABLO_NUM_KEYS total
 };
 
 extern struct tzarc_eeprom_cfg_t tzarc_eeprom_cfg;
@@ -115,27 +122,30 @@ void matrix_scan_wow(void);
 
 #ifdef GAME_MODES_ENABLE
 
-struct diablo3_runtime_t {
+struct diablo_runtime_t {
     uint32_t last_config_press;
-    bool     config_mode;
-    uint8_t  config_selection;
-    struct d3_desc_ {
+    bool     config_mode_active;
+    uint8_t  config_curr_selection;
+    struct diablo_key_desc {
         deferred_token token;
         bool           pressed;
-    } key_desc[4];
+    } key_desc[DIABLO_NUM_KEYS];
 };
 
-#    define DIABLO_3_CONFIG_PRESS_DELTA 250
+#    define DIABLO_CONFIG_PRESS_DELTA 250
 
-extern struct diablo3_config_t  diablo3_config;
-extern struct diablo3_runtime_t diablo3_runtime;
+extern struct diablo_config_t  diablo_config;
+extern struct diablo_runtime_t diablo_runtime;
 
-void tzarc_diablo3_init(void);
-bool process_record_diablo3(uint16_t keycode, keyrecord_t *record);
-void matrix_scan_diablo3(void);
+void tzarc_diablo_init(void);
+bool process_record_diablo(uint16_t keycode, keyrecord_t *record);
+void matrix_scan_diablo(void);
 
-bool diablo3_key_enabled_get(uint16_t keycode);
-bool diablo3_automatic_running(void);
-void enable_automatic_diablo3(void);
-void disable_automatic_diablo3(void);
+uint8_t  diablo_keycode_to_index(uint16_t keycode);
+uint16_t diablo_index_to_keycode(uint8_t index);
+
+bool diablo_automatic_key_enabled(uint16_t keycode);
+bool diablo_automatic_active(void);
+void diablo_automatic_start(void);
+void diablo_automatic_stop(void);
 #endif // GAME_MODES_ENABLE

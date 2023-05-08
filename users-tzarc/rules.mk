@@ -52,7 +52,7 @@ endif
 ifneq ("$(wildcard $(LIB_PATH)/lvgl)","")
 
 #	ifeq ($(strip $(QUANTUM_PAINTER_LVGL_INTEGRATION)),yes)
-#		VPATH += $(USER_PATH)/screens/diablo3
+#		VPATH += $(USER_PATH)/screens/diablo
 #		SRC += ui.c ui_helpers.c ui_img_d3_png.c
 #	endif
 
@@ -65,7 +65,7 @@ ifeq ($(strip $(GAME_MODES_ENABLE)),yes)
 
 	SRC += \
 		tzarc_wow.c \
-		tzarc_diablo3.c
+		tzarc_diablo.c
 endif
 
 #OPT = 0

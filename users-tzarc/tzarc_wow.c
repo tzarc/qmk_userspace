@@ -83,7 +83,7 @@ bool process_record_wow(uint16_t keycode, keyrecord_t* record) {
 
             // Keep track of last keydown, as well as next trigger time
             wow_key_last_keydown_set(keycode, now);
-            wow_key_next_trigger_set(keycode, now + 128 + (prng() % 128));
+            wow_key_next_trigger_set(keycode, now + prng(120, 350));
 
             // Inform the OS that we've got a keydown event
             register_code(keycode);
@@ -128,7 +128,7 @@ void matrix_scan_wow(void) {
             }
 
             // Set the next trigger.
-            wow_key_next_trigger_set(keycode, now + 64 + (prng() % 64));
+            wow_key_next_trigger_set(keycode, now + prng(110, 250));
         }
     }
 }

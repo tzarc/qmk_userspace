@@ -17,28 +17,28 @@ distclean: clean
 ################################################################################################################################################################
 # Game images
 
-generated-files: $(GENERATED_OUTPUT)/diablo3.qgf.h $(GENERATED_OUTPUT)/wow.qgf.h
+generated-files: $(GENERATED_OUTPUT)/diablo.qgf.h $(GENERATED_OUTPUT)/wow.qgf.h
 
-$(GENERATED_OUTPUT)/diablo3.qgf.h: $(USER_PATH)/Makefile $(USER_PATH)/diablo3.png
+$(GENERATED_OUTPUT)/diablo.qgf.h: $(USER_PATH)/Makefile $(USER_PATH)/diablo.png
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/diablo3.png -o $(GENERATED_OUTPUT) -f rgb565
+	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/diablo.png -o $(GENERATED_OUTPUT) -f pal16
 
 $(GENERATED_OUTPUT)/wow.qgf.h: $(USER_PATH)/Makefile $(USER_PATH)/wow.png
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/wow.png -o $(GENERATED_OUTPUT) -f rgb565
+	$(QMK_BIN) painter-convert-graphics -i $(USER_PATH)/wow.png -o $(GENERATED_OUTPUT) -f pal16
 
 ################################################################################################################################################################
 # Game fonts
 
-generated-files: $(GENERATED_OUTPUT)/avqest.qff.h
+generated-files: $(GENERATED_OUTPUT)/exocet.qff.h
 
-$(GENERATED_OUTPUT)/avqest.png: $(USER_PATH)/Makefile $(USER_PATH)/AvQest.ttf
+$(GENERATED_OUTPUT)/exocet.png: $(USER_PATH)/Makefile $(USER_PATH)/exocetlight-medium.ttf
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-make-font-image --font $(USER_PATH)/AvQest.ttf --size 40 -o $(GENERATED_OUTPUT)/avqest.png --no-ascii --unicode-glyphs "1234"
+	$(QMK_BIN) painter-make-font-image --font $(USER_PATH)/exocetlight-medium.ttf --size 32 -o $(GENERATED_OUTPUT)/exocet.png --no-ascii --unicode-glyphs "1234Q"
 
-$(GENERATED_OUTPUT)/avqest.qff.h: $(GENERATED_OUTPUT)/avqest.png
+$(GENERATED_OUTPUT)/exocet.qff.h: $(GENERATED_OUTPUT)/exocet.png
 	@[ -d "$(GENERATED_OUTPUT)" ] || mkdir -p "$(GENERATED_OUTPUT)"
-	$(QMK_BIN) painter-convert-font-image --input $(GENERATED_OUTPUT)/avqest.png -f mono4 --no-ascii --unicode-glyphs "1234"
+	$(QMK_BIN) painter-convert-font-image --input $(GENERATED_OUTPUT)/exocet.png -f mono4 --no-ascii --unicode-glyphs "1234Q"
 
 ################################################################################################################################################################
 # Fixed-width fonts
