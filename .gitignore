@@ -3,6 +3,13 @@
 *.hex
 *.bin
 *.uf2
+
+users-tzarc/graphics/src/*.gif
+users-tzarc/graphics/src/*.png
+
+alternates/qp_test/graphics/*.gif
+alternates/qp_test/graphics/*.png
+
 .vscode/ipch
 .clang-format
 PR-*.patchbuild.log
