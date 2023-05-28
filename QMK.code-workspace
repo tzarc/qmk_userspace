@@ -8,6 +8,10 @@
       "name": "qmk-docs"
     },
     {
+      "path": "qmk_firmware/.build/docs",
+      "name": "qmk-docs-build"
+    },
+    {
       "path": "qmk_firmware/quantum/painter",
       "name": "quantum-painter"
     },

@@ -24,3 +24,4 @@ chibios-upgrade-output
 validation-output
 sha1_verification
 users-tzarc/qmk_version.h
+stm32_usb.txt
