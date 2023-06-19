@@ -3,9 +3,10 @@
 #include <string.h>
 #include <quantum.h>
 #include <process_unicode_common.h>
-#include "hal_trng.h"
-#include "hal_trng_lld.h"
+#include "keycodes.h"
 #include "tzarc.h"
+#include "tzarc_layout.h"
+#include "util.h"
 
 bool          config_enabled;
 typing_mode_t typing_mode;
@@ -21,7 +22,9 @@ const char *typing_mode_name(typing_mode_t mode) {
     return "unknown";
 }
 
-#ifdef HAL_USE_TRNG
+#if HAL_USE_TRNG
+#    include "hal_trng.h"
+#    include "hal_trng_lld.h"
 static bool rng_initialized = false;
 static void rng_init(void) {
     if (!rng_initialized) {
@@ -134,9 +137,61 @@ void keyboard_post_init_user(void) {
     keyboard_post_init_keymap();
 }
 
+#ifdef KONAMI_CODE_ENABLE
+static void konami_code_handler(void) {
+    dprintf("Konami code entered\n");
+    wait_ms(50);
+    reset_keyboard();
+}
+
+static bool process_record_konami_code(uint16_t keycode, keyrecord_t *record) {
+    static uint8_t        konami_index          = 0;
+    static const uint16_t konami_code[] PROGMEM = {KC_UP, KC_UP, KC_DOWN, KC_DOWN, KC_LEFT, KC_RIGHT, KC_LEFT, KC_RIGHT, KC_B, KC_A, KC_ENTER};
+
+    if (!record->event.pressed) {
+        switch (keycode) {
+            case QK_MOD_TAP ... QK_MOD_TAP_MAX:
+                return process_record_konami_code(QK_MOD_TAP_GET_TAP_KEYCODE(keycode), record);
+            case QK_LAYER_TAP ... QK_LAYER_TAP_MAX:
+                return process_record_konami_code(QK_LAYER_TAP_GET_TAP_KEYCODE(keycode), record);
+            case QK_SWAP_HANDS ... QK_SWAP_HANDS_MAX:
+                return process_record_konami_code(QK_SWAP_HANDS_GET_TAP_KEYCODE(keycode), record);
+            case KC_KP_ENTER:
+            case KC_RETURN:
+            case QK_SPACE_CADET_RIGHT_SHIFT_ENTER:
+                return process_record_konami_code(KC_ENTER, record);
+            case KC_UP:
+            case KC_DOWN:
+            case KC_LEFT:
+            case KC_RIGHT:
+            case KC_B:
+            case KC_A:
+            case KC_ENTER:
+                dprintf("Key released: %s\n", key_name(keycode, false));
+                if (keycode == pgm_read_word(&konami_code[konami_index])) {
+                    konami_index++;
+                    if (konami_index == ARRAY_SIZE(konami_code)) {
+                        konami_code_handler();
+                        return false;
+                    }
+                } else {
+                    konami_index = 0;
+                }
+        }
+    }
+    return true;
+}
+#endif // KONAMI_CODE_ENABLE
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t reset_key_timer  = 0;
     static uint32_t eeprst_key_timer = 0;
+
+#ifdef KONAMI_CODE_ENABLE
+    if (!process_record_konami_code(keycode, record)) {
+        return false;
+    }
+#endif // KONAMI_CODE_ENABLE
 
     switch (keycode) {
         case CHANGEMODE:

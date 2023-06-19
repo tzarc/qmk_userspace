@@ -32,12 +32,14 @@ VPATH += $(USER_PATH)/graphics/src
 XAP_ENABLE ?= no
 RAW_ENABLE ?= no
 VIA_ENABLE ?= no
+KONAMI_CODE_ENABLE ?= no
 
 ifeq ($(strip $(PLATFORM_KEY)),chibios)
-	CREATE_MAP=yes
-	EXTRAFLAGS=-fstack-usage
-	EXTRALDFLAGS=-Wl,--print-memory-usage
+	CREATE_MAP = yes
+	EXTRAFLAGS = -fstack-usage
+	EXTRALDFLAGS = -Wl,--print-memory-usage
 	DEBOUNCE_TYPE = asym_eager_defer_pk
+	KONAMI_CODE_ENABLE = yes
 else ifeq ($(strip $(PLATFORM_KEY)),arm_atsam)
 	LTO_ENABLE = no
 else ifeq ($(strip $(PLATFORM_KEY)),avr)
@@ -58,7 +60,9 @@ ifneq ("$(wildcard $(LIB_PATH)/lvgl)","")
 
 endif
 
-QUANTUM_PAINTER_DRIVERS += surface
+ifeq ($(strip $(KONAMI_CODE_ENABLE)),yes)
+	OPT_DEFS += -DKONAMI_CODE_ENABLE
+endif
 
 ifeq ($(strip $(GAME_MODES_ENABLE)),yes)
 	OPT_DEFS += -DGAME_MODES_ENABLE

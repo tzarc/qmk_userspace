@@ -93,12 +93,12 @@ build_targets() {
     pushd "$pr_dir" >/dev/null 2>&1
 
     # Auto-determined from modified files in diff, will traverse the children and pick out child boards too
-    pcmd git diff --name-only $TARGET_BRANCH | grep -P '^keyboards' | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' | while read kb; do
-        find "keyboards/$kb" \( -name 'rules.mk' \) -and -not -path '*/keymaps/*' | while read rules; do
-            kb=$(dirname "$rules" | sed -e 's@^keyboards/@@g')
-            echo "${kb}:default";
-        done
-    done | sort | uniq
+    #pcmd git diff --name-only $TARGET_BRANCH | grep -P '^keyboards' | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' | while read kb; do
+    #    find "keyboards/$kb" \( -name 'rules.mk' \) -and -not -path '*/keymaps/*' | while read rules; do
+    #        kb=$(dirname "$rules" | sed -e 's@^keyboards/@@g')
+    #        echo "${kb}:default";
+    #    done
+    #done | sort | uniq
 
     # Generated from features present in boards
     #qmk find -f 'features.quantum_painter=true' | sort | uniq
@@ -108,7 +108,7 @@ build_targets() {
     #echo takashiski/namecard2x4/rev1:default takashiski/namecard2x4/rev2:default
 
     # Random selection of 100 of all boards
-    #qmk find | shuf | head -n100
+    qmk find | shuf | head -n100
 
     popd >/dev/null 2>&1
 }
@@ -181,7 +181,7 @@ main() {
 
     local differences=$( (diff -yW 200 --suppress-common-lines "$build_dir/sha1sums_base.txt" "$build_dir/sha1sums_pr.txt" || true) | awk '{print $2}' | sed -e 's@\.\(hex\|bin\|uf2\)$@@g' | xargs echo)
     for difference in $differences; do
-        find "$base_dir/.build/obj_$difference" "$pr_dir/.build/obj_$difference" -type f -name '*.i' | while read file; do
+        { find "$base_dir/.build/obj_$difference" "$pr_dir/.build/obj_$difference" "$base_dir/.build/obj_${difference%_*}" "$pr_dir/.build/obj_${difference%_*}" -type f -name '*.i' 2>/dev/null || true ; } | while read file; do
             cat "$file" | sed -e 's@^#.*@@g' -e 's@^\s*//.*@@g' -e '/^\s*$/d' | clang-format >"$file.formatted"
         done
     done

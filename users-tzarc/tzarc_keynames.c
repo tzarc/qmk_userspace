@@ -1,6 +1,7 @@
 // Copyright 2018-2023 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include <quantum.h>
+#include "util.h"
 
 #ifndef __AVR__
 static const char* const keycode_display_map[][2] = {
@@ -47,48 +48,57 @@ static const char* const keycode_display_map[][2] = {
     [KC_SPACE]     = {"Spc", "Spc"},
     [KC_MINUS]     = {"-", "_"},
     [KC_EQUAL]     = {"=", "="},
-#    if defined(QUANTUM_PAINTER)
-    [KC_LBRACKET]   = {"[", "{"},
-    [KC_RBRACKET]   = {"]", "}"},
-    [KC_BSLASH]     = {"\\", "|"},
-    [KC_NONUS_HASH] = {"#", "#"},
-    [KC_SCOLON]     = {";", ":"},
-    [KC_QUOTE]      = {"'", "\""},
-    [KC_GRAVE]      = {"`", "~"},
-    [KC_COMMA]      = {",", "<"},
-    [KC_DOT]        = {".", ">"},
-    [KC_SLASH]      = {"/", "?"},
-    [KC_CAPSLOCK]   = {"Caps", "Caps"},
-    [KC_F1]         = {"F1", "F1"},
-    [KC_F2]         = {"F2", "F2"},
-    [KC_F3]         = {"F3", "F3"},
-    [KC_F4]         = {"F4", "F4"},
-    [KC_F5]         = {"F5", "F5"},
-    [KC_F6]         = {"F6", "F6"},
-    [KC_F7]         = {"F7", "F7"},
-    [KC_F8]         = {"F8", "F8"},
-    [KC_F9]         = {"F9", "F9"},
-    [KC_F10]        = {"F10", "F10"},
-    [KC_F11]        = {"F11", "F11"},
-    [KC_F12]        = {"F12", "F12"},
-    [KC_PSCREEN]    = {"PScr", "PScr"},
-    [KC_SCROLLLOCK] = {"ScrL", "ScrL"},
-    [KC_PAUSE]      = {"Paus", "Paus"},
-    [KC_INSERT]     = {"Ins", "Ins"},
-    [KC_HOME]       = {"Home", "Home"},
-    [KC_PGUP]       = {"PgUp", "PgUp"},
-    [KC_DELETE]     = {"Del", "Del"},
-    [KC_END]        = {"End", "End"},
-    [KC_PGDOWN]     = {"PgDn", "PgDn"},
-    [KC_RIGHT]      = {"Rght", "Rght"},
-    [KC_LEFT]       = {"Left", "Left"},
-    [KC_DOWN]       = {"Up", "Up"},
-    [KC_UP]         = {"Down", "Down"},
-    [KC_NUMLOCK]    = {"NumL", "NumL"},
+#    if defined(QUANTUM_PAINTER_ENABLE)
+    [KC_LEFT_BRACKET]  = {"[", "{"},
+    [KC_RIGHT_BRACKET] = {"]", "}"},
+    [KC_BACKSLASH]     = {"\\", "|"},
+    [KC_NONUS_HASH]    = {"#", "#"},
+    [KC_SEMICOLON]     = {";", ":"},
+    [KC_QUOTE]         = {"'", "\""},
+    [KC_GRAVE]         = {"`", "~"},
+    [KC_COMMA]         = {",", "<"},
+    [KC_DOT]           = {".", ">"},
+    [KC_SLASH]         = {"/", "?"},
+    [KC_CAPS_LOCK]     = {"Caps", "Caps"},
+    [KC_F1]            = {"F1", "F1"},
+    [KC_F2]            = {"F2", "F2"},
+    [KC_F3]            = {"F3", "F3"},
+    [KC_F4]            = {"F4", "F4"},
+    [KC_F5]            = {"F5", "F5"},
+    [KC_F6]            = {"F6", "F6"},
+    [KC_F7]            = {"F7", "F7"},
+    [KC_F8]            = {"F8", "F8"},
+    [KC_F9]            = {"F9", "F9"},
+    [KC_F10]           = {"F10", "F10"},
+    [KC_F11]           = {"F11", "F11"},
+    [KC_F12]           = {"F12", "F12"},
+    [KC_PRINT_SCREEN]  = {"PScr", "PScr"},
+    [KC_SCROLL_LOCK]   = {"ScrL", "ScrL"},
+    [KC_PAUSE]         = {"Paus", "Paus"},
+    [KC_INSERT]        = {"Ins", "Ins"},
+    [KC_HOME]          = {"Home", "Home"},
+    [KC_PGUP]          = {"PgUp", "PgUp"},
+    [KC_DELETE]        = {"Del", "Del"},
+    [KC_END]           = {"End", "End"},
+    [KC_PAGE_DOWN]     = {"PgDn", "PgDn"},
+    [KC_RIGHT]         = {"Rght", "Rght"},
+    [KC_LEFT]          = {"Left", "Left"},
+    [KC_DOWN]          = {"Up", "Up"},
+    [KC_UP]            = {"Down", "Down"},
+    [KC_NUM_LOCK]      = {"NumL", "NumL"},
 #    endif // defined(QUANTUM_PAINTER)
 };
 
 const char* key_name(uint16_t keycode, bool shifted) {
+#    ifndef QUANTUM_PAINTER_ENABLE
+    if (keycode > KC_EQUAL) {
+        return "Unk";
+    }
+#    else
+    if (keycode > KC_NUM_LOCK) {
+        return "Unk";
+    }
+#    endif
     return keycode_display_map[keycode][shifted ? 1 : 0];
 }
 #else

@@ -3,6 +3,7 @@
 
 # Cortex version
 MCU = cortex-m7
+PLATFORM_KEY = chibios
 
 # ARM version, CORTEX-M0/M1 are 6, CORTEX-M3/M4/M7 are 7
 ARMV = 7
