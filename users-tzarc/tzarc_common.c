@@ -150,6 +150,13 @@ static bool process_record_konami_code(uint16_t keycode, keyrecord_t *record) {
 
     if (!record->event.pressed) {
         switch (keycode) {
+            case QK_MOMENTARY ... QK_MOMENTARY_MAX:
+            case QK_DEF_LAYER ... QK_DEF_LAYER_MAX:
+            case QK_TOGGLE_LAYER ... QK_TOGGLE_LAYER_MAX:
+            case QK_ONE_SHOT_LAYER ... QK_ONE_SHOT_LAYER_MAX:
+            case QK_LAYER_TAP_TOGGLE ... QK_LAYER_TAP_TOGGLE_MAX:
+                // Messing with layers, ignore but don't reset the counter.
+                break;
             case QK_MOD_TAP ... QK_MOD_TAP_MAX:
                 return process_record_konami_code(QK_MOD_TAP_GET_TAP_KEYCODE(keycode), record);
             case QK_LAYER_TAP ... QK_LAYER_TAP_MAX:
@@ -171,12 +178,16 @@ static bool process_record_konami_code(uint16_t keycode, keyrecord_t *record) {
                 if (keycode == pgm_read_word(&konami_code[konami_index])) {
                     konami_index++;
                     if (konami_index == ARRAY_SIZE(konami_code)) {
+                        konami_index = 0;
                         konami_code_handler();
-                        return false;
                     }
                 } else {
                     konami_index = 0;
                 }
+                break;
+            default:
+                konami_index = 0;
+                break;
         }
     }
     return true;
