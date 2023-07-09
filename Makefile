@@ -45,14 +45,13 @@ BOARD_DEFS := \
 	planck!keymaps/planck!planck/rev6_drop/keymaps/tzarc!tzarc \
 	sat75!keymaps/sat75!cannonkeys/satisfaction75/rev1/keymaps/tzarc!tzarc \
 	\
-	disco_f723!alternates/disco_f723!handwired/onekey/disco_f723!reset \
-	onekey_h743!alternates/nucleo144_h743zi!handwired/onekey/nucleo144_h743zi!reset \
-	onekey_l152!alternates/nucleo64_l152re!handwired/onekey/nucleo64_l152re!reset \
-	onekey_g431!alternates/nucleo64_g431rb!handwired/onekey/nucleo64_g431rb!reset \
-	onekey_g474!alternates/nucleo64_g474re!handwired/onekey/nucleo64_g474re!reset \
-	onekey_l082!alternates/nucleo32_l082kz!handwired/onekey/nucleo32_l082!reset \
+	disco_f723!alternates/disco_f723!handwired/onekey/disco_f723!console \
+	onekey_h723!alternates/nucleo144_h723zg!handwired/onekey/nucleo144_h723zg!console \
+	onekey_h743!alternates/nucleo144_h743zi!handwired/onekey/nucleo144_h743zi!console \
+	onekey_l152!alternates/nucleo64_l152re!handwired/onekey/nucleo64_l152re!console \
+	onekey_l082!alternates/nucleo32_l082kz!handwired/onekey/nucleo32_l082!console \
 	split_l082!alternates/nucleo32_l082kz_split!handwired/splittest/nucleo32_l082!default \
-	test_proton_c!alternates/proton_c_test!handwired/onekey/proton_c_test!reset \
+	test_proton_c!alternates/proton_c_test!handwired/onekey/proton_c_test!console \
 	split_proton_c!alternates/proton_c_split!handwired/splittest/proton_c_split!default!handwired/splittest/proton_c_split/a9 \
 	split_g431!alternates/g431_split!handwired/splittest/g431_split!default \
 	split_f072!alternates/f072_split!handwired/splittest/f072_split!default \

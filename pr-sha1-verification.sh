@@ -87,18 +87,18 @@ cleanup() {
         rm -rf --one-file-system "$build_dir"
     fi
 }
-trap cleanup EXIT
+trap cleanup EXIT INT TERM
 
 build_targets() {
     pushd "$pr_dir" >/dev/null 2>&1
 
     # Auto-determined from modified files in diff, will traverse the children and pick out child boards too
-    #pcmd git diff --name-only $TARGET_BRANCH | grep -P '^keyboards' | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' | while read kb; do
-    #    find "keyboards/$kb" \( -name 'rules.mk' \) -and -not -path '*/keymaps/*' | while read rules; do
-    #        kb=$(dirname "$rules" | sed -e 's@^keyboards/@@g')
-    #        echo "${kb}:default";
-    #    done
-    #done | sort | uniq
+    pcmd git diff --name-only $TARGET_BRANCH | grep -P '^keyboards' | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' | while read kb; do
+        find "keyboards/$kb" \( -name 'rules.mk' \) -and -not -path '*/keymaps/*' | while read rules; do
+            kb=$(dirname "$rules" | sed -e 's@^keyboards/@@g')
+            echo "${kb}:default";
+        done
+    done | sort | uniq
 
     # Generated from features present in boards
     #qmk find -f 'features.quantum_painter=true' | sort | uniq
@@ -108,7 +108,7 @@ build_targets() {
     #echo takashiski/namecard2x4/rev1:default takashiski/namecard2x4/rev2:default
 
     # Random selection of 100 of all boards
-    qmk find | shuf | head -n100
+    #qmk find | shuf | head -n100
 
     popd >/dev/null 2>&1
 }
@@ -147,6 +147,8 @@ main() {
     pcmd git remote set-url origin "$QMK_FIRMWARE_REPO"
     pcmd git checkout "$TARGET_BRANCH"
     pcmd git fetch origin "$TARGET_BRANCH"
+    pcmd git clean -xfd
+    pcmd git reset --hard
     pcmd git pull --ff-only
     pcmd make git-submodule
 

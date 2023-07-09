@@ -102,6 +102,31 @@
       }
     },
     {
+      "name": "Python: qmk find, all keymaps",
+      "type": "python",
+      "cwd": "${workspaceRoot}/qmk_firmware",
+      "request": "launch",
+      "args": [
+        "find",
+        "-km",
+        "all",
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+        },
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
       "name": "Python: generate-make-dependencies, Ghoul/RP2040/default",
       "type": "python",
       "cwd": "${workspaceRoot}/qmk_firmware",
@@ -310,6 +335,24 @@
       "windows": {
         "svdFile": "${workspaceRoot}\\svd\\STM32F7x3.svd",
         "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_onekey_disco_f723_reset.elf",
+        "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
+      },
+    },
+    {
+      "name": "ST-Link (handwired/onekey H723 reset keymap, cortex-debug)",
+      "type": "cortex-debug",
+      "request": "attach",
+      "cwd": "${workspaceRoot}/qmk_firmware",
+      "servertype": "stutil",
+      "device": "STM32H723",
+      "linux": {
+        "svdFile": "${workspaceRoot}/svd/STM32H723.svd",
+        "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_onekey_nucleo_h723zg_reset.elf",
+        "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
+      },
+      "windows": {
+        "svdFile": "${workspaceRoot}\\svd\\STM32H723.svd",
+        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_onekey_nucleo_h723zg_reset.elf",
         "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
       },
     },

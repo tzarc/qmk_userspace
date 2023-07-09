@@ -96,7 +96,7 @@
   "settings": {
     "python.defaultInterpreterPath":"/home/nickb/.local/pipx/venvs/qmk/bin/python3",
     "git.ignoreLimitWarning": true,
-    "cortex-debug.variableUseNaturalFormat": true,
+    "cortex-debug.variableUseNaturalFormat": false,
     "cSpell.words": [
       "Brassel",
       "Chibi",
