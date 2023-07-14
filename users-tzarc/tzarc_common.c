@@ -1,5 +1,6 @@
 // Copyright 2018-2023 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
+#include <stdint.h>
 #include <string.h>
 #include <quantum.h>
 #include <process_unicode_common.h>
@@ -194,6 +195,58 @@ static bool process_record_konami_code(uint16_t keycode, keyrecord_t *record) {
 }
 #endif // KONAMI_CODE_ENABLE
 
+static void win11_grid_relocation(uint16_t keycode1, uint16_t keycode2) {
+    const int delay = 25;
+    tap_code16_delay(LGUI(KC_Z), delay);
+    wait_ms(delay);
+    tap_code16_delay(keycode1, delay);
+    wait_ms(delay);
+    tap_code16_delay(keycode2, delay);
+    wait_ms(delay * 3);
+    tap_code16_delay(KC_ESCAPE, delay);
+}
+
+static bool process_record_win11_grid(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case TZ_WIN_M:
+            if (record->event.pressed) {
+                tap_code16_delay(LGUI(KC_UP), 25);
+                break;
+            }
+        case TZ_WIN_L:
+            if (record->event.pressed) {
+                win11_grid_relocation(KC_1, KC_1);
+                break;
+            }
+        case TZ_WIN_R:
+            if (record->event.pressed) {
+                win11_grid_relocation(KC_1, KC_2);
+                break;
+            }
+        case TZ_WIN_TL:
+            if (record->event.pressed) {
+                win11_grid_relocation(KC_5, KC_1);
+                break;
+            }
+        case TZ_WIN_BL:
+            if (record->event.pressed) {
+                win11_grid_relocation(KC_5, KC_3);
+                break;
+            }
+        case TZ_WIN_TR:
+            if (record->event.pressed) {
+                win11_grid_relocation(KC_5, KC_2);
+                break;
+            }
+        case TZ_WIN_BR:
+            if (record->event.pressed) {
+                win11_grid_relocation(KC_5, KC_4);
+                break;
+            }
+    }
+    return false;
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t reset_key_timer  = 0;
     static uint32_t eeprst_key_timer = 0;
@@ -230,6 +283,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             }
             return false;
+
+        case TZ_WIN_FIRST ... TZ_WIN_LAST:
+            return process_record_win11_grid(keycode, record);
     }
 
     if (config_enabled) {
