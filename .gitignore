@@ -1,4 +1,6 @@
 /qmk_firmware
+/qmk-dot-github
+/extra_userdir
 
 *.hex
 *.bin

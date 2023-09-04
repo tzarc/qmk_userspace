@@ -6,11 +6,10 @@
   "configurations": [
     {
       "name": "(gdb) Launch encoder_split_no_left",
-      "type": "cppdbg",
+      "type": "lldb",
       "request": "launch",
       "program": "${workspaceFolder}/qmk_firmware/.build/test/encoder_split_no_left.elf",
       "args": [],
-      "stopAtEntry": false,
       "cwd": "${workspaceFolder}/qmk_firmware/.build/test",
       "environment": [],
       "externalConsole": false,
@@ -33,6 +32,33 @@
         "lint",
         "-kb",
         "handwired/onekey/nucleo_f446re",
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+        },
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
+      "name": "Python: qmk new-keymap, iris/rev4, tzarc4",
+      "type": "python",
+      "cwd": "${workspaceRoot}/extra_userdir",
+      "request": "launch",
+      "args": [
+        "new-keymap",
+        "-kb",
+        "keebio/iris/rev4",
+        "-km",
+        "tzarc4"
       ],
       "console": "integratedTerminal",
       "linux": {
@@ -110,6 +136,31 @@
         "find",
         "-km",
         "tzarc",
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+        },
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
+      "name": "Python: qmk find, split.enabled=true",
+      "type": "python",
+      "cwd": "${workspaceRoot}/qmk_firmware",
+      "request": "launch",
+      "args": [
+        "find",
+        "-f",
+        "split.enabled=true",
       ],
       "console": "integratedTerminal",
       "linux": {
@@ -211,7 +262,7 @@
       }
     },
     {
-      "name": "Python: compile-by-keymap-folder, Ghoul/RP2040/default",
+      "name": "Python: compile, Ghoul/RP2040/default",
       "type": "python",
       "cwd": "${workspaceRoot}/qmk_firmware",
       "request": "launch",
@@ -220,12 +271,90 @@
         "-kb",
         "tzarc/ghoul/rev1/rp2040",
         "-km",
-        "/home/nickb/qmk_build/keymaps/ghoul",
+        "default",
       ],
       "console": "integratedTerminal",
       "linux": {
         "env": {
           "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+        },
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
+      "name": "Python: info, bm16s/tzarc2, external userspace",
+      "type": "python",
+      "cwd": "${workspaceRoot}/qmk_firmware",
+      "request": "launch",
+      "args": [
+        "info",
+        "-kb",
+        "kprepublic/bm16s",
+        "-km",
+        "tzarc2",
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3",
+          "QMK_USERSPACE": "/home/nickb/qmk_build/extra_userdir"
+        },
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
+      "name": "Python: compile, bm16s/tzarc2, external userspace, inside directory",
+      "type": "python",
+      "cwd": "${workspaceRoot}/extra_userdir/keyboards/kprepublic/bm16s/keymaps/tzarc2",
+      "request": "launch",
+      "args": [
+        "compile",
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3",
+          "QMK_USERSPACE": "/home/nickb/qmk_build/extra_userdir"
+        },
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
+      "name": "Python: list-keymaps, bm16s/tzarc2, external userspace",
+      "type": "python",
+      "cwd": "${workspaceRoot}/qmk_firmware",
+      "request": "launch",
+      "args": [
+        "list-keymaps",
+        "-kb",
+        "kprepublic/bm16s"
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3",
+          "QMK_USERSPACE": "/home/nickb/qmk_build/extra_userdir"
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },

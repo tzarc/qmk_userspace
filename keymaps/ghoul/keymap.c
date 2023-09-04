@@ -74,4 +74,28 @@ void keyboard_post_init_keymap(void) {
 void housekeeping_task_keymap(void) {
     // Draw the display
     ui_task();
+
+    static uint32_t last_eeprom_access = 0;
+    uint32_t        now                = timer_read32();
+    if (now - last_eeprom_access > 5000) {
+        dprint("reading eeprom\n");
+        last_eeprom_access = now;
+
+        union {
+            uint8_t  bytes[4];
+            uint32_t raw;
+        } tmp;
+        tmp.bytes[0] = prng8();
+        tmp.bytes[1] = prng8();
+        tmp.bytes[2] = prng8();
+        tmp.bytes[3] = prng8();
+
+        eeconfig_update_kb(tmp.raw);
+        uint32_t value = eeconfig_read_kb();
+        if (value != tmp.raw) {
+            dprint("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+            dprint("!! EEPROM readback mismatch!\n");
+            dprint("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+        }
+    }
 }

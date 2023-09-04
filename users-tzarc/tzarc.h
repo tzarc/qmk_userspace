@@ -80,7 +80,7 @@ layer_state_t layer_state_set_user(layer_state_t state);
 #define BITMASK_BIT_GET(array, n, first) (((array)[BITMASK_BYTE_INDEX((n), (first))] & (1 << BITMASK_BIT_INDEX((n), (first)))) ? 1 : 0)
 #define BITMASK_BIT_ASSIGN(array, value, n, first) (value ? BITMASK_BIT_SET((array), (n), (first)) : BITMASK_BIT_CLEAR((array), (n), (first)))
 
-__attribute__((packed)) struct tzarc_eeprom_cfg_t {
+struct __attribute__((packed)) tzarc_eeprom_cfg_t {
     uint8_t wow_enabled[BITMASK_BYTES_REQUIRED(WOW_KEY_MAX, WOW_KEY_MIN)];
     uint8_t diablo_enabled_keys; // 1 bit per key, DIABLO_NUM_KEYS total
 };

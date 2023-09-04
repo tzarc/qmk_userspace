@@ -46,7 +46,6 @@ BOARD_DEFS := \
 	sat75!keymaps/sat75!cannonkeys/satisfaction75/rev1/keymaps/tzarc!tzarc \
 	\
 	disco_f723!alternates/disco_f723!handwired/onekey/disco_f723!console \
-	onekey_h723!alternates/nucleo144_h723zg!handwired/onekey/nucleo144_h723zg!console \
 	onekey_h743!alternates/nucleo144_h743zi!handwired/onekey/nucleo144_h743zi!console \
 	onekey_l152!alternates/nucleo64_l152re!handwired/onekey/nucleo64_l152re!console \
 	onekey_l082!alternates/nucleo32_l082kz!handwired/onekey/nucleo32_l082!console \
