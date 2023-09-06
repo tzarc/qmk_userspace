@@ -20,13 +20,16 @@ CXX = arm-none-eabi-g++
 STRIP_S = arm-none-eabi-strip -s
 READELF = arm-none-eabi-readelf
 
+# STM32F405RG
+QMK_COMPILE_FLAGS := -mcpu=cortex-m4 -mthumb -DTHUMB_PRESENT -mno-thumb-interwork -DTHUMB_NO_INTERWORKING -mno-unaligned-access -mfloat-abi=hard -mfpu=fpv4-sp-d16 -fsingle-precision-constant -fomit-frame-pointer -ffunction-sections -fdata-sections -fno-common -fshort-wchar -fno-builtin-printf  -ggdb -flto -DLTO_ENABLE -Os -Wall -Wstrict-prototypes -Werror -std=gnu11 -fcommon -fstack-usage
+
 OPT_FLAGS = -g -O3
 CFLAGS_BASE ?= $(OPT_FLAGS) -fpic -fpie
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
 LDFLAGS ?= $(OPT_FLAGS) -shared -nostdlib -nostartfiles -nodefaultlibs
-CFLAGS ?= -std=c11 $(CFLAGS_BASE) $(LDFLAGS)
-CXXFLAGS ?= -std=c++14 $(CFLAGS_BASE) $(LDFLAGS)
+CFLAGS ?= -std=c11 $(CFLAGS_BASE) $(LDFLAGS) $(QMK_COMPILE_FLAGS)
+CXXFLAGS ?= -std=c++14 $(CFLAGS_BASE) $(LDFLAGS) $(QMK_COMPILE_FLAGS)
 
 ###########
 

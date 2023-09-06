@@ -1,4 +1,5 @@
 *.so
+*.so.rle
 .cache
 .build
 compile_commands.json
