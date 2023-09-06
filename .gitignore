@@ -1,5 +1,5 @@
 /qmk_firmware
-/qmk-dot-github
+/dot-github
 /extra_userdir
 
 *.hex
