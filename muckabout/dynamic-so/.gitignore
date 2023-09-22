@@ -1,4 +1,5 @@
 *.so
+*.so.asm
 *.so.rle
 .cache
 .build

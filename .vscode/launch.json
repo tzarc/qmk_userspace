@@ -26,6 +26,7 @@
     {
       "name": "Python: lint, handwired/onekey/nucleo_f446re",
       "type": "python",
+      "justMyCode": true,
       "cwd": "${workspaceRoot}",
       "request": "launch",
       "args": [
@@ -36,7 +37,7 @@
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },
@@ -49,8 +50,9 @@
       }
     },
     {
-      "name": "Python: qmk new-keymap, iris/rev4, tzarc4",
+      "name": "Python: qmk new-keymap, iris/rev4, tzarc4, userspace",
       "type": "python",
+      "justMyCode": true,
       "cwd": "${workspaceRoot}/extra_userdir",
       "request": "launch",
       "args": [
@@ -63,7 +65,84 @@
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+        },
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
+      "name": "Python: qmk license-check",
+      "type": "python",
+      "justMyCode": true,
+      "cwd": "${workspaceRoot}/qmk_firmware",
+      "request": "launch",
+      "args": [
+        "license-check",
+        "quantum/command.c"
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+        },
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
+      "name": "Python: qmk userspace-doctor",
+      "type": "python",
+      "justMyCode": true,
+      "cwd": "${workspaceRoot}/extra_userdir",
+      "request": "launch",
+      "args": [
+        "userspace-doctor"
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+        },
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
+      "name": "Python: qmk compile -kb all -km drashna",
+      "type": "python",
+      "justMyCode": true,
+      "cwd": "${workspaceRoot}/extra_userdir",
+      "request": "launch",
+      "args": [
+        "compile",
+        "-kb",
+        "all",
+        "-km",
+        "drashna"
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },
@@ -78,6 +157,7 @@
     {
       "name": "Python: pytest, qmk.tests.test_qmk_keymap.test_generate_c_pytest_has_template",
       "type": "python",
+      "justMyCode": true,
       "cwd": "${workspaceRoot}/qmk_firmware",
       "request": "launch",
       "args": [
@@ -90,7 +170,7 @@
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/nose2"
       },
@@ -105,17 +185,19 @@
     {
       "name": "Python: qmk find, default keymap",
       "type": "python",
+      "justMyCode": true,
       "cwd": "${workspaceRoot}/qmk_firmware",
       "request": "launch",
       "args": [
         "find",
+        "-n",
         "-km",
         "default",
       ],
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },
@@ -130,17 +212,19 @@
     {
       "name": "Python: qmk find, tzarc keymap",
       "type": "python",
+      "justMyCode": true,
       "cwd": "${workspaceRoot}/qmk_firmware",
       "request": "launch",
       "args": [
         "find",
+        "-n",
         "-km",
         "tzarc",
       ],
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },
@@ -155,17 +239,19 @@
     {
       "name": "Python: qmk find, split.enabled=true",
       "type": "python",
+      "justMyCode": true,
       "cwd": "${workspaceRoot}/qmk_firmware",
       "request": "launch",
       "args": [
         "find",
+        "-n",
         "-f",
         "split.enabled=true",
       ],
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },
@@ -180,6 +266,7 @@
     {
       "name": "Python: qmk find, all keymaps",
       "type": "python",
+      "justMyCode": true,
       "cwd": "${workspaceRoot}/qmk_firmware",
       "request": "launch",
       "args": [
@@ -190,7 +277,7 @@
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },
@@ -205,6 +292,7 @@
     {
       "name": "Python: generate-make-dependencies, Ghoul/RP2040/default",
       "type": "python",
+      "justMyCode": true,
       "cwd": "${workspaceRoot}/qmk_firmware",
       "request": "launch",
       "args": [
@@ -219,7 +307,7 @@
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },
@@ -234,6 +322,7 @@
     {
       "name": "Python: c2json, Ghoul/RP2040/default",
       "type": "python",
+      "justMyCode": true,
       "cwd": "${workspaceRoot}/qmk_firmware",
       "request": "launch",
       "args": [
@@ -249,7 +338,7 @@
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },
@@ -264,6 +353,7 @@
     {
       "name": "Python: compile, Ghoul/RP2040/default",
       "type": "python",
+      "justMyCode": true,
       "cwd": "${workspaceRoot}/qmk_firmware",
       "request": "launch",
       "args": [
@@ -276,7 +366,7 @@
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },
@@ -289,22 +379,22 @@
       }
     },
     {
-      "name": "Python: info, bm16s/tzarc2, external userspace",
+      "name": "Python: info, bm16s/tzarc, external userspace",
       "type": "python",
-      "cwd": "${workspaceRoot}/qmk_firmware",
+      "justMyCode": true,
+      "cwd": "${workspaceRoot}/extra_userdir",
       "request": "launch",
       "args": [
         "info",
         "-kb",
         "kprepublic/bm16s",
         "-km",
-        "tzarc2",
+        "tzarc",
       ],
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3",
-          "QMK_USERSPACE": "/home/nickb/qmk_build/extra_userdir"
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3",
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },
@@ -319,6 +409,7 @@
     {
       "name": "Python: compile, bm16s/tzarc2, external userspace, inside directory",
       "type": "python",
+      "justMyCode": true,
       "cwd": "${workspaceRoot}/extra_userdir/keyboards/kprepublic/bm16s/keymaps/tzarc2",
       "request": "launch",
       "args": [
@@ -327,7 +418,7 @@
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3",
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3",
           "QMK_USERSPACE": "/home/nickb/qmk_build/extra_userdir"
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
@@ -343,6 +434,7 @@
     {
       "name": "Python: list-keymaps, bm16s/tzarc2, external userspace",
       "type": "python",
+      "justMyCode": true,
       "cwd": "${workspaceRoot}/qmk_firmware",
       "request": "launch",
       "args": [
@@ -353,7 +445,7 @@
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3",
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3",
           "QMK_USERSPACE": "/home/nickb/qmk_build/extra_userdir"
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
@@ -369,6 +461,7 @@
     {
       "name": "Python: json2c, Ghoul/RP2040",
       "type": "python",
+      "justMyCode": true,
       "cwd": "${workspaceRoot}",
       "request": "launch",
       "args": [
@@ -380,7 +473,7 @@
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },
@@ -395,6 +488,7 @@
     {
       "name": "Python: convert test.gif",
       "type": "python",
+      "justMyCode": true,
       "cwd": "${workspaceRoot}",
       "request": "launch",
       "args": [
@@ -408,7 +502,7 @@
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },
@@ -423,6 +517,7 @@
     {
       "name": "Python: generate-keyboard-c, Ghoul/RP2040",
       "type": "python",
+      "justMyCode": true,
       "cwd": "${workspaceRoot}/qmk_firmware",
       "request": "launch",
       "args": [
@@ -435,7 +530,7 @@
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },
@@ -450,6 +545,7 @@
     {
       "name": "Python: generate-compilation-database, Ghoul/RP2040/tzarc",
       "type": "python",
+      "justMyCode": true,
       "cwd": "${workspaceRoot}/qmk_firmware",
       "request": "launch",
       "args": [
@@ -462,7 +558,7 @@
       "console": "integratedTerminal",
       "linux": {
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/venv_qmk/bin/python3"
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
         },
         "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
       },

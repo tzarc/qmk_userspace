@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "rle.h"
 
-bool rle_decode(stream_t *in_stream, stream_t *out_stream) {
-    int16_t (*get)(stream_t *stream)         = in_stream->get;
-    bool (*put)(stream_t *stream, int16_t c) = out_stream->put;
+bool rle_decode(stream_t* in_stream, stream_t* out_stream) {
+    int16_t (*get)(stream_t* stream)         = in_stream->get;
+    bool (*put)(stream_t* stream, int16_t c) = out_stream->put;
     int16_t c;
     size_t  i, cnt;
     while (1) {
@@ -30,8 +30,8 @@ bool rle_decode(stream_t *in_stream, stream_t *out_stream) {
 }
 
 #ifdef RLE_ENCODER
-static bool rle_append_bytes(stream_t *out_stream, uint8_t *buf, size_t len) {
-    bool (*put)(stream_t *stream, int16_t c) = out_stream->put;
+static bool rle_append_bytes(stream_t* out_stream, uint8_t* buf, size_t len) {
+    bool (*put)(stream_t* stream, int16_t c) = out_stream->put;
     int i;
     if (!put(out_stream, (int16_t)(127 + len))) return false;
     for (i = 0; i < len; i++) {
@@ -40,9 +40,9 @@ static bool rle_append_bytes(stream_t *out_stream, uint8_t *buf, size_t len) {
     return true;
 }
 
-bool rle_encode(stream_t *in_stream, stream_t *out_stream) {
-    int16_t (*get)(stream_t *stream)         = in_stream->get;
-    bool (*put)(stream_t *stream, int16_t c) = out_stream->put;
+bool rle_encode(stream_t* in_stream, stream_t* out_stream) {
+    int16_t (*get)(stream_t* stream)         = in_stream->get;
+    bool (*put)(stream_t* stream, int16_t c) = out_stream->put;
     uint8_t buf[256];
     size_t  len    = 0;
     bool    repeat = false;

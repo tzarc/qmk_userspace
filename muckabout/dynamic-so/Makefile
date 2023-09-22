@@ -17,17 +17,22 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 CC = arm-none-eabi-gcc
 CXX = arm-none-eabi-g++
-STRIP_S = arm-none-eabi-strip -s
+STRIP = arm-none-eabi-strip
 READELF = arm-none-eabi-readelf
+OBJCOPY = arm-none-eabi-objcopy
+OBJDUMP = arm-none-eabi-objdump
+SIZE = arm-none-eabi-size
 
 # STM32F405RG
-QMK_COMPILE_FLAGS := -mcpu=cortex-m4 -mthumb -DTHUMB_PRESENT -mno-thumb-interwork -DTHUMB_NO_INTERWORKING -mno-unaligned-access -mfloat-abi=hard -mfpu=fpv4-sp-d16 -fsingle-precision-constant -fomit-frame-pointer -ffunction-sections -fdata-sections -fno-common -fshort-wchar -fno-builtin-printf  -ggdb -flto -DLTO_ENABLE -Os -Wall -Wstrict-prototypes -Werror -std=gnu11 -fcommon -fstack-usage
+QMK_COMPILE_FLAGS := -mcpu=cortex-m4 -mthumb -mno-thumb-interwork -mno-unaligned-access -mfloat-abi=hard -mfpu=fpv4-sp-d16 -fsingle-precision-constant \
+	-mword-relocations -fomit-frame-pointer -ffunction-sections -fdata-sections -fno-common -fshort-wchar -fno-builtin-printf -ggdb -flto -Os \
+	-Wall -Wstrict-prototypes -Werror -std=gnu11 -fcommon -fstack-usage
 
 OPT_FLAGS = -g -O3
 CFLAGS_BASE ?= $(OPT_FLAGS) -fpic -fpie
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
-LDFLAGS ?= $(OPT_FLAGS) -shared -nostdlib -nostartfiles -nodefaultlibs
+LDFLAGS ?= $(OPT_FLAGS) -Bsymbolic -shared -nostdlib -nostartfiles -nodefaultlibs -mlong-calls -fno-common $(QMK_COMPILE_FLAGS)
 CFLAGS ?= -std=c11 $(CFLAGS_BASE) $(LDFLAGS) $(QMK_COMPILE_FLAGS)
 CXXFLAGS ?= -std=c++14 $(CFLAGS_BASE) $(LDFLAGS) $(QMK_COMPILE_FLAGS)
 
@@ -36,11 +41,17 @@ CXXFLAGS ?= -std=c++14 $(CFLAGS_BASE) $(LDFLAGS) $(QMK_COMPILE_FLAGS)
 all: $(TARGET_LIB)
 
 strip: $(TARGET_LIB)
-	$(STRIP_S) $(TARGET_LIB)
+	$(STRIP) -sx -R .hash -R .comment -R .ARM.attributes -R .persistent -R .dynamic $(TARGET_LIB)
+	$(OBJCOPY) --strip-all $(TARGET_LIB)
 
 info: strip
-	file ${TARGET_LIB}
+	$(OBJDUMP) -afphs $(TARGET_LIB) > $(TARGET_LIB).dump
+	$(OBJDUMP) -DSz $(TARGET_LIB) > $(TARGET_LIB).asm
 	$(READELF) -sSW ${TARGET_LIB}
+	$(READELF) -l ${TARGET_LIB}
+	$(SIZE) $(TARGET_LIB)
+	file ${TARGET_LIB}
+	stat ${TARGET_LIB}
 
 compile_commands.json:
 	@compiledb make -n all >/dev/null
@@ -81,7 +92,7 @@ $(BUILD_DIR)/%.cc.o: %.cc compile_commands.json
 .PHONY: clean
 
 clean:
-	$(RM) -r $(BUILD_DIR) compile_commands.json
+	$(RM) -r $(BUILD_DIR) compile_commands.json $(TARGET_LIB)
 
 .PHONY: distclean
 

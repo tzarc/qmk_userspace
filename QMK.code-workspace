@@ -5,14 +5,6 @@
       "path": "."
     },
     {
-      "name": "qmk-docs",
-      "path": "qmk_firmware/docs"
-    },
-    {
-      "name": "qmk-docs-build",
-      "path": "qmk_firmware/.build/docs"
-    },
-    {
       "name": "quantum-painter",
       "path": "qmk_firmware/quantum/painter"
     },
@@ -21,104 +13,17 @@
       "path": "qmk_firmware/drivers/painter"
     },
     {
-      "name": "quantum-wear_leveling",
-      "path": "qmk_firmware/quantum/wear_leveling"
-    },
-    {
-      "name": "drivers-wear_leveling",
-      "path": "qmk_firmware/drivers/wear_leveling"
-    },
-    {
-      "name": "onekey",
-      "path": "qmk_firmware/keyboards/handwired/onekey"
-    },
-    {
-      "name": "drivers-chibios-wear_leveling",
-      "path": "qmk_firmware/platforms/chibios/drivers/wear_leveling"
-    },
-    {
       "name": "keyboards-tzarc",
       "path": "qmk_firmware/keyboards/tzarc"
     },
     {
       "name": "python-qmk",
       "path": "qmk_firmware/lib/python/qmk"
-    },
-    {
-      "name": "python-xap_client",
-      "path": "qmk_firmware/lib/python/xap_client"
-    },
-    {
-      "name": "xap-defs",
-      "path": "qmk_firmware/data/xap"
-    },
-    {
-      "name": "xap-python",
-      "path": "qmk_firmware/lib/python/qmk/xap"
-    },
-    {
-      "name": "xap-python-cli",
-      "path": "qmk_firmware/lib/python/qmk/cli/xap"
-    },
-    {
-      "name": "xap-templates",
-      "path": "qmk_firmware/data/templates/xap"
-    },
-    {
-      "name": "xap-qmk",
-      "path": "qmk_firmware/quantum/xap"
-    },
-    {
-      "name": "xap-generated-kprepublic-bm60hsrgb_poker_rev2",
-      "path": "qmk_firmware/.build/obj_kprepublic_bm60hsrgb_poker_rev2/src"
-    },
-    {
-      "name": "xap-generated-kprepublic-bm60hsrgb_poker_rev2_tzarc",
-      "path": "qmk_firmware/.build/obj_kprepublic_bm60hsrgb_poker_rev2_tzarc/src"
-    },
-    {
-      "name": "xap-generated-kprepublic-bm16s",
-      "path": "qmk_firmware/.build/obj_kprepublic_bm16s/src"
-    },
-    {
-      "name": "xap-generated-kprepublic-bm16s_tzarc",
-      "path": "qmk_firmware/.build/obj_kprepublic_bm16s_tzarc/src"
-    },
-    {
-      "name": "xap-generated-ghoul-rev1-rp2040",
-      "path": "qmk_firmware/.build/obj_tzarc_ghoul_rev1_rp2040/src"
-    },
-    {
-      "name": "xap-generated-ghoul-rev1-rp2040_tzarc",
-      "path": "qmk_firmware/.build/obj_tzarc_ghoul_rev1_rp2040_tzarc/src"
     }
   ],
   "settings": {
     "python.defaultInterpreterPath":"/home/nickb/.local/pipx/venvs/qmk/bin/python3",
     "git.ignoreLimitWarning": true,
-    "cortex-debug.variableUseNaturalFormat": false,
-    "cSpell.words": [
-      "Brassel",
-      "Chibi",
-      "chibios",
-      "comms",
-      "Configurator",
-      "framebuffer",
-      "gpio",
-      "GPIOB",
-      "GPIOC",
-      "keymap",
-      "keymaps",
-      "LVGL",
-      "OLED",
-      "PIXDATA",
-      "QMK's",
-      "readback",
-      "SETCOLUMN",
-      "setpixel",
-      "stdlayout",
-      "tzarc",
-      "USBPD"
-    ],
+    "cortex-debug.variableUseNaturalFormat": false
   }
 }
