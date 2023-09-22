@@ -5,6 +5,44 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "(gdb) rle",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/muckabout/rle/rle",
+      "args": ["-h"],
+      "cwd": "${workspaceFolder}/muckabout/rle",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      //"preLaunchTask": "build wear_leveling tests",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    },
+    {
+      "name": "(gdb) rle16",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/muckabout/rle16/rle",
+      "args": ["-h"],
+      "cwd": "${workspaceFolder}/muckabout/rle16",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      //"preLaunchTask": "build wear_leveling tests",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    },
+    {
       "name": "(gdb) Launch encoder_split_no_left",
       "type": "lldb",
       "request": "launch",
