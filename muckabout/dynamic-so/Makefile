@@ -25,14 +25,19 @@ SIZE = arm-none-eabi-size
 
 # STM32F405RG
 QMK_COMPILE_FLAGS := -mcpu=cortex-m4 -mthumb -mno-thumb-interwork -mno-unaligned-access -mfloat-abi=hard -mfpu=fpv4-sp-d16 -fsingle-precision-constant \
-	-mword-relocations -fomit-frame-pointer -ffunction-sections -fdata-sections -fno-common -fshort-wchar -fno-builtin-printf -ggdb -flto -Os \
-	-Wall -Wstrict-prototypes -Werror -std=gnu11 -fcommon -fstack-usage
+	-mword-relocations -fomit-frame-pointer -ffunction-sections -fdata-sections -fno-builtin -fno-common -fshort-wchar -ggdb -flto -Os \
+	-Wall -Wstrict-prototypes -Werror -std=gnu11 -fcommon -fstack-usage -msingle-pic-base -mno-pic-data-is-text-relative
 
 OPT_FLAGS = -g -O3
 CFLAGS_BASE ?= $(OPT_FLAGS) -fpic -fpie
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
-LDFLAGS ?= $(OPT_FLAGS) -Bsymbolic -shared -nostdlib -nostartfiles -nodefaultlibs -mlong-calls -fno-common $(QMK_COMPILE_FLAGS)
+LDFLAGS ?= $(OPT_FLAGS) \
+	-Bsymbolic -shared -nostdlib -nostartfiles -nodefaultlibs -mlong-calls -fno-common \
+	-Wl,-Map=${TARGET_LIB}.map -Wl,--print-memory-usage -Wl,--gc-sections \
+	--specs=nosys.specs -nostdlib -Wl,--undefined=main -Wl,--emit-relocs \
+	$(QMK_COMPILE_FLAGS) \
+	-T src/lib.ld
 CFLAGS ?= -std=c11 $(CFLAGS_BASE) $(LDFLAGS) $(QMK_COMPILE_FLAGS)
 CXXFLAGS ?= -std=c++14 $(CFLAGS_BASE) $(LDFLAGS) $(QMK_COMPILE_FLAGS)
 
@@ -40,11 +45,13 @@ CXXFLAGS ?= -std=c++14 $(CFLAGS_BASE) $(LDFLAGS) $(QMK_COMPILE_FLAGS)
 
 all: $(TARGET_LIB)
 
-strip: $(TARGET_LIB)
-	$(STRIP) -sx -R .hash -R .comment -R .ARM.attributes -R .persistent -R .dynamic $(TARGET_LIB)
-	$(OBJCOPY) --strip-all $(TARGET_LIB)
+.PHONY: buildreqs
+buildreqs: compile_commands.json Makefile
 
-info: strip
+convert: $(TARGET_LIB)
+	./convert-binary.py $(TARGET_LIB)
+
+info:
 	$(OBJDUMP) -afphs $(TARGET_LIB) > $(TARGET_LIB).dump
 	$(OBJDUMP) -DSz $(TARGET_LIB) > $(TARGET_LIB).asm
 	$(READELF) -sSW ${TARGET_LIB}
@@ -53,7 +60,7 @@ info: strip
 	file ${TARGET_LIB}
 	stat ${TARGET_LIB}
 
-compile_commands.json:
+compile_commands.json: Makefile
 	@compiledb make -n all >/dev/null
 
 define setup_formatter
@@ -67,32 +74,32 @@ $(BUILD_DIR)/$(TARGET_LIB): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)
 
 # assembly
-$(BUILD_DIR)/%.s.o: %.s compile_commands.json
+$(BUILD_DIR)/%.s.o: %.s buildreqs
 	$(MKDIR_P) $(dir $@)
 	$(AS) $(ASFLAGS) -c $< -o $@
 
 # c sources
-$(BUILD_DIR)/%.c.o: %.c compile_commands.json
+$(BUILD_DIR)/%.c.o: %.c buildreqs
 	$(MKDIR_P) $(dir $@)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 # c++ sources
-$(BUILD_DIR)/%.cpp.o: %.cpp compile_commands.json
+$(BUILD_DIR)/%.cpp.o: %.cpp buildreqs
 	$(MKDIR_P) $(dir $@)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.cxx.o: %.cxx compile_commands.json
+$(BUILD_DIR)/%.cxx.o: %.cxx buildreqs
 	$(MKDIR_P) $(dir $@)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.cc.o: %.cc compile_commands.json
+$(BUILD_DIR)/%.cc.o: %.cc buildreqs
 	$(MKDIR_P) $(dir $@)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 .PHONY: clean
 
 clean:
-	$(RM) -r $(BUILD_DIR) compile_commands.json $(TARGET_LIB)
+	$(RM) -r $(BUILD_DIR) compile_commands.json $(TARGET_LIB) $(TARGET_LIB).asm $(TARGET_LIB).dump $(TARGET_LIB).map $(TARGET_LIB).qke
 
 .PHONY: distclean
 

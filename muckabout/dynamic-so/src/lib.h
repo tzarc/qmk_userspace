@@ -14,6 +14,8 @@ typedef struct qmk_bridge_t {
     bool (*is_keyboard_left)(void);
 
     // Keymap APIs
-    bool (*process_record_user)(uint16_t keycode, keyrecord_t* record);
+    bool (*process_record_user)(uint16_t keycode, keyrecord_t *record);
     void (*housekeeping_task_user)(void);
+
+    int *test;
 } qmk_bridge_t;

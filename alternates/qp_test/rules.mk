@@ -12,10 +12,14 @@ QUANTUM_PAINTER_DRIVERS = \
     sh1106_i2c \
     sh1106_spi
 
-#OPT = 0
-#OPT_DEFS += -g
+DEBOUNCE_TYPE = asym_eager_defer_pk
+
+OPT = 0
+OPT_DEFS += -g
 
 DEBUG_MATRIX_SCAN_RATE_ENABLE = yes
 
-OPT = 3
-LTO_ENABLE = yes
+TOP_SYMBOLS=3000
+
+#OPT = 3
+#LTO_ENABLE = yes

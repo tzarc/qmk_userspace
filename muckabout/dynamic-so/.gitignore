@@ -1,6 +1,8 @@
 *.so
 *.so.asm
-*.so.rle
+*.so.dump
+*.so.map
+*.so.qke
 .cache
 .build
 compile_commands.json

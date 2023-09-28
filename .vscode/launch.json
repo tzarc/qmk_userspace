@@ -2,26 +2,47 @@
   // Use IntelliSense to learn about possible attributes.
   // Hover to view descriptions of existing attributes.
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+
+  // vscode user-level settings.json:
+  // "cortex-debug.armToolchainPath.linux": "/home/nickb/gcc-arm/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi/bin",
+  // "cortex-debug.gdbPath.linux": "/home/nickb/qmk_build/bin/arm-none-eabi-gdb-shim",
+  // "cortex-debug.armToolchainPath.windows": "E:\\arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi\\bin"
+
   "version": "0.2.0",
   "configurations": [
+    {
+      "name": "Python: qmk mass-compile -n all:all",
+      "type": "python",
+      "justMyCode": true,
+      "cwd": "${workspaceRoot}",
+      "request": "launch",
+      "args": [
+        "mass-compile",
+        "-n",
+        "all:all",
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk",
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+        }
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
     {
       "name": "(gdb) rle",
       "type": "lldb",
       "request": "launch",
       "program": "${workspaceFolder}/muckabout/rle/rle",
       "args": ["-h"],
-      "cwd": "${workspaceFolder}/muckabout/rle",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "gdb",
-      //"preLaunchTask": "build wear_leveling tests",
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
-      ]
+      "cwd": "${workspaceFolder}/muckabout/rle"
     },
     {
       "name": "(gdb) rle16",
@@ -29,18 +50,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/muckabout/rle16/rle",
       "args": ["-h"],
-      "cwd": "${workspaceFolder}/muckabout/rle16",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "gdb",
-      //"preLaunchTask": "build wear_leveling tests",
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
-      ]
+      "cwd": "${workspaceFolder}/muckabout/rle16"
     },
     {
       "name": "(gdb) Launch encoder_split_no_left",
@@ -48,565 +58,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/qmk_firmware/.build/test/encoder_split_no_left.elf",
       "args": [],
-      "cwd": "${workspaceFolder}/qmk_firmware/.build/test",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "gdb",
-      //"preLaunchTask": "build wear_leveling tests",
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
-      ]
-    },
-    {
-      "name": "Python: lint, handwired/onekey/nucleo_f446re",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "lint",
-        "-kb",
-        "handwired/onekey/nucleo_f446re",
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: qmk new-keymap, iris/rev4, tzarc4, userspace",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/extra_userdir",
-      "request": "launch",
-      "args": [
-        "new-keymap",
-        "-kb",
-        "keebio/iris/rev4",
-        "-km",
-        "tzarc4"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: qmk license-check",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "request": "launch",
-      "args": [
-        "license-check",
-        "quantum/command.c"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: qmk userspace-doctor",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/extra_userdir",
-      "request": "launch",
-      "args": [
-        "userspace-doctor"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: qmk compile -kb all -km drashna",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/extra_userdir",
-      "request": "launch",
-      "args": [
-        "compile",
-        "-kb",
-        "all",
-        "-km",
-        "drashna"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: pytest, qmk.tests.test_qmk_keymap.test_generate_c_pytest_has_template",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "request": "launch",
-      "args": [
-        "-v",
-        "-t",
-        "lib/python",
-        "qmk.tests.test_qmk_keymap.test_generate_c_pytest_has_template"
-      ],
-      "subProcess": true,
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/nose2"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\nose2.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: qmk find, default keymap",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "request": "launch",
-      "args": [
-        "find",
-        "-n",
-        "-km",
-        "default",
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: qmk find, tzarc keymap",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "request": "launch",
-      "args": [
-        "find",
-        "-n",
-        "-km",
-        "tzarc",
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: qmk find, split.enabled=true",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "request": "launch",
-      "args": [
-        "find",
-        "-n",
-        "-f",
-        "split.enabled=true",
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: qmk find, all keymaps",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "request": "launch",
-      "args": [
-        "find",
-        "-km",
-        "all",
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: generate-make-dependencies, Ghoul/RP2040/default",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "request": "launch",
-      "args": [
-        "generate-make-dependencies",
-        "-kb",
-        "tzarc/ghoul/rev1/rp2040",
-        "-km",
-        "default",
-        "-o",
-        "/home/nickb/qmk_build/ghoul-deps.d",
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: c2json, Ghoul/RP2040/default",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "request": "launch",
-      "args": [
-        "c2json",
-        "-kb",
-        "tzarc/ghoul/rev1/rp2040",
-        "-km",
-        "default",
-        "-o",
-        "/home/nickb/qmk_build/ghoul-keymap.json",
-        "keyboards/tzarc/ghoul/keymaps/default/keymap.c"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: compile, Ghoul/RP2040/default",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "request": "launch",
-      "args": [
-        "compile",
-        "-kb",
-        "tzarc/ghoul/rev1/rp2040",
-        "-km",
-        "default",
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: info, bm16s/tzarc, external userspace",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/extra_userdir",
-      "request": "launch",
-      "args": [
-        "info",
-        "-kb",
-        "kprepublic/bm16s",
-        "-km",
-        "tzarc",
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3",
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: compile, bm16s/tzarc2, external userspace, inside directory",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/extra_userdir/keyboards/kprepublic/bm16s/keymaps/tzarc2",
-      "request": "launch",
-      "args": [
-        "compile",
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3",
-          "QMK_USERSPACE": "/home/nickb/qmk_build/extra_userdir"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: list-keymaps, bm16s/tzarc2, external userspace",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "request": "launch",
-      "args": [
-        "list-keymaps",
-        "-kb",
-        "kprepublic/bm16s"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3",
-          "QMK_USERSPACE": "/home/nickb/qmk_build/extra_userdir"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: json2c, Ghoul/RP2040",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "json2c",
-        "ghoul-stm32-encodermap.json",
-        "-o",
-        "-"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: convert test.gif",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "painter-convert-graphics",
-        "-f",
-        "mono2",
-        "-i",
-        "test.gif",
-        "-v"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: generate-keyboard-c, Ghoul/RP2040",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "request": "launch",
-      "args": [
-        "generate-keyboard-c",
-        "-kb",
-        "tzarc/ghoul/rev1/rp2040",
-        "-o",
-        "-"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
-    },
-    {
-      "name": "Python: generate-compilation-database, Ghoul/RP2040/tzarc",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "request": "launch",
-      "args": [
-        "generate-compilation-database",
-        "-kb",
-        "tzarc/ghoul/rev1/rp2040",
-        "-km",
-        "tzarc"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
-        },
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk"
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
+      "cwd": "${workspaceFolder}/qmk_firmware/.build/test"
     },
     {
       "name": "ST-Link (handwired/onekey F723 reset keymap, cortex-debug)",
@@ -615,15 +67,12 @@
       "cwd": "${workspaceRoot}/qmk_firmware",
       "servertype": "stutil",
       "device": "STM32F723",
+      "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_onekey_disco_f723_reset.elf",
       "linux": {
-        "svdFile": "${workspaceRoot}/svd/STM32F7x3.svd",
-        "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_onekey_disco_f723_reset.elf",
-        "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
+        "svdPath": "${workspaceRoot}/svd/STM32F7x3.svd"
       },
       "windows": {
-        "svdFile": "${workspaceRoot}\\svd\\STM32F7x3.svd",
-        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_onekey_disco_f723_reset.elf",
-        "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
+        "svdPath": "${workspaceRoot}\\svd\\STM32F7x3.svd"
       },
     },
     {
@@ -633,15 +82,12 @@
       "cwd": "${workspaceRoot}/qmk_firmware",
       "servertype": "stutil",
       "device": "STM32H723",
+      "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_onekey_nucleo_h723zg_reset.elf",
       "linux": {
-        "svdFile": "${workspaceRoot}/svd/STM32H723.svd",
-        "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_onekey_nucleo_h723zg_reset.elf",
-        "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
+        "svdPath": "${workspaceRoot}/svd/STM32H723.svd"
       },
       "windows": {
-        "svdFile": "${workspaceRoot}\\svd\\STM32H723.svd",
-        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_onekey_nucleo_h723zg_reset.elf",
-        "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
+        "svdPath": "${workspaceRoot}\\svd\\STM32H723.svd"
       },
     },
     {
@@ -649,111 +95,16 @@
       "type": "cortex-debug",
       "request": "attach",
       "cwd": "${workspaceRoot}/qmk_firmware",
-      "svdFile": "${workspaceRoot}/svd/STM32F401.svd",
+      "svdPath": "${workspaceRoot}/svd/STM32F401.svd",
       "servertype": "bmp",
       "interface": "swd",
       "device": "STM32F401",
+      "executable": "${workspaceRoot}/qmk_firmware/.build/qp_test_default.elf",
       "linux": {
-        "BMPGDBSerialPort": "/dev/ttyACM0",
-        "executable": "${workspaceRoot}/qmk_firmware/.build/qp_test_default.elf",
-        "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
+        "BMPGDBSerialPort": "/dev/ttyACM2"
       },
       "windows": {
-        "BMPGDBSerialPort": "COM4",
-        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\qp_test_default.elf",
-        "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
-      },
-      "showDevDebugOutput": "parsed",
-      "preAttachCommands": ["set mem inaccessible-by-default off"],
-      "postAttachCommands": []
-    },
-    {
-      "name": "Black Magic Probe (Djinn G474 default keymap, cortex-debug)",
-      "type": "cortex-debug",
-      "request": "attach",
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "svdFile": "${workspaceRoot}/svd/STM32G474xx.svd",
-      "servertype": "bmp",
-      "interface": "swd",
-      "device": "STM32G474",
-      "linux": {
-        "BMPGDBSerialPort": "/dev/ttyACM0",
-        "executable": "${workspaceRoot}/qmk_firmware/.build/tzarc_djinn_rev1_default.elf",
-        "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
-      },
-      "windows": {
-        "BMPGDBSerialPort": "COM4",
-        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\tzarc_djinn_rev1_default.elf",
-        "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
-      },
-      "showDevDebugOutput": "parsed",
-      "preAttachCommands": ["set mem inaccessible-by-default off"],
-      "postAttachCommands": []
-    },
-    {
-      "name": "Black Magic Probe (L412, cortex-debug)",
-      "type": "cortex-debug",
-      "request": "attach",
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "svdFile": "${workspaceRoot}/svd/STM32L4x2.svd",
-      "servertype": "bmp",
-      "interface": "swd",
-      "device": "STM32L4x2",
-      "linux": {
-        "BMPGDBSerialPort": "/dev/ttyACM0",
-        "executable": "${workspaceRoot}/qmk_firmware/.build/qp_test_stm32l412kb_default.elf",
-        "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
-      },
-      "windows": {
-        "BMPGDBSerialPort": "COM6",
-        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\qp_test_stm32l412kb_default.elf",
-        "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
-      },
-      "showDevDebugOutput": "parsed",
-      "preAttachCommands": ["set mem inaccessible-by-default off"],
-      "postAttachCommands": []
-    },
-    {
-      "name": "Black Magic Probe (Ghoul STM32F4, cortex-debug)",
-      "type": "cortex-debug",
-      "request": "attach",
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "svdFile": "${workspaceRoot}/svd/STM32F405.svd",
-      "servertype": "bmp",
-      "interface": "swd",
-      "device": "STM32F405",
-      "linux": {
-        "BMPGDBSerialPort": "/dev/ttyACM0",
-        "executable": "${workspaceRoot}/qmk_firmware/.build/tzarc_ghoul_rev1_stm32_tzarc.elf",
-        "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
-      },
-      "windows": {
-        "BMPGDBSerialPort": "COM4",
-        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\tzarc_ghoul_rev1_stm32_tzarc.elf",
-        "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
-      },
-      "showDevDebugOutput": "parsed",
-      "preAttachCommands": ["set mem inaccessible-by-default off"],
-      "postAttachCommands": []
-    },
-    {
-      "name": "Black Magic Probe (Ghoul RP2040, cortex-debug)",
-      "type": "cortex-debug",
-      "request": "attach",
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "svdFile": "${workspaceRoot}/qmk_firmware/lib/pico-sdk/rp2040/hardware_regs/rp2040.svd",
-      "servertype": "bmp",
-      "interface": "swd",
-      "device": "RP2040",
-      "linux": {
-        "BMPGDBSerialPort": "/dev/ttyACM0",
-        "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_tzarc_ghoul_rev1_rp2040_default.elf",
-        "armToolchainPath": "/home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin"
-      },
-      "windows": {
-        "BMPGDBSerialPort": "COM6",
-        "executable": "${workspaceRoot}\\qmk_firmware\\.build\\handwired_tzarc_ghoul_rev1_rp2040_default.elf",
-        "armToolchainPath": "E:\\gcc-arm-none-eabi-10.3-2021.10\\bin"
+        "BMPGDBSerialPort": "COM3"
       },
       "showDevDebugOutput": "parsed",
       "preAttachCommands": ["set mem inaccessible-by-default off"],
