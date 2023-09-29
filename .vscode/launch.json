@@ -11,7 +11,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: qmk mass-compile -n all:all",
+      "name": "Python: qmk mass-compile -n all:drashna",
       "type": "python",
       "justMyCode": true,
       "cwd": "${workspaceRoot}",
@@ -19,7 +19,7 @@
       "args": [
         "mass-compile",
         "-n",
-        "all:all",
+        "all:drashna",
       ],
       "console": "integratedTerminal",
       "linux": {
@@ -68,12 +68,7 @@
       "servertype": "stutil",
       "device": "STM32F723",
       "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_onekey_disco_f723_reset.elf",
-      "linux": {
-        "svdPath": "${workspaceRoot}/svd/STM32F7x3.svd"
-      },
-      "windows": {
-        "svdPath": "${workspaceRoot}\\svd\\STM32F7x3.svd"
-      },
+      "svdPath": "${workspaceRoot}/svd/STM32F7x3.svd"
     },
     {
       "name": "ST-Link (handwired/onekey H723 reset keymap, cortex-debug)",
@@ -83,12 +78,7 @@
       "servertype": "stutil",
       "device": "STM32H723",
       "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_onekey_nucleo_h723zg_reset.elf",
-      "linux": {
-        "svdPath": "${workspaceRoot}/svd/STM32H723.svd"
-      },
-      "windows": {
-        "svdPath": "${workspaceRoot}\\svd\\STM32H723.svd"
-      },
+      "svdPath": "${workspaceRoot}/svd/STM32H723.svd"
     },
     {
       "name": "Black Magic Probe (qp_test, cortex-debug)",
