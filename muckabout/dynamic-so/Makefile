@@ -26,10 +26,10 @@ SIZE = arm-none-eabi-size
 # STM32F405RG
 QMK_COMPILE_FLAGS := -mcpu=cortex-m4 -mthumb -mno-thumb-interwork -mno-unaligned-access -mfloat-abi=hard -mfpu=fpv4-sp-d16 -fsingle-precision-constant \
 	-mword-relocations -fomit-frame-pointer -ffunction-sections -fdata-sections -fno-builtin -fno-common -fshort-wchar -ggdb -flto -Os \
-	-Wall -Wstrict-prototypes -Werror -std=gnu11 -fcommon -fstack-usage -msingle-pic-base -mno-pic-data-is-text-relative
+	-Wall -Wstrict-prototypes -Werror -fcommon -fstack-usage #-mno-pic-data-is-text-relative #-msingle-pic-base
 
 OPT_FLAGS = -g -O3
-CFLAGS_BASE ?= $(OPT_FLAGS) -fpic -fpie
+CFLAGS_BASE ?= $(OPT_FLAGS) -fPIE #-fPIC #-fpic -fpie
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
 LDFLAGS ?= $(OPT_FLAGS) \
@@ -39,7 +39,7 @@ LDFLAGS ?= $(OPT_FLAGS) \
 	$(QMK_COMPILE_FLAGS) \
 	-T src/lib.ld
 CFLAGS ?= -std=c11 $(CFLAGS_BASE) $(LDFLAGS) $(QMK_COMPILE_FLAGS)
-CXXFLAGS ?= -std=c++14 $(CFLAGS_BASE) $(LDFLAGS) $(QMK_COMPILE_FLAGS)
+CXXFLAGS ?= -std=c++14 -fno-exceptions -fno-rtti $(CFLAGS_BASE) $(LDFLAGS) $(QMK_COMPILE_FLAGS)
 
 ###########
 
@@ -48,17 +48,24 @@ all: $(TARGET_LIB)
 .PHONY: buildreqs
 buildreqs: compile_commands.json Makefile
 
-convert: $(TARGET_LIB)
-	./convert-binary.py $(TARGET_LIB)
+format:
+	black -l 160 convert-binary.py
 
-info:
+convert: $(TARGET_LIB)
+	if false ; then $(STRIP) -s $(TARGET_LIB) ; fi
+	if true ; then $(OBJCOPY) --strip-debug --strip-dwo $(TARGET_LIB) ; fi
+	if true ; then ./convert-binary.py $(TARGET_LIB) ; fi
+
+info: convert
 	$(OBJDUMP) -afphs $(TARGET_LIB) > $(TARGET_LIB).dump
 	$(OBJDUMP) -DSz $(TARGET_LIB) > $(TARGET_LIB).asm
-	$(READELF) -sSW ${TARGET_LIB}
+	$(READELF) -sSW ${TARGET_LIB} > $(TARGET_LIB).symbols
+	$(READELF) -r ${TARGET_LIB} > $(TARGET_LIB).relocs
 	$(READELF) -l ${TARGET_LIB}
 	$(SIZE) $(TARGET_LIB)
 	file ${TARGET_LIB}
 	stat ${TARGET_LIB}
+	stat ${TARGET_LIB}.qke
 
 compile_commands.json: Makefile
 	@compiledb make -n all >/dev/null

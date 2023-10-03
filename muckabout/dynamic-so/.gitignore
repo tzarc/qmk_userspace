@@ -2,6 +2,8 @@
 *.so.asm
 *.so.dump
 *.so.map
+*.so.relocs
+*.so.symbols
 *.so.qke
 .cache
 .build

@@ -3,19 +3,29 @@
 #include "lib.h"
 #include "keycodes.h"
 
-static qmk_bridge_t* qmk;
-static int           chunder = 5;
+static int    chunder_data = 5;
+static int    chunder_bss;
+static int    chunder_nonresident __attribute__((section(".nonresident.chunder1")))     = 0x12345678;
+static int*   chunder_nonresident_ptr __attribute__((section(".nonresident.chunder2"))) = &chunder_nonresident;
+static host_t qmk;
 
-static bool process_record_user(uint16_t keycode, keyrecord_t* record) {
+bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     return qmk->is_keyboard_left() || qmk->is_keyboard_master();
 }
 
-static void housekeeping_task_user(void) {}
+void housekeeping_task_user(void) {}
 
-bool keymap_init(qmk_bridge_t* qmk_in) {
-    qmk                         = qmk_in;
-    qmk->test                   = &chunder;
-    qmk->process_record_user    = process_record_user;
-    qmk->housekeeping_task_user = housekeeping_task_user;
+static const qmk_keymap_t keymap = {
+    .process_record_user    = process_record_user,
+    .housekeeping_task_user = housekeeping_task_user,
+    .test_data              = &chunder_data,
+    .test_bss               = &chunder_bss,
+    .test_nonresident       = &chunder_nonresident,
+    .test_nonresident_ptr   = &chunder_nonresident_ptr,
+};
+
+bool __attribute__((section(".keymap_init"))) keymap_init(host_t qmk_in, keymap_t* keymap_out) {
+    qmk         = qmk_in;
+    *keymap_out = &keymap;
     return true;
 }

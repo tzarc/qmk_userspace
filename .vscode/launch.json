@@ -11,15 +11,83 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: qmk mass-compile -n all:drashna",
+      "name": "Python: convert *.so to *.qke",
+      "type": "python",
+      "justMyCode": true,
+      "cwd": "${workspaceRoot}/muckabout/dynamic-so",
+      "request": "launch",
+      "args": [
+        "dynamic_lib.so",
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "program": "${workspaceRoot}/muckabout/dynamic-so/convert-binary.py",
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
+      "name": "Python: qmk mass-compile all:drashna",
+      "type": "python",
+      "justMyCode": false,
+      "cwd": "${workspaceRoot}",
+      "request": "launch",
+      "args": [
+        "mass-compile",
+        "all:drashna",
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk",
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+        }
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
+      "name": "Python: qmk userspace-doctor",
       "type": "python",
       "justMyCode": true,
       "cwd": "${workspaceRoot}",
       "request": "launch",
       "args": [
-        "mass-compile",
-        "-n",
-        "all:drashna",
+        "userspace-doctor",
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk",
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+        }
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
+      "name": "Python: qmk userspace-compile",
+      "type": "python",
+      "justMyCode": true,
+      "cwd": "${workspaceRoot}",
+      "request": "launch",
+      "args": [
+        "userspace-compile",
       ],
       "console": "integratedTerminal",
       "linux": {

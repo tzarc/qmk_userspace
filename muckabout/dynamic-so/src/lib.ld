@@ -1,21 +1,19 @@
-
 MEMORY
 {
-    /* TODO: Change the LENGTH to a resonable value */
-    FLASH (rwx)      : ORIGIN = 0x00000000, LENGTH = 2048K
-    RAM(rwx)         : ORIGIN = 0x10000000, LENGTH = 32K
+    FLASH (rwx)            : ORIGIN = 0x00300000, LENGTH = 512K
+    RAM(rwx)               : ORIGIN = 0x00400000, LENGTH = 512K
+    NONRESIDENT (rwx)      : ORIGIN = 0x00500000, LENGTH = 512K
 }
 
-
 /* Explicitly mention label for the program's entry point */
-ENTRY(AppStart)
+ENTRY(keymap_init)
 
 SECTIONS
 {
     /* The 'text' section contains the main program code. */
     .text :
     {
-        *(.AppStart)
+        *(.keymap_init) /* must be first, so that we can jump directly to init */
         *(.text.startup.main)
         *(.text.main)
         *(.text*)
@@ -25,6 +23,7 @@ SECTIONS
 
         KEEP (*(.init))
         KEEP (*(.fini))
+
         /* The 'rodata' section contains read-only data,
         * constants, strings, information that won't change.
         * variables defined with const keyword in C */
@@ -36,9 +35,9 @@ SECTIONS
     .ARM.extab   : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >FLASH
     .ARM :
     {
-        __exidx_start = .;
+        PROVIDE_HIDDEN (__exidx_start = .);
         *(.ARM.exidx*)
-        __exidx_end = .;
+        PROVIDE_HIDDEN (__exidx_end = .);
     } >FLASH
 
     .preinit_array     :
@@ -69,31 +68,31 @@ SECTIONS
     .plt :
     {
         . = ALIGN(4);
+        PROVIDE_HIDDEN (__plt_start = .);
         *(.plt)
         . = ALIGN(4);
+        PROVIDE_HIDDEN (__plt_end = .);
     } >FLASH
 
     /* The 'data' section is space set aside in RAM for
      * things like non-zero global and static variables, which can change. */
-
     .data :
     {
         . = ALIGN(4);
-        /* Mark start/end locations for the 'data' section. */
-        app_sdata = .;
+        PROVIDE_HIDDEN (__data_start = .);
         *(.sys_struct)
         *(.data*)
         . = ALIGN(4);
+        PROVIDE_HIDDEN (__data_end = .);
     } >RAM
-    app_sidata = LOADADDR(.data);
 
     .got :
     {
         . = ALIGN(4);
-        app_sgot = .;
+        PROVIDE_HIDDEN (__got_start = .);
         *(.got)
         *(.got.plt)
-        app_edata = .;
+        PROVIDE_HIDDEN (__got_end = .);
     } > RAM
 
     /* The 'bss' section is similar to the 'data' section,
@@ -102,8 +101,7 @@ SECTIONS
     .bss :
     {
         . = ALIGN(4);
-        /* Also mark the start/end of the BSS section. */
-        app_sbss = .;
+        PROVIDE_HIDDEN (__bss_start = .);
         *(.bss*)
         /* A special notation is needed for common symbols,
          * because in many object file formats common symbols
@@ -112,9 +110,19 @@ SECTIONS
          * input section named ‘COMMON’.*/
         *(COMMON)
         . = ALIGN(4);
-        app_ebss = .;
-
+        PROVIDE_HIDDEN (__bss_end = .);
     } >RAM
+
+    /* The 'nonresident' section is space set aside in ROM where
+       data can be kept out of RAM but still be accessed by the MCU. */
+    .nonresident :
+    {
+        . = ALIGN(4);
+        PROVIDE_HIDDEN (__nonresident_start = .);
+        *(.nonresident*)
+        . = ALIGN(4);
+        PROVIDE_HIDDEN (__nonresident_end = .);
+    } >NONRESIDENT
 
     /* Remove information from the standard libraries */
     /DISCARD/ :
