@@ -184,7 +184,7 @@ main() {
     local differences=$( (diff -yW 200 --suppress-common-lines "$build_dir/sha1sums_base.txt" "$build_dir/sha1sums_pr.txt" || true) | awk '{print $2}' | sed -e 's@\.\(hex\|bin\|uf2\)$@@g' | xargs echo)
     for difference in $differences; do
         { find "$base_dir/.build/obj_$difference" "$pr_dir/.build/obj_$difference" "$base_dir/.build/obj_${difference%_*}" "$pr_dir/.build/obj_${difference%_*}" -type f -name '*.i' 2>/dev/null || true ; } | while read file; do
-            cat "$file" | sed -e 's@^#.*@@g' -e 's@^\s*//.*@@g' -e '/^\s*$/d' | clang-format >"$file.formatted"
+            cat "$file" | sed -e 's@^#.*@@g' -e 's@^\s*//.*@@g' -e '/^\s*$/d' -e 's@qmk_firmware_base@qmk_firmware@g' -e 's@qmk_firmware_pr@qmk_firmware@g' | clang-format >"$file.formatted"
         done
     done
 
