@@ -13,7 +13,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     return qmk->is_keyboard_left() || qmk->is_keyboard_master();
 }
 
-void housekeeping_task_user(void) {}
+void __attribute__((weak)) housekeeping_task_user(void);
 
 static const qmk_keymap_t keymap = {
     .process_record_user    = process_record_user,
@@ -24,7 +24,9 @@ static const qmk_keymap_t keymap = {
     .test_nonresident_ptr   = &chunder_nonresident_ptr,
 };
 
-bool __attribute__((section(".keymap_init"))) keymap_init(host_t qmk_in, keymap_t* keymap_out) {
+__attribute__((constructor(101))) void init101(void) { chunder_data = 101; }
+
+bool keymap_init(host_t qmk_in, keymap_t* keymap_out) {
     qmk         = qmk_in;
     *keymap_out = &keymap;
     return true;
