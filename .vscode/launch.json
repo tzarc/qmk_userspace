@@ -32,6 +32,63 @@
       }
     },
     {
+      "name": "Python: qmk compile -kb bm16s -km default",
+      "type": "python",
+      "justMyCode": false,
+      "cwd": "${workspaceRoot}",
+      "request": "launch",
+      "args": [
+        "compile",
+        "-kb",
+        "bm16s",
+        "-km",
+        "default"
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk",
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+        }
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
+      "name": "Python: qmk compile -kb handwired/pytest/basic -km default_json -n",
+      "type": "python",
+      "justMyCode": false,
+      "cwd": "${workspaceRoot}",
+      "request": "launch",
+      "args": [
+        "compile",
+        "-kb",
+        "handwired/pytest/basic",
+        "-km",
+        "default_json",
+        "-n"
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk",
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+        }
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
       "name": "Python: qmk ci-validate-aliases",
       "type": "python",
       "justMyCode": false,
