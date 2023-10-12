@@ -28,8 +28,8 @@ QMK_COMPILE_FLAGS := -mcpu=cortex-m4 -mthumb -mno-thumb-interwork -mno-unaligned
 	-mword-relocations -fomit-frame-pointer -ffunction-sections -fdata-sections -fno-builtin -fno-common -fshort-wchar -ggdb -flto -Os \
 	-Wall -Wstrict-prototypes -Werror -fcommon -fstack-usage #-mno-pic-data-is-text-relative #-msingle-pic-base
 
-OPT_FLAGS = -g -O0
-CFLAGS_BASE ?= $(OPT_FLAGS) -fPIE #-fPIC #-fpic -fpie
+OPT_FLAGS = -g -O3
+CFLAGS_BASE ?= $(OPT_FLAGS) -fPIE -fPIC -fpic -fpie
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
 LDFLAGS ?= $(OPT_FLAGS) \

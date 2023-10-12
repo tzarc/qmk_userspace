@@ -1,10 +1,48 @@
 #!/usr/bin/env python3
-import sys
 import struct
 import argparse
 
 from elftools.elf.elffile import ELFFile
 from elftools import elf
+
+
+def leb128_encode_unsigned(i: int) -> bytearray:
+    r = []
+    while True:
+        byte = i & 0x7F
+        i = i >> 7
+        if i == 0:
+            r.append(byte)
+            return bytearray(r)
+        r.append(0x80 | byte)
+
+
+def leb128_decode_unsigned(b: bytearray) -> int:
+    r = 0
+    for i, e in enumerate(b):
+        r = r + ((e & 0x7F) << (i * 7))
+    return r
+
+
+def leb128_encode_signed(i: int) -> bytearray:
+    r = []
+    while True:
+        byte = i & 0x7F
+        i = i >> 7
+        if (i == 0 and byte & 0x40 == 0) or (i == -1 and byte & 0x40 != 0):
+            r.append(byte)
+            return bytearray(r)
+        r.append(0x80 | byte)
+
+
+def leb128_decode_signed(b: bytearray) -> int:
+    r = 0
+    for i, e in enumerate(b):
+        r = r + ((e & 0x7F) << (i * 7))
+    if e & 0x40 != 0:
+        r |= -(1 << (i * 7) + 7)
+    return r
+
 
 alignment = 8  # 64k (uint16_max) * 8 = 512k max section size
 
@@ -32,8 +70,49 @@ args = parser.parse_args()
 with open(args.elf, "rb") as f:
     elffile = ELFFile(f)
 
+    libinfo_section = elffile.get_section_by_name(".lib_info")
+    libinfo_size = libinfo_section["sh_size"]
+    libinfo_data = libinfo_section.data()
+    (
+        libinfo_text_start,
+        libinfo_text_size,
+        libinfo_code_start,
+        libinfo_code_size,
+        libinfo_preinit_array_start,
+        libinfo_preinit_array_count,
+        libinfo_init_array_start,
+        libinfo_init_array_count,
+        libinfo_fini_array_start,
+        libinfo_fini_array_count,
+        libinfo_data_start,
+        libinfo_data_size,
+        libinfo_bss_start,
+        libinfo_bss_size,
+        libinfo_nonresident_size,
+        libinfo_entrypoint,
+    ) = struct.unpack_from("<IIIIIIIIIIIIIIII", libinfo_data, 0)
+
+    encoded_info = bytearray()
+    encoded_info += leb128_encode_unsigned(libinfo_text_start)
+    encoded_info += leb128_encode_unsigned(libinfo_text_size)
+    encoded_info += leb128_encode_unsigned(libinfo_code_start)
+    encoded_info += leb128_encode_unsigned(libinfo_code_size)
+    encoded_info += leb128_encode_unsigned(libinfo_preinit_array_start)
+    encoded_info += leb128_encode_unsigned(libinfo_preinit_array_count)
+    encoded_info += leb128_encode_unsigned(libinfo_init_array_start)
+    encoded_info += leb128_encode_unsigned(libinfo_init_array_count)
+    encoded_info += leb128_encode_unsigned(libinfo_fini_array_start)
+    encoded_info += leb128_encode_unsigned(libinfo_fini_array_count)
+    encoded_info += leb128_encode_unsigned(libinfo_data_start)
+    encoded_info += leb128_encode_unsigned(libinfo_data_size)
+    encoded_info += leb128_encode_unsigned(libinfo_bss_start)
+    encoded_info += leb128_encode_unsigned(libinfo_bss_size)
+    encoded_info += leb128_encode_unsigned(libinfo_nonresident_size)
+    encoded_info += leb128_encode_unsigned(libinfo_entrypoint)
+
+    encoded_info_size = len(encoded_info)
+
     text_section = elffile.get_section_by_name(".text")
-    data_section = elffile.get_section_by_name(".data")
     nonresident_section = elffile.get_section_by_name(".nonresident")
     bss_section = elffile.get_section_by_name(".bss")
 
@@ -45,18 +124,6 @@ with open(args.elf, "rb") as f:
     text_binary = text_section.data()
     while len(text_binary) < new_text_length:
         text_binary += b"\x00"
-
-    data_address = 0
-    new_data_length = 0
-    if data_section is not None:
-        data_address = data_section["sh_addr"]
-        data_length = data_section["sh_size"]
-        new_data_length = ((data_length + alignment - 1) // alignment) * alignment
-        print(f"       .data length: {data_length:4d} -> {new_data_length:4d}")
-
-        data_binary = data_section.data()
-        while len(data_binary) < new_data_length:
-            data_binary += b"\x00"
 
     nonresident_address = 0
     new_nonresident_length = 0
@@ -106,14 +173,11 @@ with open(args.elf, "rb") as f:
     executable += struct.pack("<B", 0)  # TBD
     executable += struct.pack("<B", alignment)
     executable += struct.pack("<H", new_text_length // alignment)
-    executable += struct.pack("<H", new_data_length // alignment)
     executable += struct.pack("<H", new_nonresident_length // alignment)
     executable += struct.pack("<H", new_bss_length // alignment)
     executable += struct.pack("<H", len(relocs))
 
     executable += text_binary
-    if new_data_length > 0:
-        executable += data_binary
     if new_nonresident_length > 0:
         executable += nonresident_binary
 
