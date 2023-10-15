@@ -106,7 +106,7 @@ $(BUILD_DIR)/%.cc.o: %.cc buildreqs
 .PHONY: clean
 
 clean:
-	$(RM) -r $(BUILD_DIR) compile_commands.json $(TARGET_LIB) $(TARGET_LIB).asm $(TARGET_LIB).dump $(TARGET_LIB).map $(TARGET_LIB).qke
+	$(RM) -r $(BUILD_DIR) .cache compile_commands.json $(TARGET_LIB) $(TARGET_LIB).asm $(TARGET_LIB).dump $(TARGET_LIB).map $(TARGET_LIB).relocs $(TARGET_LIB).symbols $(TARGET_LIB).qke
 
 .PHONY: distclean
 
