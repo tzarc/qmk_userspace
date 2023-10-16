@@ -44,9 +44,9 @@
       ],
       "console": "integratedTerminal",
       "linux": {
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk",
+        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
       "windows": {
@@ -72,9 +72,9 @@
       ],
       "console": "integratedTerminal",
       "linux": {
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk",
+        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
       "windows": {
@@ -101,9 +101,9 @@
       ],
       "console": "integratedTerminal",
       "linux": {
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk",
+        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
       "windows": {
@@ -125,9 +125,9 @@
       ],
       "console": "integratedTerminal",
       "linux": {
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk",
+        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
       "windows": {
@@ -150,9 +150,9 @@
       ],
       "console": "integratedTerminal",
       "linux": {
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk",
+        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
       "windows": {
@@ -178,9 +178,9 @@
       ],
       "console": "integratedTerminal",
       "linux": {
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk",
+        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
       "windows": {
@@ -206,9 +206,9 @@
       ],
       "console": "integratedTerminal",
       "linux": {
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk",
+        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
       "windows": {
@@ -234,9 +234,9 @@
       ],
       "console": "integratedTerminal",
       "linux": {
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk",
+        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
       "windows": {
@@ -258,9 +258,9 @@
       ],
       "console": "integratedTerminal",
       "linux": {
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk",
+        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
       "windows": {
@@ -282,9 +282,9 @@
       ],
       "console": "integratedTerminal",
       "linux": {
-        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk",
+        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
         "env": {
-          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
       "windows": {

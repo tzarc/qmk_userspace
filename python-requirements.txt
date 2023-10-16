@@ -4,6 +4,7 @@ qmk
 
 ghapi
 mpire
+pyelftools
 python-sqlite-cache
 redis
 rq
