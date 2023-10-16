@@ -5,16 +5,35 @@ if [[ ! -z $SIZE_REGRESSION_EXECUTING ]]; then
 fi
 
 if [ "$1" = "" -o "$1" != "$2" ]; then
-    [ -e lib/littlefs ] && rm -rf lib/littlefs
-    [ -e lib/lua ] && rm -rf lib/lua
-    [ -e lib/lvgl ] && rm -rf lib/lvgl
-    [ -e lib/pico-sdk ] && rm -rf lib/pico-sdk
-    [ -e lib/riot ] && rm -rf lib/riot
-    [ -e lib/ugfx ] && rm -rf lib/ugfx
-    [ -e lib/chibios-contrib/ext/mcux-sdk ] && rm -rf lib/chibios-contrib/ext/mcux-sdk
-    qmk --update
-    make git-submodule
-    which qmk
-    make git-submodule
-    qmk --update
+    # Work out where we are
+    this_script=$(realpath "${BASH_SOURCE[0]}")
+    script_dir=$(dirname "$this_script")
+
+    # If we have a valid direnv and valid qmk_firmware, do the actual processing
+    if [[ -d "$script_dir/.direnv/" ]] && [[ -d "$script_dir/qmk_firmware" ]]; then
+
+        # Figure out and enter the qmk venv
+        activation_script=$(ls -1 "$script_dir/.direnv/"*"/bin/activate" | sort | head -n1)
+        source "$activation_script"
+
+        # Upgrade QMK CLI and all other deps
+        python3 -m pip install --upgrade -r "$script_dir/python-requirements.txt"
+
+        # Nuke all the git submodules that may or may not be present in different branches
+        [ -e lib/chibios-contrib/ext/mcux-sdk ] && rm -rf lib/chibios-contrib/ext/mcux-sdk
+        [ -e lib/littlefs ] && rm -rf lib/littlefs
+        [ -e lib/lua ] && rm -rf lib/lua
+        [ -e lib/lvgl ] && rm -rf lib/lvgl
+        [ -e lib/pico-sdk ] && rm -rf lib/pico-sdk
+        [ -e lib/riot ] && rm -rf lib/riot
+        [ -e lib/ugfx ] && rm -rf lib/ugfx
+
+        # Reconfigure git submodules
+        pushd "$script_dir/qmk_firmware" >/dev/null 2>&1 \
+            && qmk git-submodule -f \
+            && popd >/dev/null 2>&1
+
+        # Drop out of the qmk venv
+        deactivate
+    fi
 fi

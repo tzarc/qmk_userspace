@@ -52,7 +52,7 @@ format:
 	black -l 160 convert-binary.py
 
 convert: $(TARGET_LIB)
-	if false ; then $(STRIP) -s $(TARGET_LIB) ; fi
+	if true ; then $(STRIP) -s $(TARGET_LIB) ; fi
 	if true ; then $(OBJCOPY) --strip-debug --strip-dwo $(TARGET_LIB) ; fi
 	if true ; then ./convert-binary.py $(TARGET_LIB) ; fi
 

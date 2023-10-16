@@ -88,9 +88,20 @@ with open(args.elf, "rb") as f:
         libinfo_data_size,
         libinfo_bss_start,
         libinfo_bss_size,
+        libinfo_nonresident_start,
         libinfo_nonresident_size,
         libinfo_entrypoint,
-    ) = struct.unpack_from("<IIIIIIIIIIIIIIII", libinfo_data, 0)
+    ) = struct.unpack_from("<IIIIIIIIIIIIIIIII", libinfo_data, 0)
+
+    print(f"         text: 0x{libinfo_text_start:08x}, {libinfo_text_size:4d} (0x{libinfo_text_size:04x})")
+    print(f"         code: 0x{libinfo_code_start:08x}, {libinfo_code_size:4d} (0x{libinfo_code_size:04x})")
+    print(f"preinit_array: 0x{libinfo_preinit_array_start:08x}, {libinfo_preinit_array_count:4d}")
+    print(f"   init_array: 0x{libinfo_init_array_start:08x}, {libinfo_init_array_count:4d}")
+    print(f"   fini_array: 0x{libinfo_fini_array_start:08x}, {libinfo_fini_array_count:4d}")
+    print(f"         data: 0x{libinfo_data_start:08x}, {libinfo_data_size:4d} (0x{libinfo_data_size:04x})")
+    print(f"          bss: 0x{libinfo_bss_start:08x}, {libinfo_bss_size:4d} (0x{libinfo_bss_size:04x})")
+    print(f"  nonresident: 0x{libinfo_nonresident_start:08x}, {libinfo_nonresident_size:4d} (0x{libinfo_nonresident_size:04x})")
+    print(f"   entrypoint: 0x{libinfo_entrypoint:08x}")
 
     encoded_info = bytearray()
     encoded_info += leb128_encode_unsigned(libinfo_text_start)

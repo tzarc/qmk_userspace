@@ -1,0 +1,10 @@
+qmk
+-r qmk_firmware/requirements.txt
+-r qmk_firmware/requirements-dev.txt
+
+ghapi
+mpire
+python-sqlite-cache
+redis
+rq
+yappi

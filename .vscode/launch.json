@@ -32,6 +32,32 @@
       }
     },
     {
+      "name": "Python: qmk find -f features.rgblight=true",
+      "type": "python",
+      "justMyCode": false,
+      "cwd": "${workspaceRoot}",
+      "request": "launch",
+      "args": [
+        "find",
+        "-f",
+        "features.rgblight=true"
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "program": "/home/nickb/.local/pipx/venvs/qmk/bin/qmk",
+        "env": {
+          "PYTHONPATH": "/home/nickb/.local/pipx/venvs/qmk/bin/python3"
+        }
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
       "name": "Python: qmk compile -kb bm16s -km default",
       "type": "python",
       "justMyCode": false,

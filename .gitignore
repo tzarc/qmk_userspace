@@ -1,3 +1,5 @@
+/.direnv
+
 /qmk_firmware
 /dot-github
 /extra_userdir

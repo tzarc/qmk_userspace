@@ -1,9 +1,10 @@
 MEMORY
 {
-    FLAT_LAYOUT (rwx)      : ORIGIN = 0x00000000, LENGTH = 0x00100000
+    TEXT (rx)              : ORIGIN = 0x04000000, LENGTH = 0x00100000
+    DATA (rwx)             : ORIGIN = 0x05000000, LENGTH = 0x00100000
+    NONRESIDENT (r)        : ORIGIN = 0x06000000, LENGTH = 0x00100000
     OTHER (r)              : ORIGIN = 0xE0000000, LENGTH = 0x00100000
     LIBINFO (r)            : ORIGIN = 0xF0000000, LENGTH = 0x00100000
-    NONRESIDENT (r)        : ORIGIN = 0x04000000, LENGTH = 0x00100000
 }
 
 SECTIONS
@@ -23,13 +24,13 @@ SECTIONS
         LONG(__data_end - __data_start);
         LONG(__bss_start);
         LONG(__bss_end - __bss_start);
+        LONG(__nonresident_start);
         LONG(__nonresident_end - __nonresident_start);
-        LONG(__keymap_init - __text_section);
+        LONG(__keymap_init);
     } >LIBINFO
 
     /* The 'text' section contains the main program code. */
-    .text :
-    {
+    .text : {
         __text_section = LOADADDR(.text);
         __keymap_init = ABSOLUTE(keymap_init);
 
@@ -73,19 +74,18 @@ SECTIONS
 
         . = ALIGN(4);
 
+        PROVIDE_HIDDEN (__text_end = .);
+    } >TEXT
+
+    .data : {
         PROVIDE_HIDDEN (__data_start = .);
         *(.sys_struct)
         *(.data*)
         . = ALIGN(4);
         PROVIDE_HIDDEN (__data_end = .);
+    } >DATA
 
-        . = ALIGN(4);
-
-        PROVIDE_HIDDEN (__text_end = .);
-    } >FLAT_LAYOUT
-
-    .bss :
-    {
+    .bss : {
         PROVIDE_HIDDEN (__bss_start = .);
         *(.bss*)
         /* A special notation is needed for common symbols,
@@ -96,12 +96,11 @@ SECTIONS
         *(COMMON)
         . = ALIGN(4);
         PROVIDE_HIDDEN (__bss_end = .);
-    } >FLAT_LAYOUT
+    } >DATA
 
     /* The 'nonresident' section is space set aside in ROM where
        data can be kept out of RAM but still be accessed by the MCU. */
-    .nonresident :
-    {
+    .nonresident : {
         . = ALIGN(4);
         PROVIDE_HIDDEN (__nonresident_start = .);
         *(.nonresident*)
@@ -109,27 +108,34 @@ SECTIONS
         PROVIDE_HIDDEN (__nonresident_end = .);
     } >NONRESIDENT
 
-    .ARM.extab   : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >OTHER
-    .ARM :
-    {
+    .ARM.extab : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >OTHER
+    .ARM : {
         PROVIDE_HIDDEN (__exidx_start = .);
         *(.ARM.exidx*)
         PROVIDE_HIDDEN (__exidx_end = .);
     } >OTHER
 
-    .got :
-    {
+    .got : {
         . = ALIGN(4);
         PROVIDE_HIDDEN (__got_start = .);
         *(.got)
         *(.got.plt)
+        *(.igot.plt)
         PROVIDE_HIDDEN (__got_end = .);
+    } >OTHER
+
+    .dynamic : {
+        . = ALIGN(4);
+        PROVIDE_HIDDEN (__dynamic_start = .);
+        *(.dynamic)
+        *(.dynamic*)
+        . = ALIGN(4);
+        PROVIDE_HIDDEN (__dynamic_end = .);
     } >OTHER
 
     /* PLT section contains code for accessing the dynamically linked functions
      * ie funtions from shared libraries in a postion independent manner */
-    .plt :
-    {
+    .plt : {
         . = ALIGN(4);
         PROVIDE_HIDDEN (__plt_start = .);
         *(.plt)
@@ -138,8 +144,7 @@ SECTIONS
     } >OTHER
 
     /* Remove information from the standard libraries */
-    /DISCARD/ :
-    {
+    /DISCARD/ : {
         libc.a ( * )
         libm.a ( * )
         libgcc.a ( * )
