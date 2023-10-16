@@ -32,6 +32,30 @@
       }
     },
     {
+      "name": "Python: qmk env",
+      "type": "python",
+      "justMyCode": false,
+      "cwd": "${workspaceRoot}",
+      "request": "launch",
+      "args": [
+        "env"
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+        "env": {
+          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+        }
+      },
+      "windows": {
+        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
+        "env": {
+          "MSYSTEM": "MINGW64",
+          "CHERE_INVOKING": "1"
+        }
+      }
+    },
+    {
       "name": "Python: qmk find -f features.rgblight=true",
       "type": "python",
       "justMyCode": false,
