@@ -9,6 +9,13 @@ this_script="$(realpath "${BASH_SOURCE[0]}")"
 script_dir="$(realpath "$(dirname "$this_script")")"
 build_dir="$script_dir/sha1_verification"
 
+# Ensure we have access to the qmk venv if it exists
+venv_activate_path=$(find $script_dir -path '*/.direnv/python*/bin/*' -name activate | head -n1)
+if [[ ! -z "${venv_activate_path:-}" ]] ; then
+    echo "Activating environment: $venv_activate_path"
+    source "$venv_activate_path"
+fi
+
 QMK_FIRMWARE_REPO=https://github.com/qmk/qmk_firmware.git
 reproducible_build_flags="-e COMMAND_ENABLE=no -e SKIP_VERSION=yes -e KEEP_INTERMEDIATES=yes -e USE_CCACHE=no"
 
