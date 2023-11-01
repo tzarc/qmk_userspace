@@ -17,6 +17,7 @@ if [ "$1" = "" -o "$1" != "$2" ]; then
         source "$activation_script"
 
         # Upgrade QMK CLI and all other deps
+        python3 -m pip install --upgrade pip
         python3 -m pip install --upgrade -r "$script_dir/python-requirements.txt"
 
         # Nuke all the git submodules that may or may not be present in different branches
