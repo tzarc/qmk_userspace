@@ -1,6 +1,7 @@
 {
   "files.exclude": {
     "**/.build": true,
+    "**/.cache": true,
     "**/*.hex": true,
     "**/*.bin": true,
     "**/*.uf2": true

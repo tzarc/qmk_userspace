@@ -1,6 +1,6 @@
 # Copyright 2018-2023 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
-TARGET_EXEC ?= rle
+TARGET_EXEC ?= gen_circ
 
 BUILD_DIR ?= .build
 SRC_DIRS ?= src
@@ -12,9 +12,6 @@ DEPS := $(OBJS:.o=.d)
 
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 
-QMK_HOME := $(shell qmk config user.qmk_home | cut -d= -f2)
-INC_DIRS += $(QMK_HOME)/quantum
-
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 CC = gcc
@@ -25,7 +22,7 @@ OBJCOPY = objcopy
 OBJDUMP = objdump
 SIZE = size
 
-OPT_FLAGS = -g -O3 -DRLE_ENCODER -DRLE_HAS_FILE_IO
+OPT_FLAGS = -g -O0
 CFLAGS_BASE ?= $(OPT_FLAGS)
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
@@ -44,17 +41,6 @@ strip: $(TARGET_EXEC)
 	$(OBJCOPY) --strip-all $(TARGET_EXEC)
 
 test: strip
-	echo -n "eeeeeeee1234" | ./rle > e.rle \
-		&& hexdump -C e.rle \
-		&& cat e.rle | ./rle -d > e \
-		&& hexdump -C e \
-		&& rm e e.rle \
-		&& echo -n 'ffffffff1234' > f \
-		&& ./rle -i f -o f.rle \
-		&& hexdump -C f.rle \
-		&& rm f \
-		&& ./rle -d -i f.rle -o f \
-		&& hexdump -C f
 
 compile_commands.json:
 	@compiledb make -n all >/dev/null
@@ -95,7 +81,7 @@ $(BUILD_DIR)/%.cc.o: %.cc compile_commands.json
 .PHONY: clean
 
 clean:
-	$(RM) -r $(BUILD_DIR) compile_commands.json $(TARGET_EXEC) e e.rle f f.rle
+	$(RM) -r $(BUILD_DIR) compile_commands.json $(TARGET_EXEC)
 
 .PHONY: distclean
 

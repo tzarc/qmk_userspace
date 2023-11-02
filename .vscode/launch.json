@@ -16,20 +16,11 @@
       "justMyCode": true,
       "cwd": "${workspaceRoot}/muckabout/dynamic-so",
       "request": "launch",
+      "program": "${workspaceRoot}/muckabout/dynamic-so/convert-binary.py",
       "args": [
         "dynamic_lib.so",
       ],
       "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/muckabout/dynamic-so/convert-binary.py",
-      },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
     },
     {
       "name": "Python: qmk env",
@@ -47,13 +38,6 @@
           "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
     },
     {
       "name": "Python: qmk userspace-list",
@@ -71,13 +55,6 @@
           "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
     },
     {
       "name": "Python: qmk userspace-list -e",
@@ -96,13 +73,6 @@
           "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
     },
     {
       "name": "Python: qmk find -f features.rgblight=true",
@@ -122,13 +92,6 @@
           "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
     },
     {
       "name": "Python: qmk compile -kb bm16s -km default",
@@ -150,13 +113,6 @@
           "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
     },
     {
       "name": "Python: qmk compile --clean --compiledb -kb bm16s -km default",
@@ -180,13 +136,6 @@
           "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
     },
     {
       "name": "Python: qmk mass-compile bm16s:default /home/nickb/qmk_build/extra_userdir/keyboards/bm16s/keymaps/tzarc_json/keymap.json bm16s:via",
@@ -207,13 +156,6 @@
           "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
     },
     {
       "name": "Python: qmk compile -kb handwired/pytest/basic -km default_json -n",
@@ -236,13 +178,6 @@
           "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
     },
     {
       "name": "Python: qmk ci-validate-aliases",
@@ -260,13 +195,6 @@
           "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
     },
     {
       "name": "Python: qmk mass-compile all:drashna",
@@ -285,13 +213,6 @@
           "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
     },
     {
       "name": "Python: qmk compile -kb bm16s -km tzarc",
@@ -313,13 +234,6 @@
           "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
     },
     {
       "name": "Python: qmk new-keymap -kb bm16a -km new",
@@ -341,13 +255,6 @@
           "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
     },
     {
       "name": "Python: qmk new-keymap -kb bm16s -km new",
@@ -369,13 +276,6 @@
           "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
     },
     {
       "name": "Python: qmk userspace-doctor",
@@ -393,13 +293,6 @@
           "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
     },
     {
       "name": "Python: qmk userspace-compile",
@@ -417,13 +310,13 @@
           "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
         }
       },
-      "windows": {
-        "program": "E:\\QMK_MSYS\\mingw64\\bin\\qmk.exe",
-        "env": {
-          "MSYSTEM": "MINGW64",
-          "CHERE_INVOKING": "1"
-        }
-      }
+    },
+    {
+      "name": "(gdb) gen_circ",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/muckabout/gen_circ/gen_circ",
+      "cwd": "${workspaceFolder}/muckabout/gen_circ"
     },
     {
       "name": "(gdb) rle",
