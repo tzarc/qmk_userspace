@@ -43,7 +43,7 @@
     control concurrent access in calling code instead.
 
     Using the following define allows addition of extra fields into the queue,
-    such as the inclusion of a mutex:
+    such as the inclusion of a mutex to use with locking APIs:
 
         #define GEN_QUEUE_EXTRA_FIELDS \
             my_mutex mutex;
@@ -84,6 +84,16 @@
         GEN_QUEUE_GENERATION_TYPE -- the type used to store the generation
             within the queue. Defaults to `int`, but can be dropped to something
             like `uint8_t` if desired.
+
+        GEN_QUEUE_NO_IMPL -- only define the types and the API forward
+            declarations -- the implementation would need to be present in
+            another translation unit. This *must* have the same configurable
+            flags in both places.
+
+        GEN_QUEUE_NO_CLEANUP -- under normal circumstances all the preprocessor
+            definitions are `#undef`ed at the end of this file. If this needs to
+            be avoided, defining this will result in all `GEN_QUEUE_`-prefixed
+            preprocessor definitions to be left alone.
 
 *******************************************************************************/
 
