@@ -5,18 +5,20 @@
 #include <string.h>
 #include <stdio.h>
 
+#define GEN_QUEUE_NUM_ENTRIES 16
+#define GEN_QUEUE_VALUE_TYPE char
+#define GEN_QUEUE_NAMING_PREFIX
+#include "gen_queue.h"
+
 #define GEN_QUEUE_NUM_ENTRIES 8
 #define GEN_QUEUE_VALUE_TYPE int
 #define GEN_QUEUE_NAMING_PREFIX event_
+#define GEN_QUEUE_ATTRIBUTE __attribute__((align(2)))
+#define GEN_QUEUE_DATA_ATTRIBUTE __attribute__((align(2)))
 #define GEN_QUEUE_EXTRA_FIELDS \
     int lock_count;            \
     int unlock_count;          \
     int level;
-#include "gen_queue.h"
-
-#define GEN_QUEUE_NUM_ENTRIES 16
-#define GEN_QUEUE_VALUE_TYPE char
-#define GEN_QUEUE_NAMING_PREFIX
 #include "gen_queue.h"
 
 static event_queue_t queue;
