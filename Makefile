@@ -232,12 +232,15 @@ CONTAINER_PREAMBLE := export HOME="/tmp"; export PATH="/tmp/.local/bin:\$$PATH";
 
 format-core:
 	cd $(ROOTDIR)/qmk_firmware \
-		&& RUNTIME=docker ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk format-c --core-only -a" \
-		&& qmk format-python -a
+		&& RUNTIME=docker ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk format-c --core-only -a && qmk format-python -a"
 
 pytest:
 	cd $(ROOTDIR)/qmk_firmware \
 		&& RUNTIME=docker ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk pytest"
+
+format-and-pytest:
+	cd $(ROOTDIR)/qmk_firmware \
+		&& RUNTIME=docker ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk format-c --core-only -a && qmk format-python -a && qmk pytest"
 
 container-shell:
 	cd $(ROOTDIR)/qmk_firmware \
