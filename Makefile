@@ -15,10 +15,18 @@ export ROOTDIR := $(shell pwd)
 export PATH := $(ROOTDIR)/bin:$(PATH)
 
 export CLANG_TIDY := $(shell find /usr/lib/llvm* -name 'run-clang-tidy.py' 2>/dev/null)
-export CLANG_TIDY_CHECKS := *,-clang-diagnostic-error,-llvm-include-order,-cppcoreguidelines-avoid-non-const-global-variables,-hicpp-braces-around-statements,-readability-braces-around-statements,-google-readability-braces-around-statements,-llvm-header-guard,-bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,-clang-diagnostic-ignored-attributes,-clang-diagnostic-unknown-attributes,-misc-unused-parameters,-hicpp-signed-bitwise,-llvmlibc*,-hicpp-uppercase-literal-suffix,-readability-uppercase-literal-suffix,-hicpp-no-assembler
+export CLANG_TIDY_CHECKS := *,-clang-diagnostic-error,-llvm-include-order,-cppcoreguidelines-avoid-non-const-global-variables,-hicpp-braces-around-statements,-readability-braces-around-statements,-google-readability-braces-around-statements,-llvm-header-guard,-bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,-clang-diagnostic-ignored-attributes,-clang-diagnostic-unknown-attributes,-misc-unu$(SED)-parameters,-hicpp-signed-bitwise,-llvmlibc*,-hicpp-uppercase-literal-suffix,-readability-uppercase-literal-suffix,-hicpp-no-assembler
 export CLANG_TIDY_HEADER_FILTER := .*
 
 qmk_firmware: $(ROOTDIR)/qmk_firmware
+
+ifeq ($(shell uname -s),Darwin)
+SED = gsed
+ECHO = gecho
+else
+SED = sed
+ECHO = echo
+endif
 
 $(ROOTDIR)/qmk_firmware:
 	git clone --depth=1 https://github.com/tzarc/qmk_firmware.git $(ROOTDIR)/qmk_firmware
@@ -74,8 +82,8 @@ EXTRA_LINK_DEFS := \
 	users-tzarc!users/tzarc
 
 all-arm:
-	qmk mass-compile -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2) -f protocol=ChibiOS
-	qmk mass-compile -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2) -f protocol=arm_atsam
+	qmk mass-compile -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || $(ECHO) 2) -f protocol=ChibiOS
+	qmk mass-compile -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || $(ECHO) 2) -f protocol=arm_atsam
 
 all: NO_COMPILEDB = true
 all: bin
@@ -104,7 +112,7 @@ format_prereq: qmk_firmware
 format: format_prereq
 	@for file in $$({ git ls-files | grep -P '\.(c|cpp|h|hpp)$$' ; } | grep -vP 'conf\.h' | grep -vP 'board.h' | sort | uniq) ; do \
 		if [ -f "$$file" ] ; then \
-			echo -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
+			$(ECHO) -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
 			clang-format -i "$$file" >/dev/null 2>&1 || true ; \
 			ex -s +"bufdo wq" "$$file" >/dev/null 2>&1 || true ; \
 			dos2unix "$$file" >/dev/null 2>&1 ; \
@@ -125,17 +133,7 @@ graphics:
 $(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h: rgb_effects
 
 rgb_effects:
-	@echo '// Copyright 2018-2023 Nick Brassel (@tzarc)' > "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
-	@echo '// SPDX-License-Identifier: GPL-2.0-or-later' >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
-	@echo '#pragma once' >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
-	@echo >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
-	@echo '#ifdef RGB_MATRIX_ENABLE' >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
-	@grep -h '^#\s*ifdef\sENABLE_' "$(ROOTDIR)/qmk_firmware/quantum/rgb_matrix"/*.h "$(ROOTDIR)/qmk_firmware/quantum/rgb_matrix"/*/*.h | sed -e 's@#\s*ifdef\s*@#    define @g' | sort | uniq >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
-	@echo '#endif // RGB_MATRIX_ENABLE' >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
-	@echo >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
-	@echo '#ifdef RGBLIGHT_ENABLE' >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
-	@grep -h '^#\s*ifdef\s*RGBLIGHT_EFFECT' "$(ROOTDIR)/qmk_firmware/quantum/rgblight"/*.h | sed -e 's@#\s*ifdef\s*@#    define @g' | sort | uniq >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
-	@echo '#endif // RGBLIGHT_ENABLE' >> "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
+	"$(ROOTDIR)/bin/generate_rgb_effects.py" > "$(ROOTDIR)/users-tzarc/enable_all_rgb_effects.h"
 
 define handle_link_entry
 link_source_$1 := $$(word 1,$$(subst !, ,$1))
@@ -148,10 +146,10 @@ DOCKER_VOLUME_LIST += -v $$(shell readlink -f "$$(link_source_$1)"):/qmk_firmwar
 extra-links: link_$$(link_source_$1)
 link_$$(link_source_$1): qmk_firmware
 	@if [ ! -L "$(ROOTDIR)/qmk_firmware/$$(link_target_$1)" ] ; then \
-		echo -e "\e[38;5;14mSymlinking: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
+		$(ECHO) -e "\e[38;5;14mSymlinking: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
 		ln -sf $(ROOTDIR)/$$(link_source_$1) $(ROOTDIR)/qmk_firmware/$$(link_target_$1) ; \
 		if [ -z "$$(grep -P '^$$(link_target_$1)$$$$' $(ROOTDIR)/qmk_firmware/.git/info/exclude 2>/dev/null)" ] ; then \
-			echo $$(link_target_$1) >> $(ROOTDIR)/qmk_firmware/.git/info/exclude ; \
+			$(ECHO) $$(link_target_$1) >> $(ROOTDIR)/qmk_firmware/.git/info/exclude ; \
 		fi ; \
 	fi
 
@@ -160,9 +158,9 @@ distclean: unlink_$$(link_source_$1)
 unlinks: unlink_$$(link_source_$1)
 unlink_$$(link_source_$1): qmk_firmware
 	@if [ -L "$(ROOTDIR)/qmk_firmware/$$(link_target_$1)" ] ; then \
-		echo -e "\e[38;5;14mRemoving symlink: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
+		$(ECHO) -e "\e[38;5;14mRemoving symlink: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
 		rm $(ROOTDIR)/qmk_firmware/$$(link_target_$1) || true; \
-		sed -i "\@^$$(link_target_$1)@d" $(ROOTDIR)/qmk_firmware/.git/info/exclude; \
+		$(SED) -i "\@^$$(link_target_$1)@d" $(ROOTDIR)/qmk_firmware/.git/info/exclude; \
 	fi
 endef
 
@@ -179,13 +177,13 @@ ifeq ($$(board_keyboard_$1),)
 board_keyboard_$1 := $$(board_target_$1)
 endif
 
-board_qmk_$1 := $$(shell echo $$(board_keyboard_$1) | sed -e 's@/keymaps/.*@@g')
-board_file_$1 := $$(shell echo $$(board_qmk_$1) | sed -e 's@/@_@g' -e 's@:@_@g')
+board_qmk_$1 := $$(shell $(ECHO) $$(board_keyboard_$1) | $(SED) -e 's@/keymaps/.*@@g')
+board_file_$1 := $$(shell $(ECHO) $$(board_qmk_$1) | $(SED) -e 's@/@_@g' -e 's@:@_@g')
 board_files_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f \( -name '*.h' -or -name '*.c' \) -and -not -name '*conf.h' -and -not -name 'board.c' -and -not -name 'board.h' | sort)
 board_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(board_source_$1) -type f | sort)
 
 bin_$$(board_name_$1): board_link_$$(board_name_$1) rgb_effects
-	@echo -e "\e[38;5;14mBuilding: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
+	@$(ECHO) -e "\e[38;5;14mBuilding: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	+@cd "$(ROOTDIR)/qmk_firmware" \
 		&& { [ -z "$$(NO_COMPILEDB)" ] && qmk generate-compilation-database -kb $$(board_qmk_$1) -km $$(board_keymap_$1) || true; } \
 		&& { \
@@ -201,21 +199,21 @@ bin_$$(board_name_$1): board_link_$$(board_name_$1) rgb_effects
 		|| true
 
 tidy_$$(board_name_$1): bin_$$(board_name_$1)
-	@echo -e "\e[38;5;14mRunning clang-tidy on: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
+	@$(ECHO) -e "\e[38;5;14mRunning clang-tidy on: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	@rm -f "$$(ROOTDIR)/clang-tidy_$$(board_name_$1).log" || true
 	cd "$(ROOTDIR)/qmk_firmware" \
 		&& $(CLANG_TIDY) -p . keyboards drivers quantum tmk_core -j9 -checks '$(CLANG_TIDY_CHECKS)' > "$$(ROOTDIR)/clang-tidy_$$(board_name_$1).log" 2>&1 \
 		|| true
 
 db_$$(board_name_$1): board_link_$$(board_name_$1)
-	@echo -e "\e[38;5;14mCreating compiledb for: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
+	@$(ECHO) -e "\e[38;5;14mCreating compiledb for: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	cd "$(ROOTDIR)/qmk_firmware" \
 		&& $$(MAKE) distclean \
 		&& qmk generate-compilation-database -kb $$(board_qmk_$1) -km $$(board_keymap_$1)
 	@cp $$(ROOTDIR)/qmk_firmware/compile_commands.json $$(ROOTDIR) || true
 
 flash_$$(board_name_$1): bin_$$(board_name_$1)
-	@echo -e "\e[38;5;14mFlashing: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
+	@$(ECHO) -e "\e[38;5;14mFlashing: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	cd "$(ROOTDIR)/qmk_firmware" \
 		&& qmk flash -kb $$(board_qmk_$1) -km $$(board_keymap_$1)
 
@@ -224,13 +222,13 @@ bin: bin_$$(board_name_$1)
 
 board_link_$$(board_name_$1): extra-links
 	@if [ ! -L "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ] ; then \
-		echo -e "\e[38;5;14mSymlinking: $$(board_source_$1) -> $$(board_target_$1)\e[0m" ; \
+		$(ECHO) -e "\e[38;5;14mSymlinking: $$(board_source_$1) -> $$(board_target_$1)\e[0m" ; \
 		if [ ! -d "$$(shell dirname "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)")" ] ; then \
 			mkdir -p "$$(shell dirname "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)")" ; \
 		fi ; \
 		ln -sf "$$(ROOTDIR)/$$(board_source_$1)" "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ; \
 		if [ -z "$$(grep -P '^keyboards/$$(board_target_$1)$$$$' $(ROOTDIR)/qmk_firmware/.git/info/exclude 2>/dev/null)" ] ; then \
-			echo keyboards/$$(board_target_$1) >> $(ROOTDIR)/qmk_firmware/.git/info/exclude ; \
+			$(ECHO) keyboards/$$(board_target_$1) >> $(ROOTDIR)/qmk_firmware/.git/info/exclude ; \
 		fi ; \
 	fi
 	@touch $$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)
@@ -239,9 +237,9 @@ DOCKER_VOLUME_LIST += -v $$(shell readlink -f "$$(board_source_$1)"):/qmk_firmwa
 
 board_unlink_$$(board_name_$1):
 	@if [ -L "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ] ; then \
-		echo -e "\e[38;5;14mRemoving symlink: $$(board_target_$1)\e[0m" ; \
+		$(ECHO) -e "\e[38;5;14mRemoving symlink: $$(board_target_$1)\e[0m" ; \
 		rm "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" || true; \
-		sed -i "\@^keyboards/$$(board_target_$1)@d" $(ROOTDIR)/qmk_firmware/.git/info/exclude; \
+		$(SED) -i "\@^keyboards/$$(board_target_$1)@d" $(ROOTDIR)/qmk_firmware/.git/info/exclude; \
 	fi
 
 links: board_link_$$(board_name_$1)
