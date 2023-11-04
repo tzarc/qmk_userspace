@@ -2,21 +2,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 export ROOTDIR := $(shell pwd)
-#export PATH := /home/nickb/dev/cross-compilers/target_prefix/gcc11.1_arm/bin:$(PATH)
-#export PATH := /home/nickb/dev/cross-compilers/target_prefix/gcc11.1_avr/bin:$(PATH)
-#export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10.3-2021.10/bin:$(PATH)
-#export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-10-2020-q4-major/bin:$(PATH)
-#export PATH := /home/nickb/gcc-arm/gcc-arm-none-eabi-8-2018-q4-major/bin:$(PATH)
-#export PATH := /usr/lib/ccache:$(PATH)
-#export PATH := /home/nickb/qmk-stuff/qmk_toolchains/arm/bin:$(PATH)
-#export PATH := /home/nickb/qmk-stuff/qmk_toolchains/avr/bin:$(PATH)
 
-# Add qmk wrapper to path
+# Add extra binaries to path
 export PATH := $(ROOTDIR)/bin:$(PATH)
-
-export CLANG_TIDY := $(shell find /usr/lib/llvm* -name 'run-clang-tidy.py' 2>/dev/null)
-export CLANG_TIDY_CHECKS := *,-clang-diagnostic-error,-llvm-include-order,-cppcoreguidelines-avoid-non-const-global-variables,-hicpp-braces-around-statements,-readability-braces-around-statements,-google-readability-braces-around-statements,-llvm-header-guard,-bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,-clang-diagnostic-ignored-attributes,-clang-diagnostic-unknown-attributes,-misc-unu$(SED)-parameters,-hicpp-signed-bitwise,-llvmlibc*,-hicpp-uppercase-literal-suffix,-readability-uppercase-literal-suffix,-hicpp-no-assembler
-export CLANG_TIDY_HEADER_FILTER := .*
 
 qmk_firmware: $(ROOTDIR)/qmk_firmware
 
@@ -114,7 +102,6 @@ format: format_prereq
 		if [ -f "$$file" ] ; then \
 			$(ECHO) -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
 			clang-format -i "$$file" >/dev/null 2>&1 || true ; \
-			ex -s +"bufdo wq" "$$file" >/dev/null 2>&1 || true ; \
 			dos2unix "$$file" >/dev/null 2>&1 ; \
 			chmod -x "$$file" >/dev/null 2>&1 ; \
 		fi ; \
@@ -140,8 +127,6 @@ link_source_$1 := $$(word 1,$$(subst !, ,$1))
 link_target_$1 := $$(word 2,$$(subst !, ,$1))
 link_files_$1 := $$(shell find $$(ROOTDIR)/$$(link_source_$1) -type f \( -name '*.h' -or -name '*.c' \) -and -not -name '*conf.h' -and -not -name 'board.c' -and -not -name 'board.h' | sort)
 link_files_all_$1 := $$(shell find $$(ROOTDIR)/$$(link_source_$1) -type f | sort)
-
-DOCKER_VOLUME_LIST += -v $$(shell readlink -f "$$(link_source_$1)"):/qmk_firmware/$$(link_target_$1)
 
 extra-links: link_$$(link_source_$1)
 link_$$(link_source_$1): qmk_firmware
@@ -198,13 +183,6 @@ bin_$$(board_name_$1): board_link_$$(board_name_$1) rgb_effects
 	@[ -e "$$(ROOTDIR)/qmk_firmware/compile_commands.json" ] && cp $$(ROOTDIR)/qmk_firmware/compile_commands.json $$(ROOTDIR) \
 		|| true
 
-tidy_$$(board_name_$1): bin_$$(board_name_$1)
-	@$(ECHO) -e "\e[38;5;14mRunning clang-tidy on: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
-	@rm -f "$$(ROOTDIR)/clang-tidy_$$(board_name_$1).log" || true
-	cd "$(ROOTDIR)/qmk_firmware" \
-		&& $(CLANG_TIDY) -p . keyboards drivers quantum tmk_core -j9 -checks '$(CLANG_TIDY_CHECKS)' > "$$(ROOTDIR)/clang-tidy_$$(board_name_$1).log" 2>&1 \
-		|| true
-
 db_$$(board_name_$1): board_link_$$(board_name_$1)
 	@$(ECHO) -e "\e[38;5;14mCreating compiledb for: $$(board_qmk_$1):$$(board_keymap_$1)\e[0m"
 	cd "$(ROOTDIR)/qmk_firmware" \
@@ -233,8 +211,6 @@ board_link_$$(board_name_$1): extra-links
 	fi
 	@touch $$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)
 
-DOCKER_VOLUME_LIST += -v $$(shell readlink -f "$$(board_source_$1)"):/qmk_firmware/keyboards/$$(board_target_$1)
-
 board_unlink_$$(board_name_$1):
 	@if [ -L "$$(ROOTDIR)/qmk_firmware/keyboards/$$(board_target_$1)" ] ; then \
 		$(ECHO) -e "\e[38;5;14mRemoving symlink: $$(board_target_$1)\e[0m" ; \
@@ -252,7 +228,6 @@ $(foreach board_entry,$(BOARD_DEFS),$(eval $(call handle_board_entry,$(board_ent
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-#CONTAINER_PREAMBLE := export HOME="/tmp"; export PYTHONUSERBASE="/tmp/python"; export PATH="\$$PYTHONUSERBASE/bin:\$$PATH"; python3 -m pip install --upgrade pip; python3 -m pip install -r requirements-dev.txt
 CONTAINER_PREAMBLE := export HOME="/tmp"; export PATH="/tmp/.local/bin:\$$PATH"; python3 -m pip install --upgrade pip; python3 -m pip install -r requirements-dev.txt
 
 format-core:
@@ -267,12 +242,3 @@ pytest:
 container-shell:
 	cd $(ROOTDIR)/qmk_firmware \
 		&& RUNTIME=docker ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); exec bash"
-
-docker-test:
-	@docker run --rm \
-		--user $(shell id -u):$(shell id -g) \
-		-w /qmk_firmware \
-		-v $(shell readlink -f "$(ROOTDIR)/qmk_firmware"):/qmk_firmware \
-		$(DOCKER_VOLUME_LIST) \
-		qmkfm/qmk_cli:latest \
-		qmk compile -j 20 -kb annepro2/c18 -km tzarc
