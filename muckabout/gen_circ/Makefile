@@ -45,6 +45,15 @@ test: strip
 compile_commands.json:
 	@compiledb make -n all >/dev/null
 
+.PHONY: undefs
+undefs:
+	{ \
+		grep '^\s*#\s*undef' src/gen_queue.h | sed -e 's@#\s*undef@@g' ; \
+		grep '^\s*#\s*define' src/gen_queue.h | sed -e 's@#\s*define@@g' ; \
+		grep '^\s*#\s*ifdef' src/gen_queue.h | sed -e 's@#\s*ifdef@@g' ; \
+		grep '^\s*#\s*ifndef' src/gen_queue.h | sed -e 's@#\s*ifndef@@g' ; \
+	} | awk '{print $$1}' | cut -d'(' -f1 | sort | uniq | while read f ; do echo "#undef $$f" ; done
+
 define setup_formatter
 format: format_$1
 format_$1: $1

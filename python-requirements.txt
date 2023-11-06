@@ -5,6 +5,7 @@ qmk
 compiledb
 ghapi
 mpire
+profilehooks
 pyelftools
 python-sqlite-cache
 redis

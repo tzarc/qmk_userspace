@@ -40,6 +40,25 @@
       },
     },
     {
+      "name": "Python: qmk find -f 'length(layouts.LAYOUT.layout,3)'",
+      "type": "python",
+      "justMyCode": false,
+      "cwd": "${workspaceRoot}",
+      "request": "launch",
+      "args": [
+        "find",
+        "-f",
+        "length(layouts.LAYOUT.layout,3)"
+      ],
+      "console": "integratedTerminal",
+      "linux": {
+        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+        "env": {
+          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+        }
+      },
+    },
+    {
       "name": "Python: qmk userspace-list",
       "type": "python",
       "justMyCode": false,

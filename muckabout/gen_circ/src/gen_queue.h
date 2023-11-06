@@ -26,12 +26,13 @@
 
         void event_queue_init(event_queue_t *queue);
         void* event_queue_data(event_queue_t *queue);
-        size_t event_queue_size(void);
+        size_t event_queue_data_size(void);
         bool event_queue_full(event_queue_t *queue);
         bool event_queue_empty(event_queue_t *queue);
-        bool event_queue_push(event_queue_t *queue, const int *value);
-        bool event_queue_pop(event_queue_t *queue, int *value);
-        bool event_queue_peek(event_queue_t *queue, int *value);
+        bool event_queue_push(event_queue_t *queue, const int *value); // copies
+        bool event_queue_pop(event_queue_t *queue, int *value); // copies
+        bool event_queue_enqueue(event_queue_t *queue, int *value); // moves
+        bool event_queue_dequeue(event_queue_t *queue, int *value); // moves
 
     Users of the queue may also optionally implement the following APIs if they
     wish to provide support for locking:
@@ -41,6 +42,16 @@
 
     Most APIs support a `_nolock()`-suffixed variant for each API if you wish to
     control concurrent access in calling code instead.
+
+    If item copying cannot be done through the use of `memcpy()`, then you can
+    override and implement the following APIs to perform copy/move/destroy:
+
+        void event_queue_value_copy(const int *src, int *dest);
+        void event_queue_value_move(int *src, int *dest);
+        void event_queue_value_destroy(int *value);
+
+    Copy is used for push/pop, and will call copy and leave the source as-is.
+    Move is used for enqueue/dequeue, and calls move then destroy the source.
 
     Using the following define allows addition of extra fields into the queue,
     such as the inclusion of a mutex to use with locking APIs:
@@ -170,17 +181,45 @@ extern void GEN_QUEUE_LOCK(GEN_QUEUE_T *queue) __attribute__((weak));
 #define GEN_QUEUE_UNLOCK GEN_QUEUE_PREFIX_NAME(queue_unlock)
 extern void GEN_QUEUE_UNLOCK(GEN_QUEUE_T *queue) __attribute__((weak));
 
+#undef GEN_QUEUE_VALUE_COPY
+#define GEN_QUEUE_VALUE_COPY GEN_QUEUE_PREFIX_NAME(queue_value_copy)
+extern void GEN_QUEUE_VALUE_COPY(const GEN_QUEUE_VALUE_TYPE *src, GEN_QUEUE_VALUE_TYPE *dest) __attribute__((weak));
+
+#undef GEN_QUEUE_VALUE_MOVE
+#define GEN_QUEUE_VALUE_MOVE GEN_QUEUE_PREFIX_NAME(queue_value_move)
+extern void GEN_QUEUE_VALUE_MOVE(GEN_QUEUE_VALUE_TYPE *src, GEN_QUEUE_VALUE_TYPE *dest) __attribute__((weak));
+
+#undef GEN_QUEUE_VALUE_DESTROY
+#define GEN_QUEUE_VALUE_DESTROY GEN_QUEUE_PREFIX_NAME(queue_value_destroy)
+extern void GEN_QUEUE_VALUE_DESTROY(GEN_QUEUE_VALUE_TYPE *value) __attribute__((weak));
+
 #undef GEN_QUEUE_INIT
 #define GEN_QUEUE_INIT GEN_QUEUE_PREFIX_NAME(queue_init)
 void GEN_QUEUE_INIT(GEN_QUEUE_T *queue);
+
+#undef GEN_QUEUE_ADVANCE_WRITER_NOLOCK
+#define GEN_QUEUE_ADVANCE_WRITER_NOLOCK GEN_QUEUE_PREFIX_NAME(queue_advance_writer_nolock)
+void GEN_QUEUE_ADVANCE_WRITER_NOLOCK(GEN_QUEUE_T *queue);
+
+#undef GEN_QUEUE_ADVANCE_READER_NOLOCK
+#define GEN_QUEUE_ADVANCE_READER_NOLOCK GEN_QUEUE_PREFIX_NAME(queue_advance_reader_nolock)
+void GEN_QUEUE_ADVANCE_READER_NOLOCK(GEN_QUEUE_T *queue);
+
+#undef GEN_QUEUE_CLEAR_NOLOCK
+#define GEN_QUEUE_CLEAR_NOLOCK GEN_QUEUE_PREFIX_NAME(queue_clear_nolock)
+bool GEN_QUEUE_CLEAR_NOLOCK(GEN_QUEUE_T *queue);
+
+#undef GEN_QUEUE_CLEAR
+#define GEN_QUEUE_CLEAR GEN_QUEUE_PREFIX_NAME(queue_clear)
+bool GEN_QUEUE_CLEAR(GEN_QUEUE_T *queue);
 
 #undef GEN_QUEUE_DATA
 #define GEN_QUEUE_DATA GEN_QUEUE_PREFIX_NAME(queue_data)
 void *GEN_QUEUE_DATA(GEN_QUEUE_T *queue);
 
-#undef GEN_QUEUE_SIZE
-#define GEN_QUEUE_SIZE GEN_QUEUE_PREFIX_NAME(queue_size)
-size_t GEN_QUEUE_SIZE(void);
+#undef GEN_QUEUE_DATA_SIZE
+#define GEN_QUEUE_DATA_SIZE GEN_QUEUE_PREFIX_NAME(queue_data_size)
+size_t GEN_QUEUE_DATA_SIZE(void);
 
 #undef GEN_QUEUE_FULL_NOLOCK
 #define GEN_QUEUE_FULL_NOLOCK GEN_QUEUE_PREFIX_NAME(queue_full_nolock)
@@ -206,14 +245,6 @@ bool GEN_QUEUE_PUSH_NOLOCK(GEN_QUEUE_T *queue, const GEN_QUEUE_VALUE_TYPE *entry
 #define GEN_QUEUE_PUSH GEN_QUEUE_PREFIX_NAME(queue_push)
 bool GEN_QUEUE_PUSH(GEN_QUEUE_T *queue, const GEN_QUEUE_VALUE_TYPE *entry);
 
-#undef GEN_QUEUE_PEEK_NOLOCK
-#define GEN_QUEUE_PEEK_NOLOCK GEN_QUEUE_PREFIX_NAME(queue_peek_nolock)
-bool GEN_QUEUE_PEEK_NOLOCK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry);
-
-#undef GEN_QUEUE_PEEK
-#define GEN_QUEUE_PEEK GEN_QUEUE_PREFIX_NAME(queue_peek)
-bool GEN_QUEUE_PEEK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry);
-
 #undef GEN_QUEUE_POP_NOLOCK
 #define GEN_QUEUE_POP_NOLOCK GEN_QUEUE_PREFIX_NAME(queue_pop_nolock)
 bool GEN_QUEUE_POP_NOLOCK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry);
@@ -221,6 +252,22 @@ bool GEN_QUEUE_POP_NOLOCK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry);
 #undef GEN_QUEUE_POP
 #define GEN_QUEUE_POP GEN_QUEUE_PREFIX_NAME(queue_pop)
 bool GEN_QUEUE_POP(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry);
+
+#undef GEN_QUEUE_ENQUEUE_NOLOCK
+#define GEN_QUEUE_ENQUEUE_NOLOCK GEN_QUEUE_PREFIX_NAME(queue_enqueue_nolock)
+bool GEN_QUEUE_ENQUEUE_NOLOCK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry);
+
+#undef GEN_QUEUE_ENQUEUE
+#define GEN_QUEUE_ENQUEUE GEN_QUEUE_PREFIX_NAME(queue_enqueue)
+bool GEN_QUEUE_ENQUEUE(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry);
+
+#undef GEN_QUEUE_DEQUEUE_NOLOCK
+#define GEN_QUEUE_DEQUEUE_NOLOCK GEN_QUEUE_PREFIX_NAME(queue_dequeue_nolock)
+bool GEN_QUEUE_DEQUEUE_NOLOCK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry);
+
+#undef GEN_QUEUE_DEQUEUE
+#define GEN_QUEUE_DEQUEUE GEN_QUEUE_PREFIX_NAME(queue_dequeue)
+bool GEN_QUEUE_DEQUEUE(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry);
 
 #ifndef GEN_QUEUE_NO_IMPL
 
@@ -238,15 +285,74 @@ bool GEN_QUEUE_POP(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry);
             }                            \
         } while (0)
 
+#    define GEN_QUEUE_VALUE_COPY_WRAP(src, dest)                 \
+        do {                                                     \
+            if (GEN_QUEUE_VALUE_COPY) {                          \
+                GEN_QUEUE_VALUE_COPY(src, dest);                 \
+            } else {                                             \
+                memcpy(dest, src, sizeof(GEN_QUEUE_VALUE_TYPE)); \
+            }                                                    \
+        } while (0)
+
+#    define GEN_QUEUE_VALUE_MOVE_WRAP(src, dest)                 \
+        do {                                                     \
+            if (GEN_QUEUE_VALUE_MOVE) {                          \
+                GEN_QUEUE_VALUE_MOVE(src, dest);                 \
+            } else {                                             \
+                memcpy(dest, src, sizeof(GEN_QUEUE_VALUE_TYPE)); \
+            }                                                    \
+            GEN_QUEUE_VALUE_DESTROY_WRAP(src);                   \
+        } while (0)
+
+#    define GEN_QUEUE_VALUE_DESTROY_WRAP(value)                 \
+        do {                                                    \
+            if (GEN_QUEUE_VALUE_DESTROY) {                      \
+                GEN_QUEUE_VALUE_DESTROY(value);                 \
+            } else {                                            \
+                memset(value, 0, sizeof(GEN_QUEUE_VALUE_TYPE)); \
+            }                                                   \
+        } while (0)
+
 void GEN_QUEUE_INIT(GEN_QUEUE_T *queue) {
-    memset(queue, 0, sizeof(GEN_QUEUE_T));
+    memset(GEN_QUEUE_DATA(queue), 0, GEN_QUEUE_DATA_SIZE());
+}
+
+void GEN_QUEUE_ADVANCE_WRITER_NOLOCK(GEN_QUEUE_T *queue) {
+    ++queue->data.write_idx;
+    if (queue->data.write_idx >= GEN_QUEUE_NUM_ENTRIES) {
+        queue->data.write_idx = 0;
+        ++queue->data.generation;
+    }
+}
+
+void GEN_QUEUE_ADVANCE_READER_NOLOCK(GEN_QUEUE_T *queue) {
+    ++queue->data.read_idx;
+    if (queue->data.read_idx >= GEN_QUEUE_NUM_ENTRIES) {
+        queue->data.read_idx = 0;
+    }
+}
+
+bool GEN_QUEUE_CLEAR_NOLOCK(GEN_QUEUE_T *queue) {
+    while (!GEN_QUEUE_EMPTY_NOLOCK(queue)) {
+        GEN_QUEUE_VALUE_DESTROY_WRAP(&queue->data.items[queue->data.read_idx].value);
+        GEN_QUEUE_ADVANCE_READER_NOLOCK(queue);
+    }
+    memset(GEN_QUEUE_DATA(queue), 0, GEN_QUEUE_DATA_SIZE());
+    return true;
+}
+
+bool GEN_QUEUE_CLEAR(GEN_QUEUE_T *queue) {
+    GEN_QUEUE_LOCK_WRAP(queue);
+    bool r = GEN_QUEUE_CLEAR(queue);
+    GEN_QUEUE_UNLOCK_WRAP(queue);
+    return r;
 }
 
 void *GEN_QUEUE_DATA(GEN_QUEUE_T *queue) {
     return &queue->data;
 }
 
-size_t GEN_QUEUE_SIZE(void) {
+size_t GEN_QUEUE_DATA_SIZE(void) {
     return (sizeof(((GEN_QUEUE_T *)NULL)->data));
 }
 
@@ -277,14 +383,9 @@ bool GEN_QUEUE_PUSH_NOLOCK(GEN_QUEUE_T *queue, const GEN_QUEUE_VALUE_TYPE *entry
         return false;
     }
 
+    GEN_QUEUE_VALUE_COPY_WRAP(entry, &queue->data.items[queue->data.write_idx].value);
     queue->data.items[queue->data.write_idx].generation = queue->data.generation;
-    memcpy(&queue->data.items[queue->data.write_idx].value, entry, sizeof(GEN_QUEUE_VALUE_TYPE));
-
-    ++queue->data.write_idx;
-    if (queue->data.write_idx >= GEN_QUEUE_NUM_ENTRIES) {
-        queue->data.write_idx = 0;
-        ++queue->data.generation;
-    }
+    GEN_QUEUE_ADVANCE_WRITER_NOLOCK(queue);
     return true;
 }
 
@@ -295,31 +396,13 @@ bool GEN_QUEUE_PUSH(GEN_QUEUE_T *queue, const GEN_QUEUE_VALUE_TYPE *entry) {
     return r;
 }
 
-bool GEN_QUEUE_PEEK_NOLOCK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry) {
+bool GEN_QUEUE_POP_NOLOCK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry) {
     if (GEN_QUEUE_EMPTY_NOLOCK(queue)) {
         return false;
     }
 
-    memcpy(entry, &queue->data.items[queue->data.read_idx].value, sizeof(GEN_QUEUE_VALUE_TYPE));
-    return true;
-}
-
-bool GEN_QUEUE_PEEK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry) {
-    GEN_QUEUE_LOCK_WRAP(queue);
-    bool r = GEN_QUEUE_PEEK_NOLOCK(queue, entry);
-    GEN_QUEUE_UNLOCK_WRAP(queue);
-    return r;
-}
-
-bool GEN_QUEUE_POP_NOLOCK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry) {
-    if (!GEN_QUEUE_PEEK_NOLOCK(queue, entry)) {
-        return false;
-    }
-
-    ++queue->data.read_idx;
-    if (queue->data.read_idx >= GEN_QUEUE_NUM_ENTRIES) {
-        queue->data.read_idx = 0;
-    }
+    GEN_QUEUE_VALUE_COPY_WRAP(&queue->data.items[queue->data.read_idx].value, entry);
+    GEN_QUEUE_ADVANCE_READER_NOLOCK(queue);
     return true;
 }
 
@@ -330,45 +413,87 @@ bool GEN_QUEUE_POP(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry) {
     return r;
 }
 
+bool GEN_QUEUE_ENQUEUE_NOLOCK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry) {
+    if (GEN_QUEUE_FULL_NOLOCK(queue)) {
+        return false;
+    }
+
+    GEN_QUEUE_VALUE_MOVE_WRAP(entry, &queue->data.items[queue->data.write_idx].value);
+    queue->data.items[queue->data.write_idx].generation = queue->data.generation;
+    GEN_QUEUE_ADVANCE_WRITER_NOLOCK(queue);
+    return true;
+}
+
+bool GEN_QUEUE_ENQUEUE(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry) {
+    GEN_QUEUE_LOCK_WRAP(queue);
+    bool r = GEN_QUEUE_ENQUEUE_NOLOCK(queue, entry);
+    GEN_QUEUE_UNLOCK_WRAP(queue);
+    return r;
+}
+
+bool GEN_QUEUE_DEQUEUE_NOLOCK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry) {
+    if (GEN_QUEUE_EMPTY_NOLOCK(queue)) {
+        return false;
+    }
+
+    GEN_QUEUE_VALUE_MOVE_WRAP(&queue->data.items[queue->data.read_idx].value, entry);
+    GEN_QUEUE_ADVANCE_READER_NOLOCK(queue);
+    return true;
+}
+
+bool GEN_QUEUE_DEQUEUE(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry) {
+    GEN_QUEUE_LOCK_WRAP(queue);
+    bool r = GEN_QUEUE_DEQUEUE_NOLOCK(queue, entry);
+    GEN_QUEUE_UNLOCK_WRAP(queue);
+    return r;
+}
+
 #endif // GEN_QUEUE_NO_IMPL
 
 #ifndef GEN_QUEUE_NO_CLEANUP
-// Inputs
-#    undef GEN_QUEUE_NO_IMPL
-#    undef GEN_QUEUE_NO_CLEANUP
-#    undef GEN_QUEUE_NAMING_PREFIX
-#    undef GEN_QUEUE_NUM_ENTRIES
-#    undef GEN_QUEUE_VALUE_TYPE
-#    undef GEN_QUEUE_EXTRA_FIELDS
-#    undef GEN_QUEUE_ENTRY_ATTRIBUTE
+#    undef GEN_QUEUE_ADVANCE_READER_NOLOCK
+#    undef GEN_QUEUE_ADVANCE_WRITER_NOLOCK
 #    undef GEN_QUEUE_ATTRIBUTE
-#    undef GEN_QUEUE_DATA_ATTRIBUTE
-#    undef GEN_QUEUE_INDEX_TYPE
-#    undef GEN_QUEUE_GENERATION_TYPE
-// Helpers
+#    undef GEN_QUEUE_CLEAR
+#    undef GEN_QUEUE_CLEAR_NOLOCK
 #    undef GEN_QUEUE_CONCAT
 #    undef GEN_QUEUE_CONCAT2
-#    undef GEN_QUEUE_PREFIX_NAME
-#    undef GEN_QUEUE_LOCK_WRAP
-#    undef GEN_QUEUE_UNLOCK_WRAP
-// API
-#    undef GEN_QUEUE_ENTRY_T
-#    undef GEN_QUEUE_T
-#    undef GEN_QUEUE_LOCK
-#    undef GEN_QUEUE_UNLOCK
-#    undef GEN_QUEUE_LOCK_WRAP
-#    undef GEN_QUEUE_UNLOCK_WRAP
-#    undef GEN_QUEUE_INIT
 #    undef GEN_QUEUE_DATA
-#    undef GEN_QUEUE_SIZE
-#    undef GEN_QUEUE_FULL_NOLOCK
-#    undef GEN_QUEUE_FULL
-#    undef GEN_QUEUE_EMPTY_NOLOCK
+#    undef GEN_QUEUE_DATA_ATTRIBUTE
+#    undef GEN_QUEUE_DATA_SIZE
+#    undef GEN_QUEUE_DEQUEUE
+#    undef GEN_QUEUE_DEQUEUE_NOLOCK
 #    undef GEN_QUEUE_EMPTY
-#    undef GEN_QUEUE_PUSH_NOLOCK
-#    undef GEN_QUEUE_PUSH
-#    undef GEN_QUEUE_PEEK_NOLOCK
-#    undef GEN_QUEUE_PEEK
-#    undef GEN_QUEUE_POP_NOLOCK
+#    undef GEN_QUEUE_EMPTY_NOLOCK
+#    undef GEN_QUEUE_ENQUEUE
+#    undef GEN_QUEUE_ENQUEUE_NOLOCK
+#    undef GEN_QUEUE_ENTRY_ATTRIBUTE
+#    undef GEN_QUEUE_ENTRY_T
+#    undef GEN_QUEUE_EXTRA_FIELDS
+#    undef GEN_QUEUE_FULL
+#    undef GEN_QUEUE_FULL_NOLOCK
+#    undef GEN_QUEUE_GENERATION_TYPE
+#    undef GEN_QUEUE_INDEX_TYPE
+#    undef GEN_QUEUE_INIT
+#    undef GEN_QUEUE_LOCK
+#    undef GEN_QUEUE_LOCK_WRAP
+#    undef GEN_QUEUE_NAMING_PREFIX
+#    undef GEN_QUEUE_NO_CLEANUP
+#    undef GEN_QUEUE_NO_IMPL
+#    undef GEN_QUEUE_NUM_ENTRIES
 #    undef GEN_QUEUE_POP
+#    undef GEN_QUEUE_POP_NOLOCK
+#    undef GEN_QUEUE_PREFIX_NAME
+#    undef GEN_QUEUE_PUSH
+#    undef GEN_QUEUE_PUSH_NOLOCK
+#    undef GEN_QUEUE_T
+#    undef GEN_QUEUE_UNLOCK
+#    undef GEN_QUEUE_UNLOCK_WRAP
+#    undef GEN_QUEUE_VALUE_COPY
+#    undef GEN_QUEUE_VALUE_COPY_WRAP
+#    undef GEN_QUEUE_VALUE_DESTROY
+#    undef GEN_QUEUE_VALUE_DESTROY_WRAP
+#    undef GEN_QUEUE_VALUE_MOVE
+#    undef GEN_QUEUE_VALUE_MOVE_WRAP
+#    undef GEN_QUEUE_VALUE_TYPE
 #endif // GEN_QUEUE_NO_CLEANUP

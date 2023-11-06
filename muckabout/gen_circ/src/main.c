@@ -13,8 +13,8 @@
 #define GEN_QUEUE_NUM_ENTRIES 8
 #define GEN_QUEUE_VALUE_TYPE int
 #define GEN_QUEUE_NAMING_PREFIX event_
-#define GEN_QUEUE_ATTRIBUTE __attribute__((align(2)))
-#define GEN_QUEUE_DATA_ATTRIBUTE __attribute__((align(2)))
+#define GEN_QUEUE_ATTRIBUTE __attribute__((packed))
+#define GEN_QUEUE_DATA_ATTRIBUTE __attribute__((packed))
 #define GEN_QUEUE_EXTRA_FIELDS \
     int lock_count;            \
     int unlock_count;          \
@@ -45,13 +45,14 @@ int main(int argc, const char *argv[]) {
     queue_init(&q);
 
     for (int i = 0; i < 16; ++i) {
-        if (!event_queue_push(&queue, &i)) {
+        int n = i;
+        if (!event_queue_enqueue(&queue, &n)) {
             while (!event_queue_empty(&queue)) {
                 int dummy;
-                event_queue_pop(&queue, &dummy);
+                event_queue_dequeue(&queue, &dummy);
                 printf("< Pop: %d\n", (int)dummy);
             }
-            event_queue_push(&queue, &i);
+            event_queue_enqueue(&queue, &n);
             printf("> Push: %d\n", i);
         } else {
             printf("> Push: %d\n", i);
