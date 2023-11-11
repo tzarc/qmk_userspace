@@ -1,4 +1,6 @@
 gen_circ
+.clang-format
+.clangd
 .cache
 .build
 compile_commands.json

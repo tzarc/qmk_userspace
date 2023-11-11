@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include <stdbool.h>
 #include <stdint.h>
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 #define GEN_QUEUE_NUM_ENTRIES 16
 #define GEN_QUEUE_VALUE_TYPE char
@@ -15,6 +15,7 @@
 #define GEN_QUEUE_NAMING_PREFIX event_
 #define GEN_QUEUE_ATTRIBUTE __attribute__((packed))
 #define GEN_QUEUE_DATA_ATTRIBUTE __attribute__((packed))
+#define GEN_QUEUE_USE_LOCKING
 #define GEN_QUEUE_EXTRA_FIELDS \
     int lock_count;            \
     int unlock_count;          \
@@ -24,23 +25,23 @@
 static event_queue_t queue;
 static queue_t       q;
 
-void print_lock_stats(event_queue_t *queue) {
+void print_lock_stats(event_queue_t* queue) {
     printf("     Locks: %d, Unlocks; %d, Level: %d\n", queue->lock_count, queue->unlock_count, queue->level);
 }
 
-void event_queue_lock(event_queue_t *queue) {
+void event_queue_lock(event_queue_t* queue) {
     ++queue->lock_count;
     ++queue->level;
     print_lock_stats(queue);
 }
 
-void event_queue_unlock(event_queue_t *queue) {
+void event_queue_unlock(event_queue_t* queue) {
     ++queue->unlock_count;
     --queue->level;
     print_lock_stats(queue);
 }
 
-int main(int argc, const char *argv[]) {
+int main(int argc, const char* argv[]) {
     event_queue_init(&queue);
     queue_init(&q);
 
