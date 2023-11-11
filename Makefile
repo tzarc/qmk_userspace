@@ -56,7 +56,7 @@ BOARD_DEFS := \
 	spi_eeprom_proton_c!alternates/spi_eeprom_test/proton_c_test!handwired/onekey/spi_eeprom_test_proton_c!eep_rst \
 	spi_eeprom_f103!alternates/spi_eeprom_test/f103_test!handwired/onekey/spi_eeprom_test_f103!eep_rst \
 	spi_eeprom_f401!alternates/spi_eeprom_test/f401_test!handwired/onekey/spi_eeprom_test_f401!eep_rst \
-	l151x8xxA!alternates/l151x8xxA!l151x8xxA!reset \
+	l151x8xxa!alternates/l151x8xxa!l151x8xxa!reset \
 	f072_shiftreg!alternates/f072_shiftreg!f072_shiftreg!default \
 	l412_shiftreg!alternates/l412_shiftreg!l412_shiftreg!default \
 	qp_test!alternates/qp_test!qp_test!default!qp_test \
