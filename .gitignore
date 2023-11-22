@@ -1,8 +1,8 @@
 /.direnv
 
 /qmk_firmware
-/dot-github
-/extra_userdir
+/qmk_userspace
+/qmk-dot-github
 
 *.hex
 *.bin
@@ -14,19 +14,10 @@ users-tzarc/graphics/src/*.png
 alternates/qp_test/graphics/*.gif
 alternates/qp_test/graphics/*.png
 
-.vscode/ipch
-.clang-format
-PR-*.patchbuild.log
-/build.log
-/.project
-compile_commands.json
-chibios-upgrade-output
+._*
 .cache
 .DS_Store
-._*
 .vscode/.cortex-debug*
-validation-output
+.vscode/ipch
+compile_commands.json
 sha1_verification
-users-tzarc/qmk_version.h
-stm32_usb.txt
-stm32_usb.md

@@ -1,0 +1,23 @@
+{
+    "userspace_version": "1.0",
+    "build_targets": [
+        ["40percentclub/luddite", "tzarc"],
+        ["annepro2/c18", "tzarc"],
+        ["cannonkeys/satisfaction75/rev1", "tzarc"],
+        ["coseyfannitutti/mysterium", "dad"],
+        ["coseyfannitutti/mysterium", "tzarc"],
+        ["ducky/one2mini/1861st", "tzarc"],
+        ["geekboards/macropad_v2", "tzarc"],
+        ["keebio/chocopad", "tzarc"],
+        ["keebio/iris/rev4", "tzarc"],
+        ["kprepublic/bm16s", "tzarc"],
+        ["kprepublic/bm60hsrgb_poker/rev2", "tzarc"],
+        ["kprepublic/jj40", "tzarc"],
+        ["massdrop/ctrl", "tzarc"],
+        ["planck/rev6_drop", "tzarc"],
+        ["tzarc/djinn/rev1", "tzarc"],
+        ["tzarc/djinn/rev2", "tzarc"],
+        ["tzarc/ghoul/rev1/stm32", "tzarc"],
+        ["tzarc/ghoul/rev1/rp2040", "tzarc"]
+    ]
+}
