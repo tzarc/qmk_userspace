@@ -7,11 +7,10 @@ umask 022
 set -eEuo pipefail
 this_script="$(realpath "${BASH_SOURCE[0]}")"
 script_dir="$(realpath "$(dirname "$this_script")")"
-build_dir="$script_dir/sha1_verification"
 
 # Ensure we have access to the qmk venv if it exists
 venv_activate_path=$(find $script_dir -path '*/.direnv/python*/bin/*' -name activate | head -n1)
-if [[ ! -z "${venv_activate_path:-}" ]] ; then
+if [[ ! -z "${venv_activate_path:-}" ]]; then
     echo "Activating environment: $venv_activate_path"
     source "$venv_activate_path"
 fi
@@ -74,12 +73,17 @@ if [[ -z "${TARGET_PR_NUMBER:-}" ]]; then
     exit 1
 fi
 
+build_dir=$(mktemp -d -p "$HOME/.local/" -t qmk.XXX)
 # Set up the build directory
 cleanup() {
     cd "$script_dir"
-    if [[ -d "$build_dir" ]]; then
-        echo "Entering shell so that extra investigation can occur..."
-        bash
+    if [[ -z "${FIRST_INIT:-}" ]]; then
+        if [[ -d "$build_dir" ]]; then
+            echo "Entering shell so that extra investigation can occur..."
+            echo "Current directory: $(pwd)"
+            echo "Verification directory: $build_dir"
+            bash
+        fi
     fi
     if [[ -n "${USE_RAMDISK:-}" ]]; then
         while [[ -n "$(mount | grep " $build_dir ")" ]]; do
@@ -103,7 +107,7 @@ build_targets() {
     pcmd git diff --name-only $TARGET_BRANCH | grep -P '^keyboards' | sed -e 's@^keyboards/@@g' -e 's@/keymaps/.*$@@g' -e 's@/[^/]*$@@g' | while read kb; do
         find "keyboards/$kb" \( -name 'rules.mk' \) -and -not -path '*/keymaps/*' | while read rules; do
             kb=$(dirname "$rules" | sed -e 's@^keyboards/@@g')
-            echo "${kb}:default";
+            echo "${kb}:default"
         done
     done | sort | uniq
 
@@ -136,15 +140,17 @@ strip_calls() {
 }
 
 main() {
+    export FIRST_INIT=1
     cleanup
+    unset FIRST_INIT
     [[ -d "$build_dir" ]] || mkdir -p "$build_dir"
     if [[ -n "${USE_RAMDISK:-}" ]]; then
         sudo mount -t tmpfs tmpfs "$build_dir"
     fi
     cd "$build_dir"
 
-    export base_dir="$build_dir/qmk_firmware_base"
-    export pr_dir="$build_dir/qmk_firmware_pr"
+    export base_dir="$build_dir/qmk_base"
+    export pr_dir="$build_dir/qmk_pr"
 
     # Clone the base repo
     pcmd rsync -qaP --exclude='.build' "$script_dir/qmk_firmware/" "$base_dir/"
@@ -179,19 +185,19 @@ main() {
     # Build the base repo
     cd "$base_dir"
     pcmd make git-submodule
-    { pcmd ${DOCKER_PREFIX:-} qmk mass-compile -c -j $NCPUS $reproducible_build_flags $targets || true ; } | tee "$build_dir/mass_compile_base.log"
+    { pcmd ${DOCKER_PREFIX:-} qmk mass-compile -c -j $NCPUS $reproducible_build_flags $targets || true; } | tee "$build_dir/mass_compile_base.log"
     { ls -1 *.hex *.bin *.uf2 2>/dev/null || true; } | sort | xargs sha1sum >"$build_dir/sha1sums_base.txt"
 
     # Build the target PR repo
     cd "$pr_dir"
     pcmd make git-submodule
-    { pcmd ${DOCKER_PREFIX:-} qmk mass-compile -c -j $NCPUS $reproducible_build_flags $targets || true ; } | tee "$build_dir/mass_compile_pr.log"
+    { pcmd ${DOCKER_PREFIX:-} qmk mass-compile -c -j $NCPUS $reproducible_build_flags $targets || true; } | tee "$build_dir/mass_compile_pr.log"
     { ls -1 *.hex *.bin *.uf2 2>/dev/null || true; } | sort | xargs sha1sum >"$build_dir/sha1sums_pr.txt"
 
     local differences=$( (diff -yW 200 --suppress-common-lines "$build_dir/sha1sums_base.txt" "$build_dir/sha1sums_pr.txt" || true) | awk '{print $2}' | sed -e 's@\.\(hex\|bin\|uf2\)$@@g' | xargs echo)
     for difference in $differences; do
-        { find "$base_dir/.build/obj_$difference" "$pr_dir/.build/obj_$difference" "$base_dir/.build/obj_${difference%_*}" "$pr_dir/.build/obj_${difference%_*}" -type f -name '*.i' 2>/dev/null || true ; } | while read file; do
-            cat "$file" | sed -e 's@^#.*@@g' -e 's@^\s*//.*@@g' -e '/^\s*$/d' -e 's@qmk_firmware_base@qmk_firmware@g' -e 's@qmk_firmware_pr@qmk_firmware@g' | clang-format >"$file.formatted"
+        { find "$base_dir/.build/obj_$difference" "$pr_dir/.build/obj_$difference" -type f -name '*.i' 2>/dev/null || true; } | while read file; do
+            cat "$file" | sed -e 's@^#.*@@g' -e 's@^\s*//.*@@g' -e '/^\s*$/d' -e 's@qmk_base@qmk_xxx@g' -e 's@qmk_pr@qmk_xxx@g' | clang-format >"$file.formatted"
         done
     done
 
@@ -199,13 +205,13 @@ main() {
     echo '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
     echo '@@ Listing builds that failed on the base revision:           @@'
     echo '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
-    { cat "$build_dir/mass_compile_base.log" | grep ERR ; } || true
+    { cat "$build_dir/mass_compile_base.log" | grep ERR; } || true
 
     echo
     echo '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
     echo '@@ Listing builds that failed on the PR:                      @@'
     echo '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
-    { cat "$build_dir/mass_compile_pr.log" | grep ERR ; } || true
+    { cat "$build_dir/mass_compile_pr.log" | grep ERR; } || true
 
     # Work out the diff's between the two target builds
     echo
