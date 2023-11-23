@@ -118,7 +118,26 @@ BOARD_DEFS := \
 
 # short name ! keyboard path ! keymap name ! link source ! link target
 LINKED_BOARD_DEFS := \
-	disco_f723!handwired/onekey/disco_f723!console!alternates/disco_f723!handwired/onekey/disco_f723
+	disco_f723!handwired/onekey/disco_f723!console!alternates/disco_f723 \
+	onekey_h743!handwired/onekey/nucleo144_h743zi!console!alternates/nucleo144_h743zi \
+	onekey_l152!handwired/onekey/nucleo64_l152re!console!alternates/nucleo64_l152re \
+	onekey_l082!handwired/onekey/nucleo32_l082!console!alternates/nucleo32_l082kz \
+	split_l082!handwired/splittest/nucleo32_l082!default!alternates/nucleo32_l082kz_split \
+	test_proton_c!handwired/onekey/proton_c_test!console!alternates/proton_c_test \
+	split_proton_c!handwired/splittest/proton_c_split/a9!default!alternates/proton_c_split!handwired/splittest/proton_c_split \
+	split_g431!handwired/splittest/g431_split!default!alternates/g431_split \
+	split_f072!handwired/splittest/f072_split!default!alternates/f072_split \
+	split_f401!handwired/splittest/f401_split!default!alternates/f401_split \
+	split_f411!handwired/splittest/f411_split!default!alternates/f411_split \
+	spi_eeprom_promicro!handwired/onekey/spi_eeprom_test_promicro!eep_rst!alternates/spi_eeprom_test/promicro_test \
+	spi_eeprom_proton_c!handwired/onekey/spi_eeprom_test_proton_c!eep_rst!alternates/spi_eeprom_test/proton_c_test \
+	spi_eeprom_f103!handwired/onekey/spi_eeprom_test_f103!eep_rst!alternates/spi_eeprom_test/f103_test \
+	spi_eeprom_f401!handwired/onekey/spi_eeprom_test_f401!eep_rst!alternates/spi_eeprom_test/f401_test \
+	l151x8xxa!l151x8xxa!reset!alternates/l151x8xxa \
+	f072_shiftreg!f072_shiftreg!default!alternates/f072_shiftreg \
+	l412_shiftreg!l412_shiftreg!default!alternates/l412_shiftreg \
+	qp_test!qp_test!default!alternates/qp_test \
+	lvgl_test!lvgl_test!default!alternates/lvgl_test
 
 define handle_board_entry
 board_name_$1 := $$(word 1,$$(subst !, ,$1))
