@@ -1,16 +1,11 @@
 #!/usr/bin/env bash
 
 # Setup ARM gcc
+# - The specific version installed needs python 3.8.18 for `gdb` to work
+# - Install with `pyenv install 3.8.18`
 
-# sudo dnf install -y ncurses-compat-libs
-# cd ~/gcc-arm
-# wget https://www.python.org/ftp/python/3.8.18/Python-3.8.18.tgz
-# tar xzf Python-3.8.18.tgz Python-3.8.18/
-# cd Python-3.8.18/
-# ./configure --enable-optimizations --with-ensurepip=install --prefix=$HOME/gcc-arm/python38
-# make -j41 install
-
-export PATH="$HOME/gcc-arm/python38/bin:$PATH"
+export PATH="$HOME/.pyenv/versions/3.8.18/bin:$PATH"
 export PATH="$HOME/gcc-arm/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi/bin:$PATH"
-export PYTHONHOME="$HOME/gcc-arm/python38"
+export PYTHONHOME="$HOME/.pyenv/versions/3.8.18"
+
 exec arm-none-eabi-gdb "$@"
