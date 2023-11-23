@@ -1,6 +1,12 @@
 #!/bin/bash
 
 if [[ ! -z $SIZE_REGRESSION_EXECUTING ]]; then
+    # Skip executing if we're doing size regression analysis
+    exit 0
+fi
+
+if [[ -z $(which python3 | grep '/.direnv/') ]]; then
+    # Skip if we're not running python under direnv
     exit 0
 fi
 
