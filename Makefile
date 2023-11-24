@@ -44,6 +44,10 @@ QMK_USERSPACE_FILES_EXCLUDED := '(\.gitignore|qmk\.json|\.keep|Makefile|README.m
 
 .PHONY: resync-userspace resync-userspace-files
 resync-userspace:
+	@echo 'Updating files:'
+	@echo '--------------'
+	@cd $(QMK_USERSPACE)/qmk_userspace && git pull --ff-only
+	@echo
 	@echo 'Listing files:'
 	@echo '--------------'
 	@find $(QMK_USERSPACE)/qmk_userspace -type f -not -path '*/.git/*' | sed -e 's@$(QMK_USERSPACE)/qmk_userspace/@@g' | grep -vP $(QMK_USERSPACE_FILES_EXCLUDED)
@@ -51,8 +55,11 @@ resync-userspace:
 	@echo 'If everything looks okay, "make resync-userspace-files"' to copy across.
 
 resync-userspace-files:
+	@echo 'Copying files:'
+	@echo '--------------'
 	@find $(QMK_USERSPACE)/qmk_userspace -type f -not -path '*/.git/*' | sed -e 's@$(QMK_USERSPACE)/qmk_userspace/@@g' | grep -vP $(QMK_USERSPACE_FILES_EXCLUDED) \
 		| while read file ; do \
+			echo "$$file" ; \
 			[ -d "$(QMK_USERSPACE)/$$(dirname "$$file")" ] || mkdir -p "$$(dirname "$$file")" ; \
 			cp "$(QMK_USERSPACE)/qmk_userspace/$$file" "$(QMK_USERSPACE)/$$file" ; \
 		done
