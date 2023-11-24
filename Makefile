@@ -40,6 +40,23 @@ qmk-dot-github: $(QMK_USERSPACE)/qmk-dot-github
 .PHONY: repositories
 repositories: qmk_firmware qmk_userspace qmk-dot-github
 
+QMK_USERSPACE_FILES_EXCLUDED := '(\.gitignore|qmk\.json|\.keep|Makefile|README.md)$$'
+
+.PHONY: resync-userspace resync-userspace-files
+resync-userspace:
+	@echo 'Listing files:'
+	@echo '--------------'
+	@find $(QMK_USERSPACE)/qmk_userspace -type f -not -path '*/.git/*' | sed -e 's@$(QMK_USERSPACE)/qmk_userspace/@@g' | grep -vP $(QMK_USERSPACE_FILES_EXCLUDED)
+	@echo
+	@echo 'If everything looks okay, "make resync-userspace-files"' to copy across.
+
+resync-userspace-files:
+	@find $(QMK_USERSPACE)/qmk_userspace -type f -not -path '*/.git/*' | sed -e 's@$(QMK_USERSPACE)/qmk_userspace/@@g' | grep -vP $(QMK_USERSPACE_FILES_EXCLUDED) \
+		| while read file ; do \
+			[ -d "$(QMK_USERSPACE)/$$(dirname "$$file")" ] || mkdir -p "$$(dirname "$$file")" ; \
+			cp "$(QMK_USERSPACE)/qmk_userspace/$$file" "$(QMK_USERSPACE)/$$file" ; \
+		done
+
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Cleaning
 
