@@ -1,33 +1,37 @@
 {
-  "folders": [
-    {
-      "name": "qmk_build",
-      "path": "."
-    },
-    {
-      "name": "quantum-painter",
-      "path": "qmk_firmware/quantum/painter"
-    },
-    {
-      "name": "drivers-painter",
-      "path": "qmk_firmware/drivers/painter"
-    },
-    {
-      "name": "keyboards-tzarc",
-      "path": "qmk_firmware/keyboards/tzarc"
-    },
-    {
-      "name": "python-qmk",
-      "path": "qmk_firmware/lib/python/qmk"
-    }
-  ],
-  "settings": {
-    "git.ignoreLimitWarning": true,
-    "cortex-debug.variableUseNaturalFormat": false,
-    "python.defaultInterpreterPath": "/Users/nickb/Code/qmk_build/.direnv/python-3.11/bin/python",
-    "python.analysis.extraPaths": [
-      "/Users/nickb/Code/qmk_build/.direnv/python-3.11/lib/python3.11/site-packages",
-      "/Users/nickb/Code/qmk_build/qmk_firmware/lib/python"
+    "folders": [
+        {
+            "name": "qmk_build",
+            "path": "."
+        },
+        {
+            "name": "qmk_firmware",
+            "path": "qmk_firmware"
+        },
+        {
+            "name": "quantum-painter",
+            "path": "qmk_firmware/quantum/painter"
+        },
+        {
+            "name": "drivers-painter",
+            "path": "qmk_firmware/drivers/painter"
+        },
+        {
+            "name": "keyboards-tzarc",
+            "path": "qmk_firmware/keyboards/tzarc"
+        },
+        {
+            "name": "python-qmk",
+            "path": "qmk_firmware/lib/python/qmk"
+        }
     ],
-  }
+    "settings": {
+        "git.ignoreLimitWarning": true,
+        "cortex-debug.variableUseNaturalFormat": false,
+        "python.defaultInterpreterPath": "/Users/nickb/Code/qmk_build/.direnv/python-3.11/bin/python",
+        "python.analysis.extraPaths": [
+            "/Users/nickb/Code/qmk_build/.direnv/python-3.11/lib/python3.11/site-packages",
+            "/Users/nickb/Code/qmk_build/qmk_firmware/lib/python"
+        ]
+    }
 }

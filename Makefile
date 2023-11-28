@@ -25,13 +25,21 @@ endif
 # Repositories
 
 $(QMK_USERSPACE)/qmk_firmware:
-	git clone --depth=1 https://github.com/tzarc/qmk_firmware.git $(QMK_USERSPACE)/qmk_firmware
+	git clone --depth=1 https://github.com/tzarc/qmk_firmware.git $(QMK_USERSPACE)/qmk_firmware \
+		&& cd $(QMK_USERSPACE)/qmk_firmware \
+		&& git sshsign
 
 $(QMK_USERSPACE)/qmk_userspace:
-	git clone --depth=1 https://github.com/qmk/qmk_userspace.git $(QMK_USERSPACE)/qmk_userspace
+	git clone --depth=1 https://github.com/qmk/qmk_userspace.git $(QMK_USERSPACE)/qmk_userspace \
+		&& cd $(QMK_USERSPACE)/qmk_userspace \
+		&& git pull --ff-only \
+		&& git sshsign
 
 $(QMK_USERSPACE)/qmk-dot-github:
-	git clone --depth=1 https://github.com/qmk/.github.git $(QMK_USERSPACE)/qmk-dot-github
+	git clone --depth=1 https://github.com/qmk/.github.git $(QMK_USERSPACE)/qmk-dot-github \
+		&& cd $(QMK_USERSPACE)/qmk-dot-github \
+		&& git pull --ff-only \
+		&& git sshsign
 
 qmk_firmware: $(QMK_USERSPACE)/qmk_firmware
 qmk_userspace: $(QMK_USERSPACE)/qmk_userspace
@@ -43,7 +51,7 @@ repositories: qmk_firmware qmk_userspace qmk-dot-github
 QMK_USERSPACE_FILES_EXCLUDED := '(\.gitignore|qmk\.json|\.keep|Makefile|README.md)$$'
 
 .PHONY: resync-userspace resync-userspace-files
-resync-userspace:
+resync-userspace: qmk_userspace
 	@echo 'Updating files:'
 	@echo '--------------'
 	@cd $(QMK_USERSPACE)/qmk_userspace && git pull --ff-only
@@ -97,7 +105,6 @@ format-and-pytest:
 	cd $(QMK_USERSPACE)/qmk_firmware \
 		&& RUNTIME=docker ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk format-c --core-only -a && qmk format-python -a && qmk pytest"
 
-
 all-chibios:
 	qmk mass-compile -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || $(ECHO) 2) -f protocol=ChibiOS
 
@@ -107,14 +114,12 @@ all-riot:
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Helpers
 
-.PHONY: qmk_firmware rgb_effects generated-files
-
-qmk_firmware:
+.PHONY: rgb_effects generated-files
 
 generated-files: rgb_effects
 
 rgb_effects:
-	"$(QMK_USERSPACE)/bin/generate_rgb_effects.py" > "$(QMK_USERSPACE)/users/tzarc/enable_all_rgb_effects.h"
+	@"$(QMK_USERSPACE)/bin/generate_rgb_effects.py" > "$(QMK_USERSPACE)/users/tzarc/enable_all_rgb_effects.h"
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Builds
