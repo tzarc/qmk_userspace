@@ -97,6 +97,17 @@ generated-files: rgb_effects
 rgb_effects:
 	@"$(QMK_USERSPACE)/bin/generate_rgb_effects.py" > "$(QMK_USERSPACE)/users/tzarc/enable_all_rgb_effects.h"
 
+.PHONY: links link-hooks
+
+links: link-hooks
+
+link-hooks:
+	@[ -e "$(QMK_USERSPACE)/qmk_firmware/.git/hooks/post-checkout" ] || \
+		{ \
+			$(ECHO) -e "\e[38;5;14mSymlinking: $(QMK_USERSPACE)/bin/post-checkout.sh -> $(QMK_USERSPACE)/qmk_firmware/.git/hooks/post-checkout\e[0m" ; \
+			ln -sf "$(QMK_USERSPACE)/bin/post-checkout.sh" "$(QMK_USERSPACE)/qmk_firmware/.git/hooks/post-checkout" ; \
+		}
+
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Builds
 
