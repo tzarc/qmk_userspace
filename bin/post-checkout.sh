@@ -1,16 +1,22 @@
 #!/bin/bash
+# Copyright 2018-2023 Nick Brassel (@tzarc)
+# SPDX-License-Identifier: GPL-2.0-or-later
 
-if [[ ! -z $SIZE_REGRESSION_EXECUTING ]]; then
+umask 022
+
+set -eEuo pipefail
+
+if [[ ! -z "${SIZE_REGRESSION_EXECUTING:-}" ]]; then
     # Skip executing if we're doing size regression analysis
     exit 0
 fi
 
-if [[ -z $(which python3 | grep '/.direnv/') ]]; then
+if [[ -z "$(which python3 | grep '/.direnv/')" ]]; then
     # Skip if we're not running python under direnv
     exit 0
 fi
 
-if [ "$1" = "" -o "$1" != "$2" ]; then
+if [ "${1:-}" = "" -o "${1:-}" != "${2:-}" ]; then
     # Work out where we are
     this_script=$(realpath "${BASH_SOURCE[0]}")
     script_dir=$(dirname "$this_script")

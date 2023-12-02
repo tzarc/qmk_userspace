@@ -20,6 +20,7 @@ AUDIO_ENABLE = no
 
 VPATH += keyboards/tzarc/djinn/graphics
 SRC += \
+	calib.c \
 	djinn.qgf.c \
 	lock-caps-ON.qgf.c \
 	lock-scrl-ON.qgf.c \

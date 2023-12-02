@@ -3,6 +3,7 @@
 #include QMK_KEYBOARD_H
 #include "theme_djinn_default.h"
 #include "tzarc.h"
+#include "calib.h"
 #include "qp.h"
 // #include "qp_rgb565_surface.h"
 // #include "qp_lvgl.h"
@@ -99,9 +100,6 @@ void keyboard_post_init_keymap(void) {
     void keyboard_post_init_display(void);
     keyboard_post_init_display();
     rgb_matrix_disable_noeeprom();
-
-    // qp_lvgl_attach(lcd);
-    // ui_init();
 }
 
 bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
