@@ -140,45 +140,46 @@ BOARD_DEFS := \
 
 # short name ! keyboard path ! keymap name ! link source ! link target
 LINKED_BOARD_DEFS := \
-	disco_f723!handwired/onekey/disco_f723!console!alternates/disco_f723 \
-	onekey_h743!handwired/onekey/nucleo144_h743zi!console!alternates/nucleo144_h743zi \
-	onekey_l152!handwired/onekey/nucleo64_l152re!console!alternates/nucleo64_l152re \
-	onekey_l082!handwired/onekey/nucleo32_l082!console!alternates/nucleo32_l082kz \
-	split_l082!handwired/splittest/nucleo32_l082!default!alternates/nucleo32_l082kz_split \
-	test_proton_c!handwired/onekey/proton_c_test!console!alternates/proton_c_test \
-	split_proton_c!handwired/splittest/proton_c_split/a9!default!alternates/proton_c_split!handwired/splittest/proton_c_split \
-	split_g431!handwired/splittest/g431_split!default!alternates/g431_split \
-	split_f072!handwired/splittest/f072_split!default!alternates/f072_split \
-	split_f401!handwired/splittest/f401_split!default!alternates/f401_split \
-	split_f411!handwired/splittest/f411_split!default!alternates/f411_split \
-	spi_eeprom_promicro!handwired/onekey/spi_eeprom_test_promicro!eep_rst!alternates/spi_eeprom_test/promicro_test \
-	spi_eeprom_proton_c!handwired/onekey/spi_eeprom_test_proton_c!eep_rst!alternates/spi_eeprom_test/proton_c_test \
-	spi_eeprom_f103!handwired/onekey/spi_eeprom_test_f103!eep_rst!alternates/spi_eeprom_test/f103_test \
-	spi_eeprom_f401!handwired/onekey/spi_eeprom_test_f401!eep_rst!alternates/spi_eeprom_test/f401_test \
-	l151x8xxa!l151x8xxa!reset!alternates/l151x8xxa \
-	f072_shiftreg!f072_shiftreg!default!alternates/f072_shiftreg \
-	l412_shiftreg!l412_shiftreg!default!alternates/l412_shiftreg \
-	qp_test!qp_test!default!alternates/qp_test \
-	lvgl_test!lvgl_test!default!alternates/lvgl_test
+	disco_f723!keyboards/handwired/onekey/disco_f723!console!alternates/disco_f723 \
+	onekey_h743!keyboards/handwired/onekey/nucleo144_h743zi!console!alternates/nucleo144_h743zi \
+	onekey_l152!keyboards/handwired/onekey/nucleo64_l152re!console!alternates/nucleo64_l152re \
+	onekey_l082!keyboards/handwired/onekey/nucleo32_l082!console!alternates/nucleo32_l082kz \
+	split_l082!keyboards/handwired/splittest/nucleo32_l082!default!alternates/nucleo32_l082kz_split \
+	test_proton_c!keyboards/handwired/onekey/proton_c_test!console!alternates/proton_c_test \
+	split_proton_c!keyboards/handwired/splittest/proton_c_split/a9!default!alternates/proton_c_split!handwired/splittest/proton_c_split \
+	split_g431!keyboards/handwired/splittest/g431_split!default!alternates/g431_split \
+	split_f072!keyboards/handwired/splittest/f072_split!default!alternates/f072_split \
+	split_f401!keyboards/handwired/splittest/f401_split!default!alternates/f401_split \
+	split_f411!keyboards/handwired/splittest/f411_split!default!alternates/f411_split \
+	spi_eeprom_promicro!keyboards/handwired/onekey/spi_eeprom_test_promicro!eep_rst!alternates/spi_eeprom_test/promicro_test \
+	spi_eeprom_proton_c!keyboards/handwired/onekey/spi_eeprom_test_proton_c!eep_rst!alternates/spi_eeprom_test/proton_c_test \
+	spi_eeprom_f103!keyboards/handwired/onekey/spi_eeprom_test_f103!eep_rst!alternates/spi_eeprom_test/f103_test \
+	spi_eeprom_f401!keyboards/handwired/onekey/spi_eeprom_test_f401!eep_rst!alternates/spi_eeprom_test/f401_test \
+	l151x8xxa!keyboards/l151x8xxa!reset!alternates/l151x8xxa \
+	f072_shiftreg!keyboards/f072_shiftreg!default!alternates/f072_shiftreg \
+	l412_shiftreg!keyboards/l412_shiftreg!default!alternates/l412_shiftreg \
+	qp_test!keyboards/qp_test!default!alternates/qp_test \
+	lvgl_test!keyboards/lvgl_test!default!alternates/lvgl_test
 
+keyboards_folder := keyboards/
+empty :=
 define handle_board_entry
 board_name_$1 := $$(word 1,$$(subst !, ,$1))
 board_keyboard_$1 := $$(word 2,$$(subst !, ,$1))
+board_keyboard_stripped_$1 := $$(subst $$(keyboards_folder),$$(empty),$$(board_keyboard_$1))
 board_keymap_$1 := $$(word 3,$$(subst !, ,$1))
-
-board_files_$1 := $$(shell find $$(QMK_USERSPACE)/keyboards/$$(board_source_$1) -type f \( -name '*.h' -or -name '*.c' \) -and -not -name '*conf.h' -and -not -name 'board.c' -and -not -name 'board.h' | sort)
-board_files_all_$1 := $$(shell find $$(QMK_USERSPACE)/keyboards/$$(board_source_$1) -type f | sort)
 
 .PHONY: $$(board_name_$1) bin_$$(board_name_$1)
 
 $$(board_name_$1): bin_$$(board_name_$1)
 
 bin_$$(board_name_$1): rgb_effects
-	@$(ECHO) -e "\e[38;5;14mBuilding: $$(board_keyboard_$1):$$(board_keymap_$1)\e[0m"
+	@$(ECHO) -e "\e[38;5;14mBuilding: $$(board_keyboard_stripped_$1):$$(board_keymap_$1)\e[0m"
 	+@cd "$(QMK_USERSPACE)/qmk_firmware" \
-		&& { [ -z "$$(NO_COMPILEDB)" ] && qmk generate-compilation-database -kb $$(board_keyboard_$1) -km $$(board_keymap_$1) || true; } \
 		&& { \
-			$$(MAKE) --no-print-directory -r -R -C "$(QMK_USERSPACE)/qmk_firmware" -f "$(QMK_USERSPACE)/qmk_firmware/builddefs/build_keyboard.mk" $$(MAKEFLAGS) KEYBOARD="$$(board_keyboard_$1)" KEYMAP="$$(board_keymap_$1)" REQUIRE_PLATFORM_KEY= COLOR=true SILENT=false QMK_USERSPACE=$(QMK_USERSPACE) ; \
+			[ -z "$$(NO_COMPILEDB)" ] \
+				&& qmk compile --compiledb -kb $$(board_keyboard_stripped_$1) -km $$(board_keymap_$1) \
+				|| qmk compile -kb $$(board_keyboard_stripped_$1) -km $$(board_keymap_$1); \
 		}
 	@[ -e "$$(QMK_USERSPACE)/qmk_firmware/compile_commands.json" ] && cp $$(QMK_USERSPACE)/qmk_firmware/compile_commands.json $$(QMK_USERSPACE) \
 		|| true
@@ -202,20 +203,20 @@ bin_$$(board_name_$1): link_$$(link_target_$1)
 
 links: link_$$(link_target_$1)
 link_$$(link_target_$1): qmk_firmware
-	@if [ ! -L "$(QMK_USERSPACE)/qmk_firmware/keyboards/$$(link_target_$1)" ] ; then \
+	@if [ ! -L "$(QMK_USERSPACE)/qmk_firmware/$$(link_target_$1)" ] ; then \
 		$(ECHO) -e "\e[38;5;14mSymlinking: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
-		ln -sf $(QMK_USERSPACE)/$$(link_source_$1) $(QMK_USERSPACE)/qmk_firmware/keyboards/$$(link_target_$1) ; \
-		if [ -z "$$(grep -P '^keyboards/$$(link_target_$1)$$$$' $(QMK_USERSPACE)/qmk_firmware/.git/info/exclude 2>/dev/null)" ] ; then \
-			$(ECHO) keyboards/$$(link_target_$1) >> $(QMK_USERSPACE)/qmk_firmware/.git/info/exclude ; \
+		ln -sf $(QMK_USERSPACE)/$$(link_source_$1) $(QMK_USERSPACE)/qmk_firmware/$$(link_target_$1) ; \
+		if [ -z "$$(grep -P '^$$(link_target_$1)$$$$' $(QMK_USERSPACE)/qmk_firmware/.git/info/exclude 2>/dev/null)" ] ; then \
+			$(ECHO) $$(link_target_$1) >> $(QMK_USERSPACE)/qmk_firmware/.git/info/exclude ; \
 		fi ; \
 	fi
 
 unlinks: unlink_$$(link_target_$1)
 unlink_$$(link_target_$1): qmk_firmware
-	@if [ -L "$(QMK_USERSPACE)/qmk_firmware/keyboards/$$(link_target_$1)" ] ; then \
+	@if [ -L "$(QMK_USERSPACE)/qmk_firmware/$$(link_target_$1)" ] ; then \
 		$(ECHO) -e "\e[38;5;14mRemoving symlink: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
-		rm $(QMK_USERSPACE)/qmk_firmware/keyboards/$$(link_target_$1) || true; \
-		$(SED) -i "\@^keyboards/$$(link_target_$1)@d" $(QMK_USERSPACE)/qmk_firmware/.git/info/exclude; \
+		rm $(QMK_USERSPACE)/qmk_firmware/$$(link_target_$1) || true; \
+		$(SED) -i "\@^$$(link_target_$1)@d" $(QMK_USERSPACE)/qmk_firmware/.git/info/exclude; \
 	fi
 
 clean: unlink_$$(link_target_$1)
