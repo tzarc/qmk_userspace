@@ -97,6 +97,12 @@ generated-files: rgb_effects
 rgb_effects:
 	@"$(QMK_USERSPACE)/bin/generate_rgb_effects.py" > "$(QMK_USERSPACE)/users/tzarc/enable_all_rgb_effects.h"
 
+format:
+	@git ls-files | grep -E '\.(c|h|cpp|hpp|cxx|hxx)$$' | grep -vE '\.q[gf]f\.' | grep -vE '(ch|hal|mcu)conf\.h$$' | grep -vE 'board.[ch]$$' | while read file ; do \
+		$(ECHO) -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
+		clang-format -i "$$file" ; \
+	done
+
 .PHONY: links link-hooks
 
 links: link-hooks
