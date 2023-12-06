@@ -3,7 +3,6 @@
 #include QMK_KEYBOARD_H
 #include "theme_djinn_default.h"
 #include "tzarc.h"
-#include "calib.h"
 #include "qp.h"
 // #include "qp_rgb565_surface.h"
 // #include "qp_lvgl.h"

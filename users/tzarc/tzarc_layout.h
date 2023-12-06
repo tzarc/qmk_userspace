@@ -72,8 +72,10 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 #define KC_SFT_ENT MT(MOD_RSFT, KC_ENT) // KC_SFTENT doesn't seem to abide by tapping term timing?
 
 // Layer taps
-#define KC_RGUI_LOWER LT(LAYER_LOWER, KC_RGUI)
-#define KC_APP_RAISE LT(LAYER_RAISE, KC_APP)
+#define KC_UP_RSFT MT(MOD_RSFT, KC_UP)
+#define KC_LEFT_LOWER LT(LAYER_LOWER, KC_LEFT)
+#define KC_DOWN_RAISE LT(LAYER_RAISE, KC_DOWN)
+#define KC_RIGHT_RCTL MT(MOD_RCTL, KC_RIGHT)
 
 // clang-format off
 
@@ -285,11 +287,11 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 //                                               └─────────────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴─────────────┴─────────────┴──────────────────────────┘
 //                                               ┌────────────────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬──────────────────────────────────────┐
 //                                               | LShift                 | Z          | X          | C          | V          | B          | N          | M          | ,          | .          | /          | RShift                               |
-#define ____________TZARC_BASE_R5_ALPHA__________ KC_LSFT,                 KC_Z,        KC_X,        KC_C,        KC_V,        KC_B,        KC_N,        KC_M,        KC_COMM,     KC_DOT,      KC_SLSH,     KC_RSFT
+#define ____________TZARC_BASE_R5_ALPHA__________ KC_LSFT,                 KC_Z,        KC_X,        KC_C,        KC_V,        KC_B,        KC_N,        KC_M,        KC_COMM,     KC_DOT,      KC_SLSH,     KC_UP_RSFT
 //                                               └────────────────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴──────────────────────────────────────┘
 //                                               ┌──────────────┬──────────────┬──────────────┬────────────────────────────────────────────────────────────────────────────────────────┬──────────────┬──────────────┬──────────────┬──────────────┐
 //                                               | LCtrl        | LGui         | LAlt         | Space                                                                                  | RAlt         | RGui         | AppMenu      | RCtrl        |
-#define ____________TZARC_BASE_R6_ALPHA__________ KC_LCTL,       KC_LGUI,       KC_LALT,       KC_SPC,                                                                                  KC_LALT,       KC_RGUI_LOWER, KC_APP_RAISE,  KC_RCTL
+#define ____________TZARC_BASE_R6_ALPHA__________ KC_LCTL,       KC_LGUI,       KC_LALT,       KC_SPC,                                                                                  KC_LALT,       KC_LEFT_LOWER, KC_DOWN_RAISE, KC_RIGHT_RCTL
 //                                               └──────────────┴──────────────┴──────────────┴────────────────────────────────────────────────────────────────────────────────────────┴──────────────┴──────────────┴──────────────┴──────────────┘
 
 // Base, but grave-escape:
