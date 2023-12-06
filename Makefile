@@ -45,6 +45,14 @@ qmk_firmware: $(QMK_USERSPACE)/qmk_firmware
 qmk_userspace: $(QMK_USERSPACE)/qmk_userspace
 qmk-dot-github: $(QMK_USERSPACE)/qmk-dot-github
 
+.PHONY: shrink
+shrink: repositories
+	@git -C $(QMK_USERSPACE) shrink
+	@git -C $(QMK_USERSPACE)/qmk_firmware shrink
+	@git -C $(QMK_USERSPACE)/qmk_userspace shrink
+	@git -C $(QMK_USERSPACE)/qmk-dot-github shrink
+
+
 .PHONY: repositories
 repositories: qmk_firmware qmk_userspace qmk-dot-github
 

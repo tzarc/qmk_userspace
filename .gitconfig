@@ -1,0 +1,14 @@
+# These would go into `.git/config` or your user-local `$HOME/.gitconfig`.
+[alias]
+    # Use ssh key signing for commits
+	sshsign = "!git config gpg.format ssh; git config commit.gpgsign true; git config user.signingkey \"$HOME/.ssh/id_ed25519.pub\""
+    # Per-repo shrink
+	shrinkthis = "!echo @@@@@@@@@@@@@@@@@@@@@@@@ Shrinking $(git rev-parse --show-toplevel) @@@@@@@@@@@@@@@@@@@@@@@@; git gc --aggressive; git repack -A -d --depth=250 --window=250 -f; git prune"
+    # This repo and all submodule shrink
+	shrink = "!git shrinkthis; git submodule foreach --recursive git shrinkthis"
+    # QMK Firmware PR: swap to master, apply PR without committing
+	qmpr = !"__qmpr() { git checkout master && git pull --ff-only && hub merge --no-commit --squash https://github.com/qmk/qmk_firmware/pull/$1 && make git-submodule && git reset --soft ; }; __qmpr "
+    # QMK Firmware PR: swap to develop, apply PR without committing
+	qdpr = !"__qdpr() { git checkout develop && git pull --ff-only && hub merge --no-commit --squash https://github.com/qmk/qmk_firmware/pull/$1 && make git-submodule && git reset --soft ; }; __qdpr "
+    # QMK Firmware PR: checkout PR branch directly
+	qcpr = !"__qcpr() { hub checkout https://github.com/qmk/qmk_firmware/pull/$1 && make git-submodule ; }; __qcpr "
