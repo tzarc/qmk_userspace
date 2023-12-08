@@ -30,3 +30,4 @@ alternates/qp_test/graphics/*.png
 .vscode/ipch
 compile_commands.json
 sha1_verification
+linkermap.html

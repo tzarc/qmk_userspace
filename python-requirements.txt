@@ -2,6 +2,7 @@ qmk
 -r qmk_firmware/requirements.txt
 -r qmk_firmware/requirements-dev.txt
 
+bokeh>=2.0,<3.0
 compiledb
 ghapi
 mpire
@@ -10,4 +11,5 @@ pyelftools
 python-sqlite-cache
 redis
 rq
+squarify>=0.4.3,<1.0
 yappi
