@@ -2,6 +2,7 @@
 # Copyright 2018-2023 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+import datetime
 import os
 import re
 from pathlib import Path
@@ -25,8 +26,10 @@ for f in rgblight_files:
         rgblight_list.append(f'#    define {m.group(1)}')
 rgblight_list = '\n'.join(sorted(set(rgblight_list)))
 
+this_year = datetime.date.today().year
+
 print(f"""\
-// Copyright 2018-2023 Nick Brassel (@tzarc)
+// Copyright 2018-{this_year} Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
