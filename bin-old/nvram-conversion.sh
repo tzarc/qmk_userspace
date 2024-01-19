@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2018-2023 Nick Brassel (@tzarc)
+# Copyright 2018-2024 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 umask 022
@@ -86,7 +86,7 @@ do_stuff() {
     #sed -i '5,24d' platforms/eeprom.h
 
     cat <<__EOF__ >>platforms/nvram.h
-// Copyright 2018-2023 Nick Brassel (@tzarc)
+// Copyright 2018-2024 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
@@ -107,7 +107,7 @@ void nvram_write_u32(uint32_t addr, uint32_t value);
 __EOF__
 
     cat <<__EOF__ >>platforms/nvram.c
-// Copyright 2018-2023 Nick Brassel (@tzarc)
+// Copyright 2018-2024 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "eeprom.h"

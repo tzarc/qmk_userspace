@@ -1,4 +1,4 @@
-# Copyright 2018-2023 Nick Brassel (@tzarc)
+# Copyright 2018-2024 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
 ENCODER_MAP_ENABLE = yes
 MOUSEKEY_ENABLE = yes

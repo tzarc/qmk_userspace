@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2018-2023 Nick Brassel (@tzarc)
+# Copyright 2018-2024 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import datetime
