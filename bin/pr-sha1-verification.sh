@@ -7,9 +7,10 @@ umask 022
 set -eEuo pipefail
 this_script="$(realpath "${BASH_SOURCE[0]}")"
 script_dir="$(realpath "$(dirname "$this_script")")"
+userspace_dir="$(realpath "$script_dir/..")"
 
 # Ensure we have access to the qmk venv if it exists
-venv_activate_path=$(find $script_dir -path '*/.direnv/python*/bin/*' -name activate | head -n1)
+venv_activate_path=$(find $userspace_dir -path '*/.direnv/python*/bin/*' -name activate | head -n1)
 if [[ ! -z "${venv_activate_path:-}" ]]; then
     echo "Activating environment: $venv_activate_path"
     source "$venv_activate_path"
@@ -76,7 +77,7 @@ fi
 build_dir=$(mktemp -d -p "$HOME/.local/" -t qmk.XXX)
 # Set up the build directory
 cleanup() {
-    cd "$script_dir"
+    cd "$userspace_dir"
     if [[ -z "${FIRST_INIT:-}" ]]; then
         if [[ -d "$build_dir" ]]; then
             echo "Entering shell so that extra investigation can occur..."
@@ -153,7 +154,7 @@ main() {
     export pr_dir="$build_dir/qmk_pr"
 
     # Clone the base repo
-    pcmd rsync -qaP --exclude='.build' "$script_dir/qmk_firmware/" "$base_dir/"
+    pcmd rsync -qaP --exclude='.build' "$userspace_dir/qmk_firmware/" "$base_dir/"
     cd "$base_dir"
     pcmd make distclean
     pcmd rm .git/hooks/*
