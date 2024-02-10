@@ -203,6 +203,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t reset_key_timer  = 0;
     static uint32_t eeprst_key_timer = 0;
 
+    bool is_shifted = (get_mods() | get_oneshot_mods()) & MOD_MASK_SHIFT;
+    dprintf("Keycode: %s, pressed: %s, shifted: %s\n", key_name(keycode, is_shifted), record->event.pressed ? "true" : "false", is_shifted ? "true" : "false");
+
 #ifdef KONAMI_CODE_ENABLE
     if (!process_record_konami_code(keycode, record)) {
         return false;

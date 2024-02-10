@@ -1,10 +1,11 @@
 // Copyright 2018-2024 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include <quantum.h>
-#include "util.h"
+#include "keycodes.h"
+#include "quantum_keycodes.h"
 
 #ifndef __AVR__
-static const char* const keycode_display_map[][2] = {
+static const char *const keycode_display_map[][2] = {
     [KC_A]         = {"a", "A"},
     [KC_B]         = {"b", "B"},
     [KC_C]         = {"c", "C"},
@@ -89,20 +90,79 @@ static const char* const keycode_display_map[][2] = {
 #    endif // defined(QUANTUM_PAINTER)
 };
 
-const char* key_name(uint16_t keycode, bool shifted) {
+const char *key_name_hid(uint16_t keycode, bool shifted) {
 #    ifndef QUANTUM_PAINTER_ENABLE
     if (keycode > KC_EQUAL) {
-        return "Unk";
+        return "Unknown";
     }
 #    else
     if (keycode > KC_NUM_LOCK) {
-        return "Unk";
+        return "Unknown";
     }
 #    endif
     return keycode_display_map[keycode][shifted ? 1 : 0];
 }
-#else
-const char* key_name(uint16_t keycode, bool shifted) {
-    return "Unknown";
+#else  // __AVR__
+const char *key_name_hid(uint16_t keycode, bool shifted) {
+    static char buffer[16];
+    const char *f = get_numeric_str(buffer, sizeof(buffer), keycode, ' ');
+    while (*f == ' ')
+        ++f;
+    return f;
 }
 #endif // __AVR__
+
+void fill_one_param_name(char *buffer, const char *name, const char *param1, size_t buffer_length) {
+    memset(buffer, 0, buffer_length);
+    strlcpy(buffer, name, buffer_length);
+    strlcat(buffer, "(", buffer_length);
+    strlcat(buffer, param1, buffer_length);
+    strlcat(buffer, ")", buffer_length);
+}
+
+void fill_two_param_name(char *buffer, const char *name, const char *param1, const char *param2, size_t buffer_length) {
+    memset(buffer, 0, buffer_length);
+    strlcpy(buffer, name, buffer_length);
+    strlcat(buffer, "(", buffer_length);
+    strlcat(buffer, param1, buffer_length);
+    strlcat(buffer, ",", buffer_length);
+    strlcat(buffer, param2, buffer_length);
+    strlcat(buffer, ")", buffer_length);
+}
+
+const char *key_name(uint16_t keycode, bool shifted) {
+    static char buffer[16];
+    char buf1[16];
+    char buf2[16];
+    (void)buf1;
+    (void)buf2;
+    switch (keycode) {
+        case KC_A ... KC_NUM_LOCK: {
+            const char *name = key_name_hid(keycode, shifted);
+            if (!name) return "Unknown";
+            return name;
+        }
+        case QK_MOMENTARY ... QK_MOMENTARY_MAX: {
+            const char *n = get_numeric_str(buf1, sizeof(buf1), QK_MOMENTARY_GET_LAYER(keycode), ' ');
+            while (*n == ' ')
+                ++n;
+            fill_one_param_name(buffer, "MO", n, sizeof(buffer));
+            return buffer;
+        }
+        case QK_MOD_TAP ... QK_MOD_TAP_MAX: {
+            const char *n = get_numeric_str(buf1, sizeof(buf1), QK_MOD_TAP_GET_MODS(keycode), ' ');
+            while (*n == ' ')
+                ++n;
+            fill_two_param_name(buffer, "MT", n, key_name_hid(QK_MOD_TAP_GET_TAP_KEYCODE(keycode), shifted), sizeof(buffer));
+            return buffer;
+        }
+        case QK_LAYER_TAP ... QK_LAYER_TAP_MAX: {
+            const char *n = get_numeric_str(buf1, sizeof(buf1), QK_LAYER_TAP_GET_LAYER(keycode), ' ');
+            while (*n == ' ')
+                ++n;
+            fill_two_param_name(buffer, "LT", n, key_name_hid(QK_LAYER_TAP_GET_TAP_KEYCODE(keycode), shifted), sizeof(buffer));
+            return buffer;
+        }
+    }
+    return "Unknown";
+}

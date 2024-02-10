@@ -473,7 +473,7 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 ////////////////////////////////////////////////////////////////////////////////
 // Layer A
 //                                                      ┌─────────────┬─────────────┬─────────────┬─────────────┐
-#define ____________TZARC_4x4_MACROPAD_A_R1_____________ KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS
+#define ____________TZARC_4x4_MACROPAD_A_R1_____________ KC_TRNS,      LT(2,KC_A),   KC_TRNS,      KC_TRNS
 //                                                      ├─────────────┼─────────────┼─────────────┼─────────────┤
 #define ____________TZARC_4x4_MACROPAD_A_R2_____________ KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS
 //                                                      ├─────────────┼─────────────┼─────────────┼─────────────┤
