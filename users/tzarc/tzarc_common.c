@@ -175,8 +175,8 @@ static bool process_record_konami_code(uint16_t keycode, keyrecord_t *record) {
             case KC_B:
             case KC_A:
             case KC_ENTER:
-                dprintf("Key released: %s\n", key_name(keycode, false));
                 if (keycode == pgm_read_word(&konami_code[konami_index])) {
+                    dprintf("Konami code: key released: %s\n", key_name(keycode, false));
                     konami_index++;
                     if (konami_index == ARRAY_SIZE(konami_code)) {
                         konami_index = 0;
@@ -194,58 +194,6 @@ static bool process_record_konami_code(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 #endif // KONAMI_CODE_ENABLE
-
-static void win11_grid_relocation(uint16_t keycode1, uint16_t keycode2) {
-    const int delay = 25;
-    tap_code16_delay(LGUI(KC_Z), delay);
-    wait_ms(delay);
-    tap_code16_delay(keycode1, delay);
-    wait_ms(delay);
-    tap_code16_delay(keycode2, delay);
-    wait_ms(delay * 3);
-    tap_code16_delay(KC_ESCAPE, delay);
-}
-
-static bool process_record_win11_grid(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        case TZ_WIN_M:
-            if (record->event.pressed) {
-                tap_code16_delay(LGUI(KC_UP), 25);
-                break;
-            }
-        case TZ_WIN_L:
-            if (record->event.pressed) {
-                win11_grid_relocation(KC_1, KC_1);
-                break;
-            }
-        case TZ_WIN_R:
-            if (record->event.pressed) {
-                win11_grid_relocation(KC_1, KC_2);
-                break;
-            }
-        case TZ_WIN_TL:
-            if (record->event.pressed) {
-                win11_grid_relocation(KC_5, KC_1);
-                break;
-            }
-        case TZ_WIN_BL:
-            if (record->event.pressed) {
-                win11_grid_relocation(KC_5, KC_3);
-                break;
-            }
-        case TZ_WIN_TR:
-            if (record->event.pressed) {
-                win11_grid_relocation(KC_5, KC_2);
-                break;
-            }
-        case TZ_WIN_BR:
-            if (record->event.pressed) {
-                win11_grid_relocation(KC_5, KC_4);
-                break;
-            }
-    }
-    return false;
-}
 
 #ifndef GAME_MODES_ENABLE
 void diablo_automatic_stop(void) {}
@@ -287,9 +235,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             }
             return false;
-
-        case TZ_WIN_FIRST ... TZ_WIN_LAST:
-            return process_record_win11_grid(keycode, record);
     }
 
     if (config_enabled) {

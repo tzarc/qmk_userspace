@@ -11,6 +11,29 @@
   "version": "0.2.0",
   "configurations": [
     {
+        "name": "Python: qmk compile -kb dz60 -km bcat -e FORCE_LAYOUT=60_tsangan_hhkb",
+        "type": "python",
+        "justMyCode": false,
+        "cwd": "${workspaceRoot}/bcat-qmk_userspace",
+        "request": "launch",
+        "args": [
+          "compile",
+          "-kb",
+          "dz60",
+          "-km",
+          "bcat",
+          "-e",
+          "FORCE_LAYOUT=60_tsangan_hhkb"
+        ],
+        "console": "integratedTerminal",
+        "linux": {
+          "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+          "env": {
+            "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+          }
+        },
+      },
+      {
       "name": "Python: convert *.so to *.qke",
       "type": "python",
       "justMyCode": true,

@@ -37,16 +37,6 @@ enum {
     TZ_ENC2R,
     TZ_ENC_LAST = TZ_ENC2R,
 
-    TZ_WIN_FIRST,
-    TZ_WIN_M = TZ_WIN_FIRST, // Maximise
-    TZ_WIN_L,                // Left side of screen
-    TZ_WIN_R,                // Right side of screen
-    TZ_WIN_TL,               // Top left corner of screen
-    TZ_WIN_TR,               // Top right corner of screen
-    TZ_WIN_BL,               // Bottom left corner of screen
-    TZ_WIN_BR,               // Bottom right corner of screen
-    TZ_WIN_LAST = TZ_WIN_BR,
-
     KEYMAP_SAFE_RANGE
 };
 enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
@@ -485,11 +475,11 @@ enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
 //                                                      ┌─────────────┬─────────────┬─────────────┬─────────────┐
 #define ____________TZARC_4x4_MACROPAD_A_R1_____________ KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS
 //                                                      ├─────────────┼─────────────┼─────────────┼─────────────┤
-#define ____________TZARC_4x4_MACROPAD_A_R2_____________ KC_TRNS,      TZ_WIN_TL,    KC_TRNS,      TZ_WIN_TR
+#define ____________TZARC_4x4_MACROPAD_A_R2_____________ KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS
 //                                                      ├─────────────┼─────────────┼─────────────┼─────────────┤
-#define ____________TZARC_4x4_MACROPAD_A_R3_____________ KC_TRNS,      TZ_WIN_L,     TZ_WIN_M,     TZ_WIN_R
+#define ____________TZARC_4x4_MACROPAD_A_R3_____________ KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS
 //                                                      ├─────────────┼─────────────┼─────────────┼─────────────┤
-#define ____________TZARC_4x4_MACROPAD_A_R4_____________ KC_TRNS,      TZ_WIN_BL,    KC_TRNS,      TZ_WIN_BR
+#define ____________TZARC_4x4_MACROPAD_A_R4_____________ KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS
 //                                                      └─────────────┴─────────────┴─────────────┴─────────────┘
 
 ////////////////////////////////////////////////////////////////////////////////
