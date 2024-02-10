@@ -11,12 +11,6 @@
 // Unicode modes available for use
 #define UNICODE_SELECTED_MODES UNICODE_MODE_MACOS, UNICODE_MODE_LINUX, UNICODE_MODE_WINCOMPOSE
 
-// Handle per-key tapping timing
-#ifdef TAPPING_TERM
-#    undef TAPPING_TERM
-#endif // TAPPING_TERM
-#define TAPPING_TERM 120
-
 // Pre-define the amount of space to use for userspace EEPROM
 #define EECONFIG_USER_DATA_SIZE 32
 #define EECONFIG_USER_DATA_VERSION ((uint32_t)__TIME__[0] + (uint32_t)__TIME__[1] + (uint32_t)__TIME__[3] + (uint32_t)__TIME__[4] + (uint32_t)__TIME__[6] + (uint32_t)__TIME__[7]) // HH:MM::SS
