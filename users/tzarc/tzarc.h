@@ -58,6 +58,7 @@ uint8_t     prng8(void);
 uint16_t    prng16(void);
 uint32_t    prng32(void);
 const char *key_name(uint16_t keycode, bool shifted);
+const char *layer_name(uint8_t layer);
 
 bool process_record_keymap(uint16_t keycode, keyrecord_t *record);
 bool process_record_user(uint16_t keycode, keyrecord_t *record);

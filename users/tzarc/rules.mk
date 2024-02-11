@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 SRC += \
 	tzarc_common.c \
-	tzarc_keynames.c \
+	tzarc_names.c \
 	tzarc_eeprom.c \
 	tzarc_unicode.c \
 	tzarc_screen.c

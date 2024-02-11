@@ -1,8 +1,10 @@
 // Copyright 2018-2024 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
+#include <ctype.h>
 #include <quantum.h>
 #include "keycodes.h"
 #include "quantum_keycodes.h"
+#include "tzarc_layout.h"
 
 #ifndef __AVR__
 static const char *const keycode_display_map[][2] = {
@@ -90,7 +92,7 @@ static const char *const keycode_display_map[][2] = {
 #    endif // defined(QUANTUM_PAINTER)
 };
 
-const char *key_name_hid(uint16_t keycode, bool shifted) {
+static const char *key_name_hid(uint16_t keycode, bool shifted) {
 #    ifndef QUANTUM_PAINTER_ENABLE
     if (keycode > KC_EQUAL) {
         return "Unknown";
@@ -103,7 +105,7 @@ const char *key_name_hid(uint16_t keycode, bool shifted) {
     return keycode_display_map[keycode][shifted ? 1 : 0];
 }
 #else  // __AVR__
-const char *key_name_hid(uint16_t keycode, bool shifted) {
+static const char *key_name_hid(uint16_t keycode, bool shifted) {
     static char buffer[16];
     const char *f = get_numeric_str(buffer, sizeof(buffer), keycode, ' ');
     while (*f == ' ')
@@ -112,7 +114,7 @@ const char *key_name_hid(uint16_t keycode, bool shifted) {
 }
 #endif // __AVR__
 
-void fill_one_param_name(char *buffer, const char *name, const char *param1, size_t buffer_length) {
+static void fill_one_param_name(char *buffer, const char *name, const char *param1, size_t buffer_length) {
     memset(buffer, 0, buffer_length);
     strlcpy(buffer, name, buffer_length);
     strlcat(buffer, "(", buffer_length);
@@ -120,7 +122,7 @@ void fill_one_param_name(char *buffer, const char *name, const char *param1, siz
     strlcat(buffer, ")", buffer_length);
 }
 
-void fill_two_param_name(char *buffer, const char *name, const char *param1, const char *param2, size_t buffer_length) {
+static void fill_two_param_name(char *buffer, const char *name, const char *param1, const char *param2, size_t buffer_length) {
     memset(buffer, 0, buffer_length);
     strlcpy(buffer, name, buffer_length);
     strlcat(buffer, "(", buffer_length);
@@ -130,10 +132,39 @@ void fill_two_param_name(char *buffer, const char *name, const char *param1, con
     strlcat(buffer, ")", buffer_length);
 }
 
+const char *layer_name(uint8_t layer) {
+    static char buffer[16];
+    switch (layer) {
+#define LAYER_SWITCH_CASE(n)                    \
+    case n: {                                   \
+        strlcpy(buffer, #n, sizeof(buffer));    \
+        if (memcmp(buffer, "LAYER_", 6) == 0) { \
+            int len   = strlen(buffer);         \
+            buffer[6] = toupper(buffer[6]);     \
+            for (int i = 7; i < len; i++) {     \
+                buffer[i] = tolower(buffer[i]); \
+            }                                   \
+            return &buffer[6];                  \
+        }                                       \
+        return buffer;                          \
+    }
+
+        FOREACH_CUSTOM_LAYER(LAYER_SWITCH_CASE)
+
+        default:
+            break;
+    }
+
+    const char *n = get_numeric_str(buffer, sizeof(buffer), layer, ' ');
+    while (*n == ' ')
+        ++n;
+    return n;
+}
+
 const char *key_name(uint16_t keycode, bool shifted) {
     static char buffer[16];
-    char buf1[16];
-    char buf2[16];
+    char        buf1[16];
+    char        buf2[16];
     (void)buf1;
     (void)buf2;
     switch (keycode) {
@@ -157,10 +188,7 @@ const char *key_name(uint16_t keycode, bool shifted) {
             return buffer;
         }
         case QK_LAYER_TAP ... QK_LAYER_TAP_MAX: {
-            const char *n = get_numeric_str(buf1, sizeof(buf1), QK_LAYER_TAP_GET_LAYER(keycode), ' ');
-            while (*n == ' ')
-                ++n;
-            fill_two_param_name(buffer, "LT", n, key_name_hid(QK_LAYER_TAP_GET_TAP_KEYCODE(keycode), shifted), sizeof(buffer));
+            fill_two_param_name(buffer, "LT", layer_name(QK_LAYER_TAP_GET_LAYER(keycode)), key_name_hid(QK_LAYER_TAP_GET_TAP_KEYCODE(keycode), shifted), sizeof(buffer));
             return buffer;
         }
     }

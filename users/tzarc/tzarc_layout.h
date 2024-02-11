@@ -24,22 +24,30 @@
 #    define BT_USB KC_NO
 #endif
 
-enum {
-    CHANGEMODE = QK_USER_0, // from normal QMK
-    TIME_RESET,
-    TIME_EEPRST,
-    TZ_ENC_FIRST,
-    TZ_ENC1P = TZ_ENC_FIRST,
-    TZ_ENC1L,
-    TZ_ENC1R,
-    TZ_ENC2P,
-    TZ_ENC2L,
-    TZ_ENC2R,
-    TZ_ENC_LAST = TZ_ENC2R,
+#define FOREACH_CUSTOM_KEYCODE(X) \
+    X(CHANGEMODE, = QK_USER_0)    \
+    X(TIME_RESET, /**/)           \
+    X(TIME_EEPRST, /**/)          \
+    X(TZ_ENC_FIRST, /**/)         \
+    X(TZ_ENC1P, = TZ_ENC_FIRST)   \
+    X(TZ_ENC1L, /**/)             \
+    X(TZ_ENC1R, /**/)             \
+    X(TZ_ENC2P, /**/)             \
+    X(TZ_ENC2L, /**/)             \
+    X(TZ_ENC2R, /**/)             \
+    X(TZ_ENC_LAST, = TZ_ENC2R)
+#define KEYCODE_ENUM(kc, val) kc val,
 
-    KEYMAP_SAFE_RANGE
-};
-enum { LAYER_BASE, LAYER_LOWER, LAYER_RAISE, LAYER_ADJUST };
+enum { FOREACH_CUSTOM_KEYCODE(KEYCODE_ENUM) KEYMAP_SAFE_RANGE };
+
+#define FOREACH_CUSTOM_LAYER(X) \
+    X(LAYER_BASE)               \
+    X(LAYER_LOWER)              \
+    X(LAYER_RAISE)              \
+    X(LAYER_ADJUST)
+#define LAYER_ENUM(layer) layer,
+
+enum { FOREACH_CUSTOM_LAYER(LAYER_ENUM) };
 
 // Layers
 #define KC_LOWER MO(LAYER_LOWER)
