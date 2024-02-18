@@ -26,18 +26,44 @@ OBJDUMP = arm-none-eabi-objdump
 SIZE = arm-none-eabi-size
 
 # STM32F405RG
-QMK_COMPILE_FLAGS := -mcpu=cortex-m4 -mthumb -mno-thumb-interwork -mno-unaligned-access -mfloat-abi=hard -mfpu=fpv4-sp-d16 -fsingle-precision-constant \
-	-mword-relocations -fomit-frame-pointer -ffunction-sections -fdata-sections -fno-builtin -fno-common -fshort-wchar -ggdb -flto -Os \
-	-Wall -Wstrict-prototypes -Werror -fcommon -fstack-usage #-mno-pic-data-is-text-relative #-msingle-pic-base
+QMK_COMPILE_FLAGS := \
+	-mcpu=cortex-m4 \
+	-mthumb \
+	-mno-thumb-interwork \
+	-mno-unaligned-access \
+	-mword-relocations \
+	-fomit-frame-pointer \
+	-ffunction-sections \
+	-fdata-sections \
+	-fno-builtin \
+	-fno-common \
+	-fshort-wchar \
+	-flto \
+	-Wall \
+	-Wstrict-prototypes \
+	-Werror \
+	-fstack-usage \
+	#-mfloat-abi=hard -mfpu=fpv4-sp-d16 -fsingle-precision-constant \
+	#-mno-pic-data-is-text-relative \
+	#-msingle-pic-base
 
-OPT_FLAGS = -g -O3
+OPT_FLAGS = -g -Os
 CFLAGS_BASE ?= $(OPT_FLAGS) -fPIE -fPIC -fpic -fpie
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
 LDFLAGS ?= $(OPT_FLAGS) \
-	-Bsymbolic -shared -nostdlib -nostartfiles -nodefaultlibs -mlong-calls -fno-common \
-	-Wl,-Map=${TARGET_LIB}.map -Wl,--print-memory-usage -Wl,--gc-sections \
-	--specs=nosys.specs -nostdlib -Wl,--undefined=main -Wl,--emit-relocs \
+	-Bsymbolic \
+	-shared \
+	-nostdlib \
+	-nostartfiles \
+	-nodefaultlibs \
+	-mlong-calls \
+	-Wl,-Map=${TARGET_LIB}.map \
+	-Wl,--print-memory-usage \
+	-Wl,--gc-sections \
+	--specs=nano.specs \
+	-Wl,--undefined=main \
+	-Wl,--emit-relocs \
 	$(QMK_COMPILE_FLAGS) \
 	-T src/lib.ld
 CFLAGS ?= -std=c11 $(CFLAGS_BASE) $(LDFLAGS) $(QMK_COMPILE_FLAGS)
@@ -68,6 +94,7 @@ info: convert
 	file ${TARGET_LIB}
 	stat ${TARGET_LIB}
 	stat ${TARGET_LIB}.qke
+	sha256sum ${TARGET_LIB}.qke
 
 compile_commands.json: Makefile
 	@compiledb make -n all >/dev/null

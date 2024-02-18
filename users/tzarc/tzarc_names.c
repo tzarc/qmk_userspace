@@ -3,8 +3,10 @@
 #include <ctype.h>
 #include <quantum.h>
 #include "keycodes.h"
+#include "modifiers.h"
 #include "quantum_keycodes.h"
 #include "tzarc_layout.h"
+#include "util.h"
 
 #ifndef __AVR__
 static const char *const keycode_display_map[][2] = {
@@ -132,22 +134,26 @@ static void fill_two_param_name(char *buffer, const char *name, const char *para
     strlcat(buffer, ")", buffer_length);
 }
 
+static const char *layer_name_pretty(const char *input) {
+    static char buffer[16];
+    strlcpy(buffer, input, sizeof(buffer));
+    if (memcmp(buffer, "LAYER_", 6) == 0) {
+        int len   = strlen(buffer);
+        buffer[6] = toupper(buffer[6]);
+        for (int i = 7; i < len; i++) {
+            buffer[i] = tolower(buffer[i]);
+        }
+        return &buffer[6];
+    }
+    return buffer;
+}
+
 const char *layer_name(uint8_t layer) {
     static char buffer[16];
     switch (layer) {
-#define LAYER_SWITCH_CASE(n)                    \
-    case n: {                                   \
-        strlcpy(buffer, #n, sizeof(buffer));    \
-        if (memcmp(buffer, "LAYER_", 6) == 0) { \
-            int len   = strlen(buffer);         \
-            buffer[6] = toupper(buffer[6]);     \
-            for (int i = 7; i < len; i++) {     \
-                buffer[i] = tolower(buffer[i]); \
-            }                                   \
-            return &buffer[6];                  \
-        }                                       \
-        return buffer;                          \
-    }
+#define LAYER_SWITCH_CASE(n) \
+    case n:                  \
+        return layer_name_pretty(#n);
 
         FOREACH_CUSTOM_LAYER(LAYER_SWITCH_CASE)
 
@@ -161,8 +167,25 @@ const char *layer_name(uint8_t layer) {
     return n;
 }
 
-const char *key_name(uint16_t keycode, bool shifted) {
+const char *mod_name(uint16_t mod) {
     static char buffer[16];
+    static struct {
+        uint8_t mod;
+        uint8_t index;
+    } mods[] = {
+        {MOD_LSFT, 1}, {MOD_RSFT, 6}, {MOD_LCTL, 2}, {MOD_RCTL, 7}, {MOD_LALT, 3}, {MOD_RALT, 8}, {MOD_LGUI, 4}, {MOD_RGUI, 9},
+    };
+    strlcpy(buffer, "LscagRscag", sizeof(buffer));
+    for (int i = 0; i < ARRAY_SIZE(mods); ++i) {
+        if ((mod & mods[i].mod) == mods[i].mod) {
+            buffer[mods[i].index] = toupper(buffer[mods[i].index]);
+        }
+    }
+    return buffer;
+}
+
+const char *key_name(uint16_t keycode, bool shifted) {
+    static char buffer[32];
     char        buf1[16];
     char        buf2[16];
     (void)buf1;
@@ -181,10 +204,7 @@ const char *key_name(uint16_t keycode, bool shifted) {
             return buffer;
         }
         case QK_MOD_TAP ... QK_MOD_TAP_MAX: {
-            const char *n = get_numeric_str(buf1, sizeof(buf1), QK_MOD_TAP_GET_MODS(keycode), ' ');
-            while (*n == ' ')
-                ++n;
-            fill_two_param_name(buffer, "MT", n, key_name_hid(QK_MOD_TAP_GET_TAP_KEYCODE(keycode), shifted), sizeof(buffer));
+            fill_two_param_name(buffer, "MT", mod_name(QK_MOD_TAP_GET_MODS(keycode)), key_name_hid(QK_MOD_TAP_GET_TAP_KEYCODE(keycode), shifted), sizeof(buffer));
             return buffer;
         }
         case QK_LAYER_TAP ... QK_LAYER_TAP_MAX: {

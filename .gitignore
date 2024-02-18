@@ -4,6 +4,7 @@
 *~
 .DS_Store
 ._*
+__pycache__
 
 # Firmware files
 *.hex

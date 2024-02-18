@@ -3,48 +3,18 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 import struct
 import argparse
+import sys
+from pathlib import Path
 
 from elftools.elf.elffile import ELFFile
 from elftools import elf
 
-
-def leb128_encode_unsigned(i: int) -> bytearray:
-    r = []
-    while True:
-        byte = i & 0x7F
-        i = i >> 7
-        if i == 0:
-            r.append(byte)
-            return bytearray(r)
-        r.append(0x80 | byte)
-
-
-def leb128_decode_unsigned(b: bytearray) -> int:
-    r = 0
-    for i, e in enumerate(b):
-        r = r + ((e & 0x7F) << (i * 7))
-    return r
-
-
-def leb128_encode_signed(i: int) -> bytearray:
-    r = []
-    while True:
-        byte = i & 0x7F
-        i = i >> 7
-        if (i == 0 and byte & 0x40 == 0) or (i == -1 and byte & 0x40 != 0):
-            r.append(byte)
-            return bytearray(r)
-        r.append(0x80 | byte)
-
-
-def leb128_decode_signed(b: bytearray) -> int:
-    r = 0
-    for i, e in enumerate(b):
-        r = r + ((e & 0x7F) << (i * 7))
-    if e & 0x40 != 0:
-        r |= -(1 << (i * 7) + 7)
-    return r
-
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+try:
+    from leb128 import leb128_encode_unsigned
+except ImportError:
+    print("Error: leb128.py not found. Please ensure leb128.py is in the same directory as this script.")
+    sys.exit(1)
 
 alignment = 8  # 64k (uint16_max) * 8 = 512k max section size
 
@@ -95,6 +65,11 @@ with open(args.elf, "rb") as f:
         libinfo_entrypoint,
     ) = struct.unpack_from("<IIIIIIIIIIIIIIIII", libinfo_data, 0)
 
+    print( '==========================================')
+    print( "Library information:")
+    print( '==========================================')
+    print( '      Field                Length')
+    print( '==========================================')
     print(f"         text: 0x{libinfo_text_start:08x}, {libinfo_text_size:4d} (0x{libinfo_text_size:04x})")
     print(f"         code: 0x{libinfo_code_start:08x}, {libinfo_code_size:4d} (0x{libinfo_code_size:04x})")
     print(f"preinit_array: 0x{libinfo_preinit_array_start:08x}, {libinfo_preinit_array_count:4d}")
