@@ -18,6 +18,7 @@ __pycache__
 /qmk_firmware
 /qmk_userspace
 /qmk-dot-github
+/qmk_cli
 
 # Don't need source images
 users-tzarc/graphics/src/*.gif

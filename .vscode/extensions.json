@@ -1,7 +1,11 @@
 {
     "recommendations": [
+        "amodio.toggle-excluded-files",
+        "EditorConfig.EditorConfig",
+        "xaver.clang-format",
         "llvm-vs-code-extensions.vscode-clangd",
-        "marus25.cortex-debug",
-        "mcu-debug.peripheral-viewer"
+        "bierner.github-markdown-preview",
+        "donjayamanne.git-extension-pack",
+        "ms-vscode-remote.remote-containers"
     ]
 }

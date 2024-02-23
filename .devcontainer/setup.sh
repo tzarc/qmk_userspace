@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright 2018-2024 Nick Brassel (@tzarc)
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 set -eEuo pipefail
 
@@ -6,6 +8,8 @@ wget https://bootstrap.pypa.io/get-pip.py
 python3 get-pip.py
 python3 -m pip install qmk
 rm get-pip.py
+
+python3 -m pip install --upgrade milc
 
 git config --global --add safe.directory /workspaces/qmk_userspace
 git submodule update --init --recursive
@@ -17,18 +21,3 @@ qmk config user.qmk_home=/workspaces/qmk_firmware
 qmk config user.overlay_dir=/workspaces/qmk_userspace
 
 qmk git-submodule
-
-cat << __EOF__ > /workspaces/qmk_userspace/devcontainer.code-workspace
-{
-    "folders": [
-        {
-            "name": "qmk_userspace",
-            "path": "/workspaces/qmk_userspace"
-        },
-        {
-            "name": "qmk_firmware",
-            "path": "/workspaces/qmk_firmware"
-        },
-    ],
-}
-__EOF__
