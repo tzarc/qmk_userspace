@@ -81,6 +81,10 @@ format-core:
 	cd $(QMK_USERSPACE)/qmk_firmware \
 		&& RUNTIME=docker ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk format-c --core-only -a && qmk format-python -a"
 
+format-tzarc-keyboards:
+	cd $(QMK_USERSPACE)/qmk_firmware \
+		&& RUNTIME=docker ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk format-c \$$(find keyboards/tzarc \( -name '*.c' -o -name '*.h' \) -and -not -name '*.qgf.*' -and -not -name '*.qff.*' -and -not -name '*conf.h' -and -not -name 'board.h')"
+
 pytest:
 	cd $(QMK_USERSPACE)/qmk_firmware \
 		&& RUNTIME=docker ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk pytest"
