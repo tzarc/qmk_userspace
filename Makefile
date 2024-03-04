@@ -177,7 +177,8 @@ LINKED_BOARD_DEFS := \
 	f072_shiftreg!keyboards/f072_shiftreg!default!alternates/f072_shiftreg \
 	l412_shiftreg!keyboards/l412_shiftreg!default!alternates/l412_shiftreg \
 	qp_test!keyboards/qp_test!default!alternates/qp_test \
-	lvgl_test!keyboards/lvgl_test!default!alternates/lvgl_test
+	lvgl_test!keyboards/lvgl_test!default!alternates/lvgl_test \
+	rp2040_split!keyboards/rp2040_split!default!alternates/rp2040_split
 
 keyboards_folder := keyboards/
 empty :=
