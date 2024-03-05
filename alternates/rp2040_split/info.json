@@ -15,7 +15,9 @@
         "console": true,
         "encoder": true,
         "extrakey": true,
-        "mousekey": true
+        "mousekey": true,
+        "os_detection": true,
+        "rgblight": true
     },
     "build": {
         "lto": true
@@ -39,6 +41,7 @@
         "transport": {
             "sync": {
                 "activity": true,
+                "detected_os": true,
                 "indicators": true,
                 "layer_state": true,
                 "matrix_state": true,
@@ -50,6 +53,28 @@
     "ws2812": {
         "pin": "GP5",
         "driver": "vendor"
+    },
+    "rgblight": {
+        "led_count": 144,
+        "split": true,
+        "sleep": true,
+        "split_count": [72, 72],
+        "animations": {
+            "alternating": true,
+            "breathing": true,
+            "christmas": true,
+            "knight": true,
+            "rainbow_mood": true,
+            "rainbow_swirl": true,
+            "rgb_test": false,
+            "snake": true,
+            "static_gradient": true,
+            "twinkle": true
+        },
+        "hue_steps": 8,
+        "saturation_steps": 8,
+        "brightness_steps": 8,
+        "max_brightness": 255
     },
     "layouts": {
         "LAYOUT_ortho_2x1": {
