@@ -20,7 +20,7 @@
         "rgblight": true
     },
     "build": {
-        // "lto": true
+        "lto": true
     },
     "diode_direction": "COL2ROW",
     "matrix_pins": {
