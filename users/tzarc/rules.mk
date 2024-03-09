@@ -7,6 +7,11 @@ SRC += \
 	tzarc_unicode.c \
 	tzarc_screen.c
 
+VPATH += \
+		$(QMK_USERSPACE)/qmk_firmware-mods \
+		$(QMK_USERSPACE)/qmk_firmware-mods/quantum \
+		$(QMK_USERSPACE)/qmk_firmware-mods/quantum/filesystem
+
 # Ensure file listings are generated
 # cat .build/obj_tzarc_djinn_rev2_tzarc/tzarc_unicode.i | sed -e 's@^#.*@@g' -e 's@^\s*//.*@@g' -e '/^\s*$/d' | clang-format
 OPT_DEFS += -save-temps=obj

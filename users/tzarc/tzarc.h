@@ -5,6 +5,7 @@
 #include <quantum.h>
 #include <stdint.h>
 #include "tzarc_layout.h"
+#include "filesystem.h"
 
 #ifndef __cplusplus
 #    define static_assert _Static_assert

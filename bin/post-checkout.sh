@@ -36,13 +36,13 @@ if [ "${1:-}" = "" -o "${1:-}" != "${2:-}" ]; then
 
         # Nuke all the git submodules that may or may not be present in different branches
         pushd "$firmware_dir" >/dev/null 2>&1 \
-            && [ -e lib/chibios-contrib/ext/mcux-sdk ] && rm -rf lib/chibios-contrib/ext/mcux-sdk \
-            && [ -e lib/littlefs ] && rm -rf lib/littlefs \
-            && [ -e lib/lua ] && rm -rf lib/lua \
-            && [ -e lib/lvgl ] && rm -rf lib/lvgl \
-            && [ -e lib/pico-sdk ] && rm -rf lib/pico-sdk \
-            && [ -e lib/riot ] && rm -rf lib/riot \
-            && [ -e lib/ugfx ] && rm -rf lib/ugfx \
+            && { [ -e lib/chibios-contrib/ext/mcux-sdk ] && rm -rf lib/chibios-contrib/ext/mcux-sdk || true ; } \
+            && { [ -e lib/littlefs ] && rm -rf lib/littlefs || true ; } \
+            && { [ -e lib/lua ] && rm -rf lib/lua || true ; } \
+            && { [ -e lib/lvgl ] && rm -rf lib/lvgl || true ; } \
+            && { [ -e lib/pico-sdk ] && rm -rf lib/pico-sdk || true ; } \
+            && { [ -e lib/riot ] && rm -rf lib/riot || true ; } \
+            && { [ -e lib/ugfx ] && rm -rf lib/ugfx || true ; } \
             && popd >/dev/null 2>&1
 
         # Reconfigure git submodules

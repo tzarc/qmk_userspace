@@ -22,10 +22,6 @@ git ls-files | grep '\(Makefile.*\|Dockerfile.*\|\.\(c\|cpp\|h\|hpp\|mk\|sh\|py\
     fi
 done
 
-git grep '\(#\|//\|::\) Copyright.*tzarc' | cut -d: -f1 | while read file ; do
-    # Limit license year changes to first 5 lines of the file
-    sed -i '1,5s%^\(#\|//\|::\) Copyright.*tzarc.*$%\1 Copyright 2018-'$(date +%Y)' Nick Brassel (@tzarc)%g' $file
-    sed -i '1,5s%^\(#\|//\|::\) SPDX-License-Identifier.*$%\1 SPDX-License-Identifier: GPL-2.0-or-later%g' $file
-done
+update_license_headers.py
 
 exit $exitcode
