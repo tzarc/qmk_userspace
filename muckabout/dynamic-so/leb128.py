@@ -4,6 +4,7 @@
 
 # Equivalent C++ code can be found here: https://llvm.org/doxygen/LEB128_8h_source.html
 
+
 def leb128_encode_unsigned(i: int) -> bytearray:
     r = []
     while True:

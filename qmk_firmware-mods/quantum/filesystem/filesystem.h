@@ -10,8 +10,8 @@ typedef int32_t  fs_offset_t;
 typedef int32_t  fs_size_t;
 #define INVALID_FILESYSTEM_FD ((fs_fd_t)0)
 
-#ifndef MAX_NUM_OPEN_FILES
-#    define MAX_NUM_OPEN_FILES 4
+#ifndef MAX_NUM_OPEN_FDS
+#    define MAX_NUM_OPEN_FDS 8
 #endif
 
 typedef enum fs_whence_t {
@@ -24,10 +24,19 @@ bool fs_init(void);
 bool fs_mount(void);
 void fs_unmount(void);
 
-bool fs_mkdir(const char *path);
-bool fs_rmdir(const char *path, bool recursive);
+typedef struct fs_dirent_t {
+    const char *name;
+    fs_size_t   size; // only relevant for files
+    bool        is_dir;
+} fs_dirent_t;
 
-fs_fd_t fs_open(const char *filename, const char *mode);
+bool         fs_mkdir(const char *path);
+bool         fs_rmdir(const char *path, bool recursive);
+fs_fd_t      fs_opendir(const char *path);
+fs_dirent_t *fs_readdir(fs_fd_t fd);
+void         fs_closedir(fs_fd_t fd);
+
+fs_fd_t fs_open(const char *filename, const char *mode); // "rwt" => read, write, truncate
 void    fs_close(fs_fd_t fd);
 bool    fs_delete(const char *filename);
 

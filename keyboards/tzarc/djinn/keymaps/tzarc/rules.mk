@@ -37,3 +37,13 @@ SRC += \
 
 #OPT = 1
 #OPT_DEFS += -g
+
+#####################
+
+FLASH_DRIVER = spi
+FILESYSTEM_DRIVER = lfs_spi_flash
+
+VPATH += \
+		$(QMK_USERSPACE)/qmk_firmware-mods \
+		$(QMK_USERSPACE)/qmk_firmware-mods/quantum \
+		$(QMK_USERSPACE)/qmk_firmware-mods/quantum/filesystem

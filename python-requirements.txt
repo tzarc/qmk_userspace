@@ -4,6 +4,7 @@ qmk
 
 bokeh>=2.0,<3.0
 compiledb
+fnvhash
 ghapi
 mpire
 profilehooks

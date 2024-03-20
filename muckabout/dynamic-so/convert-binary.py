@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 # Copyright 2018-2024 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
-import struct
 import argparse
+import binascii
+import struct
 import sys
 from pathlib import Path
 
-from elftools.elf.elffile import ELFFile
 from elftools import elf
+from elftools.elf.elffile import ELFFile
+from fnvhash import fnv1a_32
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 try:
@@ -16,24 +18,92 @@ except ImportError:
     print("Error: leb128.py not found. Please ensure leb128.py is in the same directory as this script.")
     sys.exit(1)
 
-alignment = 8  # 64k (uint16_max) * 8 = 512k max section size
+section_info = {
+    ".null1": {"id": 0, "offset": 0x00000000, "length": 0x00000000},
+    ".null2": {"id": 0, "offset": 0x10000000, "length": 0xE0000000},
+    ".text": {"id": 1, "offset": 0x04000000, "length": 0x02000000},
+    ".data": {"id": 2, "offset": 0x06000000, "length": 0x02000000},
+    ".nonresident": {"id": 3, "offset": 0x08000000, "length": 0x08000000},
+}
 
-SECTION_TEXT = 0x10000000
-SECTION_DATA = 0x20000000
-SECTION_NONRESIDENT = 0x30000000
+reloc_mapping = {
+    elf.enums.ENUM_RELOC_TYPE_ARM["R_ARM_ABS32"]: 0,
+    elf.enums.ENUM_RELOC_TYPE_ARM["R_ARM_TARGET1"]: 0,
+    elf.enums.ENUM_RELOC_TYPE_ARM["R_ARM_RELATIVE"]: 1,
+    elf.enums.ENUM_RELOC_TYPE_ARM["R_ARM_REL32"]: 2,
+}
 
-RELOC_TYPE_ABS32 = 0x01000000
-RELOC_TYPE_REL32 = 0x02000000
+reloc_short_names = {0: "ABS", 1: "REL", 2: "R32"}
 
 reloc_enum_names = {}
 for n in elf.enums.ENUM_RELOC_TYPE_ARM.keys():
-    reloc_enum_names[elf.enums.ENUM_RELOC_TYPE_ARM[n]] = n
+    reloc_enum_names[elf.enums.ENUM_RELOC_TYPE_ARM[n]] = f"{n} ({elf.enums.ENUM_RELOC_TYPE_ARM[n]})"
 
-section_reloc_mapping = {
-    ".rel.text": SECTION_TEXT,
-    ".rel.data": SECTION_DATA,
-    ".rel.nonresident": SECTION_NONRESIDENT,
-}
+reloc_section_names = [".rel.text", ".rel.data", ".rel.nonresident", ".rel.dyn"]
+
+
+class SectionAddr:
+    def __init__(self, addr: int | None = None):
+        self.addr = addr
+        self.section_name = None
+        self.section_id = 0  # i.e. null
+        self.section_base = None
+        self.section_offset = 0
+        self.abs_offset = None
+
+        if addr is not None:
+            for s_name, section in section_info.items():
+                id = section["id"]
+                offset = section["offset"]
+                length = section["length"]
+
+                if addr >= offset and addr < (offset + length):
+                    self.section_name = s_name
+                    self.section_id = id
+                    self.section_base = offset
+                    self.section_offset = addr - offset
+                    self.abs_offset = addr
+                    return
+
+    def __repr__(self) -> str:
+        if self.is_null:
+            return f"SectionAddr<None = [{binascii.hexlify(self.bytes)}]>"
+        return f"SectionAddr<{self.section_name}+0x{self.section_offset:X} = [{binascii.hexlify(self.bytes)}]>"
+
+    @property
+    def is_null(self) -> bool:
+        return self.section_id is None or self.section_id == 0
+
+    @property
+    def bytes(self) -> bytearray:
+        r = bytearray()
+        if self.addr is not None:
+            r += leb128_encode_unsigned(self.section_id)
+            if self.section_id is not None and self.section_id > 0:
+                r += leb128_encode_unsigned(self.section_offset)
+        return r
+
+
+class PackedReloc:
+    def __init__(self, type: int, offset: SectionAddr, target: SectionAddr | None = None):
+        self.type = type
+        self.offset = offset
+        self.target = target
+
+    def __repr__(self) -> str:
+        if self.target is not None:
+            return f"PackedReloc<type={self.type}({reloc_short_names[self.type]}), reloc:{self.offset}...{self.target} = [{binascii.hexlify(self.bytes)}]>"
+        return f"PackedReloc<type={self.type}({reloc_short_names[self.type]}), reloc:{self.offset} = [{binascii.hexlify(self.bytes)}]>"
+
+    @property
+    def bytes(self) -> bytearray:
+        r = bytearray()
+        r += leb128_encode_unsigned(self.type)
+        r += self.offset.bytes
+        if self.target is not None:
+            r += self.target.bytes
+        return r
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("elf", help="ELF file to convert")
@@ -65,11 +135,11 @@ with open(args.elf, "rb") as f:
         libinfo_entrypoint,
     ) = struct.unpack_from("<IIIIIIIIIIIIIIIII", libinfo_data, 0)
 
-    print( '==========================================')
-    print( "Library information:")
-    print( '==========================================')
-    print( '      Field                Length')
-    print( '==========================================')
+    print("==========================================")
+    print("Library information:")
+    print("==========================================")
+    print("      Field                Length")
+    print("==========================================")
     print(f"         text: 0x{libinfo_text_start:08x}, {libinfo_text_size:4d} (0x{libinfo_text_size:04x})")
     print(f"         code: 0x{libinfo_code_start:08x}, {libinfo_code_size:4d} (0x{libinfo_code_size:04x})")
     print(f"preinit_array: 0x{libinfo_preinit_array_start:08x}, {libinfo_preinit_array_count:4d}")
@@ -80,98 +150,93 @@ with open(args.elf, "rb") as f:
     print(f"  nonresident: 0x{libinfo_nonresident_start:08x}, {libinfo_nonresident_size:4d} (0x{libinfo_nonresident_size:04x})")
     print(f"   entrypoint: 0x{libinfo_entrypoint:08x}")
 
-    encoded_info = bytearray()
-    encoded_info += leb128_encode_unsigned(libinfo_text_start)
-    encoded_info += leb128_encode_unsigned(libinfo_text_size)
-    encoded_info += leb128_encode_unsigned(libinfo_code_start)
-    encoded_info += leb128_encode_unsigned(libinfo_code_size)
-    encoded_info += leb128_encode_unsigned(libinfo_preinit_array_start)
-    encoded_info += leb128_encode_unsigned(libinfo_preinit_array_count)
-    encoded_info += leb128_encode_unsigned(libinfo_init_array_start)
-    encoded_info += leb128_encode_unsigned(libinfo_init_array_count)
-    encoded_info += leb128_encode_unsigned(libinfo_fini_array_start)
-    encoded_info += leb128_encode_unsigned(libinfo_fini_array_count)
-    encoded_info += leb128_encode_unsigned(libinfo_data_start)
-    encoded_info += leb128_encode_unsigned(libinfo_data_size)
-    encoded_info += leb128_encode_unsigned(libinfo_bss_start)
-    encoded_info += leb128_encode_unsigned(libinfo_bss_size)
-    encoded_info += leb128_encode_unsigned(libinfo_nonresident_size)
-    encoded_info += leb128_encode_unsigned(libinfo_entrypoint)
-
-    encoded_info_size = len(encoded_info)
-
     text_section = elffile.get_section_by_name(".text")
     nonresident_section = elffile.get_section_by_name(".nonresident")
     bss_section = elffile.get_section_by_name(".bss")
 
     text_address = text_section["sh_addr"]
     text_length = text_section["sh_size"]
-    new_text_length = ((text_length + alignment - 1) // alignment) * alignment
-    print(f"       .text length: {text_length:4d} -> {new_text_length:4d}")
+    print(f"       .text length: {text_length:4d}")
 
     text_binary = text_section.data()
-    while len(text_binary) < new_text_length:
-        text_binary += b"\x00"
 
     nonresident_address = 0
-    new_nonresident_length = 0
+    nonresident_length = 0
     if nonresident_section is not None:
         nonresident_address = nonresident_section["sh_addr"]
         nonresident_length = nonresident_section["sh_size"]
-        new_nonresident_length = ((nonresident_length + alignment - 1) // alignment) * alignment
-        print(f".nonresident length: {nonresident_length:4d} -> {new_nonresident_length:4d}")
+        print(f".nonresident length: {nonresident_length:4d}")
 
         nonresident_binary = nonresident_section.data()
-        while len(nonresident_binary) < new_nonresident_length:
-            nonresident_binary += b"\x00"
 
     bss_length = bss_section["sh_size"]
-    new_bss_length = ((bss_length + alignment - 1) // alignment) * alignment
-    print(f"        .bss length: {bss_length:4d} -> {new_bss_length:4d}")
+    print(f"        .bss length: {bss_length:4d}")
 
     relocs = []
 
     def parse_relocs(section_name):
         print("Parsing relocs for " + section_name)
-        rel_text = elffile.get_section_by_name(section_name)
-        if not isinstance(rel_text, elf.relocation.RelocationSection):
+        section = elffile.get_section_by_name(section_name)
+
+        if not isinstance(section, elf.relocation.RelocationSection):
             print("ELF file has no " + section_name + " section")
             return
 
-        for reloc in rel_text.iter_relocations():
-            offset = reloc["r_offset"]
-            if reloc["r_info_type"] == elf.enums.ENUM_RELOC_TYPE_ARM["R_ARM_ABS32"]:
-                reloc_type = RELOC_TYPE_ABS32
-            elif reloc["r_info_type"] == elf.enums.ENUM_RELOC_TYPE_ARM["R_ARM_REL32"]:
-                reloc_type = RELOC_TYPE_REL32
+        symtable = elffile.get_section(section["sh_link"])
+
+        for reloc in section.iter_relocations():
+            reloc_type_name = reloc_enum_names[reloc["r_info_type"]]
+            if reloc["r_info_type"] in reloc_mapping:
+                reloc_type = reloc_mapping[reloc["r_info_type"]]
             else:
-                print("Invalid relocation " + str(reloc["r_info_type"]) + ".")
+                print(f"Invalid relocation {reloc_type_name}.")
                 continue
 
-            if offset >= RELOC_TYPE_ABS32:
-                print("Reloc " + str(reloc["r_info_type"]) + " has an invalid offset.")
-                continue
-            relocs.append(section_reloc_mapping[section_name] | reloc_type | reloc["r_offset"])
-            print(f"Reloc {reloc_enum_names[reloc['r_info_type']]} offset: {int(str(reloc['r_offset'])):08x}")
+            reloc_offset = reloc["r_offset"]
+            reloc_value = None
+            for _, section in section_info.items():
+                if reloc["r_info_sym"] != 0:
+                    symbol = symtable.get_symbol(reloc["r_info_sym"])
+                    reloc_value = symbol["st_value"]
 
-    for section_name in section_reloc_mapping.keys():
+            reloc = PackedReloc(
+                reloc_type,
+                SectionAddr(reloc_offset),
+                SectionAddr(reloc_value),
+            )
+            relocs.append(reloc)
+            print(reloc)
+
+    for section_name in reloc_section_names:
         parse_relocs(section_name)
 
+    if libinfo_preinit_array_count > 0:
+        raise ValueError("preinit array unsupported")
+
     executable = bytearray("QKE1", encoding="utf8")
-    executable += struct.pack("<B", 0)  # TBD
-    executable += struct.pack("<B", alignment)
-    executable += struct.pack("<H", new_text_length // alignment)
-    executable += struct.pack("<H", new_nonresident_length // alignment)
-    executable += struct.pack("<H", new_bss_length // alignment)
-    executable += struct.pack("<H", len(relocs))
+    executable += leb128_encode_unsigned(text_length)
+    executable += leb128_encode_unsigned(nonresident_length)
+    executable += leb128_encode_unsigned(bss_length)
+    executable += leb128_encode_unsigned(libinfo_init_array_start)
+    executable += leb128_encode_unsigned(libinfo_init_array_count)
+    executable += leb128_encode_unsigned(libinfo_fini_array_start)
+    executable += leb128_encode_unsigned(libinfo_fini_array_count)
+
+    entrypoint = SectionAddr(libinfo_entrypoint)
+    print(entrypoint)
+    executable += entrypoint.bytes
+
+    executable += leb128_encode_unsigned(len(relocs))
 
     executable += text_binary
-    if new_nonresident_length > 0:
+    if nonresident_length > 0:
         executable += nonresident_binary
 
     for reloc in relocs:
-        print(f"Writing reloc: {reloc:08x} -- Section flag: {reloc & 0xF0000000:08x}, type: {reloc & 0x0F000000:08x}, offset: {reloc & 0x00FFFFFF:08x}")
-        executable += struct.pack("<I", reloc)
+        executable += reloc.bytes
+
+    fnv1a_32_hash = fnv1a_32(bytes(executable))
+    executable += struct.pack("<I", fnv1a_32_hash)
 
     with open(args.elf + ".qke", "wb") as out:
         out.write(executable)

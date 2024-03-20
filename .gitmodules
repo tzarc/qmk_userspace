@@ -1,0 +1,3 @@
+[submodule "qmk_firmware-mods/lib/littlefs"]
+	path = qmk_firmware-mods/lib/littlefs
+	url = https://github.com/littlefs-project/littlefs.git

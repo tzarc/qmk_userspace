@@ -5,6 +5,8 @@
 // 1000Hz poll rate
 #define USB_POLLING_INTERVAL_MS 1
 
+#define FILESYSTEM_DEBUG
+
 // We don't ever have more than 8 layers.
 #define LAYER_STATE_8BIT
 

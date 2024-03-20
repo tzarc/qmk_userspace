@@ -13,7 +13,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     return qmk->is_keyboard_left() || qmk->is_keyboard_master();
 }
 
-void __attribute__((weak)) housekeeping_task_user(void);
+void __attribute__((weak)) housekeeping_task_user(void) {
+    process_record_user(0, 0);
+}
 
 static const qmk_keymap_t keymap = {
     .process_record_user    = process_record_user,

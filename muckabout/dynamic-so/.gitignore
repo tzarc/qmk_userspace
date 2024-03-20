@@ -6,5 +6,6 @@
 *.so.symbols
 *.so.qke
 .cache
+.ruff_cache
 .build
 compile_commands.json

@@ -1,16 +1,12 @@
 # Copyright 2018-2024 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
+
 SRC += \
 	tzarc_common.c \
 	tzarc_names.c \
 	tzarc_eeprom.c \
 	tzarc_unicode.c \
 	tzarc_screen.c
-
-VPATH += \
-		$(QMK_USERSPACE)/qmk_firmware-mods \
-		$(QMK_USERSPACE)/qmk_firmware-mods/quantum \
-		$(QMK_USERSPACE)/qmk_firmware-mods/quantum/filesystem
 
 # Ensure file listings are generated
 # cat .build/obj_tzarc_djinn_rev2_tzarc/tzarc_unicode.i | sed -e 's@^#.*@@g' -e 's@^\s*//.*@@g' -e '/^\s*$/d' | clang-format
@@ -45,6 +41,7 @@ ifeq ($(strip $(PLATFORM_KEY)),chibios)
 	EXTRALDFLAGS = -Wl,--print-memory-usage
 	DEBOUNCE_TYPE = asym_eager_defer_pk
 	KONAMI_CODE_ENABLE = yes
+
 else ifeq ($(strip $(PLATFORM_KEY)),arm_atsam)
 	LTO_ENABLE = no
 else ifeq ($(strip $(PLATFORM_KEY)),avr)
@@ -55,15 +52,6 @@ else ifeq ($(strip $(PLATFORM_KEY)),avr)
 		CONSOLE_ENABLE = no
 		DEBUG_MATRIX_SCAN_RATE_ENABLE = no
 	endif
-endif
-
-ifneq ("$(wildcard $(LIB_PATH)/lvgl)","")
-
-#	ifeq ($(strip $(QUANTUM_PAINTER_LVGL_INTEGRATION)),yes)
-#		VPATH += $(USER_PATH)/screens/diablo
-#		SRC += ui.c ui_helpers.c ui_img_d3_png.c
-#	endif
-
 endif
 
 ifeq ($(strip $(KONAMI_CODE_ENABLE)),yes)
@@ -79,3 +67,5 @@ ifeq ($(strip $(GAME_MODES_ENABLE)),yes)
 endif
 
 #OPT = 0
+
+include $(QMK_USERSPACE)/qmk_firmware-mods/builddefs/common_features_mod.mk

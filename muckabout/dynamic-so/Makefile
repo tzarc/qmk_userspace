@@ -38,11 +38,11 @@ QMK_COMPILE_FLAGS := \
 	-fno-builtin \
 	-fno-common \
 	-fshort-wchar \
-	-flto \
+	-flto=auto \
+	-fstack-usage \
 	-Wall \
 	-Wstrict-prototypes \
 	-Werror \
-	-fstack-usage \
 	#-mfloat-abi=hard -mfpu=fpv4-sp-d16 -fsingle-precision-constant \
 	#-mno-pic-data-is-text-relative \
 	#-msingle-pic-base
@@ -52,19 +52,19 @@ CFLAGS_BASE ?= $(OPT_FLAGS) -fPIE -fPIC -fpic -fpie
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
 LDFLAGS ?= $(OPT_FLAGS) \
+	$(QMK_COMPILE_FLAGS) \
 	-Bsymbolic \
 	-shared \
 	-nostdlib \
 	-nostartfiles \
 	-nodefaultlibs \
 	-mlong-calls \
+	--specs=nano.specs \
 	-Wl,-Map=${TARGET_LIB}.map \
 	-Wl,--print-memory-usage \
 	-Wl,--gc-sections \
-	--specs=nano.specs \
 	-Wl,--undefined=main \
 	-Wl,--emit-relocs \
-	$(QMK_COMPILE_FLAGS) \
 	-T src/lib.ld
 CFLAGS ?= -std=c11 $(CFLAGS_BASE) $(LDFLAGS) $(QMK_COMPILE_FLAGS)
 CXXFLAGS ?= -std=c++14 -fno-exceptions -fno-rtti $(CFLAGS_BASE) $(LDFLAGS) $(QMK_COMPILE_FLAGS)
@@ -77,12 +77,12 @@ all: $(TARGET_LIB)
 buildreqs: compile_commands.json Makefile
 
 format:
-	black -l 160 convert-binary.py
+	ruff check --select I --fix .
+	ruff format .
 
 convert: $(TARGET_LIB)
-	if true ; then $(STRIP) -s $(TARGET_LIB) ; fi
-	if true ; then $(OBJCOPY) --strip-debug --strip-dwo $(TARGET_LIB) ; fi
-	if true ; then ./convert-binary.py $(TARGET_LIB) ; fi
+	$(STRIP) -s $(TARGET_LIB)
+	./convert-binary.py $(TARGET_LIB)
 
 info: convert
 	$(OBJDUMP) -afphs $(TARGET_LIB) > $(TARGET_LIB).dump
@@ -95,6 +95,9 @@ info: convert
 	stat ${TARGET_LIB}
 	stat ${TARGET_LIB}.qke
 	sha256sum ${TARGET_LIB}.qke
+
+hexdump: info
+	hexdump -C $(TARGET_LIB).qke
 
 compile_commands.json: Makefile
 	@compiledb make -n all >/dev/null

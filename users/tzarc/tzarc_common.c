@@ -5,9 +5,13 @@
 #include <quantum.h>
 #include <process_unicode_common.h>
 #include "keycodes.h"
+#include "timer.h"
 #include "tzarc.h"
 #include "tzarc_layout.h"
 #include "util.h"
+#ifdef FILESYSTEM_ENABLE
+#    include "filesystem.h"
+#endif // FILESYSTEM_ENABLE
 
 bool          config_enabled;
 typing_mode_t typing_mode;
@@ -23,53 +27,66 @@ const char *typing_mode_name(typing_mode_t mode) {
     return "unknown";
 }
 
-#if HAL_USE_TRNG
-#    include "hal_trng.h"
-#    include "hal_trng_lld.h"
-static bool rng_initialized = false;
-static void rng_init(void) {
-    if (!rng_initialized) {
-        rng_initialized = true;
+#if __has_include("prng.h")
+#    include "prng.h"
+#else // __has_include("prng.h")
+#    if HAL_USE_TRNG
+#        include "hal_trng.h"
+#        include "hal_trng_lld.h"
+static bool prng_initialized = false;
+static void prng_init(void) {
+    if (!prng_initialized) {
+        prng_initialized = true;
         trngStart(&TRNGD1, NULL);
     }
 }
-bool rng_generate(void *buf, size_t n) {
-    rng_init();
-    trngStart(&TRNGD1, NULL);
+bool prng_generate(void *buf, size_t n) {
+    prng_init();
     bool err = trngGenerate(&TRNGD1, n, (uint8_t *)buf);
-    trngStop(&TRNGD1);
     return err;
 }
 uint8_t prng8(void) {
     uint8_t ret;
-    rng_generate(&ret, sizeof(ret));
+    prng_generate(&ret, sizeof(ret));
     return ret;
 }
-uint16_t prng16(void) {
-    uint16_t ret;
-    rng_generate(&ret, sizeof(ret));
-    return ret;
-}
-uint32_t prng32(void) {
-    uint32_t ret;
-    rng_generate(&ret, sizeof(ret));
-    return ret;
-}
-#else  // HAL_USE_TRNG
+#    else // HAL_USE_TRNG
+// https://filterpaper.github.io/prng.html --
+// https://www.pcg-random.org/posts/bob-jenkins-small-prng-passes-practrand.html
+#        define rot8(x, k) (((x) << (k)) | ((x) >> (8 - (k))))
 uint8_t prng8(void) {
-    static uint8_t s = 0xAA, a = 0;
-    s ^= s << 3;
-    s ^= s >> 5;
-    s ^= a++ >> 2;
-    return s;
+    static uint8_t a = 0xf1;
+    static uint8_t b = 0xee, c = 0xee, d = 0xee;
+
+    uint8_t e = a - rot8(b, 1);
+    a         = b ^ rot8(c, 4);
+    b         = c + d;
+    c         = d + e;
+    return d  = e + a;
 }
+bool prng_generate(void *buf, size_t n) {
+    for (size_t i = 0; i < n; ++i) {
+        ((uint8_t *)buf)[i] = prng8();
+    }
+    return true;
+}
+#    endif // HAL_USE_TRNG
 uint16_t prng16(void) {
-    return prng8() | (((uint16_t)prng8()) << 8);
+    uint16_t r;
+    prng_generate(&r, sizeof(r));
+    return r;
 }
 uint32_t prng32(void) {
-    return prng16() | (((uint32_t)prng16()) << 16);
+    uint32_t r;
+    prng_generate(&r, sizeof(r));
+    return r;
 }
-#endif // HAL_USE_TRNG
+uint64_t prng64(void) {
+    uint64_t r;
+    prng_generate(&r, sizeof(r));
+    return r;
+}
+#endif     // __has_include("prng.h")
 
 uint32_t prng(uint32_t min, uint32_t max) {
     if (min > max) {
@@ -128,7 +145,14 @@ void keyboard_pre_init_user(void) {
     print_set_sendchar(tzarc_sendchar);
 }
 
+#ifdef FILESYSTEM_ENABLE
+static bool is_mounted = false;
+#endif // FILESYSTEM_ENABLE
+
 void keyboard_post_init_user(void) {
+#ifdef FILESYSTEM_ENABLE
+    is_mounted = fs_init();
+#endif // FILESYSTEM_ENABLE
     tzarc_common_init();
     tzarc_eeprom_init();
 #ifdef GAME_MODES_ENABLE
@@ -204,6 +228,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t eeprst_key_timer = 0;
 
     bool is_shifted = (get_mods() | get_oneshot_mods()) & MOD_MASK_SHIFT;
+    (void)is_shifted;
     dprintf("Keycode: %s, pressed: %s, shifted: %s\n", key_name(keycode, is_shifted), record->event.pressed ? "true" : "false", is_shifted ? "true" : "false");
 
 #ifdef KONAMI_CODE_ENABLE
@@ -310,4 +335,25 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 void housekeeping_task_user(void) {
     housekeeping_task_keymap();
     tzarc_eeprom_task();
+
+#ifdef FILESYSTEM_ENABLE
+    if (is_mounted) {
+        static uint32_t minutes_running = 0;
+        if (timer_elapsed32(minutes_running) > 60000) {
+            minutes_running = timer_read32();
+            fs_fd_t fd      = fs_open("minutes", "rw");
+            if (fd != INVALID_FILESYSTEM_FD) {
+                uint32_t minutes = 0;
+                if (fs_read(fd, &minutes, sizeof(minutes)) != sizeof(minutes)) {
+                    minutes = 0;
+                }
+                ++minutes;
+                fs_seek(fd, 0, FS_SEEK_SET);
+                fs_write(fd, &minutes, sizeof(minutes));
+                fs_close(fd);
+                dprintf("Minutes running: %d\n", (int)minutes);
+            }
+        }
+    }
+#endif // FILESYSTEM_ENABLE
 }

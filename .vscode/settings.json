@@ -1,14 +1,16 @@
 {
-  "files.exclude": {
-    "**/.build": true,
-    "**/.cache": true,
-    "**/*.hex": true,
-    "**/*.bin": true,
-    "**/*.uf2": true
-  },
-  "[markdown]": {
-    "files.trimFinalNewlines": false,
-    "editor.trimAutoWhitespace": false,
-    "files.trimTrailingWhitespace": false,
-  }
+    "files.exclude": {
+        "**/.build": true,
+        "**/.cache": true,
+        "**/*.hex": true,
+        "**/*.bin": true,
+        "**/*.uf2": true
+    },
+    "[markdown]": {
+        "files.trimFinalNewlines": false,
+        "editor.trimAutoWhitespace": false,
+        "files.trimTrailingWhitespace": false
+    },
+    "C_Cpp.codeAnalysis.clangTidy.enabled": true,
+    "C_Cpp.codeAnalysis.clangTidy.useBuildPath": true
 }
