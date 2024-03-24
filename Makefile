@@ -121,6 +121,12 @@ format:
 		clang-format -i "$$file" ; \
 	done
 
+format-keyboards-tzarc:
+	@git -C $(QMK_USERSPACE)/qmk_firmware ls-files | grep tzarc | grep -E '\.(c|h|cpp|hpp|cxx|hxx)$$' | grep -vE '\.q[gf]f\.' | grep -vE '(ch|hal|mcu)conf\.h$$' | grep -vE 'board.[ch]$$' | while read file ; do \
+		$(ECHO) -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
+		clang-format -i "$(QMK_USERSPACE)/qmk_firmware/$$file" ; \
+	done
+
 .PHONY: links link-hooks
 
 links: link-hooks

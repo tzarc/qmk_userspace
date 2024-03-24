@@ -11,7 +11,7 @@ typedef int32_t  fs_size_t;
 #define INVALID_FILESYSTEM_FD ((fs_fd_t)0)
 
 #ifndef MAX_NUM_OPEN_FDS
-#    define MAX_NUM_OPEN_FDS 8
+#    define MAX_NUM_OPEN_FDS 6
 #endif
 
 typedef enum fs_whence_t {
@@ -20,9 +20,11 @@ typedef enum fs_whence_t {
     FS_SEEK_END = 2  // Seek relative to the end of the file
 } fs_whence_t;
 
+bool fs_erase(void);
 bool fs_init(void);
 bool fs_mount(void);
 void fs_unmount(void);
+bool fs_mounted(void);
 
 typedef struct fs_dirent_t {
     const char *name;
@@ -38,7 +40,7 @@ void         fs_closedir(fs_fd_t fd);
 
 fs_fd_t fs_open(const char *filename, const char *mode); // "rwt" => read, write, truncate
 void    fs_close(fs_fd_t fd);
-bool    fs_delete(const char *filename);
+bool    fs_delete(const char *path);
 
 fs_offset_t fs_seek(fs_fd_t fd, fs_offset_t offset, fs_whence_t whence);
 fs_offset_t fs_tell(fs_fd_t fd);
@@ -49,7 +51,11 @@ bool        fs_is_eof(fs_fd_t fd);
 #ifdef FILESYSTEM_DEBUG
 #    include <debug.h>
 #    include <print.h>
-#    define fs_dprintf(...) dprintf(__VA_ARGS__)
+#    define fs_dprintf(...)            \
+        do {                           \
+            dprintf("%s: ", __func__); \
+            dprintf(__VA_ARGS__);      \
+        } while (0)
 #else
 #    define fs_dprintf(...) \
         do {                \

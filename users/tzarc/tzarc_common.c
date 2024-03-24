@@ -128,6 +128,9 @@ void eeconfig_init_user(void) {
 #endif
     tzarc_eeprom_reset();
     eeconfig_init_keymap();
+#ifdef FILESYSTEM_ENABLE
+    fs_erase();
+#endif // FILESYSTEM_ENABLE
 }
 
 __attribute__((weak)) void tzarc_sendchar_hook(uint8_t c) {}
@@ -352,6 +355,24 @@ void housekeeping_task_user(void) {
                 fs_write(fd, &minutes, sizeof(minutes));
                 fs_close(fd);
                 dprintf("Minutes running: %d\n", (int)minutes);
+
+                static bool recursive_test = false;
+                if (!recursive_test) {
+                    recursive_test = true;
+                    fs_mkdir("a");
+                    fs_mkdir("a/b");
+                    fs_mkdir("a/b/c");
+                    fs_fd_t fd = fs_open("a/z", "w");
+                    fs_write(fd, &recursive_test, sizeof(recursive_test));
+                    fs_close(fd);
+                    fd = fs_open("a/b/y", "w");
+                    fs_write(fd, &recursive_test, sizeof(recursive_test));
+                    fs_close(fd);
+                    fd = fs_open("a/b/c/x", "w");
+                    fs_write(fd, &recursive_test, sizeof(recursive_test));
+                    fs_close(fd);
+                    fs_rmdir("a", true);
+                }
             }
         }
     }
