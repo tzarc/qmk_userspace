@@ -50,5 +50,5 @@ VPATH += \
 
 #EEPROM_DRIVER = custom
 #SRC += eeprom_filesystem.c
-#VPATH += \
-#		$(QMK_USERSPACE)/qmk_firmware-mods/drivers/eeprom
+VPATH += \
+		$(QMK_USERSPACE)/qmk_firmware-mods/drivers/eeprom

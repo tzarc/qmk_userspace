@@ -289,17 +289,17 @@ static fs_fd_t fs_open_nolock(const char *filename, const char *mode) {
     FIND_FD_GET_HANDLE(INVALID_FILESYSTEM_FD, FD_TYPE_EMPTY, {
         FS_AUTO_MOUNT_UNMOUNT(INVALID_FILESYSTEM_FD);
 
-        int flags = LFS_O_CREAT;
+        int flags = 0;
         while (*mode) {
             switch (*mode) {
                 case 'r':
                     flags |= LFS_O_RDONLY;
                     break;
                 case 'w':
-                    flags |= LFS_O_WRONLY;
+                    flags |= LFS_O_WRONLY | LFS_O_CREAT;
                     break;
                 case 't':
-                    flags |= LFS_O_TRUNC;
+                    flags |= LFS_O_TRUNC | LFS_O_CREAT;
                     break;
             }
             ++mode;
@@ -434,21 +434,25 @@ static bool fs_is_eof_nolock(fs_fd_t fd) {
 }
 
 bool fs_erase(void) {
+    fs_dprintf("\n");
     FS_AUTO_LOCK_UNLOCK(false);
     return fs_erase_nolock();
 }
 
 bool fs_init(void) {
+    fs_dprintf("\n");
     FS_AUTO_LOCK_UNLOCK(false);
     return fs_init_nolock();
 }
 
 bool fs_mount(void) {
+    fs_dprintf("%d\n", mount_count);
     FS_AUTO_LOCK_UNLOCK(false);
     return fs_mount_nolock();
 }
 
 void fs_unmount(void) {
+    fs_dprintf("%d\n", mount_count);
     FS_AUTO_LOCK_UNLOCK();
     fs_unmount_nolock();
 }
@@ -459,41 +463,57 @@ bool fs_mounted(void) {
 }
 
 fs_fd_t fs_opendir(const char *path) {
-    FS_AUTO_LOCK_UNLOCK(INVALID_FILESYSTEM_FD);
-    return fs_opendir_nolock(path);
+    fs_fd_t fd;
+    {
+        FS_AUTO_LOCK_UNLOCK(INVALID_FILESYSTEM_FD);
+        fd = fs_opendir_nolock(path);
+    }
+    fs_dprintf("%s, fd=%d\n", path, (int)fd);
+    return fd;
 }
 
 fs_dirent_t *fs_readdir(fs_fd_t fd) {
+    fs_dprintf("%d\n", (int)fd);
     FS_AUTO_LOCK_UNLOCK(NULL);
     return fs_readdir_nolock(fd);
 }
 
 void fs_closedir(fs_fd_t fd) {
+    fs_dprintf("%d\n", (int)fd);
     FS_AUTO_LOCK_UNLOCK();
     fs_closedir_nolock(fd);
 }
 
 bool fs_mkdir(const char *path) {
+    fs_dprintf("%s\n", path);
     FS_AUTO_LOCK_UNLOCK(false);
     return fs_mkdir_nolock(path);
 }
 
 bool fs_rmdir(const char *path, bool recursive) {
+    fs_dprintf("%s - %s\n", path, recursive ? "recursive" : "non-recursive");
     FS_AUTO_LOCK_UNLOCK(false);
     return fs_rmdir_nolock(path, recursive);
 }
 
 fs_fd_t fs_open(const char *filename, const char *mode) {
-    FS_AUTO_LOCK_UNLOCK(INVALID_FILESYSTEM_FD);
-    return fs_open_nolock(filename, mode);
+    fs_fd_t fd;
+    {
+        FS_AUTO_LOCK_UNLOCK(INVALID_FILESYSTEM_FD);
+        fd = fs_open_nolock(filename, mode);
+    }
+    fs_dprintf("%s, %s, fd=%d\n", filename, mode, (int)fd);
+    return fd;
 }
 
 void fs_close(fs_fd_t fd) {
+    fs_dprintf("%d\n", (int)fd);
     FS_AUTO_LOCK_UNLOCK();
     fs_close_nolock(fd);
 }
 
 bool fs_delete(const char *path) {
+    fs_dprintf("%s\n", path);
     FS_AUTO_LOCK_UNLOCK(false);
     return fs_delete_nolock(path);
 }
@@ -521,4 +541,13 @@ fs_size_t fs_write(fs_fd_t fd, const void *buffer, fs_size_t length) {
 bool fs_is_eof(fs_fd_t fd) {
     FS_AUTO_LOCK_UNLOCK(true);
     return fs_is_eof_nolock(fd);
+}
+
+void fs_dump_info(void) {
+    struct lfs_fsinfo fs_info;
+    if (lfs_fs_stat(&lfs, &fs_info) >= 0) {
+        dprintf("LFS disk version: 0x%08x, block size: %d, block count: %d, allocated blocks: %d, name_max: %d, file_max: %d, attr_max: %d\n", //
+                (int)fs_info.disk_version, (int)fs_info.block_size, (int)fs_info.block_count, (int)lfs_fs_size(&lfs),                          //
+                (int)fs_info.name_max, (int)fs_info.file_max, (int)fs_info.attr_max);
+    }
 }

@@ -5,6 +5,7 @@
 #include <quantum.h>
 #include <process_unicode_common.h>
 #include "keycodes.h"
+#include "lfs.h"
 #include "timer.h"
 #include "tzarc.h"
 #include "tzarc_layout.h"
@@ -210,10 +211,16 @@ static bool process_record_konami_code(uint16_t keycode, keyrecord_t *record) {
                         konami_code_handler();
                     }
                 } else {
+                    if (konami_index) {
+                        dprintf("Konami code: reset\n");
+                    }
                     konami_index = 0;
                 }
                 break;
             default:
+                if (konami_index) {
+                    dprintf("Konami code: reset\n");
+                }
                 konami_index = 0;
                 break;
         }
@@ -232,7 +239,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     bool is_shifted = (get_mods() | get_oneshot_mods()) & MOD_MASK_SHIFT;
     (void)is_shifted;
-    dprintf("Keycode: %s, pressed: %s, shifted: %s\n", key_name(keycode, is_shifted), record->event.pressed ? "true" : "false", is_shifted ? "true" : "false");
+    // dprintf("Keycode: %s, pressed: %s, shifted: %s\n", key_name(keycode, is_shifted), record->event.pressed ? "true" : "false", is_shifted ? "true" : "false");
 
 #ifdef KONAMI_CODE_ENABLE
     if (!process_record_konami_code(keycode, record)) {
@@ -335,7 +342,15 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return layer_state_set_keymap(state);
 }
 
+__attribute__((weak)) void eeprom_driver_flush(void) {}
+
 void housekeeping_task_user(void) {
+    static uint32_t last_eeprom_flush = 0;
+    if (timer_elapsed32(last_eeprom_flush) > 1000) {
+        last_eeprom_flush = timer_read32();
+        eeprom_driver_flush(); // To be moved to a more appropriate location.
+    }
+
     housekeeping_task_keymap();
     tzarc_eeprom_task();
 
@@ -355,26 +370,62 @@ void housekeeping_task_user(void) {
                 fs_write(fd, &minutes, sizeof(minutes));
                 fs_close(fd);
                 dprintf("Minutes running: %d\n", (int)minutes);
+            }
+        }
 
-                static bool recursive_test = false;
-                if (!recursive_test) {
-                    recursive_test = true;
-                    fs_mkdir("a");
-                    fs_mkdir("a/b");
-                    fs_mkdir("a/b/c");
-                    fs_fd_t fd = fs_open("a/z", "w");
-                    fs_write(fd, &recursive_test, sizeof(recursive_test));
-                    fs_close(fd);
-                    fd = fs_open("a/b/y", "w");
-                    fs_write(fd, &recursive_test, sizeof(recursive_test));
-                    fs_close(fd);
-                    fd = fs_open("a/b/c/x", "w");
-                    fs_write(fd, &recursive_test, sizeof(recursive_test));
-                    fs_close(fd);
-                    fs_rmdir("a", true);
-                }
+        // Dump info
+        static bool testing = false;
+        if (!testing) {
+            if (timer_read32() > 15000) {
+                testing = true;
+
+                // Test filesystem-based eeprom
+                void test_fs_eeprom(void);
+                test_fs_eeprom();
+
+                extern void fs_dump_info(void);
+                fs_dump_info();
+
+                // Test recursive directory creation and deletion
+                fs_mkdir("a");
+                fs_mkdir("a/b");
+                fs_mkdir("a/b/c");
+                fs_fd_t fd = fs_open("a/z", "w");
+                fs_write(fd, &testing, sizeof(testing));
+                fs_close(fd);
+                fd = fs_open("a/b/y", "w");
+                fs_write(fd, &testing, sizeof(testing));
+                fs_close(fd);
+                fd = fs_open("a/b/c/x", "w");
+                fs_write(fd, &testing, sizeof(testing));
+                fs_close(fd);
+                fs_rmdir("a", true);
             }
         }
     }
 #endif // FILESYSTEM_ENABLE
 }
+
+#ifdef FILESYSTEM_ENABLE
+#    define EEPROM_SIZE 1024
+#    define eeprom_driver_init fs_eeprom_driver_init
+#    define eeprom_driver_erase fs_eeprom_driver_erase
+#    define eeprom_driver_flush fs_eeprom_driver_flush
+#    define eeprom_read_block fs_eeprom_read_block
+#    define eeprom_write_block fs_eeprom_write_block
+#    include "eeprom_filesystem.c"
+
+void test_fs_eeprom(void) {
+    uint32_t test = 0x12345678;
+    fs_eeprom_driver_init();
+    fs_eeprom_write_block(&test, (void *)620, sizeof(test));
+    fs_eeprom_driver_flush();
+
+    test = 0;
+    fs_eeprom_driver_init();
+    fs_eeprom_read_block(&test, (void *)620, sizeof(test));
+    dprintf("Test value: %08lX\n", (uint32_t)test);
+
+    fs_eeprom_driver_erase();
+}
+#endif // FILESYSTEM_ENABLE
