@@ -18,6 +18,6 @@ else
 			lfs_util.c \
 			fs_lfs_common.c \
 			fs_lfs_spi_flash.c
-		OPT_DEFS += -DLFS_NO_MALLOC -DLFS_NAME_MAX=40
+		OPT_DEFS += -DLFS_NO_MALLOC -DLFS_THREADSAFE -DLFS_NAME_MAX=40
 	endif
 endif

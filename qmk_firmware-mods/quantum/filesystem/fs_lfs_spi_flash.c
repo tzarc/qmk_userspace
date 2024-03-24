@@ -1,5 +1,6 @@
 // Copyright 2022-2024 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
+#include <ch.h>
 #include "filesystem.h"
 #include "flash/flash_spi.h"
 #include "lfs.h"
@@ -65,8 +66,23 @@ int fs_device_sync(const struct lfs_config *c) {
     return 0;
 }
 
+static MUTEX_DECL(fs_dev_mutex);
+int fs_device_lock(const struct lfs_config *c) {
+    chMtxLock(&fs_dev_mutex);
+    return 0;
+}
+
+int fs_device_unlock(const struct lfs_config *c) {
+    chMtxUnlock(&fs_dev_mutex);
+    return 0;
+}
+
 // configuration of the filesystem is provided by this struct
 const struct lfs_config lfs_cfg = {
+    // thread safety
+    .lock   = fs_device_lock,
+    .unlock = fs_device_unlock,
+
     // block device operations
     .read  = fs_device_read,
     .prog  = fs_device_prog,
