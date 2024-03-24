@@ -162,14 +162,13 @@ void matrix_scan_keymap(void) {
             uint8_t  bytes[4];
             uint32_t raw;
         } tmp;
-        extern uint8_t prng(void);
-        tmp.bytes[0] = prng();
-        tmp.bytes[1] = prng();
-        tmp.bytes[2] = prng();
-        tmp.bytes[3] = prng();
+        tmp.bytes[0] = prng8();
+        tmp.bytes[1] = prng8();
+        tmp.bytes[2] = prng8();
+        tmp.bytes[3] = prng8();
 
-        eeconfig_update_user(tmp.raw);
-        uint32_t value = eeconfig_read_user();
+        eeconfig_update_kb(tmp.raw);
+        uint32_t value = eeconfig_read_kb();
         if (value != tmp.raw) {
             dprint("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
             dprint("!! EEPROM readback mismatch!\n");

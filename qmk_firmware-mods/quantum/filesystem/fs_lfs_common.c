@@ -134,8 +134,10 @@ static bool fs_erase_nolock(void) {
 }
 
 static bool fs_init_nolock(void) {
+    while (fs_mounted_nolock()) {
+        fs_unmount_nolock();
+    }
     memset(fs_handles, 0, sizeof(fs_handles));
-
     return fs_device_init() && fs_mount_nolock();
 }
 

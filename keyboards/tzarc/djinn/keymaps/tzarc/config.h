@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#ifdef EEPROM_CUSTOM
+#    define EEPROM_SIZE 4096
+#endif
+
 // Uncomment to spit out debugging info whenever an action is executed.
 // #define DEBUG_ACTION
 

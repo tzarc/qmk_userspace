@@ -47,3 +47,8 @@ VPATH += \
 		$(QMK_USERSPACE)/qmk_firmware-mods \
 		$(QMK_USERSPACE)/qmk_firmware-mods/quantum \
 		$(QMK_USERSPACE)/qmk_firmware-mods/quantum/filesystem
+
+#EEPROM_DRIVER = custom
+#SRC += eeprom_filesystem.c
+#VPATH += \
+#		$(QMK_USERSPACE)/qmk_firmware-mods/drivers/eeprom
