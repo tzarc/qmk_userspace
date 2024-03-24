@@ -153,7 +153,6 @@ static bool fs_mount_nolock(void) {
         }
     }
     ++mount_count;
-    fs_dprintf("mount_count=%d\n", mount_count);
     return true;
 }
 
@@ -164,7 +163,6 @@ static void fs_unmount_nolock(void) {
             LFS_API_CALL(lfs_unmount, &lfs);
         }
     }
-    fs_dprintf("mount_count=%d\n", mount_count);
 }
 
 static void fs_unmount_helper(bool *mounted) {
@@ -248,7 +246,6 @@ static bool fs_mkdir_nolock(const char *path) {
 }
 
 static bool fs_rmdir_nolock(const char *path, bool recursive) {
-    fs_dprintf("%s: %s\n", path, recursive ? "recursive" : "non-recursive");
     FS_AUTO_MOUNT_UNMOUNT(false);
 
     if (recursive) {
@@ -338,7 +335,6 @@ static void fs_close_nolock(fs_fd_t fd) {
 }
 
 static bool fs_delete_nolock(const char *path) {
-    fs_dprintf("%s\n", path);
     FS_AUTO_MOUNT_UNMOUNT(false);
     int err = LFS_API_CALL(lfs_remove, &lfs, path);
     return err >= 0 || err == LFS_ERR_NOENT; // Allow for already deleted files to count as success
