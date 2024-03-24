@@ -130,7 +130,7 @@ void eeconfig_init_user(void) {
     tzarc_eeprom_reset();
     eeconfig_init_keymap();
 #ifdef FILESYSTEM_ENABLE
-    fs_erase();
+    fs_format();
 #endif // FILESYSTEM_ENABLE
 }
 

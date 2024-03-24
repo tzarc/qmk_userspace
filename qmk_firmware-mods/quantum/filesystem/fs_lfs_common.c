@@ -119,12 +119,12 @@ static bool fs_delete_nolock(const char *path);
 
 static int mount_count = 0;
 
-static bool fs_mounted_nolock(void) {
+static bool fs_is_mounted_nolock(void) {
     return mount_count > 0;
 }
 
-static bool fs_erase_nolock(void) {
-    while (fs_mounted_nolock()) {
+static bool fs_format_nolock(void) {
+    while (fs_is_mounted_nolock()) {
         fs_unmount_nolock();
     }
     if (LFS_API_CALL(lfs_format, &lfs, &lfs_cfg) < 0) {
@@ -134,7 +134,7 @@ static bool fs_erase_nolock(void) {
 }
 
 static bool fs_init_nolock(void) {
-    while (fs_mounted_nolock()) {
+    while (fs_is_mounted_nolock()) {
         fs_unmount_nolock();
     }
     memset(fs_handles, 0, sizeof(fs_handles));
@@ -142,11 +142,11 @@ static bool fs_init_nolock(void) {
 }
 
 static bool fs_mount_nolock(void) {
-    if (!fs_mounted_nolock()) {
+    if (!fs_is_mounted_nolock()) {
         // reformat if we can't mount the filesystem
         // this should only happen on the first boot
         if (LFS_API_CALL(lfs_mount, &lfs, &lfs_cfg) < 0) {
-            if (!fs_erase_nolock()) {
+            if (!fs_format_nolock()) {
                 return false;
             }
             if (LFS_API_CALL(lfs_mount, &lfs, &lfs_cfg) < 0) {
@@ -159,7 +159,7 @@ static bool fs_mount_nolock(void) {
 }
 
 static void fs_unmount_nolock(void) {
-    if (fs_mounted_nolock()) {
+    if (fs_is_mounted_nolock()) {
         --mount_count;
         if (mount_count == 0) {
             LFS_API_CALL(lfs_unmount, &lfs);
@@ -206,7 +206,7 @@ static fs_fd_t fs_opendir_nolock(const char *path) {
 }
 
 static fs_dirent_t *fs_readdir_explicit_nolock(lfs_dir_t *dir_handle, struct lfs_info *entry_info, fs_dirent_t *dirent) {
-    if (!fs_mounted_nolock()) {
+    if (!fs_is_mounted_nolock()) {
         return NULL;
     }
 
@@ -285,6 +285,19 @@ static bool fs_rmdir_nolock(const char *path, bool recursive) {
     return fs_delete_nolock(path);
 }
 
+static bool fs_exists_nolock(const char *path) {
+    FS_AUTO_MOUNT_UNMOUNT(false);
+    struct lfs_info info;
+    int             err = lfs_stat(&lfs, path, &info); // intentionally do not use LFS_API_CALL here, don't need error checking for this usage of the API
+    return err >= 0 || err == LFS_ERR_EXIST;
+}
+
+static bool fs_delete_nolock(const char *path) {
+    FS_AUTO_MOUNT_UNMOUNT(false);
+    int err = LFS_API_CALL(lfs_remove, &lfs, path);
+    return err >= 0 || err == LFS_ERR_NOENT; // Allow for already deleted files to count as success
+}
+
 static fs_fd_t fs_open_nolock(const char *filename, const char *mode) {
     FIND_FD_GET_HANDLE(INVALID_FILESYSTEM_FD, FD_TYPE_EMPTY, {
         FS_AUTO_MOUNT_UNMOUNT(INVALID_FILESYSTEM_FD);
@@ -299,7 +312,7 @@ static fs_fd_t fs_open_nolock(const char *filename, const char *mode) {
                     flags |= LFS_O_WRONLY | LFS_O_CREAT;
                     break;
                 case 't':
-                    flags |= LFS_O_TRUNC | LFS_O_CREAT;
+                    flags |= LFS_O_TRUNC;
                     break;
             }
             ++mode;
@@ -324,27 +337,9 @@ static fs_fd_t fs_open_nolock(const char *filename, const char *mode) {
     return INVALID_FILESYSTEM_FD;
 }
 
-static void fs_close_nolock(fs_fd_t fd) {
-    FIND_FD_GET_HANDLE(fd, FD_TYPE_FILE, {
-        LFS_API_CALL(lfs_file_close, &lfs, &handle->file.file_handle);
-
-        handle->fd   = INVALID_FILESYSTEM_FD;
-        handle->type = FD_TYPE_EMPTY;
-
-        fs_unmount_nolock(); // we can unmount here, mirrors the open in fs_open()
-        return;
-    });
-}
-
-static bool fs_delete_nolock(const char *path) {
-    FS_AUTO_MOUNT_UNMOUNT(false);
-    int err = LFS_API_CALL(lfs_remove, &lfs, path);
-    return err >= 0 || err == LFS_ERR_NOENT; // Allow for already deleted files to count as success
-}
-
 static fs_offset_t fs_seek_nolock(fs_fd_t fd, fs_offset_t offset, fs_whence_t whence) {
     FIND_FD_GET_HANDLE(fd, FD_TYPE_FILE, {
-        if (!fs_mounted_nolock()) {
+        if (!fs_is_mounted_nolock()) {
             return -1;
         }
 
@@ -373,7 +368,7 @@ static fs_offset_t fs_seek_nolock(fs_fd_t fd, fs_offset_t offset, fs_whence_t wh
 
 static fs_offset_t fs_tell_nolock(fs_fd_t fd) {
     FIND_FD_GET_HANDLE(fd, FD_TYPE_FILE, {
-        if (!fs_mounted_nolock()) {
+        if (!fs_is_mounted_nolock()) {
             return -1;
         }
 
@@ -385,7 +380,7 @@ static fs_offset_t fs_tell_nolock(fs_fd_t fd) {
 
 static fs_size_t fs_read_nolock(fs_fd_t fd, void *buffer, fs_size_t length) {
     FIND_FD_GET_HANDLE(fd, FD_TYPE_FILE, {
-        if (!fs_mounted_nolock()) {
+        if (!fs_is_mounted_nolock()) {
             return -1;
         }
 
@@ -397,7 +392,7 @@ static fs_size_t fs_read_nolock(fs_fd_t fd, void *buffer, fs_size_t length) {
 
 static fs_size_t fs_write_nolock(fs_fd_t fd, const void *buffer, fs_size_t length) {
     FIND_FD_GET_HANDLE(fd, FD_TYPE_FILE, {
-        if (!fs_mounted_nolock()) {
+        if (!fs_is_mounted_nolock()) {
             return -1;
         }
 
@@ -409,7 +404,7 @@ static fs_size_t fs_write_nolock(fs_fd_t fd, const void *buffer, fs_size_t lengt
 
 static bool fs_is_eof_nolock(fs_fd_t fd) {
     FIND_FD_GET_HANDLE(fd, FD_TYPE_FILE, {
-        if (!fs_mounted_nolock()) {
+        if (!fs_is_mounted_nolock()) {
             return true;
         }
 
@@ -433,10 +428,26 @@ static bool fs_is_eof_nolock(fs_fd_t fd) {
     return true;
 }
 
-bool fs_erase(void) {
+static void fs_close_nolock(fs_fd_t fd) {
+    FIND_FD_GET_HANDLE(fd, FD_TYPE_FILE, {
+        LFS_API_CALL(lfs_file_close, &lfs, &handle->file.file_handle);
+
+        handle->fd   = INVALID_FILESYSTEM_FD;
+        handle->type = FD_TYPE_EMPTY;
+
+        fs_unmount_nolock(); // we can unmount here, mirrors the open in fs_open()
+        return;
+    });
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Public APIs
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool fs_format(void) {
     fs_dprintf("\n");
     FS_AUTO_LOCK_UNLOCK(false);
-    return fs_erase_nolock();
+    return fs_format_nolock();
 }
 
 bool fs_init(void) {
@@ -446,20 +457,30 @@ bool fs_init(void) {
 }
 
 bool fs_mount(void) {
-    fs_dprintf("%d\n", mount_count);
-    FS_AUTO_LOCK_UNLOCK(false);
-    return fs_mount_nolock();
+    int before = mount_count;
+    (void)before;
+    bool ret;
+    {
+        FS_AUTO_LOCK_UNLOCK(false);
+        ret = fs_mount_nolock();
+    }
+    fs_dprintf("%d -> %d\n", before, mount_count);
+    return ret;
 }
 
 void fs_unmount(void) {
-    fs_dprintf("%d\n", mount_count);
-    FS_AUTO_LOCK_UNLOCK();
-    fs_unmount_nolock();
+    int before = mount_count;
+    (void)before;
+    {
+        FS_AUTO_LOCK_UNLOCK();
+        fs_unmount_nolock();
+    }
+    fs_dprintf("%d -> %d\n", before, mount_count);
 }
 
-bool fs_mounted(void) {
+bool fs_is_mounted(void) {
     FS_AUTO_LOCK_UNLOCK(false);
-    return fs_mounted_nolock();
+    return fs_is_mounted_nolock();
 }
 
 fs_fd_t fs_opendir(const char *path) {
@@ -496,6 +517,18 @@ bool fs_rmdir(const char *path, bool recursive) {
     return fs_rmdir_nolock(path, recursive);
 }
 
+bool fs_exists(const char *path) {
+    fs_dprintf("%s\n", path);
+    FS_AUTO_LOCK_UNLOCK(false);
+    return fs_exists_nolock(path);
+}
+
+bool fs_delete(const char *path) {
+    fs_dprintf("%s\n", path);
+    FS_AUTO_LOCK_UNLOCK(false);
+    return fs_delete_nolock(path);
+}
+
 fs_fd_t fs_open(const char *filename, const char *mode) {
     fs_fd_t fd;
     {
@@ -504,18 +537,6 @@ fs_fd_t fs_open(const char *filename, const char *mode) {
     }
     fs_dprintf("%s, %s, fd=%d\n", filename, mode, (int)fd);
     return fd;
-}
-
-void fs_close(fs_fd_t fd) {
-    fs_dprintf("%d\n", (int)fd);
-    FS_AUTO_LOCK_UNLOCK();
-    fs_close_nolock(fd);
-}
-
-bool fs_delete(const char *path) {
-    fs_dprintf("%s\n", path);
-    FS_AUTO_LOCK_UNLOCK(false);
-    return fs_delete_nolock(path);
 }
 
 fs_offset_t fs_seek(fs_fd_t fd, fs_offset_t offset, fs_whence_t whence) {
@@ -543,11 +564,28 @@ bool fs_is_eof(fs_fd_t fd) {
     return fs_is_eof_nolock(fd);
 }
 
+void fs_close(fs_fd_t fd) {
+    fs_dprintf("%d\n", (int)fd);
+    FS_AUTO_LOCK_UNLOCK();
+    fs_close_nolock(fd);
+}
+
 void fs_dump_info(void) {
+#if defined(CONSOLE_ENABLE)
     struct lfs_fsinfo fs_info;
-    if (lfs_fs_stat(&lfs, &fs_info) >= 0) {
-        dprintf("LFS disk version: 0x%08x, block size: %d, block count: %d, allocated blocks: %d, name_max: %d, file_max: %d, attr_max: %d\n", //
-                (int)fs_info.disk_version, (int)fs_info.block_size, (int)fs_info.block_count, (int)lfs_fs_size(&lfs),                          //
-                (int)fs_info.name_max, (int)fs_info.file_max, (int)fs_info.attr_max);
+    lfs_ssize_t       size;
+    {
+        FS_AUTO_LOCK_UNLOCK();
+        if ((size = lfs_fs_size(&lfs)) < 0) {
+            return;
+        }
+        if (lfs_fs_stat(&lfs, &fs_info) < 0) {
+            return;
+        }
     }
+    fs_dprintf("LFS disk version: 0x%08x, block size: %d, block count: %d, allocated blocks: %d, name_max: %d, file_max: %d, attr_max: %d\n", //
+               (int)fs_info.disk_version, (int)fs_info.block_size, (int)fs_info.block_count, (int)size,                                       //
+               (int)fs_info.name_max, (int)fs_info.file_max, (int)fs_info.attr_max);
+
+#endif
 }

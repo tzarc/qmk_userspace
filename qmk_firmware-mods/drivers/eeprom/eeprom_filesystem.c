@@ -29,6 +29,9 @@ void eeprom_driver_init(void) {
     for (int i = 0; i < ARRAY_SIZE(eeprom_backing); i += (EEPROM_FILESYSTEM_CHUNK_SIZE)) {
         char path[8] = {0};
         ee_filename(i / (EEPROM_FILESYSTEM_CHUNK_SIZE), path, sizeof(path));
+        if (!fs_exists(path)) {
+            continue;
+        }
         fs_fd_t fd = fs_open(path, "r");
         if (fd == INVALID_FILESYSTEM_FD) {
             continue;

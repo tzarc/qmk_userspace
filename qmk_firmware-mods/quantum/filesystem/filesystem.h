@@ -20,11 +20,11 @@ typedef enum fs_whence_t {
     FS_SEEK_END = 2  // Seek relative to the end of the file
 } fs_whence_t;
 
-bool fs_erase(void);
+bool fs_format(void);
 bool fs_init(void);
 bool fs_mount(void);
 void fs_unmount(void);
-bool fs_mounted(void);
+bool fs_is_mounted(void);
 
 typedef struct fs_dirent_t {
     const char *name;
@@ -38,17 +38,18 @@ fs_fd_t      fs_opendir(const char *path);
 fs_dirent_t *fs_readdir(fs_fd_t fd);
 void         fs_closedir(fs_fd_t fd);
 
-fs_fd_t fs_open(const char *filename, const char *mode); // "rwt" => read, write, truncate
-void    fs_close(fs_fd_t fd);
-bool    fs_delete(const char *path);
+bool fs_exists(const char *path);
+bool fs_delete(const char *path);
 
+fs_fd_t     fs_open(const char *filename, const char *mode); // "rwt" => read, write, truncate
 fs_offset_t fs_seek(fs_fd_t fd, fs_offset_t offset, fs_whence_t whence);
 fs_offset_t fs_tell(fs_fd_t fd);
 fs_size_t   fs_read(fs_fd_t fd, void *buffer, fs_size_t length);
 fs_size_t   fs_write(fs_fd_t fd, const void *buffer, fs_size_t length);
 bool        fs_is_eof(fs_fd_t fd);
+void        fs_close(fs_fd_t fd);
 
-#ifdef FILESYSTEM_DEBUG
+#if defined(FILESYSTEM_DEBUG) && defined(CONSOLE_ENABLE)
 #    include <debug.h>
 #    include <print.h>
 #    define fs_dprintf(...)            \
