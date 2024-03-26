@@ -237,6 +237,7 @@ static void fs_closedir_nolock(fs_fd_t fd) {
         handle->type = FD_TYPE_EMPTY;
 
         fs_unmount_nolock(); // we can unmount here, mirrors the open in fs_opendir()
+        return;
     });
 }
 
@@ -294,6 +295,9 @@ static bool fs_exists_nolock(const char *path) {
 
 static bool fs_delete_nolock(const char *path) {
     FS_AUTO_MOUNT_UNMOUNT(false);
+    if (!fs_exists_nolock(path)) {
+        return true;
+    }
     int err = LFS_API_CALL(lfs_remove, &lfs, path);
     return err >= 0 || err == LFS_ERR_NOENT; // Allow for already deleted files to count as success
 }
