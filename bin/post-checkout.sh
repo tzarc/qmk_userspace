@@ -25,29 +25,38 @@ if [ "${1:-}" = "" -o "${1:-}" != "${2:-}" ]; then
 
     # If we have a valid direnv and valid qmk_firmware, do the actual processing
     if [[ -d "$direnv_dir" ]] && [[ -d "$firmware_dir" ]]; then
+        # Everything here happens within qmk_firmware
+        cd "$firmware_dir"
 
         # Figure out and enter the qmk venv
         activation_script=$(ls -1 "$direnv_dir/"*"/bin/activate" | sort | head -n1)
         source "$activation_script"
 
-        # Upgrade QMK CLI and all other deps
-        python3 -m pip install --upgrade pip
-        python3 -m pip install --upgrade -r "$script_dir/../python-requirements.txt"
+        # Ensure we have uv available
+        [[ ! -z "$(which uv)" ]] || pip install uv
 
-        # Nuke all the git submodules that may or may not be present in different branches
-        pushd "$firmware_dir" >/dev/null 2>&1 \
-            && { [ -e lib/chibios-contrib/ext/mcux-sdk ] && rm -rf lib/chibios-contrib/ext/mcux-sdk || true ; } \
-            && { [ -e lib/littlefs ] && rm -rf lib/littlefs || true ; } \
-            && { [ -e lib/lua ] && rm -rf lib/lua || true ; } \
-            && { [ -e lib/lvgl ] && rm -rf lib/lvgl || true ; } \
-            && { [ -e lib/pico-sdk ] && rm -rf lib/pico-sdk || true ; } \
-            && { [ -e lib/riot ] && rm -rf lib/riot || true ; } \
-            && { [ -e lib/ugfx ] && rm -rf lib/ugfx || true ; } \
-            && popd >/dev/null 2>&1
+        # Upgrade QMK CLI and all other deps
+        uv pip install --upgrade pip uv -r "$script_dir/../python-requirements.txt"
+
+        # Determine all the submodules we expect, as well as the ones we found on-disk
+        actual_submodules=$(git submodule --quiet foreach --recursive git rev-parse --show-toplevel | sed -e "s@${firmware_dir}/@@g")
+        found_submodules=$(find lib -type f -name .git | while read p; do echo $(dirname $p); done)
+        all_submodules=$(echo -e "$actual_submodules\n$found_submodules" | sort -u)
+        while read actual; do
+            # Remove the actual submodule from the total list of submodules
+            all_submodules=$(echo "$all_submodules" | grep -vP "^$actual\$")
+        done <<< "$actual_submodules"
+
+        # Remove any submodules that are no longer in use
+        while read remove; do
+            echo -n "Removing ${remove}... " >&2
+            rm -rf "$firmware_dir/$remove"
+            echo "done." >&2
+        done <<< "$all_submodules"
 
         # Reconfigure git submodules
         pushd "$firmware_dir" >/dev/null 2>&1 \
-            && qmk git-submodule -f \
+            && git submodule update --jobs $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) --init --recursive \
             && popd >/dev/null 2>&1
 
         # Drop out of the qmk venv
