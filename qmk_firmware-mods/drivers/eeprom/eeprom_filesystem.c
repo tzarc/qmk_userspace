@@ -27,8 +27,8 @@ void eeprom_driver_init(void) {
     fs_init();
     fs_mkdir("ee");
     for (int i = 0; i < ARRAY_SIZE(eeprom_backing); i += (EEPROM_FILESYSTEM_CHUNK_SIZE)) {
-        int chunk_index = i / (EEPROM_FILESYSTEM_CHUNK_SIZE);
-        char path[8] = {0};
+        int  chunk_index = i / (EEPROM_FILESYSTEM_CHUNK_SIZE);
+        char path[8]     = {0};
         ee_filename(chunk_index, path, sizeof(path));
         if (!fs_exists(path)) {
             continue;

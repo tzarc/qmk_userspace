@@ -147,6 +147,7 @@ BOARD_DEFS := \
 	bm16s!kprepublic/bm16s!tzarc \
 	bm60!kprepublic/bm60hsrgb_poker/rev2!tzarc \
 	chocopad!keebio/chocopad!tzarc \
+	chocv!chocv!tzarc \
 	ctrl!massdrop/ctrl!tzarc \
 	djinn_rev1!tzarc/djinn/rev1!tzarc \
 	djinn_rev2!tzarc/djinn/rev2!tzarc \

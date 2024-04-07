@@ -5,7 +5,6 @@
 #include <quantum.h>
 #include <process_unicode_common.h>
 #include "keycodes.h"
-#include "lfs.h"
 #include "timer.h"
 #include "tzarc.h"
 #include "tzarc_layout.h"

@@ -87,6 +87,7 @@ enum { FOREACH_CUSTOM_LAYER(LAYER_ENUM) };
 #define LAYOUT_60_ansi_wrapper(...) LAYOUT_60_ansi(__VA_ARGS__)
 #define LAYOUT_ortho_4x4_wrapper(...) LAYOUT_ortho_4x4(__VA_ARGS__)
 #define LAYOUT_ortho_4x12_wrapper(...) LAYOUT_ortho_4x12(__VA_ARGS__)
+#define LAYOUT_split_3x5_3_wrapper(...) LAYOUT_split_3x5_3(__VA_ARGS__)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Layout Helpers: Split 6x4 layouts
