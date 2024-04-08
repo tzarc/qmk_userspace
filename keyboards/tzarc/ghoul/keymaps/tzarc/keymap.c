@@ -1,7 +1,11 @@
 // Copyright 2018-2024 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
+#include <ch.h>
+#include "rgb_matrix.h"
 #include QMK_KEYBOARD_H
 #include "tzarc.h"
+
+#define MULTITHREADED_UI
 
 enum { _QWERTY, _LOWER, _RAISE, _ADJUST };
 
@@ -61,19 +65,34 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
     [_ADJUST] = {ENCODER_CCW_CW(RGB_HUI, RGB_HUD)},
 };
 
-void keyboard_post_init_keymap(void) {
-    // debug_enable   = true;
-    // debug_matrix   = true;
-    // debug_keyboard = true;
-    // debug_mouse    = true;
-
-    // Init the display
+#ifdef MULTITHREADED_UI
+static THD_WORKING_AREA(waUIThread, 1024);
+static THD_FUNCTION(UIThread, arg) {
+    (void)arg;
+    chRegSetThreadName("ui");
     ui_init();
+    while (true) {
+        ui_task();
+        wait_ms(2);
+    }
+}
+#endif // MULTITHREADED_UI
+
+void keyboard_post_init_keymap(void) {
+#ifdef MULTITHREADED_UI
+    chThdCreateStatic(waUIThread, sizeof(waUIThread), NORMALPRIO, UIThread, NULL);
+#else  // MULTITHREADED_UI
+    ui_init();
+#endif // MULTITHREADED_UI
+
+    rgb_matrix_mode(RGB_MATRIX_SOLID_COLOR);
+    rgb_matrix_sethsv(0, 255, 255);
 }
 
 void housekeeping_task_keymap(void) {
-    // Draw the display
+#ifndef MULTITHREADED_UI
     ui_task();
+#endif // MULTITHREADED_UI
 
     static uint32_t last_eeprom_access = 0;
     uint32_t        now                = timer_read32();

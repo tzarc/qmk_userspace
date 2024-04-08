@@ -69,7 +69,7 @@ void ui_task(void) {
     static int     write_offset                 = 0;
 
     static uint32_t last_read = 0;
-    if (timer_elapsed32(last_read) >= 1) {
+    if (timer_elapsed32(last_read) >= 2) {
         // Perform the reads
         int16_t current    = analogReadPin(ADC_CURRENT_PIN);
         int16_t voltage    = analogReadPin(ADC_VOLTAGE_PIN);

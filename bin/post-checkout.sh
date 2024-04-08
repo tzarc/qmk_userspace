@@ -39,25 +39,28 @@ if [ "${1:-}" = "" -o "${1:-}" != "${2:-}" ]; then
         uv pip install --upgrade pip uv -r "$script_dir/../python-requirements.txt"
 
         # Determine all the submodules we expect, as well as the ones we found on-disk
-        actual_submodules=$(git submodule --quiet foreach --recursive git rev-parse --show-toplevel | sed -e "s@${firmware_dir}/@@g")
+        actual_submodules=$(git -C "$firmware_dir" submodule --quiet foreach --recursive git rev-parse --show-toplevel | sed -e "s@${firmware_dir}/@@g")
         found_submodules=$(find lib -type f -name .git | while read p; do echo $(dirname $p); done)
-        all_submodules=$(echo -e "$actual_submodules\n$found_submodules" | sort -u)
+        all_submodules=$(echo -e "$actual_submodules\n$found_submodules" | sort -u || true)
         while read actual; do
             # Remove the actual submodule from the total list of submodules
-            all_submodules=$(echo "$all_submodules" | grep -vP "^$actual\$")
-        done <<< "$actual_submodules"
+            all_submodules=$(echo "$all_submodules" | grep -vP "^$actual\$" || true)
+        done <<<"$actual_submodules"
 
         # Remove any submodules that are no longer in use
         while read remove; do
-            echo -n "Removing ${remove}... " >&2
-            rm -rf "$firmware_dir/$remove"
-            echo "done." >&2
-        done <<< "$all_submodules"
+            if [[ "$remove" != "" ]] && [[ "$remove" != "." ]] && [[ "$remove" != ".." ]]; then
+                this_dir=$(realpath "$firmware_dir/$remove")
+                if [[ $(realpath "$firmware_dir") != $(realpath "$this_dir") ]] && [[ -f "$this_dir/.git" ]] && [[ ! -z $(cat "$this_dir/.git" | head -n1 | grep '^gitdir:' || true) ]]; then
+                    echo -n "Removing ${remove}... " >&2
+                    rm -rf "$this_dir"
+                    echo "done." >&2
+                fi
+            fi
+        done <<<"$all_submodules"
 
         # Reconfigure git submodules
-        pushd "$firmware_dir" >/dev/null 2>&1 \
-            && git submodule update --jobs $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) --init --recursive \
-            && popd >/dev/null 2>&1
+        git -C "$firmware_dir" submodule update --jobs $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) --init --recursive
 
         # Drop out of the qmk venv
         deactivate
