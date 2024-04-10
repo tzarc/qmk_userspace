@@ -1,0 +1,8 @@
+{
+    "converter": "promicro_rp2040",
+    "config": {
+        "features": {
+            "unicode": true
+        }
+    }
+}
