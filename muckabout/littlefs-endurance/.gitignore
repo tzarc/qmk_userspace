@@ -1,0 +1,4 @@
+littlefs-endurance
+.cache
+.build
+compile_commands.json

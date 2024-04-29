@@ -347,6 +347,13 @@
             "cwd": "${workspaceFolder}/muckabout/gen_circ"
         },
         {
+            "name": "(gdb) littlefs-endurance",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/muckabout/littlefs-endurance/littlefs-endurance",
+            "cwd": "${workspaceFolder}/muckabout/littlefs-endurance"
+        },
+        {
             "name": "(gdb) rle",
             "type": "lldb",
             "request": "launch",
