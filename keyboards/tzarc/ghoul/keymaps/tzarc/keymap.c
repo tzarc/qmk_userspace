@@ -5,7 +5,7 @@
 #include QMK_KEYBOARD_H
 #include "tzarc.h"
 
-#define MULTITHREADED_UI
+// #define MULTITHREADED_UI
 
 enum { _QWERTY, _LOWER, _RAISE, _ADJUST };
 

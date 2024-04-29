@@ -1,449 +1,414 @@
 {
-  // Use IntelliSense to learn about possible attributes.
-  // Hover to view descriptions of existing attributes.
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 
-  // vscode user-level settings.json:
-  // "cortex-debug.armToolchainPath.linux": "/home/nickb/gcc-arm/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi/bin",
-  // "cortex-debug.gdbPath.linux": "/home/nickb/qmk_build/bin/arm-none-eabi-gdb-shim",
-  // "cortex-debug.armToolchainPath.windows": "E:\\arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi\\bin"
+    // vscode user-level settings.json:
+    // "cortex-debug.armToolchainPath.linux": "/home/nickb/gcc-arm/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi/bin",
+    // "cortex-debug.gdbPath.linux": "/home/nickb/qmk_build/bin/arm-none-eabi-gdb-shim",
+    // "cortex-debug.armToolchainPath.windows": "E:\\arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi\\bin"
 
-  "version": "0.2.0",
-  "configurations": [
-    {
-        "name": "Python: qmk compile -kb dz60 -km bcat -e FORCE_LAYOUT=60_tsangan_hhkb",
-        "type": "python",
-        "justMyCode": false,
-        "cwd": "${workspaceRoot}/bcat-qmk_userspace",
-        "request": "launch",
-        "args": [
-          "compile",
-          "-kb",
-          "dz60",
-          "-km",
-          "bcat",
-          "-e",
-          "FORCE_LAYOUT=60_tsangan_hhkb"
-        ],
-        "console": "integratedTerminal",
-        "linux": {
-          "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-          "env": {
-            "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
-          }
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: qmk -v license-check -a users/tzarc/tzarc_unicode.c users/tzarc/tzarc_wow.c",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": [
+                "-v",
+                "license-check",
+                "-a",
+                "users/tzarc/tzarc_unicode.c",
+                "users/tzarc/tzarc_wow.c"
+            ],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
         },
-      },
-      {
-      "name": "Python: convert *.so to *.qke",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}/muckabout/dynamic-so",
-      "request": "launch",
-      "program": "${workspaceRoot}/muckabout/dynamic-so/convert-binary.py",
-      "args": [
-        "dynamic_lib.so",
-      ],
-      "console": "integratedTerminal",
-    },
-    {
-      "name": "Python: qmk env",
-      "type": "python",
-      "justMyCode": false,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "env"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-        "env": {
-          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+        {
+            "name": "Python: qmk compile -kb dz60 -km bcat -e FORCE_LAYOUT=60_tsangan_hhkb",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}/bcat-qmk_userspace",
+            "request": "launch",
+            "args": [
+                "compile",
+                "-kb",
+                "dz60",
+                "-km",
+                "bcat",
+                "-e",
+                "FORCE_LAYOUT=60_tsangan_hhkb"
+            ],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: convert *.so to *.qke",
+            "type": "debugpy",
+            "justMyCode": true,
+            "cwd": "${workspaceRoot}/muckabout/dynamic-so",
+            "request": "launch",
+            "program": "${workspaceRoot}/muckabout/dynamic-so/convert-binary.py",
+            "args": ["dynamic_lib.so"],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: qmk env",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": ["env"],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: qmk find -f 'features.quantum_painter=true'",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": ["find", "-f", "features.quantum_painter=true"],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: qmk userspace-list",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": ["userspace-list"],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: qmk userspace-list -e",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": ["userspace-list", "-e"],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: qmk find -f features.rgblight=true",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": ["find", "-f", "features.rgblight=true"],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: qmk compile -kb bm16s -km default",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": ["compile", "-kb", "bm16s", "-km", "default"],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: qmk compile -kb bm16s -km tzarc_layout_c",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": ["compile", "-kb", "bm16s", "-km", "tzarc_layout_c"],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: qmk compile --clean --compiledb -kb bm16s -km default",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": [
+                "compile",
+                "--clean",
+                "--compiledb",
+                "-kb",
+                "bm16s",
+                "-km",
+                "default"
+            ],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: qmk mass-compile bm16s:default /home/nickb/qmk_build/extra_userdir/keyboards/bm16s/keymaps/tzarc_json/keymap.json bm16s:via",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": [
+                "mass-compile",
+                "bm16s:default",
+                "/home/nickb/qmk_build/extra_userdir/keyboards/bm16s/keymaps/tzarc_json/keymap.json",
+                "bm16s:via"
+            ],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: qmk compile -kb handwired/pytest/basic -km default_json -n",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": [
+                "compile",
+                "-kb",
+                "handwired/pytest/basic",
+                "-km",
+                "default_json",
+                "-n"
+            ],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: qmk ci-validate-aliases",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": ["ci-validate-aliases"],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: qmk mass-compile all:drashna",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": ["mass-compile", "all:drashna"],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: qmk compile -kb bm16s -km tzarc",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": ["compile", "-kb", "bm16s", "-km", "tzarc"],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: qmk new-keymap -kb bm16a -km new",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": ["new-keymap", "-kb", "bm16a", "-km", "new"],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: qmk new-keymap -kb bm16s -km new",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": ["new-keymap", "-kb", "bm16s", "-km", "new"],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: qmk userspace-doctor",
+            "type": "debugpy",
+            "justMyCode": true,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": ["userspace-doctor"],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: qmk userspace-compile",
+            "type": "debugpy",
+            "justMyCode": true,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": ["userspace-compile"],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "(gdb) gen_circ",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/muckabout/gen_circ/gen_circ",
+            "cwd": "${workspaceFolder}/muckabout/gen_circ"
+        },
+        {
+            "name": "(gdb) rle",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/muckabout/rle/rle",
+            "args": ["-h"],
+            "cwd": "${workspaceFolder}/muckabout/rle"
+        },
+        {
+            "name": "(gdb) rle16",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/muckabout/rle16/rle",
+            "args": ["-h"],
+            "cwd": "${workspaceFolder}/muckabout/rle16"
+        },
+        {
+            "name": "(gdb) Launch encoder_split_no_left",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/qmk_firmware/.build/test/encoder_split_no_left.elf",
+            "args": [],
+            "cwd": "${workspaceFolder}/qmk_firmware/.build/test"
+        },
+        {
+            "name": "ST-Link (handwired/onekey F723 reset keymap, cortex-debug)",
+            "type": "cortex-debug",
+            "request": "attach",
+            "cwd": "${workspaceRoot}/qmk_firmware",
+            "servertype": "stutil",
+            "device": "STM32F723",
+            "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_onekey_disco_f723_reset.elf",
+            "svdPath": "${workspaceRoot}/svd/STM32F7x3.svd"
+        },
+        {
+            "name": "ST-Link (handwired/onekey H723 reset keymap, cortex-debug)",
+            "type": "cortex-debug",
+            "request": "attach",
+            "cwd": "${workspaceRoot}/qmk_firmware",
+            "servertype": "stutil",
+            "device": "STM32H723",
+            "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_onekey_nucleo_h723zg_reset.elf",
+            "svdPath": "${workspaceRoot}/svd/STM32H723.svd"
+        },
+        {
+            "name": "Black Magic Probe (qp_test, cortex-debug)",
+            "type": "cortex-debug",
+            "request": "attach",
+            "cwd": "${workspaceRoot}/qmk_firmware",
+            "svdPath": "${workspaceRoot}/svd/STM32F401.svd",
+            "servertype": "bmp",
+            "interface": "swd",
+            "device": "STM32F401",
+            "executable": "${workspaceRoot}/qmk_firmware/.build/qp_test_default.elf",
+            "linux": {
+                "BMPGDBSerialPort": "/dev/ttyACM2"
+            },
+            "windows": {
+                "BMPGDBSerialPort": "COM3"
+            },
+            "showDevDebugOutput": "parsed",
+            "preAttachCommands": ["set mem inaccessible-by-default off"],
+            "postAttachCommands": []
         }
-      },
-    },
-    {
-      "name": "Python: qmk find -f 'length(layouts.LAYOUT.layout,3)'",
-      "type": "python",
-      "justMyCode": false,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "find",
-        "-f",
-        "length(layouts.LAYOUT.layout,3)"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-        "env": {
-          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
-        }
-      },
-    },
-    {
-      "name": "Python: qmk userspace-list",
-      "type": "python",
-      "justMyCode": false,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "userspace-list"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-        "env": {
-          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
-        }
-      },
-    },
-    {
-      "name": "Python: qmk userspace-list -e",
-      "type": "python",
-      "justMyCode": false,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "userspace-list",
-        "-e"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-        "env": {
-          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
-        }
-      },
-    },
-    {
-      "name": "Python: qmk find -f features.rgblight=true",
-      "type": "python",
-      "justMyCode": false,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "find",
-        "-f",
-        "features.rgblight=true"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-        "env": {
-          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
-        }
-      },
-    },
-    {
-      "name": "Python: qmk compile -kb bm16s -km default",
-      "type": "python",
-      "justMyCode": false,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "compile",
-        "-kb",
-        "bm16s",
-        "-km",
-        "default"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-        "env": {
-          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
-        }
-      },
-    },
-    {
-      "name": "Python: qmk compile -kb bm16s -km tzarc_layout_c",
-      "type": "python",
-      "justMyCode": false,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "compile",
-        "-kb",
-        "bm16s",
-        "-km",
-        "tzarc_layout_c"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-        "env": {
-          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
-        }
-      },
-    },
-    {
-      "name": "Python: qmk compile --clean --compiledb -kb bm16s -km default",
-      "type": "python",
-      "justMyCode": false,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "compile",
-        "--clean",
-        "--compiledb",
-        "-kb",
-        "bm16s",
-        "-km",
-        "default"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-        "env": {
-          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
-        }
-      },
-    },
-    {
-      "name": "Python: qmk mass-compile bm16s:default /home/nickb/qmk_build/extra_userdir/keyboards/bm16s/keymaps/tzarc_json/keymap.json bm16s:via",
-      "type": "python",
-      "justMyCode": false,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "mass-compile",
-        "bm16s:default",
-        "/home/nickb/qmk_build/extra_userdir/keyboards/bm16s/keymaps/tzarc_json/keymap.json",
-        "bm16s:via"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-        "env": {
-          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
-        }
-      },
-    },
-    {
-      "name": "Python: qmk compile -kb handwired/pytest/basic -km default_json -n",
-      "type": "python",
-      "justMyCode": false,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "compile",
-        "-kb",
-        "handwired/pytest/basic",
-        "-km",
-        "default_json",
-        "-n"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-        "env": {
-          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
-        }
-      },
-    },
-    {
-      "name": "Python: qmk ci-validate-aliases",
-      "type": "python",
-      "justMyCode": false,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "ci-validate-aliases",
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-        "env": {
-          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
-        }
-      },
-    },
-    {
-      "name": "Python: qmk mass-compile all:drashna",
-      "type": "python",
-      "justMyCode": false,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "mass-compile",
-        "all:drashna",
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-        "env": {
-          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
-        }
-      },
-    },
-    {
-      "name": "Python: qmk compile -kb bm16s -km tzarc",
-      "type": "python",
-      "justMyCode": false,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "compile",
-        "-kb",
-        "bm16s",
-        "-km",
-        "tzarc"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-        "env": {
-          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
-        }
-      },
-    },
-    {
-      "name": "Python: qmk new-keymap -kb bm16a -km new",
-      "type": "python",
-      "justMyCode": false,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "new-keymap",
-        "-kb",
-        "bm16a",
-        "-km",
-        "new"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-        "env": {
-          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
-        }
-      },
-    },
-    {
-      "name": "Python: qmk new-keymap -kb bm16s -km new",
-      "type": "python",
-      "justMyCode": false,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "new-keymap",
-        "-kb",
-        "bm16s",
-        "-km",
-        "new"
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-        "env": {
-          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
-        }
-      },
-    },
-    {
-      "name": "Python: qmk userspace-doctor",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "userspace-doctor",
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-        "env": {
-          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
-        }
-      },
-    },
-    {
-      "name": "Python: qmk userspace-compile",
-      "type": "python",
-      "justMyCode": true,
-      "cwd": "${workspaceRoot}",
-      "request": "launch",
-      "args": [
-        "userspace-compile",
-      ],
-      "console": "integratedTerminal",
-      "linux": {
-        "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
-        "env": {
-          "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
-        }
-      },
-    },
-    {
-      "name": "(gdb) gen_circ",
-      "type": "lldb",
-      "request": "launch",
-      "program": "${workspaceFolder}/muckabout/gen_circ/gen_circ",
-      "cwd": "${workspaceFolder}/muckabout/gen_circ"
-    },
-    {
-      "name": "(gdb) rle",
-      "type": "lldb",
-      "request": "launch",
-      "program": "${workspaceFolder}/muckabout/rle/rle",
-      "args": ["-h"],
-      "cwd": "${workspaceFolder}/muckabout/rle"
-    },
-    {
-      "name": "(gdb) rle16",
-      "type": "lldb",
-      "request": "launch",
-      "program": "${workspaceFolder}/muckabout/rle16/rle",
-      "args": ["-h"],
-      "cwd": "${workspaceFolder}/muckabout/rle16"
-    },
-    {
-      "name": "(gdb) Launch encoder_split_no_left",
-      "type": "lldb",
-      "request": "launch",
-      "program": "${workspaceFolder}/qmk_firmware/.build/test/encoder_split_no_left.elf",
-      "args": [],
-      "cwd": "${workspaceFolder}/qmk_firmware/.build/test"
-    },
-    {
-      "name": "ST-Link (handwired/onekey F723 reset keymap, cortex-debug)",
-      "type": "cortex-debug",
-      "request": "attach",
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "servertype": "stutil",
-      "device": "STM32F723",
-      "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_onekey_disco_f723_reset.elf",
-      "svdPath": "${workspaceRoot}/svd/STM32F7x3.svd"
-    },
-    {
-      "name": "ST-Link (handwired/onekey H723 reset keymap, cortex-debug)",
-      "type": "cortex-debug",
-      "request": "attach",
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "servertype": "stutil",
-      "device": "STM32H723",
-      "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_onekey_nucleo_h723zg_reset.elf",
-      "svdPath": "${workspaceRoot}/svd/STM32H723.svd"
-    },
-    {
-      "name": "Black Magic Probe (qp_test, cortex-debug)",
-      "type": "cortex-debug",
-      "request": "attach",
-      "cwd": "${workspaceRoot}/qmk_firmware",
-      "svdPath": "${workspaceRoot}/svd/STM32F401.svd",
-      "servertype": "bmp",
-      "interface": "swd",
-      "device": "STM32F401",
-      "executable": "${workspaceRoot}/qmk_firmware/.build/qp_test_default.elf",
-      "linux": {
-        "BMPGDBSerialPort": "/dev/ttyACM2"
-      },
-      "windows": {
-        "BMPGDBSerialPort": "COM3"
-      },
-      "showDevDebugOutput": "parsed",
-      "preAttachCommands": ["set mem inaccessible-by-default off"],
-      "postAttachCommands": []
-    }
-  ]
+    ]
 }

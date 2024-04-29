@@ -8,6 +8,10 @@
 // #include "qp_lvgl.h"
 // #include "ui.h"
 
+#if defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
+#    include "filesystem.h"
+#endif // defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
+
 //----------------------------------------------------------
 // Key map
 
@@ -92,6 +96,10 @@ const char *current_layer_name(void) {
 //----------------------------------------------------------
 // Overrides
 
+#if defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
+static bool is_mounted = false;
+#endif // defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
+
 void keyboard_post_init_keymap(void) {
     // Initialise the theme
     theme_init();
@@ -99,6 +107,10 @@ void keyboard_post_init_keymap(void) {
     void keyboard_post_init_display(void);
     keyboard_post_init_display();
     rgb_matrix_disable_noeeprom();
+
+#if defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
+    is_mounted = fs_init();
+#endif // defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
 }
 
 bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
@@ -143,6 +155,57 @@ void housekeeping_task_keymap(void) {
 
     // Data sync from master to slave
     theme_state_sync();
+
+#if defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
+    if (is_mounted) {
+        static uint32_t minutes_running = 0;
+        if (timer_elapsed32(minutes_running) > 60000) {
+            minutes_running = timer_read32();
+            fs_fd_t fd      = fs_open("minutes", "rw");
+            if (fd != INVALID_FILESYSTEM_FD) {
+                uint32_t minutes = 0;
+                if (fs_read(fd, &minutes, sizeof(minutes)) != sizeof(minutes)) {
+                    minutes = 0;
+                }
+                ++minutes;
+                fs_seek(fd, 0, FS_SEEK_SET);
+                fs_write(fd, &minutes, sizeof(minutes));
+                fs_close(fd);
+                dprintf("Minutes running: %d\n", (int)minutes);
+            }
+        }
+
+        // Dump info
+        static bool testing = false;
+        if (!testing) {
+            if (timer_read32() > 15000) {
+                testing = true;
+
+                // Test filesystem-based eeprom
+                void test_fs_eeprom(void);
+                test_fs_eeprom();
+
+                extern void fs_dump_info(void);
+                fs_dump_info();
+
+                // Test recursive directory creation and deletion
+                fs_mkdir("a");
+                fs_mkdir("a/b");
+                fs_mkdir("a/b/c");
+                fs_fd_t fd = fs_open("a/z", "w");
+                fs_write(fd, &testing, sizeof(testing));
+                fs_close(fd);
+                fd = fs_open("a/b/y", "w");
+                fs_write(fd, &testing, sizeof(testing));
+                fs_close(fd);
+                fd = fs_open("a/b/c/x", "w");
+                fs_write(fd, &testing, sizeof(testing));
+                fs_close(fd);
+                fs_rmdir("a", true);
+            }
+        }
+    }
+#endif // defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
 }
 
 #ifdef DEBUG_EEPROM_OUTPUT
@@ -187,3 +250,27 @@ void matrix_scan_keymap(void) {
 }
 
 #endif // DEBUG_EEPROM_OUTPUT
+
+#if defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
+#    define EEPROM_SIZE 1024
+#    define eeprom_driver_init fs_eeprom_driver_init
+#    define eeprom_driver_erase fs_eeprom_driver_erase
+#    define eeprom_driver_flush fs_eeprom_driver_flush
+#    define eeprom_read_block fs_eeprom_read_block
+#    define eeprom_write_block fs_eeprom_write_block
+#    include "eeprom_filesystem.c"
+
+void test_fs_eeprom(void) {
+    uint32_t test = 0x12345678;
+    fs_eeprom_driver_init();
+    fs_eeprom_write_block(&test, (void *)620, sizeof(test));
+    fs_eeprom_driver_flush();
+
+    test = 0;
+    fs_eeprom_driver_init();
+    fs_eeprom_read_block(&test, (void *)620, sizeof(test));
+    dprintf("Test value: %08lX\n", (uint32_t)test);
+
+    fs_eeprom_driver_erase();
+}
+#endif // defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)

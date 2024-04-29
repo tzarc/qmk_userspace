@@ -40,6 +40,8 @@ SRC += \
 
 #####################
 
+ifneq ($(strip $(KEYBOARD)),tzarc/djinn/rev1)
+
 FLASH_DRIVER = spi
 FILESYSTEM_DRIVER = lfs_spi_flash
 
@@ -52,3 +54,5 @@ VPATH += \
 #SRC += eeprom_filesystem.c
 VPATH += \
 		$(QMK_USERSPACE)/qmk_firmware-mods/drivers/eeprom
+
+endif

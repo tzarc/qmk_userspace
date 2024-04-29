@@ -1,0 +1,10 @@
+POINTING_DEVICE_DRIVERS += pmw3389
+POINTING_DEVICE_DRIVER = pmw3389
+POINTING_DEVICE_ENABLE = yes
+
+DEBOUNCE_TYPE = asym_eager_defer_pk
+
+OPT=1
+
+LIB_SRC += i2c_master.c
+SRC += ld7032.c
