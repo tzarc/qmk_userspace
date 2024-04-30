@@ -4,9 +4,9 @@
 
 The original firmware was read protected, so there's likely no going back to the manufacturers firmware. This QMK firmware does not support the dedicated lift off sensor and only has basic OLED support.
 
-Erased and flashed with uf2-stm32f103 bootloader adjusted for 12MHz HSE using stlink. A15 is connected to the USB D+ pullup (1.5K).
+Erased and flashed with a uf2boot bootloader adjusted for 12MHz HSE using stlink. A15 is connected to the USB D+ pullup (1.5K).
 
-* Keyboard Maintainer: [Dasky](https://github.com/Dasky)
+* Keyboard Maintainer: [Dasky](https://github.com/daskygit)
 * Hardware Supported: SteelSeries Prime+
 * Hardware Availability: https://steelseries.com/gaming-mice/prime-plus
 
@@ -25,4 +25,4 @@ See the [build environment setup](https://docs.qmk.fm/#/getting_started_build_to
 Enter the bootloader in 3 ways:
 
 * **Bootmagic reset**: Hold down left mouse button and plug in.
-* **Bootloader entry**: Hold the CPI while plugging in.
+* **Bootloader entry**: Hold the CPI button while plugging in.

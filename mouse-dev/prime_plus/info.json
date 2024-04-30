@@ -3,29 +3,43 @@
     "keyboard_name": "Prime+",
     "maintainer": "Dasky",
     "bootloader": "uf2boot",
+    "build": {
+        "debounce_type": "asym_eager_defer_pk",
+        "lto": true
+    },
+    "encoder": {
+        "enabled": true,
+        "rotary": [
+            {"pin_a": "B5", "pin_b": "B4", "resolution": 2}
+        ]
+    },
     "features": {
         "bootmagic": true,
         "command": false,
         "console": true,
         "extrakey": true,
         "mousekey": true,
-        "nkro": true
+        "nkro": true,
+        "deferred_exec": true,
+        "rgblight": true,
+        "quantum_painter": false,
+        "pointing_device": true
     },
     "matrix_pins": {
         "direct": [
             ["A0", "C15", "A1", "C13", "C14", "A3"]
         ]
     },
-    "encoder": {
-        "enabled": true,
-        "rotary": [
-            {
-                "pin_a": "B5",
-                "pin_b": "B4"
-            }
-        ]
-    },
     "processor": "STM32F103",
+    "rgblight": {
+        "driver": "custom",
+        "led_count": 1,
+        "animations": {
+            "breathing": true,
+            "rainbow_mood": true,
+            "rgb_test": true
+        }
+    },
     "url": "",
     "usb": {
         "device_version": "1.0.0",

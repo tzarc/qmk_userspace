@@ -59,14 +59,6 @@ const ld7032_write_direction_t direction = {.right = true, .vertical = false, .f
 #include "i2c_master.h"
 
 void ld7032_init(void) {
-    setPinOutput(OLED_RESET);
-    writePinLow(OLED_RESET);
-    wait_us(10); // min 1us
-    writePinHigh(OLED_RESET);
-    wait_ms(1); // min 1ms
-    setPinOutput(OLED_PWR);
-    writePinHigh(OLED_PWR);
-    wait_ms(10); // wait for psu to come up
     i2c_init();
 }
 
