@@ -4,7 +4,7 @@
 
 The original firmware was read protected, so there's likely no going back to the manufacturers firmware. This QMK firmware does not support the dedicated lift off sensor and only has basic OLED support.
 
-Erased and flashed with stm32duino bootloader adjusted for 12MHz HSE using stlink. A15 is connected to the USB D+ pullup (1.5K).
+Erased and flashed with uf2-stm32f103 bootloader adjusted for 12MHz HSE using stlink. A15 is connected to the USB D+ pullup (1.5K).
 
 * Keyboard Maintainer: [Dasky](https://github.com/Dasky)
 * Hardware Supported: SteelSeries Prime+

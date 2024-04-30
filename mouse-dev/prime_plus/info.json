@@ -2,7 +2,7 @@
     "manufacturer": "SteelSeries",
     "keyboard_name": "Prime+",
     "maintainer": "Dasky",
-    "bootloader": "stm32duino",
+    "bootloader": "uf2boot",
     "features": {
         "bootmagic": true,
         "command": false,
