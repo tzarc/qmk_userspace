@@ -1,13 +1,6 @@
 # Copyright 2018-2024 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-SRC += \
-	tzarc_common.c \
-	tzarc_names.c \
-	tzarc_eeprom.c \
-	tzarc_unicode.c \
-	tzarc_screen.c
-
 # Ensure file listings are generated
 # cat .build/obj_tzarc_djinn_rev2_tzarc/tzarc_unicode.i | sed -e 's@^#.*@@g' -e 's@^\s*//.*@@g' -e '/^\s*$/d' | clang-format
 OPT_DEFS += -save-temps=obj
@@ -28,8 +21,6 @@ UNICODE_ENABLE ?= yes
 DEFERRED_EXEC_ENABLE = yes
 GAME_MODES_ENABLE ?= yes
 
-VPATH += $(USER_PATH)/graphics/src
-
 XAP_ENABLE ?= no
 RAW_ENABLE ?= no
 VIA_ENABLE ?= no
@@ -40,7 +31,7 @@ ifeq ($(strip $(PLATFORM_KEY)),chibios)
 	EXTRAFLAGS = -fstack-usage
 	EXTRALDFLAGS = -Wl,--print-memory-usage
 	DEBOUNCE_TYPE = asym_eager_defer_pk
-	KONAMI_CODE_ENABLE = yes
+	KONAMI_CODE_ENABLE ?= yes
 
 else ifeq ($(strip $(PLATFORM_KEY)),arm_atsam)
 	LTO_ENABLE = no
@@ -54,13 +45,26 @@ else ifeq ($(strip $(PLATFORM_KEY)),avr)
 	endif
 endif
 
+SRC += \
+	tzarc_common.c \
+	tzarc_names.c \
+	tzarc_eeprom.c
+
+ifeq ($(strip $(QUANTUM_PAINTER_ENABLE)),yes)
+	VPATH += $(USER_PATH)/graphics/src
+	SRC += tzarc_screen.c
+endif
+
+ifeq ($(strip $(UNICODE_ENABLE)),yes)
+	SRC += tzarc_unicode.c
+endif
+
 ifeq ($(strip $(KONAMI_CODE_ENABLE)),yes)
 	OPT_DEFS += -DKONAMI_CODE_ENABLE
 endif
 
 ifeq ($(strip $(GAME_MODES_ENABLE)),yes)
 	OPT_DEFS += -DGAME_MODES_ENABLE
-
 	SRC += \
 		tzarc_wow.c \
 		tzarc_diablo.c

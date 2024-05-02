@@ -165,7 +165,7 @@ BOARD_DEFS := \
 
 # short name ! keyboard path ! keymap name ! link source ! link target
 LINKED_BOARD_DEFS := \
-	prime_plus!keyboards/prime_plus!default!mouse-dev/prime_plus \
+	prime_plus!keyboards/prime_plus!tzarc!mouse-dev/prime_plus \
 	disco_f723!keyboards/handwired/onekey/disco_f723!console!alternates/disco_f723 \
 	onekey_h743!keyboards/handwired/onekey/nucleo144_h743zi!console!alternates/nucleo144_h743zi \
 	onekey_l152!keyboards/handwired/onekey/nucleo64_l152re!console!alternates/nucleo64_l152re \
