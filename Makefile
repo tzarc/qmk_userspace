@@ -165,7 +165,7 @@ BOARD_DEFS := \
 
 # short name ! keyboard path ! keymap name ! link source ! link target
 LINKED_BOARD_DEFS := \
-	prime_plus!keyboards/prime_plus!tzarc!mouse-dev/prime_plus \
+	prime_plus!keyboards/steelseries/prime_plus!tzarc!mouse-dev/prime_plus \
 	disco_f723!keyboards/handwired/onekey/disco_f723!console!alternates/disco_f723 \
 	onekey_h743!keyboards/handwired/onekey/nucleo144_h743zi!console!alternates/nucleo144_h743zi \
 	onekey_l152!keyboards/handwired/onekey/nucleo64_l152re!console!alternates/nucleo64_l152re \
@@ -232,6 +232,7 @@ links: link_$$(link_target_$1)
 link_$$(link_target_$1): qmk_firmware
 	@if [ ! -L "$(QMK_USERSPACE)/qmk_firmware/$$(link_target_$1)" ] ; then \
 		$(ECHO) -e "\e[38;5;14mSymlinking: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
+		mkdir -p $$(shell dirname "$(QMK_USERSPACE)/qmk_firmware/$$(link_target_$1)") ; \
 		ln -sf $(QMK_USERSPACE)/$$(link_source_$1) $(QMK_USERSPACE)/qmk_firmware/$$(link_target_$1) ; \
 		if [ -z "$$(grep -P '^$$(link_target_$1)$$$$' $(QMK_USERSPACE)/qmk_firmware/.git/info/exclude 2>/dev/null)" ] ; then \
 			$(ECHO) $$(link_target_$1) >> $(QMK_USERSPACE)/qmk_firmware/.git/info/exclude ; \

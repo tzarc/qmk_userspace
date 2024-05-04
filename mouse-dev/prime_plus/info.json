@@ -22,7 +22,7 @@
         "nkro": true,
         "deferred_exec": true,
         "rgblight": true,
-        "quantum_painter": false,
+        "quantum_painter": true,
         "pointing_device": true
     },
     "matrix_pins": {
