@@ -33,7 +33,7 @@ void eeprom_driver_init(void) {
         if (!fs_exists(path)) {
             continue;
         }
-        fs_fd_t fd = fs_open(path, "r");
+        fs_fd_t fd = fs_open(path, FS_READ);
         if (fd == INVALID_FILESYSTEM_FD) {
             continue;
         }
@@ -60,7 +60,7 @@ void eeprom_driver_flush(void) {
                     uint8_t *ptr         = &eeprom_backing[chunk_index * (EEPROM_FILESYSTEM_CHUNK_SIZE)];
                     char     path[8]     = {0};
                     ee_filename(chunk_index, path, sizeof(path));
-                    fs_fd_t fd = fs_open(path, "wt");
+                    fs_fd_t fd = fs_open(path, FS_WRITE | FS_TRUNCATE);
                     if (fd == INVALID_FILESYSTEM_FD) {
                         continue;
                     }

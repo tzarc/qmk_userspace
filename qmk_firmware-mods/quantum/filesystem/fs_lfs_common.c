@@ -302,24 +302,19 @@ static bool fs_delete_nolock(const char *path) {
     return err >= 0 || err == LFS_ERR_NOENT; // Allow for already deleted files to count as success
 }
 
-static fs_fd_t fs_open_nolock(const char *filename, const char *mode) {
+static fs_fd_t fs_open_nolock(const char *filename, fs_mode_t mode) {
     FIND_FD_GET_HANDLE(INVALID_FILESYSTEM_FD, FD_TYPE_EMPTY, {
         FS_AUTO_MOUNT_UNMOUNT(INVALID_FILESYSTEM_FD);
 
         int flags = 0;
-        while (*mode) {
-            switch (*mode) {
-                case 'r':
-                    flags |= LFS_O_RDONLY;
-                    break;
-                case 'w':
-                    flags |= LFS_O_WRONLY | LFS_O_CREAT;
-                    break;
-                case 't':
-                    flags |= LFS_O_TRUNC;
-                    break;
-            }
-            ++mode;
+        if (mode & FS_READ) {
+            flags |= LFS_O_RDONLY;
+        }
+        if (mode & FS_WRITE) {
+            flags |= LFS_O_WRONLY | LFS_O_CREAT;
+        }
+        if (mode & FS_TRUNCATE) {
+            flags |= LFS_O_TRUNC;
         }
 
         extern void *fs_device_filebuf(int file_idx);
@@ -533,13 +528,13 @@ bool fs_delete(const char *path) {
     return fs_delete_nolock(path);
 }
 
-fs_fd_t fs_open(const char *filename, const char *mode) {
+fs_fd_t fs_open(const char *filename, fs_mode_t mode) {
     fs_fd_t fd;
     {
         FS_AUTO_LOCK_UNLOCK(INVALID_FILESYSTEM_FD);
         fd = fs_open_nolock(filename, mode);
     }
-    fs_dprintf("%s, %s, fd=%d\n", filename, mode, (int)fd);
+    fs_dprintf("%s, mode=%x, fd=%d\n", filename, (int)mode, (int)fd);
     return fd;
 }
 

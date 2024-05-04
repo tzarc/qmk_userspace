@@ -20,6 +20,12 @@ typedef enum fs_whence_t {
     FS_SEEK_END = 2  // Seek relative to the end of the file
 } fs_whence_t;
 
+typedef enum fs_mode_t {
+    FS_READ     = 1 << 0, // Read an existing file
+    FS_WRITE    = 1 << 1, // Write to a file, creating it if necessary
+    FS_TRUNCATE = 1 << 2, // Truncate the file to zero length
+} fs_mode_t;
+
 bool fs_format(void);
 bool fs_init(void);
 bool fs_mount(void);
@@ -41,7 +47,7 @@ void         fs_closedir(fs_fd_t fd);
 bool fs_exists(const char *path);
 bool fs_delete(const char *path);
 
-fs_fd_t     fs_open(const char *filename, const char *mode); // "rwt" => read, write, truncate
+fs_fd_t     fs_open(const char *filename, fs_mode_t mode);
 fs_offset_t fs_seek(fs_fd_t fd, fs_offset_t offset, fs_whence_t whence);
 fs_offset_t fs_tell(fs_fd_t fd);
 fs_size_t   fs_read(fs_fd_t fd, void *buffer, fs_size_t length);

@@ -161,7 +161,7 @@ void housekeeping_task_keymap(void) {
         static uint32_t minutes_running = 0;
         if (timer_elapsed32(minutes_running) > 60000) {
             minutes_running = timer_read32();
-            fs_fd_t fd      = fs_open("minutes", "rw");
+            fs_fd_t fd      = fs_open("minutes", FS_READ | FS_WRITE);
             if (fd != INVALID_FILESYSTEM_FD) {
                 uint32_t minutes = 0;
                 if (fs_read(fd, &minutes, sizeof(minutes)) != sizeof(minutes)) {
@@ -192,13 +192,13 @@ void housekeeping_task_keymap(void) {
                 fs_mkdir("a");
                 fs_mkdir("a/b");
                 fs_mkdir("a/b/c");
-                fs_fd_t fd = fs_open("a/z", "w");
+                fs_fd_t fd = fs_open("a/z", FS_WRITE);
                 fs_write(fd, &testing, sizeof(testing));
                 fs_close(fd);
-                fd = fs_open("a/b/y", "w");
+                fd = fs_open("a/b/y", FS_WRITE);
                 fs_write(fd, &testing, sizeof(testing));
                 fs_close(fd);
-                fd = fs_open("a/b/c/x", "w");
+                fd = fs_open("a/b/c/x", FS_WRITE);
                 fs_write(fd, &testing, sizeof(testing));
                 fs_close(fd);
                 fs_rmdir("a", true);
