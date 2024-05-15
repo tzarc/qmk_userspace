@@ -16,9 +16,11 @@ jobs:
       - name: Download binaries
         if: always() && !cancelled()
         uses: actions/download-artifact@v4
+        with:
+          name: Firmware
 
       - name: Generate Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: always() && !cancelled()
         with:
           token: ${{ github.token }}
