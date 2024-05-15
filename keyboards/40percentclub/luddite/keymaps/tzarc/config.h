@@ -1,7 +1,7 @@
 // Copyright 2018-2024 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
-#undef RGBLED_NUM
-#define RGBLED_NUM 16
+#undef RGBLIGHT_LED_COUNT
+#define RGBLIGHT_LED_COUNT 16
 
 #undef RGBLIGHT_EFFECT_TWINKLE
 
