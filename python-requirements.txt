@@ -1,6 +1,7 @@
 qmk
 -r qmk_firmware/requirements.txt
 -r qmk_firmware/requirements-dev.txt
+-r qmk_firmware/util/ci/requirements.txt
 
 bokeh>=2.0,<3.0
 compiledb

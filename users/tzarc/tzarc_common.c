@@ -222,6 +222,13 @@ static bool process_record_konami_code(uint16_t keycode, keyrecord_t *record) {
 void diablo_automatic_stop(void) {}
 #endif // GAME_MODES_ENABLE
 
+bool remember_last_key_user(uint16_t keycode, keyrecord_t *record, uint8_t *remembered_mods) {
+    if (keycode >= TZ_REP_2 && keycode <= TZ_REP_5) {
+        return false;
+    }
+    return true;
+};
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t reset_key_timer  = 0;
     static uint32_t eeprst_key_timer = 0;
@@ -259,6 +266,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } else {
                 if (timer_elapsed32(eeprst_key_timer) >= 500) {
                     eeconfig_init();
+                }
+            }
+            return false;
+
+        case TZ_REP_2 ... TZ_REP_5:
+            if (record->event.pressed) {
+                for (int i = TZ_REP_2 - 1; i <= keycode; i++) {
+                    tap_code16(get_last_keycode());
                 }
             }
             return false;

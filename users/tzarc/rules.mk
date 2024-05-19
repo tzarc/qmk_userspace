@@ -25,6 +25,7 @@ XAP_ENABLE ?= no
 RAW_ENABLE ?= no
 VIA_ENABLE ?= no
 KONAMI_CODE_ENABLE ?= no
+REPEAT_KEY_ENABLE ?= yes
 
 ifeq ($(strip $(PLATFORM_KEY)),chibios)
 	CREATE_MAP = yes

@@ -30,14 +30,14 @@ jobs:
 
     steps:
       - name: Checkout Userspace
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ github.token }}
           submodules: recursive
 
       - name: Check if qmk_firmware exists
         id: check_files
-        uses: andstor/file-existence-action@v2
+        uses: andstor/file-existence-action@v3
         with:
           files: qmk_firmware
 

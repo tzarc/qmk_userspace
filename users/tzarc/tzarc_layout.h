@@ -24,18 +24,22 @@
 #    define BT_USB KC_NO
 #endif
 
-#define FOREACH_CUSTOM_KEYCODE(X) \
-    X(CHANGEMODE, =, QK_USER_0)   \
-    X(TIME_RESET, /**/, /**/)     \
-    X(TIME_EEPRST, /**/, /**/)    \
-    X(TZ_ENC_FIRST, /**/, /**/)   \
-    X(TZ_ENC1P, =, TZ_ENC_FIRST)  \
-    X(TZ_ENC1L, /**/, /**/)       \
-    X(TZ_ENC1R, /**/, /**/)       \
-    X(TZ_ENC2P, /**/, /**/)       \
-    X(TZ_ENC2L, /**/, /**/)       \
-    X(TZ_ENC2R, /**/, /**/)       \
-    X(TZ_ENC_LAST, /**/, = TZ_ENC2R)
+#define FOREACH_CUSTOM_KEYCODE(X)    \
+    X(CHANGEMODE, =, QK_USER_0)      \
+    X(TIME_RESET, /**/, /**/)        \
+    X(TIME_EEPRST, /**/, /**/)       \
+    X(TZ_ENC_FIRST, /**/, /**/)      \
+    X(TZ_ENC1P, =, TZ_ENC_FIRST)     \
+    X(TZ_ENC1L, /**/, /**/)          \
+    X(TZ_ENC1R, /**/, /**/)          \
+    X(TZ_ENC2P, /**/, /**/)          \
+    X(TZ_ENC2L, /**/, /**/)          \
+    X(TZ_ENC2R, /**/, /**/)          \
+    X(TZ_ENC_LAST, /**/, = TZ_ENC2R) \
+    X(TZ_REP_2, /**/, /**/)          \
+    X(TZ_REP_3, /**/, /**/)          \
+    X(TZ_REP_4, /**/, /**/)          \
+    X(TZ_REP_5, /**/, /**/)
 #define KEYCODE_ENUM(kc, eq, val) kc eq val,
 
 enum { FOREACH_CUSTOM_KEYCODE(KEYCODE_ENUM) KEYMAP_SAFE_RANGE };
@@ -176,7 +180,7 @@ enum { FOREACH_CUSTOM_LAYER(LAYER_ENUM) };
 #define ____________TZARC_6x4_RAISE_R2_R_________ _______,      _______,      _______,      _______,      _______,      _______
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | H           | J           | K           | L           | ;           | '           |
-#define ____________TZARC_6x4_RAISE_R3_R_________ KC_EQL,       _______,      _______,      _______,      _______,      _______
+#define ____________TZARC_6x4_RAISE_R3_R_________ KC_EQL,       QK_REP,       TZ_REP_2,     TZ_REP_3,     TZ_REP_4,     TZ_REP_5
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | N           | M           | ,           | .           | /           | Enter       |
 #define ____________TZARC_6x4_RAISE_R4_R_________ KC_PLUS,      _______,      _______,      _______,      _______,      _______
