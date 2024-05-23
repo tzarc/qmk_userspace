@@ -8,7 +8,7 @@ permissions:
 jobs:
   build:
     name: 'QMK Userspace Build'
-    uses: ./.github/workflows/qmk_userspace_build.yml
+    uses: qmk/.github/.github/workflows/qmk_userspace_build.yml@main
     with:
       qmk_repo: qmk/qmk_firmware
       qmk_ref: develop
@@ -16,6 +16,6 @@ jobs:
 
   publish:
     name: 'QMK Userspace Publish'
-    uses: ./.github/workflows/qmk_userspace_publish.yml
+    uses: qmk/.github/.github/workflows/qmk_userspace_publish.yml@main
     if: always() && !cancelled()
     needs: build
