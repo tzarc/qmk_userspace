@@ -43,20 +43,20 @@ tag_name=${1:-latest}
 
 echo OS: $(fn_os), Arch: $(fn_arch), tag: ${tag_name}
 
-[[ -f qmk_toolchain-gcc13.2.0-host_$(fn_os)$(fn_arch)-target_baremetalARM.tar.xz ]] ||
+[[ -f qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalARM.tar.xz ]] ||
     {
         echo "Downloading ARM toolchain" &&
-            curl -fsSLO https://github.com/qmk/qmk_toolchains/releases/download/${tag_name}/qmk_toolchain-gcc13.2.0-host_$(fn_os)$(fn_arch)-target_baremetalARM.tar.xz
+            curl -fsSLO https://github.com/qmk/qmk_toolchains/releases/download/${tag_name}/qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalARM.tar.xz
     }
-[[ -f qmk_toolchain-gcc13.2.0-host_$(fn_os)$(fn_arch)-target_baremetalAVR.tar.xz ]] ||
+[[ -f qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalAVR.tar.xz ]] ||
     {
         echo "Downloading AVR toolchain" &&
-            curl -fsSLO https://github.com/qmk/qmk_toolchains/releases/download/${tag_name}/qmk_toolchain-gcc13.2.0-host_$(fn_os)$(fn_arch)-target_baremetalAVR.tar.xz
+            curl -fsSLO https://github.com/qmk/qmk_toolchains/releases/download/${tag_name}/qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalAVR.tar.xz
     }
-[[ -f qmk_toolchain-gcc13.2.0-host_$(fn_os)$(fn_arch)-target_baremetalRV32.tar.xz ]] ||
+[[ -f qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalRV32.tar.xz ]] ||
     {
         echo "Downloading RISC-V toolchain" &&
-            curl -fsSLO https://github.com/qmk/qmk_toolchains/releases/download/${tag_name}/qmk_toolchain-gcc13.2.0-host_$(fn_os)$(fn_arch)-target_baremetalRV32.tar.xz
+            curl -fsSLO https://github.com/qmk/qmk_toolchains/releases/download/${tag_name}/qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalRV32.tar.xz
     }
 
 if [[ -d "$HOME/.local/qmk/toolchains" ]]; then
@@ -67,18 +67,8 @@ fi
 mkdir -p "$HOME/.local/qmk/toolchains"
 
 echo "Extracting ARM toolchain" &&
-    tar -C "$HOME/.local/qmk/toolchains" -xf qmk_toolchain-gcc13.2.0-host_$(fn_os)$(fn_arch)-target_baremetalARM.tar.xz --strip-components=1
+    tar -C "$HOME/.local/qmk/toolchains" -xf qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalARM.tar.xz --strip-components=1
 echo "Extracting AVR toolchain" &&
-    tar -C "$HOME/.local/qmk/toolchains" -xf qmk_toolchain-gcc13.2.0-host_$(fn_os)$(fn_arch)-target_baremetalAVR.tar.xz --strip-components=1
+    tar -C "$HOME/.local/qmk/toolchains" -xf qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalAVR.tar.xz --strip-components=1
 echo "Extracting RISC-V toolchain" &&
-    tar -C "$HOME/.local/qmk/toolchains" -xf qmk_toolchain-gcc13.2.0-host_$(fn_os)$(fn_arch)-target_baremetalRV32.tar.xz --strip-components=1
-
-if [[ $(fn_os) == "linux" ]]; then
-    [[ -f qmk_toolchain-gcc13.2.0-host_$(fn_os)$(fn_arch)-target_$(fn_os)$(fn_arch).tar.xz ]] ||
-        {
-            echo "Downloading $(fn_os)$(fn_arch) toolchain" &&
-                curl -fsSLO https://github.com/qmk/qmk_toolchains/releases/download/${tag_name}/qmk_toolchain-gcc13.2.0-host_$(fn_os)$(fn_arch)-target_$(fn_os)$(fn_arch).tar.xz
-        }
-    echo "Extracting $(fn_os)$(fn_arch) toolchain" &&
-        tar -C "$HOME/.local/qmk/toolchains" -xf qmk_toolchain-gcc13.2.0-host_$(fn_os)$(fn_arch)-target_$(fn_os)$(fn_arch).tar.xz --strip-components=1
-fi
+    tar -C "$HOME/.local/qmk/toolchains" -xf qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalRV32.tar.xz --strip-components=1
