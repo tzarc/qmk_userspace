@@ -29,6 +29,10 @@ LINK_PATTERN = re.compile(r'(?P<mdlink>\[(?P<txt>[^)]+)\]\((?P<url>[^)]+)\))')
 SECTION_WITH_ID_PATTERN = re.compile(r'(?P<mdheader>(?P<depth>#+)\s+(?P<title>.+)\s+(?P<linkmarker>\:id=(?P<linkid>.*)))')
 SECTION_PATTERN = re.compile(r'(?P<mdheader>(?P<depth>#+)\s+(?P<title>.+))')
 
+INDENTED_ITEM_PATTERN = re.compile(r'^(?P<mditem>\>\s+(?P<text>.+))$', re.MULTILINE)
+QUERY_ITEM_PATTERN = re.compile(r'^(?P<mditem>\?\>\s+(?P<text>.+))$', re.MULTILINE)
+WARN_ITEM_PATTERN = re.compile(r'^(?P<mditem>\!\>\s+(?P<text>.+))$', re.MULTILINE)
+
 def is_valid_file(f):
     if not f or not f.is_file() or f.parent.stem == 'ja' or f.parent.stem == 'zh-cn' or f.stem == '__capabilities' or f.stem == '__langs':
         return False
@@ -96,6 +100,9 @@ def replace_links(file, sections):
             if '#' in url:
                 url, link_id = (url.split('#', 2) + [None])[:2]
 
+            if '?id=' in url:
+                url, link_id = (url.split('?id=', 2) + [None])[:2]
+
             # Remove any trailing `.md`
             if url[-3:] == '.md':
                 url = url[:-3]
@@ -115,6 +122,10 @@ def replace_links(file, sections):
                 test_file = candidate_files[0]
                 if test_file is not None and test_file.exists():
                     url = os.path.relpath(test_file, file.parent) # pathlib Path.relative_to() doesn't work here?
+
+            # Remove any trailing `.md`...again
+            if url[-3:] == '.md':
+                url = url[:-3]
 
             if (url, link_id) in sections:
                 new_link = f'[{label}]({url}#{link_id})'
@@ -174,6 +185,24 @@ def replace_all_image_prefixes(files):
     for file in files:
         replace_image_prefixes(file)
 
+
+def replace_indented_items(file):
+    file = Path(file).absolute()
+    with open(file, 'r') as f:
+        text = f.read()
+        for m in INDENTED_ITEM_PATTERN.finditer(text):
+            text = text.replace(m.group('mditem'), f'::: info\n{m.group("text")}\n:::')
+        for m in QUERY_ITEM_PATTERN.finditer(text):
+            text = text.replace(m.group('mditem'), f'::: tip\n{m.group("text")}\n:::')
+        for m in WARN_ITEM_PATTERN.finditer(text):
+            text = text.replace(m.group('mditem'), f'::: warning\n{m.group("text")}\n:::')
+    with open(file, 'w') as f:
+        f.write(text)
+
+def replace_all_indented_items(files):
+    for file in files:
+        replace_indented_items(file)
+
 #-----------------------------------------------------------------------------------------------------------------------
 
 # Make sure we're on the `vitepress` branch
@@ -195,12 +224,13 @@ _run("git rm -rf docs/README.md")
 _run("git checkout vitepress -- docs/__capabilities.md")
 _run("git checkout vitepress -- docs/_summary.md")
 _run("git checkout vitepress -- docs/breaking_changes.md")
-_run("git checkout vitepress -- docs/index.md")
 _run("git checkout vitepress -- docs/coding_conventions_python.md")
 _run("git checkout vitepress -- docs/faq_build.md")
+_run("git checkout vitepress -- docs/feature_stenography.md")
+_run("git checkout vitepress -- docs/hardware_keyboard_guidelines.md")
+_run("git checkout vitepress -- docs/index.md")
 _run("git checkout vitepress -- docs/newbs.md")
 _run("git checkout vitepress -- docs/serial_driver.md")
-_run("git checkout vitepress -- docs/hardware_keyboard_guidelines.md")
 
 # Clear out any staged changes
 _run("git reset")
@@ -210,3 +240,4 @@ sections = determine_all_sections(files)
 replace_all_links(files, sections)
 replace_all_sections(files, sections)
 replace_all_image_prefixes(files)
+replace_all_indented_items(files)
