@@ -34,10 +34,19 @@
             "/Users/nickb/Code/qmk_build/qmk_firmware/lib/python"
         ],
         "files.exclude": {
-            "**/.direnv": true,
-            "**/.bin": true,
-            "**/.hex": true,
-            "**/.uf2": true
-        }
+            "**/.cache": false,
+            "**/.direnv": false,
+            "**/.bin": false,
+            "**/.hex": false,
+            "**/.uf2": false
+        },
+        "files.watcherExclude": {
+            "**/.cache/**": true,
+            "**/.direnv/**": true,
+            "**/.git/objects/**": true,
+            "**/.git/subtree-cache/**": true,
+            "**/node_modules/*/**": true
+        },
+        "clangd.inactiveRegions.opacity": 0.50,
     }
 }
