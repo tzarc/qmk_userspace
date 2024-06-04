@@ -39,6 +39,13 @@
             "**/.hex": false,
             "**/.uf2": false
         },
-        "clangd.inactiveRegions.opacity": 0.30,
+        "files.watcherExclude": {
+            "**/.cache/**": true,
+            "**/.direnv/**": true,
+            "**/.git/objects/**": true,
+            "**/.git/subtree-cache/**": true,
+            "**/node_modules/*/**": true
+        },
+        "clangd.inactiveRegions.opacity": 0.40,
     }
 }

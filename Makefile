@@ -63,6 +63,7 @@ repositories: qmk_firmware qmk_userspace qmk-dot-github
 
 userspace_clean:
 	@rm -f $(QMK_USERSPACE)/compile_commands.json || true
+	@rm -f $(QMK_USERSPACE)/.cache || true
 
 clean: userspace_clean
 	@$(MAKE) -C $(QMK_USERSPACE)/qmk_firmware clean
@@ -76,23 +77,21 @@ distclean: userspace_clean
 CONTAINER_PREAMBLE := export HOME="/tmp"; export PATH="/tmp/.local/bin:\$$PATH"; python3 -m pip install --upgrade pip; python3 -m pip install -r requirements-dev.txt
 
 .PHONY: format-core pytest format-and-pytest
-
 format-core:
-	cd $(QMK_USERSPACE)/qmk_firmware \
-		&& RUNTIME=docker ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk format-c --core-only -a && qmk format-python -a"
+	make -C $(QMK_USERSPACE)/qmk_firmware format-core
 
-format-tzarc-keyboards:
+pytest:
+	make -C $(QMK_USERSPACE)/qmk_firmware pytest
+
+format-and-pytest:
+	make -C $(QMK_USERSPACE)/qmk_firmware format-and-pytest
+
+.PHONY: format-keyboards-tzarc
+format-keyboards-tzarc:
 	cd $(QMK_USERSPACE)/qmk_firmware \
 		&& RUNTIME=docker ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk format-c \$$(find keyboards/tzarc \( -name '*.c' -o -name '*.h' \) -and -not -name '*.qgf.*' -and -not -name '*.qff.*' -and -not -name '*conf.h' -and -not -name 'board.h')"
 
-pytest:
-	cd $(QMK_USERSPACE)/qmk_firmware \
-		&& RUNTIME=docker ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk pytest"
-
-format-and-pytest:
-	cd $(QMK_USERSPACE)/qmk_firmware \
-		&& RUNTIME=docker ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk format-c --core-only -a && qmk format-python -a && qmk pytest"
-
+.PHONY: all-vusb all-lufa all-chibios all-riot
 all-vusb:
 	qmk mass-compile -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || $(ECHO) 2) -f protocol=VUSB
 
@@ -108,7 +107,7 @@ all-riot:
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Helpers
 
-.PHONY: rgb_effects generated-files
+.PHONY: rgb_effects generated-files format
 
 generated-files: rgb_effects
 
@@ -116,13 +115,13 @@ rgb_effects:
 	@"$(QMK_USERSPACE)/bin/generate_rgb_effects.py" > "$(QMK_USERSPACE)/users/tzarc/enable_all_rgb_effects.h"
 
 format:
-	@git ls-files | grep -E '\.(c|h|cpp|hpp|cxx|hxx)$$' | grep -vE '\.q[gf]f\.' | grep -vE '(ch|hal|mcu)conf\.h$$' | grep -vE 'board.[ch]$$' | while read file ; do \
+	@git ls-files | grep -E '\.(c|h|cpp|hpp|cxx|hxx)$$' | grep -vE '\.q[gf]f\.' | grep -vE '(ch|hal|mcu)conf\.h$$' | grep -vE 'board.[ch]$$' | grep -vE 'mini-rv32ima.h$$' | while read file ; do \
 		$(ECHO) -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
 		clang-format -i "$$file" ; \
 	done
 
 format-keyboards-tzarc:
-	@git -C $(QMK_USERSPACE)/qmk_firmware ls-files | grep tzarc | grep -E '\.(c|h|cpp|hpp|cxx|hxx)$$' | grep -vE '\.q[gf]f\.' | grep -vE '(ch|hal|mcu)conf\.h$$' | grep -vE 'board.[ch]$$' | while read file ; do \
+	@git -C $(QMK_USERSPACE)/qmk_firmware ls-files | grep tzarc | grep -E '\.(c|h|cpp|hpp|cxx|hxx)$$' | grep -vE '\.q[gf]f\.' | grep -vE '(ch|hal|mcu)conf\.h$$' | grep -vE 'board.[ch]$$' | grep -vE 'mini-rv32ima.h$$' | while read file ; do \
 		$(ECHO) -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
 		clang-format -i "$(QMK_USERSPACE)/qmk_firmware/$$file" ; \
 	done
