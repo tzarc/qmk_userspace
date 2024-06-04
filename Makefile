@@ -164,28 +164,28 @@ BOARD_DEFS := \
 
 # short name ! keyboard path ! keymap name ! link source ! link target
 LINKED_BOARD_DEFS := \
-	prime_plus!keyboards/steelseries/prime_plus!tzarc!mouse-dev/prime_plus \
-	disco_f723!keyboards/handwired/onekey/disco_f723!console!alternates/disco_f723 \
-	onekey_h743!keyboards/handwired/onekey/nucleo144_h743zi!console!alternates/nucleo144_h743zi \
-	onekey_l152!keyboards/handwired/onekey/nucleo64_l152re!console!alternates/nucleo64_l152re \
-	onekey_l082!keyboards/handwired/onekey/nucleo32_l082!console!alternates/nucleo32_l082kz \
-	split_l082!keyboards/handwired/splittest/nucleo32_l082!default!alternates/nucleo32_l082kz_split \
-	test_proton_c!keyboards/handwired/onekey/proton_c_test!console!alternates/proton_c_test \
-	split_proton_c!keyboards/handwired/splittest/proton_c_split/a9!default!alternates/proton_c_split!handwired/splittest/proton_c_split \
-	split_g431!keyboards/handwired/splittest/g431_split!default!alternates/g431_split \
-	split_f072!keyboards/handwired/splittest/f072_split!default!alternates/f072_split \
-	split_f401!keyboards/handwired/splittest/f401_split!default!alternates/f401_split \
-	split_f411!keyboards/handwired/splittest/f411_split!default!alternates/f411_split \
-	spi_eeprom_promicro!keyboards/handwired/onekey/spi_eeprom_test_promicro!eep_rst!alternates/spi_eeprom_test/promicro_test \
-	spi_eeprom_proton_c!keyboards/handwired/onekey/spi_eeprom_test_proton_c!eep_rst!alternates/spi_eeprom_test/proton_c_test \
-	spi_eeprom_f103!keyboards/handwired/onekey/spi_eeprom_test_f103!eep_rst!alternates/spi_eeprom_test/f103_test \
-	spi_eeprom_f401!keyboards/handwired/onekey/spi_eeprom_test_f401!eep_rst!alternates/spi_eeprom_test/f401_test \
-	l151x8xxa!keyboards/l151x8xxa!reset!alternates/l151x8xxa \
-	f072_shiftreg!keyboards/f072_shiftreg!default!alternates/f072_shiftreg \
-	l412_shiftreg!keyboards/l412_shiftreg!default!alternates/l412_shiftreg \
-	qp_test!keyboards/qp_test!default!alternates/qp_test \
-	lvgl_test!keyboards/lvgl_test!default!alternates/lvgl_test \
-	rp2040_split!keyboards/rp2040_split!default!alternates/rp2040_split
+	prime_plus!keyboards/steelseries/prime_plus!tzarc!development/mouse-dev/prime_plus \
+	disco_f723!keyboards/handwired/onekey/disco_f723!console!development/alternates/disco_f723 \
+	onekey_h743!keyboards/handwired/onekey/nucleo144_h743zi!console!development/alternates/nucleo144_h743zi \
+	onekey_l152!keyboards/handwired/onekey/nucleo64_l152re!console!development/alternates/nucleo64_l152re \
+	onekey_l082!keyboards/handwired/onekey/nucleo32_l082!console!development/alternates/nucleo32_l082kz \
+	split_l082!keyboards/handwired/splittest/nucleo32_l082!default!development/alternates/nucleo32_l082kz_split \
+	test_proton_c!keyboards/handwired/onekey/proton_c_test!console!development/alternates/proton_c_test \
+	split_proton_c!keyboards/handwired/splittest/proton_c_split/a9!default!development/alternates/proton_c_split!handwired/splittest/proton_c_split \
+	split_g431!keyboards/handwired/splittest/g431_split!default!development/alternates/g431_split \
+	split_f072!keyboards/handwired/splittest/f072_split!default!development/alternates/f072_split \
+	split_f401!keyboards/handwired/splittest/f401_split!default!development/alternates/f401_split \
+	split_f411!keyboards/handwired/splittest/f411_split!default!development/alternates/f411_split \
+	spi_eeprom_promicro!keyboards/handwired/onekey/spi_eeprom_test_promicro!eep_rst!development/alternates/spi_eeprom_test/promicro_test \
+	spi_eeprom_proton_c!keyboards/handwired/onekey/spi_eeprom_test_proton_c!eep_rst!development/alternates/spi_eeprom_test/proton_c_test \
+	spi_eeprom_f103!keyboards/handwired/onekey/spi_eeprom_test_f103!eep_rst!development/alternates/spi_eeprom_test/f103_test \
+	spi_eeprom_f401!keyboards/handwired/onekey/spi_eeprom_test_f401!eep_rst!development/alternates/spi_eeprom_test/f401_test \
+	l151x8xxa!keyboards/l151x8xxa!reset!development/alternates/l151x8xxa \
+	f072_shiftreg!keyboards/f072_shiftreg!default!development/alternates/f072_shiftreg \
+	l412_shiftreg!keyboards/l412_shiftreg!default!development/alternates/l412_shiftreg \
+	qp_test!keyboards/qp_test!default!development/alternates/qp_test \
+	lvgl_test!keyboards/lvgl_test!default!development/alternates/lvgl_test \
+	rp2040_split!keyboards/rp2040_split!default!development/alternates/rp2040_split
 
 keyboards_folder := keyboards/
 empty :=
