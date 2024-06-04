@@ -44,7 +44,7 @@ if [ "${1:-}" = "" -o "${1:-}" != "${2:-}" ]; then
         all_submodules=$(echo -e "$actual_submodules\n$found_submodules" | sort -u || true)
         while read actual; do
             # Remove the actual submodule from the total list of submodules
-            all_submodules=$(echo "$all_submodules" | grep -vP "^$actual\$" || true)
+            all_submodules=$(echo "$all_submodules" | grep -vE "^$actual\$" || true)
         done <<<"$actual_submodules"
 
         # Remove any submodules that are no longer in use
