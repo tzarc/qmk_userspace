@@ -48,5 +48,23 @@
             "**/node_modules/*/**": true
         },
         "clangd.inactiveRegions.opacity": 0.50,
+        "files.associations": {
+            "keymap.json": "jsonc",
+            "info.json": "jsonc",
+            "keyboard.json": "jsonc"
+        },
+        "json.schemas": [
+            {
+                "fileMatch": ["keymap.json"],
+                "url": "./qmk_firmware/data/schemas/keymap.jsonschema"
+            },
+            {
+                "fileMatch": ["info.json", "keyboard.json"],
+                "url": "./qmk_firmware/data/schemas/keyboard.jsonschema"
+            }
+        ],
+        "clangd.arguments": [
+            "--header-insertion=never"
+        ],
     }
 }

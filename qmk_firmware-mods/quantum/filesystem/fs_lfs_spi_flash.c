@@ -45,13 +45,13 @@ void *fs_device_filebuf(int file_idx) {
 
 int fs_device_read(const struct lfs_config *c, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size) {
     // fs_dprintf("read\n");
-    flash_read_block(block * c->block_size + off, buffer, size);
+    flash_read_range(block * c->block_size + off, buffer, size);
     return 0;
 }
 
 int fs_device_prog(const struct lfs_config *c, lfs_block_t block, lfs_off_t off, const void *buffer, lfs_size_t size) {
     // fs_dprintf("prog\n");
-    flash_write_block(block * c->block_size + off, buffer, size);
+    flash_write_range(block * c->block_size + off, buffer, size);
     return 0;
 }
 

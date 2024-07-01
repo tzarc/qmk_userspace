@@ -39,25 +39,14 @@ function fn_arch() {
     esac
 }
 
-tag_name=${1:-latest}
+tag_name=${1:-v14.1.0-4}
 
 echo OS: $(fn_os), Arch: $(fn_arch), tag: ${tag_name}
 
-[[ -f qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalARM.tar.xz ]] ||
-    {
-        echo "Downloading ARM toolchain" &&
-            curl -fsSLO https://github.com/qmk/qmk_toolchains/releases/download/${tag_name}/qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalARM.tar.xz
-    }
-[[ -f qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalAVR.tar.xz ]] ||
-    {
-        echo "Downloading AVR toolchain" &&
-            curl -fsSLO https://github.com/qmk/qmk_toolchains/releases/download/${tag_name}/qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalAVR.tar.xz
-    }
-[[ -f qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalRV32.tar.xz ]] ||
-    {
-        echo "Downloading RISC-V toolchain" &&
-            curl -fsSLO https://github.com/qmk/qmk_toolchains/releases/download/${tag_name}/qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalRV32.tar.xz
-    }
+curl -fsSL https://api.github.com/repos/qmk/qmk_toolchains/releases/tags/${tag_name} \
+    | jq -r '.assets[] | select(.name | contains("toolchain")) | .browser_download_url' \
+    | grep $(fn_os)$(fn_arch) \
+    | xargs curl -fsSLO
 
 if [[ -d "$HOME/.local/qmk/toolchains" ]]; then
     echo "Removing old toolchains" &&
@@ -66,9 +55,7 @@ fi
 
 mkdir -p "$HOME/.local/qmk/toolchains"
 
-echo "Extracting ARM toolchain" &&
-    tar -C "$HOME/.local/qmk/toolchains" -xf qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalARM.tar.xz --strip-components=1
-echo "Extracting AVR toolchain" &&
-    tar -C "$HOME/.local/qmk/toolchains" -xf qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalAVR.tar.xz --strip-components=1
-echo "Extracting RISC-V toolchain" &&
-    tar -C "$HOME/.local/qmk/toolchains" -xf qmk_toolchain-gcc14.1.0-host_$(fn_os)$(fn_arch)-target_baremetalRV32.tar.xz --strip-components=1
+echo "Extracting toolchains" &&
+    tar -C "$HOME/.local/qmk/toolchains" -xf qmk_toolchains-*.tar.xz --strip-components=1
+
+rm qmk_toolchains-*.tar.xz
