@@ -25,9 +25,9 @@
             ],
             "console": "integratedTerminal",
             "linux": {
-                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "program": "${workspaceRoot}/.direnv/python-3.12/bin/qmk",
                 "env": {
-                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.12/bin/python3"
                 }
             }
         },
@@ -58,9 +58,9 @@
             ],
             "console": "integratedTerminal",
             "linux": {
-                "program": "${workspaceRoot}/.direnv/python-3.11/bin/qmk",
+                "program": "${workspaceRoot}/.direnv/python-3.12/bin/qmk",
                 "env": {
-                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.11/bin/python3"
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.12/bin/python3"
                 }
             }
         },
