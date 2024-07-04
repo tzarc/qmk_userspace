@@ -11,6 +11,7 @@ mpire
 profilehooks
 pyelftools
 python-sqlite-cache
+qmk
 redis
 rq
 ruff

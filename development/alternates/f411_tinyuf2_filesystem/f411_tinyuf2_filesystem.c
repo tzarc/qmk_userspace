@@ -4,6 +4,6 @@
 
 void keyboard_post_init_user() {
     // This should be in a keymap, but eh
-    debug_enable=true;
-    debug_matrix=true;
+    debug_enable = true;
+    debug_matrix = true;
 }

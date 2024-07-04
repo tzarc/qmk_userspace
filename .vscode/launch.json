@@ -10,7 +10,7 @@
 
     "version": "0.2.0",
     "configurations": [
-\        {
+        {
             "name": "Python: qmk -v license-check -a users/tzarc/tzarc_unicode.c users/tzarc/tzarc_wow.c",
             "type": "debugpy",
             "justMyCode": false,
@@ -22,6 +22,25 @@
                 "-a",
                 "users/tzarc/tzarc_unicode.c",
                 "users/tzarc/tzarc_wow.c"
+            ],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.12/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.12/bin/python3"
+                }
+            }
+        },
+        {
+            "name": "Python: qmk similarity -kb bm16s",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "args": [
+                "similarity",
+                "-kb",
+                "bm16s"
             ],
             "console": "integratedTerminal",
             "linux": {

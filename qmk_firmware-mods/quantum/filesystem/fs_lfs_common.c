@@ -81,12 +81,12 @@ static inline fs_fd_t allocate_fd(void) {
 
 static MUTEX_DECL(fs_mutex);
 
-bool fs_lock(void) {
+static inline bool fs_lock(void) {
     chMtxLock(&fs_mutex);
     return true;
 }
 
-bool fs_unlock(void) {
+static inline bool fs_unlock(void) {
     chMtxUnlock(&fs_mutex);
     return true;
 }
