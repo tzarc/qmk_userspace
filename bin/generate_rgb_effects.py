@@ -39,5 +39,5 @@ print(f"""\
 
 #ifdef RGBLIGHT_ENABLE
 {rgblight_list}
-#endif // RGBLIGHT_ENABLE
+#endif // RGBLIGHT_ENABLE\
 """)

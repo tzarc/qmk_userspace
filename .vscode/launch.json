@@ -84,34 +84,41 @@
             }
         },
         {
+            "name": "(gdb) arena",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/development/muckabout/arena/arena",
+            "cwd": "${workspaceFolder}/development/muckabout/arena"
+        },
+        {
             "name": "(gdb) gen_circ",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/muckabout/gen_circ/gen_circ",
-            "cwd": "${workspaceFolder}/muckabout/gen_circ"
+            "program": "${workspaceFolder}/development/muckabout/gen_circ/gen_circ",
+            "cwd": "${workspaceFolder}/development/muckabout/gen_circ"
         },
         {
             "name": "(gdb) littlefs-endurance",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/muckabout/littlefs-endurance/littlefs-endurance",
-            "cwd": "${workspaceFolder}/muckabout/littlefs-endurance"
+            "program": "${workspaceFolder}/development/muckabout/littlefs-endurance/littlefs-endurance",
+            "cwd": "${workspaceFolder}/development/muckabout/littlefs-endurance"
         },
         {
             "name": "(gdb) rle",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/muckabout/rle/rle",
+            "program": "${workspaceFolder}/development/muckabout/rle/rle",
             "args": ["-h"],
-            "cwd": "${workspaceFolder}/muckabout/rle"
+            "cwd": "${workspaceFolder}/development/muckabout/rle"
         },
         {
             "name": "(gdb) rle16",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/muckabout/rle16/rle",
+            "program": "${workspaceFolder}/development/muckabout/rle16/rle",
             "args": ["-h"],
-            "cwd": "${workspaceFolder}/muckabout/rle16"
+            "cwd": "${workspaceFolder}/development/muckabout/rle16"
         },
         {
             "name": "(gdb) Launch encoder_split_no_left",

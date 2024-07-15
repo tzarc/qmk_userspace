@@ -24,5 +24,6 @@ test_distro fedora:36
 test_distro fedora:37
 test_distro fedora:38
 test_distro fedora:39
+test_distro fedora:40
 
 test_distro archlinux:latest

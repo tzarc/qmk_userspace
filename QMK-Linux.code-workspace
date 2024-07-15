@@ -28,11 +28,12 @@
     "settings": {
         "git.ignoreLimitWarning": true,
         "cortex-debug.variableUseNaturalFormat": false,
-        "python.defaultInterpreterPath": "/home/nickb/qmk_build/.direnv/python-3.12/bin/python",
+        "python.defaultInterpreterPath": "/home/nickb/qmk_build/.direnv/python-3.12/bin/python3",
         "python.analysis.extraPaths": [
             "/home/nickb/qmk_build/.direnv/python-3.12/lib/python3.12/site-packages",
             "/home/nickb/qmk_build/qmk_firmware/lib/python"
         ],
+        "ansible.python.interpreterPath": "/home/nickb/qmk_build/.direnv/python-3.12/bin/python3",
         "files.exclude": {
             "**/.cache": false,
             "**/.direnv": false,

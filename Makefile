@@ -62,8 +62,8 @@ repositories: qmk_firmware qmk_userspace qmk-dot-github
 .PHONY: clean distclean userspace_clean
 
 userspace_clean:
-	@rm -f $(QMK_USERSPACE)/compile_commands.json || true
-	@rm -f $(QMK_USERSPACE)/.cache || true
+	@rm -f $(QMK_USERSPACE)/compile_commands.json $(QMK_USERSPACE)/*.bin $(QMK_USERSPACE)/*.hex $(QMK_USERSPACE)/*.uf2 || true
+	@rm -rf $(QMK_USERSPACE)/.cache || true
 
 clean: userspace_clean
 	@$(MAKE) -C $(QMK_USERSPACE)/qmk_firmware clean
