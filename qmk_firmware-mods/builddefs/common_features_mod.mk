@@ -6,3 +6,9 @@ FILESYSTEM_DRIVER ?=
 ifneq ($(strip $(FILESYSTEM_DRIVER)),)
     include $(MOD_QUANTUM_DIR)/filesystem/rules.mk
 endif
+
+RV32_VM_ENABLE ?= no
+ifneq ($(strip $(RV32_VM_ENABLE)),no)
+	OPT_DEFS += -DRV32_VM_ENABLE
+	COMMON_VPATH += $(MOD_LIB_PATH)/mini-rv32ima/mini-rv32ima
+endif
