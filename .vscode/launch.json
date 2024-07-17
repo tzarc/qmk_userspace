@@ -158,8 +158,8 @@
             "windows": {
                 "BMPGDBSerialPort": "COM3"
             },
-            "macos": {
-                "BMPGDBSerialPort": "COM3"
+            "osx": {
+                "BMPGDBSerialPort": "/dev/cu.usbmodem3789344F30381"
             },
             "showDevDebugOutput": "parsed",
             "preAttachCommands": ["set mem inaccessible-by-default off"],

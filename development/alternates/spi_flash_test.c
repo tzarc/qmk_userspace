@@ -20,11 +20,11 @@ void housekeeping_task_kb(void) {
             const uint8_t test_data[]                  = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
             uint8_t       recv_data[sizeof(test_data)] = {0};
             dprint("Reading initial state:\n");
-            flash_read_block(0, recv_data, sizeof(recv_data));
+            flash_read_range(0, recv_data, sizeof(recv_data));
             dprint("Writing test data:\n");
-            flash_write_block(0, test_data, sizeof(test_data));
+            flash_write_range(0, test_data, sizeof(test_data));
             dprint("Reading test data:\n");
-            flash_read_block(0, recv_data, sizeof(recv_data));
+            flash_read_range(0, recv_data, sizeof(recv_data));
         }
     }
 #endif // EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN
