@@ -52,7 +52,7 @@ SECTIONS
 
 	.bss : ALIGN( 16 ) {
 		__BSS_BEGIN__ = .;
-		*(.bss) /* Tricky: BSS needs to be allocated but not sent. GCC Will not populate these for calculating data size */
+		*(.bss)
 		*(.bss.*)
 		__BSS_END__ = .;
 	}
