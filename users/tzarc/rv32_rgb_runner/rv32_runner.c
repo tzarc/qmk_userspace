@@ -1,5 +1,7 @@
 // Copyright 2024 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
+#include <stdint.h>
+#include "stdbool.h"
 #include "ecall.h"
 #include "rv32_runner.h"
 
@@ -54,20 +56,30 @@ static inline RV32_RGB rgb_matrix_hsv_to_rgb(RV32_HSV hsv) {
 #define RGB_MATRIX_LED_COUNT 42
 
 static uint16_t time_offsets[RGB_MATRIX_LED_COUNT] = {0};
-RV32_HSV        hsv                                = {0};
-uint8_t         speed                              = 0;
 
-void effect_init(void) {
-    hsv   = rgb_matrix_config_hsv();
-    speed = rgb_matrix_config_speed();
-    for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
-        time_offsets[i] = rand() % 65500;
+RV32_HSV hsv;
+uint8_t speed;
+uint32_t rgb_timer;
+
+void effect_init(void *params) {
+    static bool initial = false;
+    if (!initial) {
+        initial = true;
+        for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
+            time_offsets[i] = rand() % 65500;
+        }
     }
 }
 
+void effect_begin_iter(void *params, uint8_t led_min, uint8_t led_max) {
+    hsv   = rgb_matrix_config_hsv();
+    speed = rgb_matrix_config_speed();
+    rgb_timer = g_rgb_timer();
+}
+
 void effect_led(void *params, uint8_t led_index) {
-    uint16_t time = scale16by8((g_rgb_timer() / 2) + time_offsets[led_index], speed / 16);
-    hsv.v         = scale8(abs8(sin8(time) - 128) * 2, hsv.v);
-    RV32_RGB rgb  = rgb_matrix_hsv_to_rgb(hsv);
+    uint16_t time  = scale16by8((rgb_timer / 2) + time_offsets[led_index], speed / 16);
+    uint8_t v          = scale8(abs8(sin8(time) - 128) * 2, hsv.v);
+    RV32_RGB rgb   = rgb_matrix_hsv_to_rgb((RV32_HSV){.h = hsv.h, .s = hsv.s, .v = v});
     rgb_matrix_set_color(led_index, rgb.r, rgb.g, rgb.b);
 }

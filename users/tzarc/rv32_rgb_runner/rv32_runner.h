@@ -7,7 +7,9 @@
 // This list needs to be kept in-sync with the api_table in rv32_runner.S
 typedef enum rv32_api_t {
     RV32_EFFECT_INIT = 0,
+    RV32_EFFECT_BEGIN_ITER,
     RV32_EFFECT_LED,
+    RV32_EFFECT_END_ITER,
 } rv32_api_t;
 
 // This list needs to be kept in sync with rv32_runner.c

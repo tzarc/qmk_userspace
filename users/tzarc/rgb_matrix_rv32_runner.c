@@ -114,11 +114,11 @@ static void rv32vm_invoke(rv32_api_t api) {
 
     uint32_t start = timer_read32();
     while (true) {
-        if (timer_elapsed32(start) > 1) {
-            // Failsafe -- if the VM runs for more than 1ms, terminate it
+        if (timer_elapsed32(start) > 10) {
+            // Failsafe -- if the VM runs for more than 10ms, terminate it
             return;
         }
-        int ret = MiniRV32IMAStepRGB(&rgb_core, rgb_ram_area, 0, 0, 1024);
+        int ret = MiniRV32IMAStepRGB(&rgb_core, rgb_ram_area, 0, 0, 100000);
         switch (ret) {
             case 0:
                 if (rgb_core.mcause == 11) { // machine-mode ecall
@@ -138,11 +138,27 @@ static void rv32vm_invoke(rv32_api_t api) {
 }
 
 void rv32vm_effect_init_impl(effect_params_t* params) {
-    debug_enable = true;
-    memset(&rgb_core, 0, sizeof(rgb_core));
-    memset(rgb_ram_area, 0, sizeof(rgb_ram_area));
-    memcpy(rgb_ram_area, rv32_runner, rv32_runner_len);
+    static bool initial = false;
+    if (!initial) {
+        initial      = true;
+        debug_enable = true;
+        memset(&rgb_core, 0, sizeof(rgb_core));
+        memset(rgb_ram_area, 0, sizeof(rgb_ram_area));
+        memcpy(rgb_ram_area, rv32_runner, rv32_runner_len);
+    }
     rv32vm_invoke(RV32_EFFECT_INIT);
+}
+
+void rv32vm_effect_begin_iter_impl(effect_params_t* params, uint8_t led_min, uint8_t led_max) {
+    rgb_core.regs[10] = (uint32_t)(uintptr_t)params;
+    rgb_core.regs[11] = (uint32_t)led_min;
+    rgb_core.regs[12] = (uint32_t)led_max;
+    rv32vm_invoke(RV32_EFFECT_BEGIN_ITER);
+}
+
+void rv32vm_effect_end_iter_impl(effect_params_t* params) {
+    rgb_core.regs[10] = (uint32_t)(uintptr_t)params;
+    rv32vm_invoke(RV32_EFFECT_END_ITER);
 }
 
 void rv32vm_effect_led_impl(effect_params_t* params, uint8_t led_index) {

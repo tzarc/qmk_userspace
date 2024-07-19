@@ -21,18 +21,20 @@ _start:
 _shutdown:
 	li a7, 0			# load 0 (RV32_EXIT) as ecall param
 	ecall				# kick off termination procedure
-
-_hard_loop:
-	j _hard_loop			# Hard loop if writing to SYSCON didn't terminate the VM for whatever reason
+	j _shutdown			# Keep retying shutdown if there was a failure for whatever reason
 
 .global _api_table
 
 .weak effect_init
+.weak effect_begin_iter
 .weak effect_led
+.weak effect_end_iter
 
 _api_table:				# API table for functions to invoke -- kicking off the core with t0 set to an index will invoke the corresponding API
 	.long effect_init
+	.long effect_begin_iter
 	.long effect_led
+	.long effect_end_iter
 
 _api_table_end:
 	.long 0
