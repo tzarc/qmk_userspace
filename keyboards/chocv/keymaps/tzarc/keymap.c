@@ -17,9 +17,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-
 const key_override_t grave_ctrldel_override = ko_make_basic(MOD_MASK_CTRL, KC_DEL, KC_GRV);
 
-const key_override_t *key_overrides[] = {
-    &grave_ctrldel_override
-};
+const key_override_t *key_overrides[] = {&grave_ctrldel_override};

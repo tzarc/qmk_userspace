@@ -1,0 +1,38 @@
+# vim: set ft=asm ts=8 sw=8 noexpandtab
+# Copyright 2024 Nick Brassel (@tzarc)
+# SPDX-License-Identifier: GPL-2.0-or-later
+.section .initial_jump
+.global _start
+
+.align 4
+_start:
+	la t3, _api_table_end 		# end of table
+	la t2, _api_table		# start of table
+	li t1, 4			# index multiplier
+	mul t0, t0, t1			# multiply supplied index (t0) by 4 to get memory offset
+	add t0, t0, t2			# add memory offset to start of table to get function to invoke
+	bge t0, t3, _shutdown		# exit if we've calculated past the end of the table
+	lw t0, 0(t0)			# load the address from the table
+	beq t0, x0, _shutdown		# exit if the resulting location is null (weak, undefined in code)
+	la sp, _sstack			# set up stack
+	addi sp,sp,-16			# make stack space
+	sw ra,12(sp)			# save return address (not that it's in use...)
+	jalr t0				# invoke the function from the table
+_shutdown:
+	li a7, 0			# load 0 (RV32_EXIT) as ecall param
+	ecall				# kick off termination procedure
+
+_hard_loop:
+	j _hard_loop			# Hard loop if writing to SYSCON didn't terminate the VM for whatever reason
+
+.global _api_table
+
+.weak effect_init
+.weak effect_led
+
+_api_table:				# API table for functions to invoke -- kicking off the core with t0 set to an index will invoke the corresponding API
+	.long effect_init
+	.long effect_led
+
+_api_table_end:
+	.long 0
