@@ -6,13 +6,7 @@ ENTRY(_start)
 SECTIONS
 {
 	. = 0x80000000;
-/*
-	.header : ALIGN( 16 )
-	{
-		LONG( 0 )
-		LONG( 0 )
-	}
-*/
+
 	.text : ALIGN(16) {
 		__TEXT_BEGIN__ = .;
 		*(.initial_jump)
@@ -26,7 +20,6 @@ SECTIONS
 		__TEXT_END__ = .;
 	}
 
-	/* If we're on a newer compiler */
 	/DISCARD/ :
 	{
 		*(.interp)
@@ -75,6 +68,4 @@ SECTIONS
 		. = . + __stack_size;
 		_sstack = .;
 	}
-
-	PROVIDE( SYSCON = 0x11100000 );
 }

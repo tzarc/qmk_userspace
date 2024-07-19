@@ -11,6 +11,7 @@ static void rv32_effect_init(effect_params_t* params) {
 static bool rv32_effect_run(effect_params_t* params) {
     RGB_MATRIX_USE_LIMITS(led_min, led_max);
     for (uint8_t i = led_min; i < led_max; i++) {
+        RGB_MATRIX_TEST_LED_FLAGS();
         extern void rv32vm_effect_led_impl(effect_params_t * params, uint8_t led_index);
         rv32vm_effect_led_impl(params, i);
     }

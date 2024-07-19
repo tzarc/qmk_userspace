@@ -19,9 +19,8 @@ _start:
 	sw ra,12(sp)			# save return address (not that it's in use...)
 	jalr t0				# invoke the function from the table
 _shutdown:
-	li t4, 0x5555			# load 0x5555 for value
-	la t5, SYSCON			# load SYSCON for address
-	sw t4, 0(t5)			# write to SYSCON to exit
+	li a7, 0			# load 0 (RV32_EXIT) as ecall param
+	ecall				# kick off termination procedure
 
 _hard_loop:
 	j _hard_loop			# Hard loop if writing to SYSCON didn't terminate the VM for whatever reason
@@ -30,30 +29,6 @@ _hard_loop:
 
 .weak effect_init
 .weak effect_led
-
-.global _vcall0
-.global _vcall1
-.global _vcall2
-.global _vcall3
-.global _vcall4
-.global _vcall5
-.global _vcall6
-.global _vcall7
-
-# "vcall" -- simple invocation of host by writing 0x9999 to SYSCON
-# 	- saves messing about with traps and the like as this is only used by baremetal execution
-_vcall0:				# 0 arguments set up by compiler, as per vcall.h
-_vcall1:				# 1 argument set up by compiler, as per vcall.h
-_vcall2:				# 2 arguments set up by compiler, as per vcall.h
-_vcall3:				# 3 arguments set up by compiler, as per vcall.h
-_vcall4:				# 4 arguments set up by compiler, as per vcall.h
-_vcall5:				# 5 arguments set up by compiler, as per vcall.h
-_vcall6:				# 6 arguments set up by compiler, as per vcall.h
-_vcall7:				# 7 arguments set up by compiler, as per vcall.h
-	li t4, 0x9999			# load 0x9999 for value
-	la t5, SYSCON			# load SYSCON for address
-	sw t4, 0(t5)			# write to SYSCON to invoke vcall handler
-	ret				# back to caller
 
 _api_table:				# API table for functions to invoke -- kicking off the core with t0 set to an index will invoke the corresponding API
 	.long effect_init
