@@ -1,4 +1,5 @@
 *.so
+*.so.all
 *.so.asm
 *.so.dump
 *.so.map

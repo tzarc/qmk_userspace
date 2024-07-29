@@ -5,7 +5,7 @@ TARGET_LIB ?= dynamic_lib.so
 BUILD_DIR ?= .build
 SRC_DIRS ?= src
 
-SRCS := $(shell find $(SRC_DIRS) \( -name *.cpp -or -name *.cxx -or -name *.cc -or -name *.c -or -name *.s \))
+SRCS := $(shell find $(SRC_DIRS) \( -name *.cpp -or -name *.cxx -or -name *.cc -or -name *.c -or -name *.s -or -name *.S \))
 HDRS := $(shell find $(SRC_DIRS) \( -name *.hpp -or -name *.hxx -or -name *.hh -or -name *.h \))
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
@@ -25,9 +25,8 @@ OBJCOPY = arm-none-eabi-objcopy
 OBJDUMP = arm-none-eabi-objdump
 SIZE = arm-none-eabi-size
 
-# STM32F405RG
 QMK_COMPILE_FLAGS := \
-	-mcpu=cortex-m4 \
+	-mcpu=cortex-m0 \
 	-mthumb \
 	-mno-thumb-interwork \
 	-mno-unaligned-access \
@@ -38,7 +37,6 @@ QMK_COMPILE_FLAGS := \
 	-fno-builtin \
 	-fno-common \
 	-fshort-wchar \
-	-flto=auto \
 	-fstack-usage \
 	-Wall \
 	-Wstrict-prototypes \
@@ -47,8 +45,13 @@ QMK_COMPILE_FLAGS := \
 	#-mno-pic-data-is-text-relative \
 	#-msingle-pic-base
 
-OPT_FLAGS = -g -Os
-CFLAGS_BASE ?= $(OPT_FLAGS) -fPIE -fPIC -fpic -fpie
+OPT_FLAGS = -g -O0
+CFLAGS_BASE ?= $(OPT_FLAGS) \
+	-fPIC -fpic \
+	-mpic-register=r9 \
+	-msingle-pic-base \
+	-mno-pic-data-is-text-relative \
+	-ffixed-r10
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
 LDFLAGS ?= $(OPT_FLAGS) \
@@ -80,16 +83,19 @@ format:
 	ruff check --select I --fix .
 	ruff format .
 
-convert: $(TARGET_LIB)
+strip: $(TARGET_LIB)
 	$(STRIP) -s $(TARGET_LIB)
+
+convert: strip
 	./convert-binary.py $(TARGET_LIB)
 
 info: convert
-	$(OBJDUMP) -afphs $(TARGET_LIB) > $(TARGET_LIB).dump
-	$(OBJDUMP) -DSz $(TARGET_LIB) > $(TARGET_LIB).asm
-	$(READELF) -sSW ${TARGET_LIB} > $(TARGET_LIB).symbols
-	$(READELF) -r ${TARGET_LIB} > $(TARGET_LIB).relocs
-	$(READELF) -l ${TARGET_LIB}
+	$(OBJDUMP) -afphs -M force-thumb $(TARGET_LIB) > $(TARGET_LIB).dump
+	$(OBJDUMP) -DSz -M force-thumb $(TARGET_LIB) > $(TARGET_LIB).asm
+	$(READELF) -aW ${TARGET_LIB} > $(TARGET_LIB).all
+	$(READELF) -AsSW ${TARGET_LIB} > $(TARGET_LIB).symbols
+	$(READELF) -rW ${TARGET_LIB} > $(TARGET_LIB).relocs
+	$(READELF) -lW ${TARGET_LIB}
 	$(SIZE) $(TARGET_LIB)
 	file ${TARGET_LIB}
 	stat ${TARGET_LIB}
@@ -115,7 +121,11 @@ $(BUILD_DIR)/$(TARGET_LIB): $(OBJS)
 # assembly
 $(BUILD_DIR)/%.s.o: %.s buildreqs
 	$(MKDIR_P) $(dir $@)
-	$(AS) $(ASFLAGS) -c $< -o $@
+	$(CC) $(ASFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/%.S.o: %.S buildreqs
+	$(MKDIR_P) $(dir $@)
+	$(CC) $(ASFLAGS) -c $< -o $@
 
 # c sources
 $(BUILD_DIR)/%.c.o: %.c buildreqs

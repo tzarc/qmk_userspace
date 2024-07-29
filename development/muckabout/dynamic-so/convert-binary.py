@@ -19,11 +19,7 @@ except ImportError:
     sys.exit(1)
 
 section_info = {
-    ".null1": {"id": 0, "offset": 0x00000000, "length": 0x00000000},
-    ".null2": {"id": 0, "offset": 0x10000000, "length": 0xE0000000},
     ".text": {"id": 1, "offset": 0x04000000, "length": 0x02000000},
-    ".data": {"id": 2, "offset": 0x06000000, "length": 0x02000000},
-    ".nonresident": {"id": 3, "offset": 0x08000000, "length": 0x08000000},
 }
 
 reloc_mapping = {
@@ -39,7 +35,7 @@ reloc_enum_names = {}
 for n in elf.enums.ENUM_RELOC_TYPE_ARM.keys():
     reloc_enum_names[elf.enums.ENUM_RELOC_TYPE_ARM[n]] = f"{n} ({elf.enums.ENUM_RELOC_TYPE_ARM[n]})"
 
-reloc_section_names = [".rel.text", ".rel.data", ".rel.nonresident", ".rel.dyn"]
+reloc_section_names = [".rel.text", ".rel.data", ".rel.nonresident", ".rel.dyn", ".relocs"]
 
 
 class SectionAddr:
@@ -130,10 +126,11 @@ with open(args.elf, "rb") as f:
         libinfo_data_size,
         libinfo_bss_start,
         libinfo_bss_size,
-        libinfo_nonresident_start,
-        libinfo_nonresident_size,
-        libinfo_entrypoint,
-    ) = struct.unpack_from("<IIIIIIIIIIIIIIIII", libinfo_data, 0)
+        libinfo_got_start,
+        libinfo_got_size,
+        libinfo_plt_start,
+        libinfo_plt_size,
+    ) = struct.unpack_from("<IIIIIIIIIIIIIIIIII", libinfo_data, 0)
 
     print("==========================================")
     print("Library information:")
@@ -147,11 +144,10 @@ with open(args.elf, "rb") as f:
     print(f"   fini_array: 0x{libinfo_fini_array_start:08x}, {libinfo_fini_array_count:4d}")
     print(f"         data: 0x{libinfo_data_start:08x}, {libinfo_data_size:4d} (0x{libinfo_data_size:04x})")
     print(f"          bss: 0x{libinfo_bss_start:08x}, {libinfo_bss_size:4d} (0x{libinfo_bss_size:04x})")
-    print(f"  nonresident: 0x{libinfo_nonresident_start:08x}, {libinfo_nonresident_size:4d} (0x{libinfo_nonresident_size:04x})")
-    print(f"   entrypoint: 0x{libinfo_entrypoint:08x}")
+    print(f"          got: 0x{libinfo_got_start:08x}, {libinfo_got_size:4d} (0x{libinfo_got_size:04x})")
+    print(f"          plt: 0x{libinfo_plt_start:08x}, {libinfo_plt_size:4d} (0x{libinfo_plt_size:04x})")
 
     text_section = elffile.get_section_by_name(".text")
-    nonresident_section = elffile.get_section_by_name(".nonresident")
     bss_section = elffile.get_section_by_name(".bss")
 
     text_address = text_section["sh_addr"]
@@ -159,15 +155,6 @@ with open(args.elf, "rb") as f:
     print(f"       .text length: {text_length:4d}")
 
     text_binary = text_section.data()
-
-    nonresident_address = 0
-    nonresident_length = 0
-    if nonresident_section is not None:
-        nonresident_address = nonresident_section["sh_addr"]
-        nonresident_length = nonresident_section["sh_size"]
-        print(f".nonresident length: {nonresident_length:4d}")
-
-        nonresident_binary = nonresident_section.data()
 
     bss_length = bss_section["sh_size"]
     print(f"        .bss length: {bss_length:4d}")
@@ -215,22 +202,15 @@ with open(args.elf, "rb") as f:
 
     executable = bytearray("QKE1", encoding="utf8")
     executable += leb128_encode_unsigned(text_length)
-    executable += leb128_encode_unsigned(nonresident_length)
     executable += leb128_encode_unsigned(bss_length)
     executable += leb128_encode_unsigned(libinfo_init_array_start)
     executable += leb128_encode_unsigned(libinfo_init_array_count)
     executable += leb128_encode_unsigned(libinfo_fini_array_start)
     executable += leb128_encode_unsigned(libinfo_fini_array_count)
 
-    entrypoint = SectionAddr(libinfo_entrypoint)
-    print(entrypoint)
-    executable += entrypoint.bytes
-
     executable += leb128_encode_unsigned(len(relocs))
 
     executable += text_binary
-    if nonresident_length > 0:
-        executable += nonresident_binary
 
     for reloc in relocs:
         executable += reloc.bytes

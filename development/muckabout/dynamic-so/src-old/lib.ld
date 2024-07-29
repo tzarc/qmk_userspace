@@ -1,6 +1,8 @@
 MEMORY
 {
-    TEXT (rwx)             : ORIGIN = 0x04000000, LENGTH = 0x02000000
+    TEXT (rx)              : ORIGIN = 0x04000000, LENGTH = 0x02000000
+    DATA (rwx)             : ORIGIN = 0x06000000, LENGTH = 0x02000000
+    NONRESIDENT (r)        : ORIGIN = 0x08000000, LENGTH = 0x08000000
     OTHER (r)              : ORIGIN = 0xD0000000, LENGTH = 0x00100000
     LIBINFO (r)            : ORIGIN = 0xE0000000, LENGTH = 0x00100000
 }
@@ -22,18 +24,21 @@ SECTIONS
         LONG(__data_end - __data_start);
         LONG(__bss_start);
         LONG(__bss_end - __bss_start);
-        LONG(__got_start);
-        LONG(__got_end - __got_start);
-        LONG(__plt_start);
-        LONG(__plt_end - __plt_start);
+        LONG(__nonresident_start);
+        LONG(__nonresident_end - __nonresident_start);
+        LONG(__keymap_init);
     } >LIBINFO
 
     /* The 'text' section contains the main program code. */
     .text : {
+        __text_section = LOADADDR(.text);
+        __keymap_init = ABSOLUTE(keymap_init);
+
         PROVIDE_HIDDEN (__text_start = .);
 
         PROVIDE_HIDDEN (__code_start = .);
-        *(.text.get_effect_api)
+        *(.text.startup.main)
+        *(.text.main)
         *(.text*)
         *(.glue_7)         /* glue arm to thumb code */
         *(.glue_7t)        /* glue thumb to arm code */
@@ -69,30 +74,13 @@ SECTIONS
 
         . = ALIGN(4);
 
+        PROVIDE_HIDDEN (__text_end = .);
+
         PROVIDE_HIDDEN (__data_start = .);
         *(.sys_struct)
         *(.data*)
+        . = ALIGN(4);
         PROVIDE_HIDDEN (__data_end = .);
-
-        . = ALIGN(4);
-
-        PROVIDE_HIDDEN (__got_start = .);
-        *(.got)
-        /*
-        *(.got.plt)
-        *(.igot.plt)
-        */
-        PROVIDE_HIDDEN (__got_end = .);
-
-        . = ALIGN(4);
-
-        PROVIDE_HIDDEN (__plt_start = .);
-        /*
-        *(.plt)
-        */
-        PROVIDE_HIDDEN (__plt_end = .);
-
-        PROVIDE_HIDDEN (__text_end = .);
     } >TEXT
 
     .bss : {
@@ -108,11 +96,30 @@ SECTIONS
         PROVIDE_HIDDEN (__bss_end = .);
     } >DATA
 
+    /* The 'nonresident' section is space set aside in ROM where
+       data can be kept out of RAM but still be accessed by the MCU. */
+    .nonresident : {
+        . = ALIGN(4);
+        PROVIDE_HIDDEN (__nonresident_start = .);
+        *(.nonresident*)
+        . = ALIGN(4);
+        PROVIDE_HIDDEN (__nonresident_end = .);
+    } >NONRESIDENT
+
     .ARM.extab : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >OTHER
     .ARM : {
         PROVIDE_HIDDEN (__exidx_start = .);
         *(.ARM.exidx*)
         PROVIDE_HIDDEN (__exidx_end = .);
+    } >OTHER
+
+    .got : {
+        . = ALIGN(4);
+        PROVIDE_HIDDEN (__got_start = .);
+        *(.got)
+        *(.got.plt)
+        *(.igot.plt)
+        PROVIDE_HIDDEN (__got_end = .);
     } >OTHER
 
     .dynamic : {
@@ -124,23 +131,14 @@ SECTIONS
         PROVIDE_HIDDEN (__dynamic_end = .);
     } >OTHER
 
-    .relocs : {
-        . = ALIGN(4);
-        PROVIDE_HIDDEN (__relocs_start = .);
-        *(.rel.*)
-        . = ALIGN(4);
-        PROVIDE_HIDDEN (__relocs_end = .);
-    } >OTHER
-
+    /* PLT section contains code for accessing the dynamically linked functions
+     * ie funtions from shared libraries in a postion independent manner */
     .plt : {
         . = ALIGN(4);
-        PROVIDE_HIDDEN (__plt_section_start = .);
-        *(.got.plt)
-        *(.igot.plt)
+        PROVIDE_HIDDEN (__plt_start = .);
         *(.plt)
-        *(.plt.*)
         . = ALIGN(4);
-        PROVIDE_HIDDEN (__plt_section_end = .);
+        PROVIDE_HIDDEN (__plt_end = .);
     } >OTHER
 
     /* Remove information from the standard libraries */

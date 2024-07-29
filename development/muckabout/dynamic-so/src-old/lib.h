@@ -24,6 +24,8 @@ struct qmk_keymap_t {
 
     int*  test_data;
     int*  test_bss;
+    int*  test_nonresident;
+    int** test_nonresident_ptr;
 };
 
 typedef struct qmk_keymap_t qmk_keymap_t;
