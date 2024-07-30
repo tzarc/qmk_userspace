@@ -40,6 +40,9 @@ git clone -b develop --no-local "$script_dir/../qmk_firmware" "$script_dir/qmk_u
 # For safety, define a git command that explicitly refers to the git repo
 GIT_CMD="git -C $script_dir/qmk_userspace_via"
 
+# If SSH signing is available, use it.
+$GIT_CMD sshsign || true
+
 # Perform the filtering
 cd "$script_dir/qmk_userspace_via"
 git filter-repo --paths-from-file "$script_dir/filter-paths.txt" # can't use $GIT_CMD for some reason
@@ -68,6 +71,12 @@ EOF
 
 # Commit!
 $GIT_CMD commit -am 'All via keymaps.'
+
+# Apply patches in the script dir
+ls -1 "$script_dir/"*.patch | sort | while read -r patch; do
+    $GIT_CMD apply "$patch"
+    $GIT_CMD commit -am "Apply patch $(basename $patch .patch)"
+done
 
 # Push to upstream if requested
 if [[ "${1:-}" == "--push" ]]; then
