@@ -12,7 +12,11 @@ jobs:
     with:
       qmk_repo: qmk/qmk_firmware
       qmk_ref: develop
-      preparation_command: make links && git submodule update --init --recursive
+      preparation_command: |
+        set -e
+        make links
+        git config --global --add safe.directory /__w/qmk_userspace/qmk_userspace
+        git submodule update --init --recursive
 
   publish:
     name: 'QMK Userspace Publish'
