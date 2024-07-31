@@ -18,21 +18,16 @@ if [[ -e "$script_dir/qmk_userspace_via" ]]; then
     rm -rf "$script_dir/qmk_userspace_via"
 fi
 
+export QMK_USERSPACE="$script_dir/qmk_userspace_via"
+
 # Setup git filter-repo paths file
 echo 'regex:^keyboards/.*/keymaps/via/.*$' >filter-paths.txt
-cat non-via-via-keymaps.txt |
-    while read -r kbkm; do
-        kb=$(echo "$kbkm" | cut -d: -f1)
-        km=$(echo "$kbkm" | cut -d: -f2)
-        echo >>filter-paths.txt
-        echo "regex:^keyboards/${kb}/.*/keymaps/${km}/.*\$" >>filter-paths.txt
-        echo "regex:^keyboards/${kb}/keymaps/${km}/.*\$" >>filter-paths.txt
-        d=$(dirname ${kb})
-        while [[ "$d" != "." ]]; do
-            echo "regex:^keyboards/${d}/keymaps/${km}/.*\$" >>filter-paths.txt
-            d=$(dirname $d)
-        done
-    done
+cat non-via-via-keymaps.txt \
+    | sort \
+    | xargs ./keymap_locations.py \
+    | uniq \
+    | sed -e 's@^@regex:^@g' -e 's@$@/.*$@g' \
+    >> filter-paths.txt
 
 # Clone the repo
 git clone -b develop --no-local "$script_dir/../qmk_firmware" "$script_dir/qmk_userspace_via"
@@ -61,7 +56,7 @@ $GIT_CMD merge --allow-unrelated-histories -m "Merge qmk_userspace" upstream/mai
 $GIT_CMD remote remove upstream
 
 # Set up the build
-QMK_USERSPACE=$(readlink -f .) qmk userspace-add all:via
+qmk userspace-add all:via
 
 # Fixup readme
 cat<<EOF >README.md
