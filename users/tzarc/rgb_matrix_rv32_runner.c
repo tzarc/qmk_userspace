@@ -6,13 +6,13 @@
 #include "rgb_matrix.h"
 #include "debug.h"
 #include "rgb_matrix.h"
-#include "rv32_rgb_runner.inl.h"
-#include "rv32_rgb_runner/rv32_runner.h"
 #include "color.h"
 #include <lib/lib8tion/lib8tion.h>
+#include "rv32_rgb_runner.inl.h"
+#include "rv32_rgb_runner/rv32_runner.h"
 
 #ifndef RGB_MATRIX_RV32_RUNNER_RAM
-#    define RGB_MATRIX_RV32_RUNNER_RAM 1024
+#    define RGB_MATRIX_RV32_RUNNER_RAM 2048
 #endif // RGB_MATRIX_RV32_RUNNER_RAM
 
 #define MINI_RV32_RAM_SIZE (RGB_MATRIX_RV32_RUNNER_RAM)
@@ -108,17 +108,35 @@ static rv32vm_ecall_result_t rv32vm_ecall_handler(void) {
 }
 
 static void rv32vm_invoke(rv32_api_t api) {
-    rgb_core.pc = MINIRV32_RAM_IMAGE_OFFSET;
-    rgb_core.extraflags |= 3; // Machine mode
+    if (timer_read32() < 5000) return; // don't do anything for first 5 seconds of bootup, so we can actually let console connect, but also bootmagic will run
+
+    static bool has_checked = false;
+    static bool can_run     = false;
+    if (!has_checked) {
+        has_checked           = true;
+        uint32_t required_ram = (((uint32_t)rv32_runner[0]) << 0 | ((uint32_t)rv32_runner[1]) << 8 | ((uint32_t)rv32_runner[2]) << 16 | ((uint32_t)rv32_runner[3]) << 24) - MINIRV32_RAM_IMAGE_OFFSET;
+        dprintf("Required RAM: %d\n", (int)required_ram);
+        if (required_ram > MINI_RV32_RAM_SIZE) {
+            dprintf("Not enough RAM for MiniRV32IMAStepRGB: %d > %d\n", (int)required_ram, (int)MINI_RV32_RAM_SIZE);
+            return;
+        }
+        can_run = true;
+    }
+
+    if (!can_run) return;
+
+    rgb_core.pc = MINIRV32_RAM_IMAGE_OFFSET + 4; // +4 because first u32 is RAM sizing info
+    rgb_core.extraflags |= 3;                    // Machine mode
     rgb_core.regs[5] = (uint32_t)api;
 
     uint32_t start = timer_read32();
     while (true) {
-        if (timer_elapsed32(start) > 10) {
-            // Failsafe -- if the VM runs for more than 10ms, terminate it
+        if (timer_elapsed32(start) > 1) {
+            // Failsafe -- if the VM runs for more than 1ms, terminate it
             return;
         }
-        int ret = MiniRV32IMAStepRGB(&rgb_core, rgb_ram_area, 0, 0, 100000);
+        int ret = MiniRV32IMAStepRGB(&rgb_core, rgb_ram_area, 0, 0, 16384);
+        // dprintf("pc: %08x, ret: %d, rgb_core.mcause: %d\n", (int)rgb_core.pc, ret, (int)rgb_core.mcause);
         switch (ret) {
             case 0:
                 if (rgb_core.mcause == 11) { // machine-mode ecall
@@ -131,8 +149,14 @@ static void rv32vm_invoke(rv32_api_t api) {
                         case RV32_TERMINATE:
                             return;
                     }
+                } else if (rgb_core.mcause != 0) {
+                    dprintf("Unknown mcause: %d\n", (int)rgb_core.mcause);
+                    return;
                 }
                 break;
+            default:
+                dprintf("Unknown return code: %d\n", ret);
+                return;
         }
     }
 }
@@ -156,13 +180,13 @@ void rv32vm_effect_begin_iter_impl(effect_params_t* params, uint8_t led_min, uin
     rv32vm_invoke(RV32_EFFECT_BEGIN_ITER);
 }
 
-void rv32vm_effect_end_iter_impl(effect_params_t* params) {
-    rgb_core.regs[10] = (uint32_t)(uintptr_t)params;
-    rv32vm_invoke(RV32_EFFECT_END_ITER);
-}
-
 void rv32vm_effect_led_impl(effect_params_t* params, uint8_t led_index) {
     rgb_core.regs[10] = (uint32_t)(uintptr_t)params;
     rgb_core.regs[11] = (uint32_t)led_index;
     rv32vm_invoke(RV32_EFFECT_LED);
+}
+
+void rv32vm_effect_end_iter_impl(effect_params_t* params) {
+    rgb_core.regs[10] = (uint32_t)(uintptr_t)params;
+    rv32vm_invoke(RV32_EFFECT_END_ITER);
 }

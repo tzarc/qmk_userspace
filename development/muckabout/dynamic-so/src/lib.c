@@ -36,7 +36,7 @@ effect_api_t *get_effect_api(void) {
 
 #else
 
-#include "lib.h"
+#    include "lib.h"
 
 static int    chunder_data = 5;
 static int    chunder_bss;

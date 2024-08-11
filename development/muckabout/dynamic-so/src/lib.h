@@ -22,8 +22,8 @@ struct qmk_keymap_t {
     bool (*process_record_user)(uint16_t keycode, keyrecord_t* record);
     void (*housekeeping_task_user)(void);
 
-    int*  test_data;
-    int*  test_bss;
+    int* test_data;
+    int* test_bss;
 };
 
 typedef struct qmk_keymap_t qmk_keymap_t;

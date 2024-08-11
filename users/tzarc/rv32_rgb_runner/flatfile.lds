@@ -1,5 +1,5 @@
-__heap_size = 0x100;
-__stack_size = 0x100;
+__heap_size = 512;
+__stack_size = 256;
 
 ENTRY(_start)
 

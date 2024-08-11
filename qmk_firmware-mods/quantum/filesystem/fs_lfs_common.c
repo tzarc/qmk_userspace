@@ -534,7 +534,19 @@ fs_fd_t fs_open(const char *filename, fs_mode_t mode) {
         FS_AUTO_LOCK_UNLOCK(INVALID_FILESYSTEM_FD);
         fd = fs_open_nolock(filename, mode);
     }
-    fs_dprintf("%s, mode=%x, fd=%d\n", filename, (int)mode, (int)fd);
+#ifdef CONSOLE_ENABLE
+    char mode_str[4] = {0};
+    if (mode & FS_READ) {
+        strlcat(mode_str, "r", sizeof(mode_str));
+    }
+    if (mode & FS_WRITE) {
+        strlcat(mode_str, "w", sizeof(mode_str));
+    }
+    if (mode & FS_TRUNCATE) {
+        strlcat(mode_str, "t", sizeof(mode_str));
+    }
+    fs_dprintf("%s, mode=%s, fd=%d\n", filename, mode_str, (int)fd);
+#endif // CONSOLE_ENABLE
     return fd;
 }
 

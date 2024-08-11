@@ -11,6 +11,27 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: qmk generate-keycodes --version latest -o quantum/keycodes.h",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}/qmk_firmware",
+            "request": "launch",
+            "args": [
+                "generate-keycodes",
+                "--version",
+                "latest",
+                "-o",
+                "quantum/keycodes.h"
+            ],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.12/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.12/bin/python3"
+                }
+            }
+        },
+        {
             "name": "Python: qmk -v license-check -a users/tzarc/tzarc_unicode.c users/tzarc/tzarc_wow.c",
             "type": "debugpy",
             "justMyCode": false,

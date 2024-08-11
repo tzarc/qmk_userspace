@@ -9,7 +9,7 @@ CFLAGS+=-static-libgcc -fdata-sections -ffunction-sections
 CFLAGS+=-g -Os -march=rv32ima_zicsr -mabi=ilp32 -static
 LDFLAGS:= -T flatfile.lds -nostdlib -Wl,--gc-sections -ueffect_init -ueffect_led
 
-$(PROJECT).elf : $(PROJECT).c $(PROJECT).S
+$(PROJECT).elf : $(wildcard *.c) $(wildcard *.S)
 	$(PREFIX)gcc -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
 $(PROJECT).debug.txt : $(PROJECT).elf

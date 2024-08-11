@@ -74,6 +74,7 @@ endif
 #OPT = 0
 
 ifeq ($(strip $(RGB_MATRIX_ENABLE)),yes)
+ifeq ($(strip $(RGB_MATRIX_RV32)),yes)
 	RGB_MATRIX_CUSTOM_USER = yes
 	RV32_VM_ENABLE = yes
 	SRC += rgb_matrix_rv32_runner.c
@@ -84,7 +85,9 @@ $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h:
 	@$(MAKE) -C $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner
 	[ ! -f $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h ] || rm -f $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h
 	@xxd -n rv32_runner -i $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner/rv32_runner.bin $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h
+	sed -i 's@unsigned@static const unsigned@g' $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h
 
+endif
 endif
 
 
