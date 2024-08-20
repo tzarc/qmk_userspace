@@ -1,0 +1,21 @@
+FROM fedora:40
+
+RUN <<EOF
+dnf install -y util-linux python3-pip sudo wget git '@Development Tools'
+python3 -m pip install qmk
+EOF
+
+COPY <<EOF /init.sh
+#!/bin/bash
+set -xeEuo pipefail
+qmk_uid=\$(stat --format='%u' /qmk_firmware)
+qmk_gid=\$(stat --format='%g' /qmk_firmware)
+groupadd -g \$qmk_gid qmk
+useradd -u \$qmk_uid -g \$qmk_gid -N qmk
+echo "qmk ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/qmk
+su -g qmk -P -w QMK_USERSPACE -c "cd /qmk_firmware && exec bash -li" - qmk
+EOF
+
+RUN chmod +x /init.sh
+
+CMD ["/init.sh"]

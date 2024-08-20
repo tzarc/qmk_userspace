@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -x
+
+this_script=$(realpath "${BASH_SOURCE[0]}")
+script_dir=$(dirname "$this_script")
+dockerfiles_dir=$(realpath "$script_dir/../development/docker")
+qmk_firmware_dir=$(realpath "$script_dir/../qmk_firmware")
+
+if [[ -z "$(docker images -q fedora:qmk)" ]] || [[ "$1" == "--build" ]]; then
+    docker build -t fedora:qmk -f "$dockerfiles_dir/Dockerfile.fedora-qmk" "$dockerfiles_dir"
+    exit 0
+fi
+
+unset qmk_userspace_dir
+
+if [ -n "$QMK_USERSPACE" ] && [ -e "$QMK_USERSPACE/qmk.json" ]; then
+	qmk_userspace_dir=$(cd "$QMK_USERSPACE" && pwd -W 2>/dev/null) || qmk_userspace_dir=$QMK_USERSPACE  # Use Windows path if on Windows
+elif [ -n "$(which qmk 2>/dev/null)" ] && [ -n "$(qmk userspace-path)" ]; then
+	qmk_userspace_dir=$(cd "$(qmk userspace-path)" && pwd -W 2>/dev/null) || qmk_userspace_dir=$(qmk userspace-path)  # Use Windows path if on Windows
+fi
+
+if [ -n "$qmk_userspace_dir" ]; then
+	userspace_docker_args="-v $qmk_userspace_dir:/qmk_userspace:z -e QMK_USERSPACE=/qmk_userspace"
+fi
+
+docker run --rm -it \
+    -v "$qmk_firmware_dir:/qmk_firmware:z" \
+    ${userspace_docker_args:-} \
+    fedora:qmk \
+    "$@"
