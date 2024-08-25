@@ -3,7 +3,7 @@ import os
 import sys
 from pathlib import Path
 
-qmk_firmware_path = Path("..") / "qmk_firmware"
+qmk_firmware_path = Path(__file__).parent / Path("..") / "qmk_firmware"
 qmk_cli_path = qmk_firmware_path / "lib/python"
 
 sys.path.append(str(qmk_cli_path))
