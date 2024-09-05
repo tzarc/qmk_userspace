@@ -1,15 +1,26 @@
 // Copyright 2018-2024 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include <ctype.h>
+#include <keymap_introspection.h>
 #include <qp.h>
-#include "painter/generic/qp_surface.h"
+#include <qp_surface.h>
 #include "qp_internal_formats.h"
-#include "quantum_keycodes.h"
 #include "tzarc.h"
+#include "wow.qgf.c"
 #include "diablo.qgf.c"
 #include "exocet.qff.c"
 #include "thintel15.qff.h"
 #include "everex_5x8.qff.c"
+
+static uint16_t display_width;
+static uint16_t display_height;
+static void     get_geometry(void) {
+    static bool geometry_retrieved = false;
+    if (!geometry_retrieved) {
+        qp_get_geometry(display_panel, &display_width, &display_height, NULL, NULL, NULL);
+        geometry_retrieved = true;
+    }
+}
 
 #define DIABLO_SURFACE_WIDTH 240
 #define DIABLO_SURFACE_HEIGHT 80
@@ -18,14 +29,136 @@ static painter_device_t      diablo_surface = NULL;
 static painter_font_handle_t thintel        = NULL;
 static painter_font_handle_t everex_5x8     = NULL;
 
-void draw_screen_diablo(bool force_redraw) {
-    static uint16_t display_width;
-    static uint16_t display_height;
-    static bool     geometry_retrieved = false;
-    if (!geometry_retrieved) {
-        qp_get_geometry(display_panel, &display_width, &display_height, NULL, NULL, NULL);
-        geometry_retrieved = true;
+void draw_screen_wow(bool force_redraw) {
+    get_geometry();
+
+    static painter_image_handle_t wow_logo = NULL;
+    if (!thintel) {
+        thintel = qp_load_font_mem(font_thintel15);
     }
+    if (!wow_logo) {
+        wow_logo = qp_load_image_mem(gfx_wow);
+    }
+
+    if (force_redraw) {
+        qp_drawimage(display_panel, (display_width / 2) - (wow_logo->width / 2), 0, wow_logo);
+    }
+
+    static int key_ystart = 180;
+    static int key_spacer = 6;
+    static int key_xsize  = 28;
+    static int key_ysize  = 0;
+    if (!key_ysize) {
+        key_ysize = thintel->line_height + key_spacer; // half key spacer as top/bottom padding
+    }
+
+    static uint8_t last_wow_enabled[BITMASK_BYTES_REQUIRED(WOW_KEY_MAX, WOW_KEY_MIN)];
+    static uint8_t last_matrix_pressed[BITMASK_BYTES_REQUIRED(7 * 5, 0)];
+
+    qp_pixel_t disabled_border = (qp_pixel_t){.hsv888 = {.h = 176, .s = 255, .v = 255}};
+    qp_pixel_t disabled_back   = (qp_pixel_t){.hsv888 = {.h = 176, .s = 255, .v = 128}};
+    qp_pixel_t disabled_text   = (qp_pixel_t){.hsv888 = {.h = 176, .s = 64, .v = 255}};
+    qp_pixel_t enabled_border  = (qp_pixel_t){.hsv888 = {.h = 72, .s = 255, .v = 96}};
+    qp_pixel_t enabled_back    = (qp_pixel_t){.hsv888 = {.h = 72, .s = 255, .v = 48}};
+    qp_pixel_t enabled_text    = (qp_pixel_t){.hsv888 = {.h = 72, .s = 64, .v = 255}};
+    qp_pixel_t pressed_inactive_border  = (qp_pixel_t){.hsv888 = {.h = 200, .s = 255, .v = 255}};
+    qp_pixel_t pressed_inactive_back    = (qp_pixel_t){.hsv888 = {.h = 200, .s = 255, .v = 128}};
+    qp_pixel_t pressed_inactive_text    = (qp_pixel_t){.hsv888 = {.h = 200, .s = 64, .v = 255}};
+    qp_pixel_t pressed_active_border  = (qp_pixel_t){.hsv888 = {.h = 44, .s = 255, .v = 255}};
+    qp_pixel_t pressed_active_back    = (qp_pixel_t){.hsv888 = {.h = 44, .s = 255, .v = 128}};
+    qp_pixel_t pressed_active_text    = (qp_pixel_t){.hsv888 = {.h = 44, .s = 64, .v = 255}};
+
+    static struct keyinfo_t {
+        int      row, col;
+        uint16_t keycode;
+        char     string[6];
+    } layout[5][7] = {
+        {{.row = 0, .col = 0}, {.row = 0, .col = 1}, {.row = 0, .col = 2}, {.row = 0, .col = 3}, {.row = 0, .col = 4}, {.row = 0, .col = 5}, {.row = 0, .col = 6}},       // row 0
+        {{.row = 1, .col = 0}, {.row = 1, .col = 1}, {.row = 1, .col = 2}, {.row = 1, .col = 3}, {.row = 1, .col = 4}, {.row = 1, .col = 5}, {.row = 1, .col = 6}},       // row 1
+        {{.row = 2, .col = 0}, {.row = 2, .col = 1}, {.row = 2, .col = 2}, {.row = 2, .col = 3}, {.row = 2, .col = 4}, {.row = 2, .col = 5}, {.row = 2, .col = 6}},       // row 2
+        {{.row = 3, .col = 0}, {.row = 3, .col = 1}, {.row = 3, .col = 2}, {.row = 3, .col = 3}, {.row = 3, .col = 4}, {.row = 3, .col = 5}, {.row = 3, .col = 6}},       // row 3
+        {{.row = -1, .col = -1}, {.row = -1, .col = -1}, {.row = -1, .col = -1}, {.row = 4, .col = 3}, {.row = 4, .col = 4}, {.row = 4, .col = 5}, {.row = 4, .col = 6}}, // row 4
+    };
+
+    // Keep track of the matrix pressed state
+    uint8_t matrix_pressed[BITMASK_BYTES_REQUIRED(7 * 5, 0)] = {0};
+    for (int row = 0; row < 5; ++row) {
+        for (int col = 0; col < 7; ++col) {
+            struct keyinfo_t *ki = &layout[row][col];
+            if (ki->row >= 0 && ki->col >= 0) {
+                if (matrix_is_on(ki->row, ki->col)) {
+                    BITMASK_BIT_SET(matrix_pressed, row * 7 + col, 0);
+                }
+            }
+        }
+    }
+
+    // Work out the names of each key, if necessary
+    static bool strings_retrieved = false;
+    if (!strings_retrieved) {
+        strings_retrieved = true;
+        for (int row = 0; row < 5; ++row) {
+            for (int col = 0; col < 7; ++col) {
+                struct keyinfo_t *ki = &layout[row][col];
+                if (ki->row >= 0 && ki->col >= 0) {
+                    ki->keycode = keycode_at_keymap_location(0, ki->row, ki->col);
+                    strncpy(ki->string, key_name(ki->keycode, false), sizeof(ki->string) - 1);
+                }
+            }
+        }
+    }
+
+    // Redraw if necessary
+    for (int row = 0; row < 5; ++row) {
+        for (int col = 0; col < 7; ++col) {
+            struct keyinfo_t *ki = &layout[row][col];
+            if (ki->row >= 0 && ki->col >= 0) {
+                bool pressed = BITMASK_BIT_GET(matrix_pressed, row * 7 + col, 0);
+                bool enabled = ki->keycode >= WOW_KEY_MIN && ki->keycode <= WOW_KEY_MAX && wow_key_enabled_get(ki->keycode);
+
+                bool redraw_key = force_redraw;
+                if (pressed != BITMASK_BIT_GET(last_matrix_pressed, row * 7 + col, 0)) {
+                    redraw_key = true;
+                }
+                if (enabled != BITMASK_BIT_GET(last_wow_enabled, ki->keycode, WOW_KEY_MIN)) {
+                    redraw_key = true;
+                }
+                if (!redraw_key) {
+                    continue;
+                }
+
+                qp_pixel_t *border = &disabled_border;
+                qp_pixel_t *back   = &disabled_back;
+                qp_pixel_t *text   = &disabled_text;
+
+                if (enabled) {
+                    border = &enabled_border;
+                    back   = &enabled_back;
+                    text   = &enabled_text;
+                }
+
+                if (pressed) {
+                    border = enabled ? &pressed_active_border : &pressed_inactive_border;
+                    back   = enabled ? &pressed_active_back : &pressed_inactive_back;
+                    text   = enabled ? &pressed_active_text : &pressed_inactive_text;
+                }
+
+                int xpos = (display_width / 2) - ((key_xsize * 7 + key_spacer * 6) / 2) + col * (key_xsize + key_spacer);
+                int ypos = key_ystart + row * (key_ysize + key_spacer);
+                qp_rect(display_panel, xpos, ypos, xpos + key_xsize - 1, ypos + key_ysize - 1, back->hsv888.h, back->hsv888.s, back->hsv888.v, true);
+                qp_rect(display_panel, xpos, ypos, xpos + key_xsize - 1, ypos + key_ysize - 1, border->hsv888.h, border->hsv888.s, border->hsv888.v, false);
+                int tw = qp_textwidth(thintel, ki->string);
+                qp_drawtext_recolor(display_panel, xpos + key_xsize / 2 - tw / 2, ypos + key_spacer / 2, thintel, ki->string, text->hsv888.h, text->hsv888.s, text->hsv888.v, back->hsv888.h, back->hsv888.s, back->hsv888.v);
+            }
+        }
+    }
+
+    memcpy(last_wow_enabled, tzarc_eeprom_cfg.wow_enabled, sizeof(last_wow_enabled));
+    memcpy(last_matrix_pressed, matrix_pressed, sizeof(last_matrix_pressed));
+}
+
+void draw_screen_diablo(bool force_redraw) {
+    get_geometry();
 
     static const int              x_offsets[DIABLO_NUM_KEYS] = {-90, -45, 0, 45, 90};
     static painter_image_handle_t diablo_logo                = NULL;
@@ -178,7 +311,7 @@ void draw_screen(bool force_redraw) {
     bool                 redraw_mode = false;
     if (last_mode != typing_mode) {
         // Check if we need to force-redraw due to full screen mode change
-        if (last_mode == MODE_DIABLO || typing_mode == MODE_DIABLO) {
+        if (last_mode == MODE_DIABLO || typing_mode == MODE_DIABLO || last_mode == MODE_WOW || typing_mode == MODE_WOW) {
             force_redraw = true;
         }
 
@@ -190,7 +323,9 @@ void draw_screen(bool force_redraw) {
         qp_rect(display_panel, 0, 0, display_width - 1, display_height - 1, 0, 0, 0, true);
     }
 
-    if (is_keyboard_left() && typing_mode == MODE_DIABLO) {
+    if (is_keyboard_left() && typing_mode == MODE_WOW) {
+        draw_screen_wow(force_redraw);
+    } else if (is_keyboard_left() && typing_mode == MODE_DIABLO) {
         draw_screen_diablo(force_redraw);
     } else {
         draw_screen_base(force_redraw);

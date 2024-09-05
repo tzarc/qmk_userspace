@@ -116,7 +116,7 @@ static const char *key_name_hid(uint16_t keycode, bool shifted) {
 }
 #endif // __AVR__
 
-static void fill_one_param_name(char *buffer, const char *name, const char *param1, size_t buffer_length) {
+void fill_one_param_name(char *buffer, const char *name, const char *param1, size_t buffer_length) {
     memset(buffer, 0, buffer_length);
     strlcpy(buffer, name, buffer_length);
     strlcat(buffer, "(", buffer_length);
@@ -124,7 +124,7 @@ static void fill_one_param_name(char *buffer, const char *name, const char *para
     strlcat(buffer, ")", buffer_length);
 }
 
-static void fill_two_param_name(char *buffer, const char *name, const char *param1, const char *param2, size_t buffer_length) {
+void fill_two_param_name(char *buffer, const char *name, const char *param1, const char *param2, size_t buffer_length) {
     memset(buffer, 0, buffer_length);
     strlcpy(buffer, name, buffer_length);
     strlcat(buffer, "(", buffer_length);
@@ -188,6 +188,7 @@ const char *key_name(uint16_t keycode, bool shifted) {
     static char buffer[32];
     char        buf1[16];
     char        buf2[16];
+    (void)buffer;
     (void)buf1;
     (void)buf2;
     switch (keycode) {
@@ -196,6 +197,23 @@ const char *key_name(uint16_t keycode, bool shifted) {
             if (!name) return "Unknown";
             return name;
         }
+        case KC_LEFT_GUI:
+            return "L.GUI";
+        case KC_RIGHT_GUI:
+            return "R.GUI";
+        case KC_LEFT_CTRL:
+            return "L.Ctl";
+        case KC_RIGHT_CTRL:
+            return "R.Ctl";
+        case KC_LEFT_ALT:
+            return "L.Alt";
+        case KC_RIGHT_ALT:
+            return "R.Alt";
+        case KC_LEFT_SHIFT:
+            return "L.Sft";
+        case KC_RIGHT_SHIFT:
+            return "R.Sft";
+        /*
         case QK_MOMENTARY ... QK_MOMENTARY_MAX: {
             const char *n = get_numeric_str(buf1, sizeof(buf1), QK_MOMENTARY_GET_LAYER(keycode), ' ');
             while (*n == ' ')
@@ -211,6 +229,15 @@ const char *key_name(uint16_t keycode, bool shifted) {
             fill_two_param_name(buffer, "LT", layer_name(QK_LAYER_TAP_GET_LAYER(keycode)), key_name_hid(QK_LAYER_TAP_GET_TAP_KEYCODE(keycode), shifted), sizeof(buffer));
             return buffer;
         }
+        */
+        case KC_LOWER:
+            return "Lower";
+        case KC_RAISE:
+            return "Raise";
+        case QK_GESC:
+            return "G.Esc";
+        case CHANGEMODE:
+            return "Cfg";
     }
     return "Unknown";
 }

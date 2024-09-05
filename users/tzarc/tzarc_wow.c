@@ -5,6 +5,7 @@
 #include "tzarc.h"
 
 struct wow_config_t wow_config;
+bool wow_configuration_active = false;
 
 bool wow_key_enabled_get(uint16_t keycode) {
     return BITMASK_BIT_GET(tzarc_eeprom_cfg.wow_enabled, keycode, WOW_KEY_MIN);
@@ -57,11 +58,29 @@ void tzarc_wow_init(void) {
 
 bool process_record_wow(uint16_t keycode, keyrecord_t* record) {
     // If it's keys we don't care about, exit.
-    if (keycode < (WOW_KEY_MIN) || (WOW_KEY_MAX) < keycode) {
+    if ( !((WOW_KEY_MIN <= keycode && keycode <= WOW_KEY_MAX) || keycode == QK_GRAVE_ESCAPE || (TZ_ENC_FIRST <= keycode && keycode <= TZ_ENC_LAST)) ) {
         return true;
     }
 
-    if (config_enabled) {
+    switch(keycode) {
+        case KC_ESCAPE:
+        case QK_GRAVE_ESCAPE:
+            if(wow_configuration_active) {
+                wow_configuration_active = false;
+                return false;
+            }
+            break;
+        case TZ_ENC1P:
+        if (!record->event.pressed) {
+            wow_configuration_active = !wow_configuration_active;
+            dprintf("[WoW] Configuration mode %s\n", wow_configuration_active ? "enabled" : "disabled");
+        }
+            return false;
+        default:
+            break;
+    }
+
+    if (wow_configuration_active) {
         if (!record->event.pressed) {
             // Toggle the enabled flag for this key
             bool new_state = !wow_key_enabled_get(keycode);
@@ -70,6 +89,9 @@ bool process_record_wow(uint16_t keycode, keyrecord_t* record) {
         }
         return false;
     } else {
+        // Keep track of if this key is held down
+        wow_key_keydown_set(keycode, record->event.pressed);
+
         // Fallback to the normal key if not enabled
         if (!wow_key_enabled_get(keycode)) {
             return true;
@@ -77,8 +99,7 @@ bool process_record_wow(uint16_t keycode, keyrecord_t* record) {
 
         uint32_t now = timer_read32();
         if (record->event.pressed) {
-            // Keydown event
-            wow_key_keydown_set(keycode, true);
+            // Keydown event, clear the released flag
             wow_key_released_set(keycode, false);
 
             // Keep track of last keydown, as well as next trigger time
@@ -88,9 +109,6 @@ bool process_record_wow(uint16_t keycode, keyrecord_t* record) {
             // Inform the OS that we've got a keydown event
             register_code(keycode);
         } else {
-            // Keyup event
-            wow_key_keydown_set(keycode, false);
-
             // If the release happened within the initial hold period, then stop the timer and tap the key as per normal
             if ((now < wow_key_next_trigger_get(keycode) && !wow_key_released_get(keycode)) || wow_key_auto_registered_get(keycode)) {
                 unregister_code(keycode);

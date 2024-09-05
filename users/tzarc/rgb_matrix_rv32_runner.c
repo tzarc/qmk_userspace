@@ -177,12 +177,12 @@ void rv32vm_effect_init_impl(effect_params_t* params) {
         memcpy(rgb_ram_area, rv32_runner, rv32_runner_len);
     }
 
-    if(!should_dump_exec_times &&   ) {
+    if (!should_dump_exec_times && false) {
         should_dump_exec_times = true;
-        dprintf("Exec time: %d\n", get_systick_count());
+        dprintf("Exec time: %d\n", (int)get_systick_count());
     }
-    if(should_dump_exec_times) {
-        dprintf("Exec time: %d\n", get_systick_count());
+    if (should_dump_exec_times) {
+        dprintf("Exec time: %d\n", (int)get_systick_count());
     }
     rv32vm_invoke(RV32_EFFECT_INIT);
 }

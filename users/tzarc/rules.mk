@@ -21,6 +21,9 @@ UNICODE_ENABLE ?= yes
 DEFERRED_EXEC_ENABLE = yes
 GAME_MODES_ENABLE ?= yes
 
+DIGITIZER_ENABLE = yes
+PROGRAMMABLE_BUTTON_ENABLE = yes
+
 XAP_ENABLE ?= no
 RAW_ENABLE ?= no
 VIA_ENABLE ?= no
@@ -34,8 +37,6 @@ ifeq ($(strip $(PLATFORM_KEY)),chibios)
 	DEBOUNCE_TYPE = asym_eager_defer_pk
 	KONAMI_CODE_ENABLE ?= yes
 
-else ifeq ($(strip $(PLATFORM_KEY)),arm_atsam)
-	LTO_ENABLE = no
 else ifeq ($(strip $(PLATFORM_KEY)),avr)
 	GAME_MODES_ENABLE = no
 	ifeq ($(strip $(PROTOCOL)),LUFA)

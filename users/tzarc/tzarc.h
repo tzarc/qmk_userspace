@@ -121,6 +121,8 @@ extern struct wow_config_t wow_config;
 void tzarc_wow_init(void);
 bool process_record_wow(uint16_t keycode, keyrecord_t *record);
 void matrix_scan_wow(void);
+bool wow_key_enabled_get(uint16_t keycode);
+bool wow_key_keydown_get(uint16_t keycode);
 #endif // GAME_MODES_ENABLE
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
