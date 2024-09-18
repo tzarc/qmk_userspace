@@ -5,7 +5,7 @@
 #include "tzarc.h"
 
 struct wow_config_t wow_config;
-bool wow_configuration_active = false;
+bool                wow_configuration_active = false;
 
 bool wow_key_enabled_get(uint16_t keycode) {
     return BITMASK_BIT_GET(tzarc_eeprom_cfg.wow_enabled, keycode, WOW_KEY_MIN);
@@ -58,23 +58,23 @@ void tzarc_wow_init(void) {
 
 bool process_record_wow(uint16_t keycode, keyrecord_t* record) {
     // If it's keys we don't care about, exit.
-    if ( !((WOW_KEY_MIN <= keycode && keycode <= WOW_KEY_MAX) || keycode == QK_GRAVE_ESCAPE || (TZ_ENC_FIRST <= keycode && keycode <= TZ_ENC_LAST)) ) {
+    if (!((WOW_KEY_MIN <= keycode && keycode <= WOW_KEY_MAX) || keycode == QK_GRAVE_ESCAPE || (TZ_ENC_FIRST <= keycode && keycode <= TZ_ENC_LAST))) {
         return true;
     }
 
-    switch(keycode) {
+    switch (keycode) {
         case KC_ESCAPE:
         case QK_GRAVE_ESCAPE:
-            if(wow_configuration_active) {
+            if (wow_configuration_active) {
                 wow_configuration_active = false;
                 return false;
             }
             break;
         case TZ_ENC1P:
-        if (!record->event.pressed) {
-            wow_configuration_active = !wow_configuration_active;
-            dprintf("[WoW] Configuration mode %s\n", wow_configuration_active ? "enabled" : "disabled");
-        }
+            if (!record->event.pressed) {
+                wow_configuration_active = !wow_configuration_active;
+                dprintf("[WoW] Configuration mode %s\n", wow_configuration_active ? "enabled" : "disabled");
+            }
             return false;
         default:
             break;

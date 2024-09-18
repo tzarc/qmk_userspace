@@ -55,18 +55,18 @@ void draw_screen_wow(bool force_redraw) {
     static uint8_t last_wow_enabled[BITMASK_BYTES_REQUIRED(WOW_KEY_MAX, WOW_KEY_MIN)];
     static uint8_t last_matrix_pressed[BITMASK_BYTES_REQUIRED(7 * 5, 0)];
 
-    qp_pixel_t disabled_border = (qp_pixel_t){.hsv888 = {.h = 176, .s = 255, .v = 255}};
-    qp_pixel_t disabled_back   = (qp_pixel_t){.hsv888 = {.h = 176, .s = 255, .v = 128}};
-    qp_pixel_t disabled_text   = (qp_pixel_t){.hsv888 = {.h = 176, .s = 64, .v = 255}};
-    qp_pixel_t enabled_border  = (qp_pixel_t){.hsv888 = {.h = 72, .s = 255, .v = 96}};
-    qp_pixel_t enabled_back    = (qp_pixel_t){.hsv888 = {.h = 72, .s = 255, .v = 48}};
-    qp_pixel_t enabled_text    = (qp_pixel_t){.hsv888 = {.h = 72, .s = 64, .v = 255}};
-    qp_pixel_t pressed_inactive_border  = (qp_pixel_t){.hsv888 = {.h = 200, .s = 255, .v = 255}};
-    qp_pixel_t pressed_inactive_back    = (qp_pixel_t){.hsv888 = {.h = 200, .s = 255, .v = 128}};
-    qp_pixel_t pressed_inactive_text    = (qp_pixel_t){.hsv888 = {.h = 200, .s = 64, .v = 255}};
-    qp_pixel_t pressed_active_border  = (qp_pixel_t){.hsv888 = {.h = 44, .s = 255, .v = 255}};
-    qp_pixel_t pressed_active_back    = (qp_pixel_t){.hsv888 = {.h = 44, .s = 255, .v = 128}};
-    qp_pixel_t pressed_active_text    = (qp_pixel_t){.hsv888 = {.h = 44, .s = 64, .v = 255}};
+    qp_pixel_t disabled_border         = (qp_pixel_t){.hsv888 = {.h = 176, .s = 255, .v = 255}};
+    qp_pixel_t disabled_back           = (qp_pixel_t){.hsv888 = {.h = 176, .s = 255, .v = 128}};
+    qp_pixel_t disabled_text           = (qp_pixel_t){.hsv888 = {.h = 176, .s = 64, .v = 255}};
+    qp_pixel_t enabled_border          = (qp_pixel_t){.hsv888 = {.h = 72, .s = 255, .v = 96}};
+    qp_pixel_t enabled_back            = (qp_pixel_t){.hsv888 = {.h = 72, .s = 255, .v = 48}};
+    qp_pixel_t enabled_text            = (qp_pixel_t){.hsv888 = {.h = 72, .s = 64, .v = 255}};
+    qp_pixel_t pressed_inactive_border = (qp_pixel_t){.hsv888 = {.h = 200, .s = 255, .v = 255}};
+    qp_pixel_t pressed_inactive_back   = (qp_pixel_t){.hsv888 = {.h = 200, .s = 255, .v = 128}};
+    qp_pixel_t pressed_inactive_text   = (qp_pixel_t){.hsv888 = {.h = 200, .s = 64, .v = 255}};
+    qp_pixel_t pressed_active_border   = (qp_pixel_t){.hsv888 = {.h = 44, .s = 255, .v = 255}};
+    qp_pixel_t pressed_active_back     = (qp_pixel_t){.hsv888 = {.h = 44, .s = 255, .v = 128}};
+    qp_pixel_t pressed_active_text     = (qp_pixel_t){.hsv888 = {.h = 44, .s = 64, .v = 255}};
 
     static struct keyinfo_t {
         int      row, col;

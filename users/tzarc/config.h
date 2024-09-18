@@ -15,7 +15,6 @@
 
 // Pre-define the amount of space to use for userspace EEPROM
 #define EECONFIG_USER_DATA_SIZE 32
-#define EECONFIG_USER_DATA_VERSION ((uint32_t)__TIME__[0] + (uint32_t)__TIME__[1] + (uint32_t)__TIME__[3] + (uint32_t)__TIME__[4] + (uint32_t)__TIME__[6] + (uint32_t)__TIME__[7]) // HH:MM::SS
 
 #if !defined(VIA_ENABLE)
 // Modify the RAW usage page and id
