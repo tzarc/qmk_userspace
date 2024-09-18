@@ -181,10 +181,6 @@ void housekeeping_task_keymap(void) {
             if (timer_read32() > 15000) {
                 testing = true;
 
-                // Test filesystem-based eeprom
-                void test_fs_eeprom(void);
-                test_fs_eeprom();
-
                 extern void fs_dump_info(void);
                 fs_dump_info();
 
@@ -250,27 +246,3 @@ void matrix_scan_keymap(void) {
 }
 
 #endif // DEBUG_EEPROM_OUTPUT
-
-#if defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
-#    define EEPROM_SIZE 1024
-#    define eeprom_driver_init fs_eeprom_driver_init
-#    define eeprom_driver_erase fs_eeprom_driver_erase
-#    define eeprom_driver_flush fs_eeprom_driver_flush
-#    define eeprom_read_block fs_eeprom_read_block
-#    define eeprom_write_block fs_eeprom_write_block
-#    include "eeprom_filesystem.c"
-
-void test_fs_eeprom(void) {
-    uint32_t test = 0x12345678;
-    fs_eeprom_driver_init();
-    fs_eeprom_write_block(&test, (void *)620, sizeof(test));
-    fs_eeprom_driver_flush();
-
-    test = 0;
-    fs_eeprom_driver_init();
-    fs_eeprom_read_block(&test, (void *)620, sizeof(test));
-    dprintf("Test value: %08lX\n", (uint32_t)test);
-
-    fs_eeprom_driver_erase();
-}
-#endif // defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
