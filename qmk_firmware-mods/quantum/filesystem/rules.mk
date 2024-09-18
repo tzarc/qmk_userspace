@@ -13,11 +13,11 @@ else
 		SPI_DRIVER_REQUIRED = yes
 		COMMON_VPATH += \
 			$(MOD_LIB_PATH)/littlefs
-		SRC += \
+		QUANTUM_LIB_SRC += \
 			lfs.c \
 			lfs_util.c \
 			fs_lfs_common.c \
 			fs_lfs_spi_flash.c
-		OPT_DEFS += -DLFS_NO_MALLOC -DLFS_THREADSAFE -DLFS_NAME_MAX=40
+		OPT_DEFS += -DLFS_NO_MALLOC -DLFS_THREADSAFE -DLFS_NAME_MAX=40 -DLFS_NO_ASSERT
 	endif
 endif
