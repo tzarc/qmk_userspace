@@ -39,7 +39,7 @@ function fn_arch() {
     esac
 }
 
-tag_name=${1:-v14.2.0-1}
+tag_name=${1:-v14.2.0-2}
 
 echo OS: $(fn_os), Arch: $(fn_arch), tag: ${tag_name}
 

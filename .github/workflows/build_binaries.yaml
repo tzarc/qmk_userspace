@@ -14,9 +14,19 @@ jobs:
       qmk_ref: develop
       preparation_command: |
         set -e
-        make links
+
+        # Set up gcc 14.2.0
+        apt update
+        apt install jq curl -y
+        /__w/qmk_userspace/qmk_userspace/bin/deploy-toolchains.sh
+        echo '/root/.local/qmk/toolchains/bin' >> $GITHUB_PATH
+
+        # Ensure submodules are checked out
         git config --global --add safe.directory /__w/qmk_userspace/qmk_userspace
         git submodule update --init --recursive
+
+        # Set up any symlinks required for the makefile
+        make links
 
   publish:
     name: 'QMK Userspace Publish'
