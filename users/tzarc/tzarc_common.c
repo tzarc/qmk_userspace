@@ -125,9 +125,6 @@ void eeconfig_init_user(void) {
 #endif
     tzarc_eeprom_reset();
     eeconfig_init_keymap();
-#ifdef FILESYSTEM_ENABLE
-    fs_format();
-#endif // FILESYSTEM_ENABLE
 }
 
 __attribute__((weak)) void tzarc_sendchar_hook(uint8_t c) {}

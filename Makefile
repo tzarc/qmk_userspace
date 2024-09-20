@@ -160,11 +160,11 @@ BOARD_DEFS := \
 	mysterium-dad!coseyfannitutti/mysterium!dad \
 	one2mini!ducky/one2mini/1861st!tzarc \
 	planck!planck/rev6_drop!tzarc \
-	sat75!cannonkeys/satisfaction75/rev1!tzarc
+	sat75!cannonkeys/satisfaction75/rev1!tzarc \
+	prime_plus!keyboards/steelseries/prime_plus!tzarc
 
 # short name ! keyboard path ! keymap name ! link source ! link target
 LINKED_BOARD_DEFS := \
-	prime_plus!keyboards/steelseries/prime_plus!tzarc!development/mouse-dev/prime_plus \
 	f411_tinyuf2_filesystem!keyboards/handwired/onekey/f411_tinyuf2_filesystem!reset!development/alternates/f411_tinyuf2_filesystem \
 	disco_f723!keyboards/handwired/onekey/disco_f723!console!development/alternates/disco_f723 \
 	onekey_h743!keyboards/handwired/onekey/nucleo144_h743zi!console!development/alternates/nucleo144_h743zi \
