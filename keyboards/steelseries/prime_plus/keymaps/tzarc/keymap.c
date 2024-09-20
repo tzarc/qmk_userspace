@@ -85,8 +85,6 @@ layer_state_t layer_state_set_keymap(layer_state_t state) {
     return state;
 }
 
-dead code
-
 void housekeeping_task_keymap(void) {
     if (!gesture_pressed && !gesture_actioned) {
         gesture_actioned = true;
