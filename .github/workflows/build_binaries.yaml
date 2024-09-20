@@ -19,11 +19,11 @@ jobs:
         apt update
         apt install jq curl -y
         /__w/qmk_userspace/qmk_userspace/bin/deploy-toolchains.sh
-        echo '/root/.local/qmk/toolchains/bin' >> $GITHUB_PATH
+        echo "$HOME/.local/qmk/toolchains/bin" >> $GITHUB_PATH
 
         # Ensure submodules are checked out
         git config --global --add safe.directory /__w/qmk_userspace/qmk_userspace
-        git submodule update --init --recursive
+        git submodule update --init --recursive --depth=1 --force
 
         # Set up any symlinks required for the makefile
         make links
