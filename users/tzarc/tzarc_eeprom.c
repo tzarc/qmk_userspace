@@ -38,7 +38,7 @@ void tzarc_eeprom_init(void) {
 #ifdef NVM_DRIVER
     eeconfig_read_user_datablock(&tzarc_eeprom_cfg, 0, sizeof(tzarc_eeprom_cfg));
 #else  // NVM_DRIVER
-    eeconfig_read_user_datablock(&tzarc_eeprom_cfg);
+    eeprom_read_block(&tzarc_eeprom_cfg, (void *)EECONFIG_USER_DATABLOCK, sizeof(tzarc_eeprom_cfg));
 #endif // NVM_DRIVER
     dump_config("read", &tzarc_eeprom_cfg);
 }
@@ -48,7 +48,7 @@ void tzarc_eeprom_reset(void) {
 #ifdef NVM_DRIVER
     eeconfig_update_user_datablock(&tzarc_eeprom_cfg, 0, sizeof(tzarc_eeprom_cfg));
 #else  // NVM_DRIVER
-    eeconfig_update_user_datablock(&tzarc_eeprom_cfg);
+    eeprom_update_block(&tzarc_eeprom_cfg, (void *)EECONFIG_USER_DATABLOCK, sizeof(tzarc_eeprom_cfg));
 #endif // NVM_DRIVER
     dump_config("reset", &tzarc_eeprom_cfg);
 }
@@ -71,7 +71,7 @@ void tzarc_eeprom_task(void) {
 #ifdef NVM_DRIVER
     eeconfig_update_user_datablock(&tzarc_eeprom_cfg, 0, sizeof(tzarc_eeprom_cfg));
 #else  // NVM_DRIVER
-    eeconfig_update_user_datablock(&tzarc_eeprom_cfg);
+    eeprom_update_block(&tzarc_eeprom_cfg, (void *)EECONFIG_USER_DATABLOCK, sizeof(tzarc_eeprom_cfg));
 #endif // NVM_DRIVER
     dump_config("dirty", &tzarc_eeprom_cfg);
 }
