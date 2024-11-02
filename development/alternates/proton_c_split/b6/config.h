@@ -8,10 +8,8 @@
 
 #define SERIAL_BUFFERS_SIZE 1024
 
-#define MATRIX_ROW_PINS \
-    { A13 }
-#define MATRIX_COL_PINS \
-    { A14 }
+#define MATRIX_ROW_PINS {A13}
+#define MATRIX_COL_PINS {A14}
 #define UNUSED_PINS
 
 #define SOFT_SERIAL_PIN B6

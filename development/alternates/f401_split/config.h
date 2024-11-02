@@ -9,10 +9,8 @@
 #define HAL_USE_SERIAL TRUE
 #define SERIAL_BUFFERS_SIZE 1024
 
-#define MATRIX_ROW_PINS \
-    { B5 }
-#define MATRIX_COL_PINS \
-    { B4 }
+#define MATRIX_ROW_PINS {B5}
+#define MATRIX_COL_PINS {B4}
 #define UNUSED_PINS
 
 #define SOFT_SERIAL_PIN A9

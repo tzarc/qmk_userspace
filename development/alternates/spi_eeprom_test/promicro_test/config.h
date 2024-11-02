@@ -4,10 +4,8 @@
 
 #include "config_common.h"
 
-#define MATRIX_COL_PINS \
-    { D0 }
-#define MATRIX_ROW_PINS \
-    { D1 }
+#define MATRIX_COL_PINS {D0}
+#define MATRIX_ROW_PINS {D1}
 #define UNUSED_PINS
 
 #define DEBUG_MATRIX_SCAN_RATE

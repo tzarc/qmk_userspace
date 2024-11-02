@@ -15,9 +15,7 @@
 
 #define DIODE_DIRECTION COL2ROW
 
-#define MATRIX_COL_PINS \
-    { B8 }
-#define MATRIX_ROW_PINS \
-    { A10 }
+#define MATRIX_COL_PINS {B8}
+#define MATRIX_ROW_PINS {A10}
 
 #define STM32_HSECLK 8000000U

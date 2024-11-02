@@ -6,10 +6,8 @@
 // Matrix config
 #define MATRIX_ROWS 1
 #define MATRIX_COLS 1
-#define MATRIX_ROW_PINS \
-    { C14 }
-#define MATRIX_COL_PINS \
-    { C15 }
+#define MATRIX_ROW_PINS {C14}
+#define MATRIX_COL_PINS {C15}
 
 // I2C config
 #define I2C_DRIVER I2CD1

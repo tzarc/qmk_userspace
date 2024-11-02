@@ -51,8 +51,8 @@ void pointing_device_init_user(void) {
     pointing_device_set_cpi(6400);
 }
 
-static bool gesture_pressed = false;
-static bool gesture_actioned = true;
+static bool    gesture_pressed  = false;
+static bool    gesture_actioned = true;
 static int32_t start_position_x = 0;
 static int32_t start_position_y = 0;
 
@@ -77,7 +77,7 @@ layer_state_t layer_state_set_keymap(layer_state_t state) {
     if (gesture_mode(state)) {
         start_position_x = 0;
         start_position_y = 0;
-        gesture_pressed = true;
+        gesture_pressed  = true;
         gesture_actioned = false;
     } else {
         gesture_pressed = false;
@@ -93,13 +93,13 @@ void housekeeping_task_keymap(void) {
             return;
         }
 
-        float r = atan2f(start_position_y, start_position_x);
-        float d = 180 * r / M_PI;
-        int id = (int)d;
+        float r  = atan2f(start_position_y, start_position_x);
+        float d  = 180 * r / M_PI;
+        int   id = (int)d;
 
-        const int directional_split = 8;
-        const char *directions[] = { "E", "SE", "S", "SW", "W", "NW", "N", "NE" };
-        int direction_idx = ((id + 360 + 360 / directional_split / 2) % 360 / (360 / directional_split)) % directional_split;
+        const int   directional_split = 8;
+        const char *directions[]      = {"E", "SE", "S", "SW", "W", "NW", "N", "NE"};
+        int         direction_idx     = ((id + 360 + 360 / directional_split / 2) % 360 / (360 / directional_split)) % directional_split;
         uprintf("Mouse movement: %d, %d => %d degrees (%s)\n", (int)start_position_x, (int)start_position_y, id, directions[direction_idx]);
 
         switch (direction_idx) {

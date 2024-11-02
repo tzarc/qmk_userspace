@@ -4,7 +4,5 @@
 
 #define USB_DRIVER USBD2
 
-#define MATRIX_COL_PINS \
-    { B8 }
-#define MATRIX_ROW_PINS \
-    { B9 }
+#define MATRIX_COL_PINS {B8}
+#define MATRIX_ROW_PINS {B9}

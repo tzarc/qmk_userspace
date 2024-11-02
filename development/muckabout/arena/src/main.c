@@ -14,7 +14,7 @@
         _a > _b ? _a : _b;      \
     })
 
-#define align_up(n, align) ((((n) + (align)-1) / (align)) * (align))
+#define align_up(n, align) ((((n) + (align) - 1) / (align)) * (align))
 
 typedef struct arena_link_t {
     uint32_t n_bytes;

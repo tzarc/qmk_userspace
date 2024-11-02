@@ -4,10 +4,8 @@
 
 #include "config_common.h"
 
-#define MATRIX_COL_PINS \
-    { B4 }
-#define MATRIX_ROW_PINS \
-    { B5 }
+#define MATRIX_COL_PINS {B4}
+#define MATRIX_ROW_PINS {B5}
 #define UNUSED_PINS
 
 #define SPLIT_USB_DETECT

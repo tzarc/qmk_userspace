@@ -24,6 +24,44 @@
 #    define BT_USB KC_NO
 #endif
 
+#if defined(RGB_MATRIX_ENABLE)
+#    define XRGB_TOG RM_TOGG
+#    define XRGB_NXT RM_NEXT
+#    define XRGB_PRV RM_PREV
+#    define XRGB_HUI RM_HUEU
+#    define XRGB_HUD RM_HUED
+#    define XRGB_SAI RM_SATU
+#    define XRGB_SAD RM_SATD
+#    define XRGB_VAI RM_VALU
+#    define XRGB_VAD RM_VALD
+#    define XRGB_SPI RM_SPDU
+#    define XRGB_SPD RM_SPDD
+#elif defined(RGBLIGHT_ENABLE)
+#    define XRGB_TOG UG_TOGG
+#    define XRGB_NXT UG_NEXT
+#    define XRGB_PRV UG_PREV
+#    define XRGB_HUI UG_HUEU
+#    define XRGB_HUD UG_HUED
+#    define XRGB_SAI UG_SATU
+#    define XRGB_SAD UG_SATD
+#    define XRGB_VAI UG_VALU
+#    define XRGB_VAD UG_VALD
+#    define XRGB_SPI UG_SPDU
+#    define XRGB_SPD UG_SPDD
+#else
+#    define XRGB_TOG KC_NO
+#    define XRGB_NXT KC_NO
+#    define XRGB_PRV KC_NO
+#    define XRGB_HUI KC_NO
+#    define XRGB_HUD KC_NO
+#    define XRGB_SAI KC_NO
+#    define XRGB_SAD KC_NO
+#    define XRGB_VAI KC_NO
+#    define XRGB_VAD KC_NO
+#    define XRGB_SPI KC_NO
+#    define XRGB_SPD KC_NO
+#endif
+
 #define FOREACH_CUSTOM_KEYCODE(X)    \
     X(CHANGEMODE, =, QK_USER_0)      \
     X(TIME_RESET, /**/, /**/)        \
@@ -210,10 +248,10 @@ enum { FOREACH_CUSTOM_LAYER(LAYER_ENUM) };
 #define ____________TZARC_6x4_ADJUST_R2_R________ _______,      _______,      _______,      _______,      _______,      _______
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | H           | J           | K           | L           | ;           | '           |
-#define ____________TZARC_6x4_ADJUST_R3_R________ _______,      RGB_MOD,      RGB_HUI,      RGB_SAI,      RGB_VAI,      RGB_SPI
+#define ____________TZARC_6x4_ADJUST_R3_R________ _______,      XRGB_NXT,     XRGB_HUI,     XRGB_SAI,     XRGB_VAI,     XRGB_SPI
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | N           | M           | ,           | .           | /           | Enter       |
-#define ____________TZARC_6x4_ADJUST_R4_R________ RGB_TOG,      RGB_RMOD,     RGB_HUD,      RGB_SAD,      RGB_VAD,      RGB_SPD
+#define ____________TZARC_6x4_ADJUST_R4_R________ XRGB_TOG,     XRGB_PRV,     XRGB_HUD,     XRGB_SAD,     XRGB_VAD,     XRGB_SPD
 //                                               └─────────────┴─────────────┴─────────────┴─────────────┴─────────────┴─────────────┘
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -434,11 +472,11 @@ enum { FOREACH_CUSTOM_LAYER(LAYER_ENUM) };
 //                                               └────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────────────────┘
 //                                               ┌──────────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬──────────────────┐
 //                                               | Tab              | Q          | W          | E          | R          | T          | Y          | U          | I          | O          | P          |  [         |  ]         |  \               |
-#define ____________TZARC_ADJUST_R3_ALPHA________ _______,           RGB_MOD,     RGB_HUI,     RGB_SAI,     RGB_VAI,     RGB_SPI,     _______,     KC_F14,      KC_F15,      KC_F16,      _______,     KC_F23,      KC_F24,      _______
+#define ____________TZARC_ADJUST_R3_ALPHA________ _______,           XRGB_NXT,    XRGB_HUI,    XRGB_SAI,    XRGB_VAI,    XRGB_SPI,    _______,     KC_F14,      KC_F15,      KC_F16,      _______,     KC_F23,      KC_F24,      _______
 //                                               └──────────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴──────────────────┘
 //                                               ┌─────────────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬─────────────┬─────────────┬──────────────────────────┐
 //                                               | Caps Lock           | A          | S          | D          | F          | G          | H          | J          | K          | L          | ;           | "           | Enter                    |
-#define ____________TZARC_ADJUST_R4_ALPHA________ KC_CAPS,              RGB_RMOD,    RGB_HUD,     RGB_SAD,     RGB_VAD,     RGB_SPD,     _______,     KC_F17,      KC_F18,      KC_F19,       _______,     _______,      _______
+#define ____________TZARC_ADJUST_R4_ALPHA________ KC_CAPS,              XRGB_PRV,    XRGB_HUD,    XRGB_SAD,    XRGB_VAD,    XRGB_SPD,    _______,     KC_F17,      KC_F18,      KC_F19,       _______,     _______,      _______
 //                                               └─────────────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴─────────────┴─────────────┴──────────────────────────┘
 //                                               ┌────────────────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬──────────────────────────────────────┐
 //                                               | LShift                 | Z          | X          | C          | V          | B          | N          | M          | ,          | .          | /          | RShift                               |

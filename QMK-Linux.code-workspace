@@ -35,17 +35,16 @@
         ],
         "ansible.python.interpreterPath": "/home/nickb/qmk_build/.direnv/python-3.12/bin/python3",
         "files.exclude": {
-            "**/.cache": false,
-            "**/.direnv": false,
-            "**/.bin": false,
-            "**/.hex": false,
-            "**/.uf2": false
+            "**/.cache": true,
+            "**/.direnv": true,
+            "**/.bin": true,
+            "**/.hex": true,
+            "**/.uf2": true
         },
         "files.watcherExclude": {
             "**/.cache/**": true,
             "**/.direnv/**": true,
-            "**/.git/objects/**": true,
-            "**/.git/subtree-cache/**": true,
+            "**/.git/**": true,
             "**/node_modules/*/**": true
         },
         "clangd.inactiveRegions.opacity": 0.50,

@@ -4,14 +4,10 @@
 #include "config_common.h"
 
 // Encoders -- right-side is reversed
-#define ENCODERS_PAD_A \
-    { C14 }
-#define ENCODERS_PAD_B \
-    { C15 }
-#define ENCODERS_PAD_A_RIGHT \
-    { C15 }
-#define ENCODERS_PAD_B_RIGHT \
-    { C14 }
+#define ENCODERS_PAD_A {C14}
+#define ENCODERS_PAD_B {C15}
+#define ENCODERS_PAD_A_RIGHT {C15}
+#define ENCODERS_PAD_B_RIGHT {C14}
 
 #ifndef ENCODER_RESOLUTION
 #    define ENCODER_RESOLUTION 2
