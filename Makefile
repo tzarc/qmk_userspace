@@ -41,20 +41,32 @@ $(QMK_USERSPACE)/qmk-dot-github:
 		&& git pull --ff-only \
 		&& git sshsign
 
+$(QMK_USERSPACE)/qmk_cli:
+	git clone --depth=1 https://github.com/qmk/qmk_cli.git $(QMK_USERSPACE)/qmk_cli \
+		&& cd $(QMK_USERSPACE)/qmk_cli \
+		&& git pull --ff-only \
+		&& git sshsign
+
 qmk_firmware: $(QMK_USERSPACE)/qmk_firmware
 qmk_userspace: $(QMK_USERSPACE)/qmk_userspace
 qmk-dot-github: $(QMK_USERSPACE)/qmk-dot-github
-
-.PHONY: shrink
-shrink: repositories
-	@git -C $(QMK_USERSPACE) shrink
-	@git -C $(QMK_USERSPACE)/qmk_firmware shrink
-	@git -C $(QMK_USERSPACE)/qmk_userspace shrink
-	@git -C $(QMK_USERSPACE)/qmk-dot-github shrink
-
+qmk_cli: $(QMK_USERSPACE)/qmk_cli
 
 .PHONY: repositories
-repositories: qmk_firmware qmk_userspace qmk-dot-github
+repositories: qmk_firmware qmk_userspace qmk-dot-github qmk_cli
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# CLI testing
+
+.PHONY: cli_build
+cli_build: qmk_cli
+	cd $(QMK_USERSPACE)/qmk_cli \
+		&& python3 -m pip install --upgrade pip \
+		&& python3 -m pip install -r requirements-dev.txt \
+		&& python3 -m build \
+		&& python3 -m pip uninstall -y qmk \
+		&& python3 -m pip install dist/qmk-*.whl \
+		&& qmk --version
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Cleaning
