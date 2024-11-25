@@ -34,5 +34,7 @@ jobs:
           echo "Base repo: $(git -C base_repo log -1)"
           echo "Target repo: $(git -C target_repo log -1)"
           echo "Diff:"
+          echo git -C target_repo fetch origin ${{ github.event.pull_request.base.sha }}
+          git -C target_repo fetch origin ${{ github.event.pull_request.base.sha }}
           echo git -C target_repo diff --name-only ${{ github.event.pull_request.base.sha }}
           git -C target_repo diff --name-only ${{ github.event.pull_request.base.sha }}
