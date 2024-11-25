@@ -14,8 +14,8 @@ jobs:
     steps:
       - name: "Prepare"
         run: |
-          apt update
-          apt install -y jq curl git
+          sudo apt update
+          sudo apt install -y jq curl git
 
       - name: "Checkout base"
         uses: actions/checkout@v4
