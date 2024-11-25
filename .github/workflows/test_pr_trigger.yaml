@@ -1,8 +1,8 @@
 name: Test PR Trigger
 
 on:
-    pull_request:
-        types: [opened, synchronize]
+  pull_request:
+    types: [opened, synchronize]
 
 permissions:
   contents: read
@@ -11,7 +11,6 @@ jobs:
   test_pr_trigger:
     name: "Test PR Trigger"
     runs-on: ubuntu-latest
-    if: github.event.pull_request.mergeable == true
     steps:
       - name: "Prepare"
         run: |
@@ -21,14 +20,14 @@ jobs:
       - name: "Checkout base"
         uses: actions/checkout@v4
         with:
-            path: base_repo
-            ref: ${{ github.event.pull_request.base.sha }}
+          path: base_repo
+          ref: ${{ github.event.pull_request.base.sha }}
 
       - name: "Checkout target"
         uses: actions/checkout@v4
         with:
-            path: target_repo
-            ref: ${{ github.event.pull_request.merge_commit_sha }}
+          path: target_repo
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
 
       - name: "List changed files"
         run: |
