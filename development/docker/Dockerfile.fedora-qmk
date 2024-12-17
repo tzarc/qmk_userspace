@@ -1,21 +1,105 @@
-FROM fedora:40
+FROM fedora:41
+
+ARG PYTHON_VERSION=3.13.1
+ARG NODE_VERSION=--lts
+ARG QMK_TOOLCHAIN=v14.2.0-3
 
 RUN <<EOF
-dnf install -y util-linux python3-pip sudo wget git '@Development Tools'
-python3 -m pip install qmk
+dnf install -y util-linux python3-pip sudo curl wget git jq dfu-util
+dnf group install -y 'development-tools'
+
+# pyenv prereqs
+dnf install -y zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel libffi-devel findutils
 EOF
+
+ENV PYENV_ROOT=/opt/pyenv
+ENV NVM_DIR=/opt/nvm
+
+# Install python
+COPY <<EOF /build.sh
+#!/bin/bash
+set -eEuo pipefail
+export PATH="\$PYENV_ROOT/bin:\$PATH"
+curl https://pyenv.run | bash
+eval "\$(pyenv init -)"
+eval "\$(pyenv virtualenv-init -)"
+pyenv install ${PYTHON_VERSION}
+EOF
+RUN chmod +x /build.sh && /build.sh && rm -f /build.sh
+
+# Install node
+COPY <<EOF /build.sh
+#!/bin/bash
+set -eEuo pipefail
+mkdir -p "\$NVM_DIR"
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+source "\$NVM_DIR/nvm.sh"
+nvm install ${NODE_VERSION}
+EOF
+RUN chmod +x /build.sh && /build.sh && rm -f /build.sh
+
+# Install the QMK CLI
+COPY <<EOF /build.sh
+#!/bin/bash
+set -eEuo pipefail
+export PATH="\$PYENV_ROOT/bin:\$PATH"
+eval "\$(pyenv init -)"
+eval "\$(pyenv virtualenv-init -)"
+pyenv global ${PYTHON_VERSION}
+pyenv exec python3 -m pip install qmk
+EOF
+RUN chmod +x /build.sh && /build.sh && rm -f /build.sh
+
+# Install QMK toolchains
+COPY <<EOF /build.sh
+#!/bin/bash
+set -eEuo pipefail
+arch_name=\$(uname -m | tr 'A-Z' 'a-z')
+case "\$arch_name" in
+    *arm64* | *aarch64*) arch_suffix=ARM64;;
+    *x86_64* | *x64*) arch_suffix=X64;;
+    *) echo unknown architecture \$arch_name >&2; exit 1;;
+esac
+curl -fsSL https://api.github.com/repos/qmk/qmk_toolchains/releases/tags/${QMK_TOOLCHAIN} \\
+    | jq -r '.assets[] | select(.name | contains("toolchain")) | .browser_download_url' \\
+    | grep linux\${arch_suffix} \\
+    | xargs curl -fsSLO
+mkdir -p /opt/qmk_toolchains
+tar -C /opt/qmk_toolchains -xf qmk_toolchains-*.tar.xz --strip-components=1
+rm -f qmk_toolchains-*.tar.xz
+EOF
+RUN chmod +x /build.sh && /build.sh && rm -f /build.sh
 
 COPY <<EOF /init.sh
 #!/bin/bash
-set -xeEuo pipefail
+set -eEuo pipefail
 qmk_uid=\$(stat --format='%u' /qmk_firmware)
 qmk_gid=\$(stat --format='%g' /qmk_firmware)
 groupadd -g \$qmk_gid qmk
 useradd -u \$qmk_uid -g \$qmk_gid -N qmk
-echo "qmk ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/qmk
-su -g qmk -P -w QMK_USERSPACE -c "cd /qmk_firmware && exec bash -li" - qmk
+cat <<EOP > /home/qmk/.bash_profile
+export PYENV_ROOT=/opt/pyenv
+export NVM_DIR=/opt/nvm
+export PATH="/opt/qmk_toolchains/bin:\\\$PYENV_ROOT/versions/${PYTHON_VERSION}/bin:\\\$PYENV_ROOT/bin:\\\$PATH"
+source "\\\$NVM_DIR/nvm.sh"
+if [[ ! -d "\\\$HOME/.qmk-venv" ]]; then
+    (
+        export PATH="\\\$PYENV_ROOT/bin:\\\$PATH"
+        pyenv exec python3 -m venv --system-site-packages "\\\$HOME/.qmk-venv"
+    )
+fi
+source "\\\$HOME/.qmk-venv/bin/activate"
+EOP
+echo "qmk ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/qmk >/dev/null 2>&1
+cd /qmk_firmware
+if [[ -n \$1 ]]; then
+    sudo -u qmk -g qmk -H --preserve-env=QMK_USERSPACE -- bash -lic "exec \$*"
+else
+    sudo -u qmk -g qmk -H --preserve-env=QMK_USERSPACE -- bash -li
+fi
 EOF
 
 RUN chmod +x /init.sh
 
-CMD ["/init.sh"]
+ENTRYPOINT ["/init.sh"]
+CMD ["bash"]

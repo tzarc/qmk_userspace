@@ -39,7 +39,8 @@ function fn_arch() {
     esac
 }
 
-tag_name=${1:-v14.2.0-2}
+tag_name=${1:-v14.2.0-3}
+TOOLCHAIN_LOCATION=${TOOLCHAIN_LOCATION:-$HOME/.local/qmk/toolchains}
 
 echo OS: $(fn_os), Arch: $(fn_arch), tag: ${tag_name}
 
@@ -48,14 +49,14 @@ curl -fsSL https://api.github.com/repos/qmk/qmk_toolchains/releases/tags/${tag_n
     | grep $(fn_os)$(fn_arch) \
     | xargs curl -fsSLO
 
-if [[ -d "$HOME/.local/qmk/toolchains" ]]; then
+if [[ -d "$TOOLCHAIN_LOCATION" ]]; then
     echo "Removing old toolchains" &&
-        rm -rf "$HOME/.local/qmk/toolchains"
+        rm -rf "$TOOLCHAIN_LOCATION"
 fi
 
-mkdir -p "$HOME/.local/qmk/toolchains"
+mkdir -p "$TOOLCHAIN_LOCATION"
 
 echo "Extracting toolchains" &&
-    tar -C "$HOME/.local/qmk/toolchains" -xf qmk_toolchains-*.tar.xz --strip-components=1
+    tar -C "$TOOLCHAIN_LOCATION" -xf qmk_toolchains-*.tar.xz --strip-components=1
 
 rm qmk_toolchains-*.tar.xz

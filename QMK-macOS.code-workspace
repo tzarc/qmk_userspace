@@ -28,9 +28,9 @@
     "settings": {
         "git.ignoreLimitWarning": true,
         "cortex-debug.variableUseNaturalFormat": false,
-        "python.defaultInterpreterPath": "/Users/nickb/Code/qmk_build/.direnv/python-3.12/bin/python",
+        "python.defaultInterpreterPath": "/Users/nickb/Code/qmk_build/.direnv/python-3.13/bin/python",
         "python.analysis.extraPaths": [
-            "/Users/nickb/Code/qmk_build/.direnv/python-3.12/lib/python3.12/site-packages",
+            "/Users/nickb/Code/qmk_build/.direnv/python-3.13/lib/python3.13/site-packages",
             "/Users/nickb/Code/qmk_build/qmk_firmware/lib/python"
         ],
         "files.exclude": {

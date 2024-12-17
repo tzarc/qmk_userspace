@@ -16,4 +16,3 @@ redis
 rq
 ruff
 squarify>=0.4.3,<1.0
-yappi
