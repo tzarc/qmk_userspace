@@ -40,6 +40,8 @@ SRC += \
 
 #####################
 
+RGB_MATRIX_RV32 = yes
+
 ifneq ($(strip $(KEYBOARD)),tzarc/djinn/rev1)
 
 FLASH_DRIVER = spi
