@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2018-2024 Nick Brassel (@tzarc)
+# Copyright 2018-2025 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 # Equivalent C++ code can be found here: https://llvm.org/doxygen/LEB128_8h_source.html

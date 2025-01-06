@@ -1,4 +1,4 @@
-// Copyright 2024 Nick Brassel (@tzarc)
+// Copyright 2024-2025 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include <string.h>
 #include <stdbool.h>
@@ -98,7 +98,7 @@ static rv32vm_ecall_result_t rv32vm_ecall_handler(void) {
             rgb_core.regs[10] = *(uint32_t*)&rgb_out;
         } break;
         case RV32_ECALL_TIMER_READ32:
-            rgb_core.regs[10] = timer_read32();
+            rgb_core.regs[10] = sync_timer_read32();
             break;
         case RV32_ECALL_RGB_MATRIX_SET_COLOR:
             rgb_matrix_set_color(rgb_core.regs[10], rgb_core.regs[11], rgb_core.regs[12], rgb_core.regs[13]);

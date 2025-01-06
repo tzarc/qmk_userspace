@@ -1,4 +1,4 @@
-// Copyright 2018-2024 Nick Brassel (@tzarc)
+// Copyright 2018-2025 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
@@ -82,7 +82,7 @@
 /* WS2812 configuration */
 #define RGB_MATRIX_LED_COUNT 15
 #define DRIVER_LED_TOTAL 15
-#ifdef WS2812
+#ifdef RGB_MATRIX_WS2812
 // Common
 #    define WS2812_DI_PIN PIN_WS2812_3V3
 // Bitbang

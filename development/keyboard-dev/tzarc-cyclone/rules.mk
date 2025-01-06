@@ -1,4 +1,4 @@
-# Copyright 2018-2024 Nick Brassel (@tzarc)
+# Copyright 2018-2025 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 ## chip/board settings
@@ -38,7 +38,7 @@ RAW_ENABLE = no
 # SLEEP_LED_ENABLE = yes
 
 RGB_MATRIX_ENABLE = yes
-RGB_MATRIX_DRIVER = WS2812
+RGB_MATRIX_DRIVER = ws2812
 WS2812_DRIVER = pwm
 CIE1931_CURVE = yes
 
