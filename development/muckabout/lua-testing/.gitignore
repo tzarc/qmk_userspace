@@ -1,0 +1,5 @@
+lua-testing
+.cache
+.build
+compile_commands.json
+src/keycode_strings.h
