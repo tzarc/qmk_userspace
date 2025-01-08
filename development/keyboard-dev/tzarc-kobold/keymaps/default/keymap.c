@@ -17,3 +17,14 @@ void keyboard_post_init_user() {
     debug_enable = true;
     debug_matrix = true;
 }
+
+extern painter_device_t oled;
+
+bool display_task_user(void) {
+    static bool filled = false;
+
+    filled = !filled;
+    qp_rect(oled, 0, 0, 16, 15, 0, 0, 0, true);
+    qp_circle(oled, 8, 8, 8, 0, 0, 255, filled);
+    return false;
+}
