@@ -178,6 +178,7 @@ BOARD_DEFS := \
 # short name ! keyboard path ! keymap name ! link source ! link target
 LINKED_BOARD_DEFS := \
 	cyclone!keyboards/tzarc/cyclone!default!development/keyboard-dev/tzarc-cyclone \
+	kobold!keyboards/tzarc/kobold!default!development/keyboard-dev/tzarc-kobold \
 	\
 	f411_tinyuf2_filesystem!keyboards/handwired/onekey/f411_tinyuf2_filesystem!reset!development/alternates/f411_tinyuf2_filesystem \
 	disco_f723!keyboards/handwired/onekey/disco_f723!console!development/alternates/disco_f723 \

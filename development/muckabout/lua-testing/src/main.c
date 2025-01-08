@@ -56,7 +56,7 @@ int main() {
     printf("---\n");
     lua_pushstring(L, "");
     int i = 0;
-    for(const struct keycode_t *p = keycodes; p->name; p++) {
+    for (const struct keycode_t *p = keycodes; p->name; p++) {
         printf("%s\n", p->name);
         lua_pushnumber(L, p->value);
         lua_setglobal(L, p->name);
