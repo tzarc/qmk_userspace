@@ -5,7 +5,7 @@
 # cat .build/obj_tzarc_djinn_rev2_tzarc/tzarc_unicode.i | sed -e 's@^#.*@@g' -e 's@^\s*//.*@@g' -e '/^\s*$/d' | clang-format
 OPT_DEFS += -save-temps=obj
 
-TOP_SYMBOLS = 25
+TOP_SYMBOLS = 5
 NKRO_ENABLE ?= no
 COMMAND_ENABLE = no
 SPACE_CADET_ENABLE ?= no
@@ -81,6 +81,14 @@ ifeq ($(strip $(RGB_MATRIX_RV32)),yes)
 	SRC += rgb_matrix_rv32_runner.c
 
 generated-files: $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h
+
+$(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h: $(wildcard $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner/*.c)
+$(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h: $(wildcard $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner/*.S)
+$(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h: $(wildcard $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner/*.h)
+$(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h: $(wildcard $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner/*.lds)
+$(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h: $(QMK_USERSPACE)/users/tzarc/rules.mk
+$(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h: $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner/Makefile
+$(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h: $(QMK_USERSPACE)/qmk_firmware-mods/lib/mini-rv32ima/mini-rv32ima/mini-rv32ima.h
 
 $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h:
 	@$(MAKE) -C $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner

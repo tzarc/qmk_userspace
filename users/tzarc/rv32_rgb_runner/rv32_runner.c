@@ -53,9 +53,9 @@ static inline RV32_RGB rgb_matrix_hsv_to_rgb(RV32_HSV hsv) {
     return rgb;
 }
 
-#define RGB_MATRIX_LED_COUNT 42
+#define MAX_RGB_MATRIX_LED_COUNT 256
 
-static uint16_t time_offsets[RGB_MATRIX_LED_COUNT] = {0};
+static uint8_t time_offsets[MAX_RGB_MATRIX_LED_COUNT] = {0};
 
 RV32_HSV hsv;
 uint8_t  speed;
@@ -65,8 +65,8 @@ void effect_init(void *params) {
     static bool initial = false;
     if (!initial) {
         initial = true;
-        for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
-            time_offsets[i] = rand() % 65500;
+        for (uint8_t i = 0; i < MAX_RGB_MATRIX_LED_COUNT; i++) {
+            time_offsets[i] = rand();
         }
     }
 }
@@ -78,7 +78,7 @@ void effect_begin_iter(void *params, uint8_t led_min, uint8_t led_max) {
 }
 
 void effect_led(void *params, uint8_t led_index) {
-    uint16_t time = scale16by8((rgb_timer / 2) + time_offsets[led_index], speed / 16);
+    uint16_t time = scale16by8((rgb_timer / 2) + (((uint16_t)time_offsets[led_index]) << 5), speed / 16);
     uint8_t  v    = scale8(abs8(sin8(time) - 128) * 2, hsv.v);
     RV32_RGB rgb  = rgb_matrix_hsv_to_rgb((RV32_HSV){.h = hsv.h, .s = hsv.s, .v = v});
     rgb_matrix_set_color(led_index, rgb.r, rgb.g, rgb.b);

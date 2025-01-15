@@ -22,7 +22,7 @@ static bool rv32_effect_run(effect_params_t* params) {
     return rgb_matrix_check_finished_leds(led_max);
 }
 static bool rv32_effect(effect_params_t* params) {
-    if (params->init) rv32_effect_init(params);
+    if (params->init && params->iter == 0) rv32_effect_init(params);
     return rv32_effect_run(params);
 }
 
