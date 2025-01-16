@@ -93,7 +93,8 @@ $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h: $(QMK_USERSPACE)/qmk_firmwar
 $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h:
 	@$(MAKE) -C $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner
 	[ ! -f $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h ] || rm -f $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h
-	@xxd -n rv32_runner -i $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner/rv32_runner.bin $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h
+	@cd $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner && \
+		xxd -i rv32_runner.bin $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h
 	sed -i 's@unsigned@static const unsigned@g' $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h
 
 endif

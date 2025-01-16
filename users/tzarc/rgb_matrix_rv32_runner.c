@@ -114,7 +114,7 @@ static void rv32vm_invoke(rv32_api_t api) {
     static bool can_run     = false;
     if (!has_checked) {
         has_checked           = true;
-        uint32_t required_ram = (((uint32_t)rv32_runner[0]) << 0 | ((uint32_t)rv32_runner[1]) << 8 | ((uint32_t)rv32_runner[2]) << 16 | ((uint32_t)rv32_runner[3]) << 24) - MINIRV32_RAM_IMAGE_OFFSET;
+        uint32_t required_ram = (((uint32_t)rv32_runner_bin[0]) << 0 | ((uint32_t)rv32_runner_bin[1]) << 8 | ((uint32_t)rv32_runner_bin[2]) << 16 | ((uint32_t)rv32_runner_bin[3]) << 24) - MINIRV32_RAM_IMAGE_OFFSET;
         dprintf("Required RAM: %d\n", (int)required_ram);
         if (required_ram > MINI_RV32_RAM_SIZE) {
             dprintf("Not enough RAM for MiniRV32IMAStepRGB: %d > %d\n", (int)required_ram, (int)MINI_RV32_RAM_SIZE);
@@ -174,7 +174,7 @@ void rv32vm_effect_init_impl(effect_params_t* params) {
         debug_enable = true;
         memset(&rgb_core, 0, sizeof(rgb_core));
         memset(rgb_ram_area, 0, sizeof(rgb_ram_area));
-        memcpy(rgb_ram_area, rv32_runner, rv32_runner_len);
+        memcpy(rgb_ram_area, rv32_runner_bin, rv32_runner_bin_len);
     }
 
     if (!should_dump_exec_times && false) {
