@@ -131,6 +131,10 @@ format:
 		$(ECHO) -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
 		clang-format -i "$$file" ; \
 	done
+	@git ls-files | grep -E 'key(board|map)\.json' | while read file ; do \
+		$(ECHO) -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
+		qmk format-json -i "$$file" ; \
+	done
 
 format-qmk-keyboards-tzarc:
 	@git -C $(QMK_USERSPACE)/qmk_firmware ls-files | grep tzarc | grep -E '\.(c|h|cpp|hpp|cxx|hxx)$$' | grep -vE '\.q[gf]f\.' | grep -vE '(ch|hal|mcu)conf\.h$$' | grep -vE 'board.[ch]$$' | grep -vE 'mini-rv32ima.h$$' | while read file ; do \

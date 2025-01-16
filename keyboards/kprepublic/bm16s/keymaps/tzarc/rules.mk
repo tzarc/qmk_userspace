@@ -12,3 +12,5 @@ UNICODE_ENABLE = no
 
 LTO_ENABLE = yes
 OPT = 2
+
+VIA_ENABLE = yes

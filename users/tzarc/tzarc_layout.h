@@ -77,7 +77,9 @@
     X(TZ_REP_2, /**/, /**/)          \
     X(TZ_REP_3, /**/, /**/)          \
     X(TZ_REP_4, /**/, /**/)          \
-    X(TZ_REP_5, /**/, /**/)
+    X(TZ_REP_5, /**/, /**/)          \
+    X(TZ_TM0, /**/, /**/)            \
+    X(TZ_TM1, /**/, /**/)
 #define KEYCODE_ENUM(kc, eq, val) kc eq val,
 
 enum { FOREACH_CUSTOM_KEYCODE(KEYCODE_ENUM) KEYMAP_SAFE_RANGE };
@@ -523,8 +525,8 @@ enum { FOREACH_CUSTOM_LAYER(LAYER_ENUM) };
 
 ////////////////////////////////////////////////////////////////////////////////
 // Layer A
-//                                                      ┌─────────────┬─────────────┬─────────────┬─────────────┐
-#define ____________TZARC_4x4_MACROPAD_A_R1_____________ KC_TRNS,      LT(2,KC_A),   KC_TRNS,      KC_TRNS
+//                                                      ┌─────────────┬─────────────┬─C────────────┬─────────────┐
+#define ____________TZARC_4x4_MACROPAD_A_R1_____________ KC_TRNS,      TZ_TM0,       TZ_TM1,       KC_TRNS
 //                                                      ├─────────────┼─────────────┼─────────────┼─────────────┤
 #define ____________TZARC_4x4_MACROPAD_A_R2_____________ KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS
 //                                                      ├─────────────┼─────────────┼─────────────┼─────────────┤

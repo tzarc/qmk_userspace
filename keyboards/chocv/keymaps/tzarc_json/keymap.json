@@ -1,9 +1,9 @@
 {
-    "converter": "promicro_rp2040",
     "config": {
         "features": {
-            "unicode": true,
             "chunder": true,
+            "unicode": true
         }
-    }
+    },
+    "converter": "promicro_rp2040"
 }

@@ -43,16 +43,18 @@ bool display_task_kb(void) {
 }
 #endif // QUANTUM_PAINTER_ENABLE
 
-void keyboard_post_init_kb() {
+void board_init(void) {
     // Disable RGB LEDs
     gpio_set_pin_output(RGB_ENABLE_PIN);
     gpio_write_pin(RGB_ENABLE_PIN, 1);
+}
 
-    keyboard_post_init_user();
-
+void keyboard_post_init_kb() {
 #ifdef QUANTUM_PAINTER_ENABLE
     display_init_kb();
 #endif // QUANTUM_PAINTER_ENABLE
+
+    keyboard_post_init_user();
 }
 
 void housekeeping_task_kb() {

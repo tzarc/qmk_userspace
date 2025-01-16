@@ -1,12 +1,14 @@
 {
     "keyboard_name": "Onekey Blackpill STM32F401 TinyUF2",
-    "development_board": "blackpill_f401",
-    "bootloader": "tinyuf2",
-    "usb": {
-        "shared_endpoint": {
-            "keyboard": true
-        }
+    "apa102": {
+        "clock_pin": "A2",
+        "data_pin": "A1"
     },
+    "backlight": {
+        "pin": "A0"
+    },
+    "bootloader": "tinyuf2",
+    "development_board": "blackpill_f401",
     "features": {
         "console": true
     },
@@ -14,14 +16,12 @@
         "cols": ["B0"],
         "rows": ["A7"]
     },
-    "backlight": {
-        "pin": "A0"
+    "usb": {
+        "shared_endpoint": {
+            "keyboard": true
+        }
     },
     "ws2812": {
         "pin": "A1"
-    },
-    "apa102": {
-        "data_pin": "A1",
-        "clock_pin": "A2"
     }
 }
