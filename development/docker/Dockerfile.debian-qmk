@@ -7,7 +7,7 @@ ARG QMK_TOOLCHAIN=v14.2.0-3
 
 RUN <<EOF
 apt update
-apt install -y --no-install-recommends util-linux python3-pip sudo curl wget git jq dfu-util build-essential libtinfo5
+apt install -y --no-install-recommends util-linux python3-pip sudo curl wget git ssh jq dfu-util build-essential libtinfo5
 rm -rf /var/lib/apt/lists/*
 EOF
 
