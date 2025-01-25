@@ -1,9 +1,8 @@
 FROM debian:12-slim
 
-ARG CLANG_VERSION=18.1.7
 ARG PYTHON_VERSION=3.13.1
+ARG NVM_VERSION=v0.40.1
 ARG NODE_VERSION=--lts
-ARG QMK_TOOLCHAIN=v14.2.0-3
 
 RUN <<EOF
 apt update
@@ -29,7 +28,7 @@ COPY <<EOF /build.sh
 #!/bin/bash
 set -eEuo pipefail
 mkdir -p "\$NVM_DIR"
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh | bash
 source "\$NVM_DIR/nvm.sh"
 nvm install ${NODE_VERSION}
 chmod -R go=u "\$NVM_DIR"
