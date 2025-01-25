@@ -1,0 +1,17 @@
+{
+    "config": {
+        "features": {
+            "xap": true,
+            "extrakey": true,
+            "mousekey": true,
+            "nkro": true,
+            "wpm": false,
+            "unicode": false,
+            "via": false
+        }
+    },
+    "modules": [
+        "hello_world2",
+        "hello_world"
+    ]
+}

@@ -2,27 +2,45 @@
     "folders": [
         {
             "name": "qmk_build",
-            "path": "."
+            "path": ".",
+            "settings": {
+                "python.pythonPath": "/home/nickb/qmk_build/.direnv/python-3.13/bin/python3"
+            }
         },
         {
             "name": "qmk_firmware",
-            "path": "qmk_firmware"
+            "path": "qmk_firmware",
+            "settings": {
+                "python.pythonPath": "/home/nickb/qmk_build/.direnv/python-3.13/bin/python3"
+            }
         },
         {
             "name": "quantum-painter",
-            "path": "qmk_firmware/quantum/painter"
+            "path": "qmk_firmware/quantum/painter",
+            "settings": {
+                "python.pythonPath": "/home/nickb/qmk_build/.direnv/python-3.13/bin/python3"
+            }
         },
         {
             "name": "drivers-painter",
-            "path": "qmk_firmware/drivers/painter"
+            "path": "qmk_firmware/drivers/painter",
+            "settings": {
+                "python.pythonPath": "/home/nickb/qmk_build/.direnv/python-3.13/bin/python3"
+            }
         },
         {
             "name": "keyboards-tzarc",
-            "path": "qmk_firmware/keyboards/tzarc"
+            "path": "qmk_firmware/keyboards/tzarc",
+            "settings": {
+                "python.pythonPath": "/home/nickb/qmk_build/.direnv/python-3.13/bin/python3"
+            }
         },
         {
             "name": "python-qmk",
-            "path": "qmk_firmware/lib/python/qmk"
+            "path": "qmk_firmware/lib/python/qmk",
+            "settings": {
+                "python.pythonPath": "/home/nickb/qmk_build/.direnv/python-3.13/bin/python3"
+            }
         }
     ],
     "settings": {

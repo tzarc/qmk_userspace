@@ -8,7 +8,7 @@ SRC_DIRS ?= src
 SRCS := $(shell find $(SRC_DIRS) \( -name *.cpp -or -name *.cxx -or -name *.cc -or -name *.c -or -name *.s \))
 HDRS := $(shell find $(SRC_DIRS) \( -name *.hpp -or -name *.hxx -or -name *.hh -or -name *.h \))
 
-VPATH += ../../qmk_firmware-mods/lib/littlefs
+VPATH += ../../../qmk_firmware-mods/lib/littlefs
 ALL_SRCS :=  $(SRCS) \
 	lfs.c \
 	lfs_util.c
@@ -17,7 +17,7 @@ OBJS := $(ALL_SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
 INC_DIRS := $(shell find $(SRC_DIRS) -type d) \
-	../../qmk_firmware-mods/lib/littlefs
+	../../../qmk_firmware-mods/lib/littlefs
 
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
@@ -29,7 +29,7 @@ OBJCOPY = objcopy
 OBJDUMP = objdump
 SIZE = size
 
-OPT_FLAGS = -g -O3
+OPT_FLAGS = -g -O0
 CFLAGS_BASE ?= $(OPT_FLAGS) -DLFS_NO_DEBUG -DLFS_NO_WARN -DLFS_NO_ERROR
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP

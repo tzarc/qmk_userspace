@@ -43,6 +43,8 @@ bool display_task_kb(void) {
 }
 #endif // QUANTUM_PAINTER_ENABLE
 
+void configure_ina219(void);
+
 void board_init(void) {
     // Disable RGB LEDs
     gpio_set_pin_output(RGB_ENABLE_PIN);
@@ -73,4 +75,30 @@ void housekeeping_task_kb() {
         qp_flush(oled);
     }
 #endif // QUANTUM_PAINTER_ENABLE
+}
+
+void configure_ina219(void) {
+    /*
+    VBUS_MAX = 16V
+    VSHUNT_MAX = 0.04V
+    RSHUNT = 0.002 ohms
+
+    Max possible current:
+    MaxPossible_I = VSHUNT_MAX / RSHUNT = 20A
+
+    Expected max current:
+    MaxExpected_I = 3A
+
+    Calculate range of LSBs
+    MinimumLSB = MaxExpected_I / 32767 = 0.0000914 (91.55uA per bit)
+    MaximumLSB = MaxExpected_I / 4096 = 0.000732 (732uA per bit)
+
+    Choose LSB between min and max, choose roundish number close to MinimumLSB
+    CurrentLSB = 0.001 (1mA per bit)
+
+    Compute calibration register
+    Cal = trunc(0.04096 / (CurrentLSB * RSHUNT))
+    Cal = 20480
+
+    */
 }

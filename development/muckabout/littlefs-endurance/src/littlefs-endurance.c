@@ -7,11 +7,14 @@
 #define SPACING 128
 #define BUFFER_SIZE 128
 #define LOOKAHEAD_SIZE 128
-#define BLOCK_COUNT 8
-#define BLOCK_SIZE 2048
+
+// Emulation on 8kB EEPROM
+#define BLOCK_COUNT 64
+#define BLOCK_SIZE 128
+const int erase_limit = 100000;
 
 #define BYTES_PER_SLICE 32
-#define TOTAL_EEPROM_SIZE 2048
+#define TOTAL_EEPROM_SIZE 512
 #define TOTAL_EEPROM_SLICES ((TOTAL_EEPROM_SIZE) / (BYTES_PER_SLICE))
 
 #define EEPROM_DIR_NAME "ee"
@@ -97,7 +100,8 @@ const struct lfs_config cfg = {
     .cache_size       = BUFFER_SIZE,
 };
 
-void prep_test() {
+bool prep_test() {
+    bool ret = true;
     memset(&locals, 0x00, sizeof(locals));
     memset(locals.barrier0, ' ', sizeof(locals.barrier0));
     memset(locals.barrier1, ' ', sizeof(locals.barrier1));
@@ -117,35 +121,56 @@ void prep_test() {
     if (err) {
         do {
             err = LFS_API_CALL(lfs_format, &locals.lfs, &cfg);
-            if (err < 0) break;
+            if (err < 0) {
+                ret = false;
+                break;
+            }
             err = LFS_API_CALL(lfs_mount, &locals.lfs, &cfg);
-            if (err < 0) break;
+            if (err < 0) {
+                ret = false;
+                break;
+            }
             if (sizeof(EEPROM_DIR_NAME) > 1) {
                 err = LFS_API_CALL(lfs_mkdir, &locals.lfs, EEPROM_DIR_NAME);
-                if (err) return;
+                if (err < 0) {
+                    ret = false;
+                    break;
+                }
             }
         } while (0);
     }
 
     // release any resources we were using
     LFS_API_CALL(lfs_unmount, &locals.lfs);
+
+    return ret;
 }
 
 static long byte_counter = 0;
 
-void run_test(void) {
+bool run_test(void) {
+    bool ret = true;
     do {
         int err = LFS_API_CALL(lfs_mount, &locals.lfs, &cfg);
         if (err) {
             // reformat if we can't mount the filesystem
             // this should only happen on the first boot
             err = LFS_API_CALL(lfs_format, &locals.lfs, &cfg);
-            if (err < 0) break;
+            if (err < 0) {
+                ret = false;
+                break;
+            }
             err = LFS_API_CALL(lfs_mount, &locals.lfs, &cfg);
-            if (err < 0) break;
+            if (err < 0) {
+                ret = false;
+                break;
+            }
             if (sizeof(EEPROM_DIR_NAME) > 1) {
                 err = LFS_API_CALL(lfs_mkdir, &locals.lfs, EEPROM_DIR_NAME);
-                if (err < 0) break;
+                if (err < 0) {
+                    ret = false;
+                    break;
+                }
             }
         }
 
@@ -155,24 +180,35 @@ void run_test(void) {
 
             sprintf(buf, EEPROM_DIR_NAME EEPROM_DIR_SEPARATOR EEPROM_FILE_PREFIX "%03d", i);
             err = LFS_API_CALL(lfs_file_open, &locals.lfs, &locals.file, buf, LFS_O_RDWR | LFS_O_CREAT);
-            if (err < 0) break;
+            if (err < 0) {
+                ret = false;
+                break;
+            }
 
             _Static_assert(BYTES_PER_SLICE % sizeof(uint64_t) == 0, "BYTES_PER_SLICE must be a multiple of 8");
             for (int j = 0; j < BYTES_PER_SLICE; j += sizeof(uint64_t))
                 *(uint64_t*)&value[j] = splitmix64_next();
 
             err = LFS_API_CALL(lfs_file_write, &locals.lfs, &locals.file, value, BYTES_PER_SLICE);
-            if (err < 0) break;
+            if (err < 0) {
+                ret = false;
+                break;
+            }
 
             byte_counter += BYTES_PER_SLICE;
 
             err = LFS_API_CALL(lfs_file_close, &locals.lfs, &locals.file);
-            if (err < 0) break;
+            if (err < 0) {
+                ret = false;
+                break;
+            }
         }
     } while (0);
 
     // release any resources we were using
     LFS_API_CALL(lfs_unmount, &locals.lfs);
+
+    return ret;
 }
 
 int main(void) {
@@ -180,13 +216,14 @@ int main(void) {
 
     long i = 0;
     while (true) {
-        run_test();
+        if (!run_test()) {
+            break;
+        }
         ++i;
 
         bool triggered = false;
 
         const int print_freq  = 1000;
-        const int erase_limit = 10000;
 
         if (i % print_freq == 0) {
             printf("After %6ld iterations:", i);

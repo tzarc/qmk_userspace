@@ -11,6 +11,28 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: qmk generate-community-modules-h -kb tzarc/djinn/rev2 -o - ../keyboards/tzarc/djinn/keymaps/tzarc/keymap.json",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}/qmk_firmware",
+            "request": "launch",
+            "args": [
+                "generate-community-modules-h",
+                "-kb",
+                "tzarc/djinn/rev2",
+                "-o",
+                "-",
+                "../keyboards/tzarc/djinn/keymaps/tzarc/keymap.json"
+            ],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.13/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.13/bin/python3"
+                }
+            }
+        },
+        {
             "name": "Python: qmk generate-keycodes --version latest -o quantum/keycodes.h",
             "type": "debugpy",
             "justMyCode": false,
@@ -25,9 +47,9 @@
             ],
             "console": "integratedTerminal",
             "linux": {
-                "program": "${workspaceRoot}/.direnv/python-3.12/bin/qmk",
+                "program": "${workspaceRoot}/.direnv/python-3.13/bin/qmk",
                 "env": {
-                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.12/bin/python3"
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.13/bin/python3"
                 }
             }
         },
@@ -46,9 +68,9 @@
             ],
             "console": "integratedTerminal",
             "linux": {
-                "program": "${workspaceRoot}/.direnv/python-3.12/bin/qmk",
+                "program": "${workspaceRoot}/.direnv/python-3.13/bin/qmk",
                 "env": {
-                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.12/bin/python3"
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.13/bin/python3"
                 }
             }
         },
@@ -65,9 +87,9 @@
             ],
             "console": "integratedTerminal",
             "linux": {
-                "program": "${workspaceRoot}/.direnv/python-3.12/bin/qmk",
+                "program": "${workspaceRoot}/.direnv/python-3.13/bin/qmk",
                 "env": {
-                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.12/bin/python3"
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.13/bin/python3"
                 }
             }
         },
@@ -98,9 +120,9 @@
             ],
             "console": "integratedTerminal",
             "linux": {
-                "program": "${workspaceRoot}/.direnv/python-3.12/bin/qmk",
+                "program": "${workspaceRoot}/.direnv/python-3.13/bin/qmk",
                 "env": {
-                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.12/bin/python3"
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.13/bin/python3"
                 }
             }
         },
