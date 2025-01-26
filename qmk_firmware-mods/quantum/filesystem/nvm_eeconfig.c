@@ -46,6 +46,13 @@ void nvm_eeconfig_erase(void) {
     fs_mkdir("ee");
 }
 
+// TODO
+// littlefs doesn't like writes mid-way through a file.
+// Swap to a mechanism much like classic QMK wear-leveling:
+// - Write the full data first time around
+// - Subsequent writes are (header+data) appended -- header contains (offset+length)
+// - Once a threahold is reached, rewrite the entire file with the live copy of data instead of playing back the log
+
 static void fs_read_block(const char *filename, void *data, size_t size) {
     fs_fd_t fd = fs_open(filename, FS_READ);
     if (fd == INVALID_FILESYSTEM_FD) {
