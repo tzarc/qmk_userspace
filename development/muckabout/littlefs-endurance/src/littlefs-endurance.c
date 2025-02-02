@@ -223,7 +223,7 @@ int main(void) {
 
         bool triggered = false;
 
-        const int print_freq  = 1000;
+        const int print_freq = 1000;
 
         if (i % print_freq == 0) {
             printf("After %6ld iterations:", i);

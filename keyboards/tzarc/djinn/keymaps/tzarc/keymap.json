@@ -1,5 +1,3 @@
 {
-    "modules": [
-        "hello_world"
-    ]
+    "modules": ["hello_world"]
 }

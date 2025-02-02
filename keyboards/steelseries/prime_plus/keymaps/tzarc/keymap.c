@@ -51,6 +51,8 @@ void pointing_device_init_user(void) {
     pointing_device_set_cpi(6400);
 }
 
+static bool    lower_pressed    = false;
+static bool    raise_pressed    = false;
 static bool    gesture_pressed  = false;
 static bool    gesture_actioned = true;
 static int32_t start_position_x = 0;
@@ -60,11 +62,28 @@ static bool gesture_mode(layer_state_t state) {
     return get_highest_layer(state) == LAYER_LOWER;
 }
 
+bool pre_process_record_keymap(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case LT(LAYER_LOWER, KC_MS_BTN4):
+            lower_pressed = record->event.pressed;
+            break;
+        case LT(LAYER_RAISE, KC_MS_BTN5):
+            raise_pressed = record->event.pressed;
+            break;
+    }
+
+    return true;
+}
+
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
+    // One layer tap has kicked in, start accumulating mouse movement
     if (gesture_mode(layer_state | default_layer_state)) {
         start_position_x += mouse_report.x;
         start_position_y += mouse_report.y;
+    }
 
+    // If we're holding lower/raise, disable any mouse movement
+    if (lower_pressed || raise_pressed) {
         mouse_report.x = 0;
         mouse_report.y = 0;
         mouse_report.v = 0;
@@ -86,6 +105,7 @@ layer_state_t layer_state_set_keymap(layer_state_t state) {
 }
 
 void housekeeping_task_keymap(void) {
+    // Handle cardinal direction gestures
     if (!gesture_pressed && !gesture_actioned) {
         gesture_actioned = true;
 

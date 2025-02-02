@@ -103,6 +103,9 @@ __attribute__((weak)) void eeconfig_init_keymap(void) {}
 __attribute__((weak)) void keyboard_pre_init_keymap(void) {}
 __attribute__((weak)) void keyboard_post_init_keymap(void) {}
 
+__attribute__((weak)) bool pre_process_record_keymap(uint16_t keycode, keyrecord_t *record) {
+    return true;
+}
 __attribute__((weak)) bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
@@ -225,6 +228,10 @@ bool remember_last_key_user(uint16_t keycode, keyrecord_t *record, uint8_t *reme
     }
     return true;
 };
+
+bool pre_process_record_user(uint16_t keycode, keyrecord_t *record) {
+    return pre_process_record_keymap(keycode, record);
+}
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t reset_key_timer  = 0;
