@@ -60,7 +60,7 @@ static int32_t start_position_x = 0;
 static int32_t start_position_y = 0;
 
 static bool gesture_mode(layer_state_t state) {
-    return get_highest_layer(state) == LAYER_LOWER;
+    return get_highest_layer(state) == LAYER_RAISE;
 }
 
 bool pre_process_record_keymap(uint16_t keycode, keyrecord_t *record) {
@@ -123,8 +123,8 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
         start_position_y += mouse_report.y;
     }
 
-    // If we're holding lower/raise, disable any mouse movement
-    if (lower_pressed || raise_pressed) {
+    // If we're holding raise, disable any mouse movement
+    if (raise_pressed) {
         mouse_report.x = 0;
         mouse_report.y = 0;
         mouse_report.v = 0;
