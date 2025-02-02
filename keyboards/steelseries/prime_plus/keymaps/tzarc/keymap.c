@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include QMK_KEYBOARD_H
+#include "tzarc.h"
 #include "tzarc_layout.h"
 
 // clang-format off
@@ -14,7 +15,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                     TIME_RESET              //   CPI
     ),
     [LAYER_LOWER] = LAYOUT(
-        KC_TRNS,  KC_TRNS, KC_TRNS,
+        TZ_TBMS1, KC_TRNS, KC_TRNS,
                   KC_TRNS,
                   KC_TRNS,
                   KC_TRNS
@@ -75,6 +76,46 @@ bool pre_process_record_keymap(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
+static const int turbo_mouse_low_rng         = 50;
+static const int turbo_mouse_high_rng        = 110;
+static bool      turbo_mouse_keydown         = false;
+static bool      turbo_mouse_released        = false;
+static bool      turbo_mouse_auto_registered = false;
+static uint32_t  turbo_mouse_last_keydown    = 0;
+static uint32_t  turbo_mouse_next_trigger    = 0;
+
+bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case TZ_TBMS1: {
+            uint32_t now = timer_read32();
+            // Keep track of if this key is held down
+            turbo_mouse_keydown = record->event.pressed;
+
+            if (record->event.pressed) {
+                // Keydown event, clear the released flag
+                turbo_mouse_released = false;
+
+                // Keep track of the last keydown event, as well as next trigger time
+                turbo_mouse_last_keydown = now;
+                turbo_mouse_next_trigger = now + prng(turbo_mouse_low_rng, turbo_mouse_high_rng);
+
+                // Inform the OS that we've got a keydown event
+                register_code(KC_MS_BTN1);
+            } else {
+                // If the release happened within the initial hold period, then stop the timer and tap the key as per normal
+                if ((now < turbo_mouse_next_trigger && !turbo_mouse_released) || turbo_mouse_auto_registered) {
+                    unregister_code(KC_MS_BTN1);
+                    turbo_mouse_auto_registered = false;
+                }
+            }
+            return false;
+        }
+        default:
+            break;
+    }
+    return true;
+}
+
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     // One layer tap has kicked in, start accumulating mouse movement
     if (gesture_mode(layer_state | default_layer_state)) {
@@ -105,6 +146,31 @@ layer_state_t layer_state_set_keymap(layer_state_t state) {
 }
 
 void housekeeping_task_keymap(void) {
+    uint32_t now = timer_read32();
+
+    // If this key is held down, and we've passed the trigger point...
+    if (turbo_mouse_keydown && turbo_mouse_next_trigger <= now) {
+        // Check if we've not yet released due to the initial hold period
+        if (!turbo_mouse_released) {
+            // ...if we haven't, then we release the key.
+            unregister_code(KC_MS_BTN1);
+            turbo_mouse_released        = true;
+            turbo_mouse_auto_registered = false;
+        } else {
+            // Toggle the keypress with random timing below
+            if (!turbo_mouse_auto_registered) {
+                register_code(KC_MS_BTN1);
+                turbo_mouse_auto_registered = true;
+            } else {
+                unregister_code(KC_MS_BTN1);
+                turbo_mouse_auto_registered = false;
+            }
+        }
+
+        // Set the next trigger.
+        turbo_mouse_next_trigger = now + prng(turbo_mouse_low_rng, turbo_mouse_high_rng);
+    }
+
     // Handle cardinal direction gestures
     if (!gesture_pressed && !gesture_actioned) {
         gesture_actioned = true;

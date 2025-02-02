@@ -79,7 +79,8 @@
     X(TZ_REP_4, /**/, /**/)          \
     X(TZ_REP_5, /**/, /**/)          \
     X(TZ_TM0, /**/, /**/)            \
-    X(TZ_TM1, /**/, /**/)
+    X(TZ_TM1, /**/, /**/)            \
+    X(TZ_TBMS1, /**/, /**/)
 #define KEYCODE_ENUM(kc, eq, val) kc eq val,
 
 enum { FOREACH_CUSTOM_KEYCODE(KEYCODE_ENUM) KEYMAP_SAFE_RANGE };
