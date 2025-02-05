@@ -33,6 +33,28 @@
             }
         },
         {
+            "name": "Python: qmk generate-rules-mk -kb tzarc/djinn/rev2 -o - ../keyboards/tzarc/djinn/keymaps/tzarc/keymap.json",
+            "type": "debugpy",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}/qmk_firmware",
+            "request": "launch",
+            "args": [
+                "generate-rules-mk",
+                "-kb",
+                "tzarc/djinn/rev2",
+                "-o",
+                "-",
+                "../keyboards/tzarc/djinn/keymaps/tzarc/keymap.json"
+            ],
+            "console": "integratedTerminal",
+            "linux": {
+                "program": "${workspaceRoot}/.direnv/python-3.13/bin/qmk",
+                "env": {
+                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.13/bin/python3"
+                }
+            }
+        },
+        {
             "name": "Python: qmk generate-keycodes --version latest -o quantum/keycodes.h",
             "type": "debugpy",
             "justMyCode": false,
