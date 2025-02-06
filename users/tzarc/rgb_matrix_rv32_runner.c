@@ -56,13 +56,13 @@ typedef enum rv32vm_ecall_result_t {
 } rv32vm_ecall_result_t;
 
 static rv32vm_ecall_result_t rv32vm_ecall_handler(void) {
-    switch (rgb_core.regs[17]) {
+    switch (rgb_core.regs[rv32reg_a7]) {
         case RV32_EXIT:
             rgb_core.pc = MINIRV32_RAM_IMAGE_OFFSET;
             return RV32_TERMINATE;
         case RV32_ECALL_RGB_TIMER: {
             extern uint32_t g_rgb_timer;
-            rgb_core.regs[10] = g_rgb_timer;
+            rgb_core.regs[rv32reg_a0] = g_rgb_timer;
         } break;
         case RV32_ECALL_RGB_MATRIX_CONFIG_HSV: {
             RV32_HSV hsv = {
@@ -70,38 +70,38 @@ static rv32vm_ecall_result_t rv32vm_ecall_handler(void) {
                 .s = rgb_matrix_config.hsv.s,
                 .v = rgb_matrix_config.hsv.v,
             };
-            rgb_core.regs[10] = *(uint32_t*)&hsv;
+            rgb_core.regs[rv32reg_a0] = *(uint32_t*)&hsv;
         } break;
         case RV32_ECALL_RGB_MATRIX_CONFIG_SPEED:
-            rgb_core.regs[10] = rgb_matrix_config.speed;
+            rgb_core.regs[rv32reg_a0] = rgb_matrix_config.speed;
             break;
         case RV32_ECALL_RAND:
-            rgb_core.regs[10] = rand();
+            rgb_core.regs[rv32reg_a0] = rand();
             break;
         case RV32_ECALL_SCALE16BY8:
-            rgb_core.regs[10] = scale16by8(rgb_core.regs[10], rgb_core.regs[11]);
+            rgb_core.regs[rv32reg_a0] = scale16by8(rgb_core.regs[rv32reg_a0], rgb_core.regs[rv32reg_a1]);
             break;
         case RV32_ECALL_SCALE8:
-            rgb_core.regs[10] = scale8(rgb_core.regs[10], rgb_core.regs[11]);
+            rgb_core.regs[rv32reg_a0] = scale8(rgb_core.regs[rv32reg_a0], rgb_core.regs[rv32reg_a1]);
             break;
         case RV32_ECALL_ABS8:
-            rgb_core.regs[10] = abs8(rgb_core.regs[10]);
+            rgb_core.regs[rv32reg_a0] = abs8(rgb_core.regs[rv32reg_a0]);
             break;
         case RV32_ECALL_SIN8:
-            rgb_core.regs[10] = sin8(rgb_core.regs[10]);
+            rgb_core.regs[rv32reg_a0] = sin8(rgb_core.regs[rv32reg_a0]);
             break;
         case RV32_ECALL_HSV_TO_RGB: {
             RV32_HSV hsv;
-            *(uint32_t*)&hsv  = rgb_core.regs[10];
-            RGB      rgb      = hsv_to_rgb((HSV){.h = hsv.h, .s = hsv.s, .v = hsv.v});
-            RV32_RGB rgb_out  = {.r = rgb.r, .g = rgb.g, .b = rgb.b};
-            rgb_core.regs[10] = *(uint32_t*)&rgb_out;
+            *(uint32_t*)&hsv          = rgb_core.regs[rv32reg_a0];
+            RGB      rgb              = hsv_to_rgb((HSV){.h = hsv.h, .s = hsv.s, .v = hsv.v});
+            RV32_RGB rgb_out          = {.r = rgb.r, .g = rgb.g, .b = rgb.b};
+            rgb_core.regs[rv32reg_a0] = *(uint32_t*)&rgb_out;
         } break;
         case RV32_ECALL_TIMER_READ32:
-            rgb_core.regs[10] = sync_timer_read32();
+            rgb_core.regs[rv32reg_a0] = sync_timer_read32();
             break;
         case RV32_ECALL_RGB_MATRIX_SET_COLOR:
-            rgb_matrix_set_color(rgb_core.regs[10], rgb_core.regs[11], rgb_core.regs[12], rgb_core.regs[13]);
+            rgb_matrix_set_color(rgb_core.regs[rv32reg_a0], rgb_core.regs[rv32reg_a1], rgb_core.regs[rv32reg_a2], rgb_core.regs[rv32reg_a3]);
             break;
     }
     return RV32_CONTINUE;
@@ -127,7 +127,7 @@ static void rv32vm_invoke(rv32_api_t api) {
 
     rgb_core.pc = MINIRV32_RAM_IMAGE_OFFSET + 4; // +4 because first u32 is RAM sizing info
     rgb_core.extraflags |= 3;                    // Machine mode
-    rgb_core.regs[5] = (uint32_t)api;
+    rgb_core.regs[rv32reg_t0] = (uint32_t)api;
 
     uint32_t start = timer_read32();
     while (true) {
@@ -188,19 +188,19 @@ void rv32vm_effect_init_impl(effect_params_t* params) {
 }
 
 void rv32vm_effect_begin_iter_impl(effect_params_t* params, uint8_t led_min, uint8_t led_max) {
-    rgb_core.regs[10] = (uint32_t)(uintptr_t)params;
-    rgb_core.regs[11] = (uint32_t)led_min;
-    rgb_core.regs[12] = (uint32_t)led_max;
+    rgb_core.regs[rv32reg_a0] = (uint32_t)(uintptr_t)params;
+    rgb_core.regs[rv32reg_a1] = (uint32_t)led_min;
+    rgb_core.regs[rv32reg_a2] = (uint32_t)led_max;
     rv32vm_invoke(RV32_EFFECT_BEGIN_ITER);
 }
 
 void rv32vm_effect_led_impl(effect_params_t* params, uint8_t led_index) {
-    rgb_core.regs[10] = (uint32_t)(uintptr_t)params;
-    rgb_core.regs[11] = (uint32_t)led_index;
+    rgb_core.regs[rv32reg_a0] = (uint32_t)(uintptr_t)params;
+    rgb_core.regs[rv32reg_a1] = (uint32_t)led_index;
     rv32vm_invoke(RV32_EFFECT_LED);
 }
 
 void rv32vm_effect_end_iter_impl(effect_params_t* params) {
-    rgb_core.regs[10] = (uint32_t)(uintptr_t)params;
+    rgb_core.regs[rv32reg_a0] = (uint32_t)(uintptr_t)params;
     rv32vm_invoke(RV32_EFFECT_END_ITER);
 }

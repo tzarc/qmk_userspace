@@ -9,7 +9,7 @@ SECTIONS
 
 	.text : ALIGN(16) {
 		__TEXT_BEGIN__ = .;
-		*(.initial_jump)
+		*(.runner_base)
 		*(.entry.text)
 		*(.init.literal)
 		*(.init)

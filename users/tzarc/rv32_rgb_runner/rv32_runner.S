@@ -1,7 +1,7 @@
 # vim: set ft=asm ts=8 sw=8 expandtab
 # Copyright 2024 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
-.section .initial_jump
+.section .runner_base
 .global _start
 
 .align 4
@@ -40,4 +40,3 @@ _api_table:                             # API table for functions to invoke -- k
         .long effect_end_iter_thunk
 
 _api_table_end:
-        .long 0
