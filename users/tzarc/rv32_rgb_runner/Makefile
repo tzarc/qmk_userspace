@@ -6,10 +6,10 @@ all : $(TARGETS)
 PREFIX:=riscv32-unknown-elf-
 CFLAGS:=-fno-stack-protector
 CFLAGS+=-static-libgcc -fdata-sections -ffunction-sections
-CFLAGS+=-g -Os -march=rv32ima_zicsr -mabi=ilp32 -static
-LDFLAGS:= -T flatfile.lds -nostdlib -Wl,--gc-sections -ueffect_init -ueffect_led
+CFLAGS+=-g -O3 -march=rv32ima_zicsr -mabi=ilp32 -static
+LDFLAGS:= -T flatfile.lds -nostdlib -Wl,--gc-sections
 
-$(PROJECT).elf : $(wildcard *.c) $(wildcard *.S)
+$(PROJECT).elf : $(wildcard *.S) $(wildcard *.c)
 	$(PREFIX)gcc -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
 $(PROJECT).debug.txt : $(PROJECT).elf

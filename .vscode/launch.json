@@ -116,12 +116,22 @@
             }
         },
         {
-            "name": "Python: convert *.so to *.qke",
+            "name": "Python: convert *.so to *.qke (convert-binary.py)",
             "type": "debugpy",
             "justMyCode": true,
-            "cwd": "${workspaceRoot}/muckabout/dynamic-so",
+            "cwd": "${workspaceRoot}/development/muckabout/dynamic-so",
             "request": "launch",
-            "program": "${workspaceRoot}/muckabout/dynamic-so/convert-binary.py",
+            "program": "${workspaceRoot}/development/muckabout/dynamic-so/convert-binary.py",
+            "args": ["dynamic_lib.so"],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: convert *.so to *.qke (lief-test.py)",
+            "type": "debugpy",
+            "justMyCode": true,
+            "cwd": "${workspaceRoot}/development/muckabout/dynamic-so",
+            "request": "launch",
+            "program": "${workspaceRoot}/development/muckabout/dynamic-so/lief-test.py",
             "args": ["dynamic_lib.so"],
             "console": "integratedTerminal"
         },
