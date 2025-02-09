@@ -1,12 +1,15 @@
-__heap_size = 512;
+__heap_size = 256;
 __stack_size = 256;
+
+MEMORY
+{
+    TEXT (rwx) : ORIGIN = 0x80000000, LENGTH = 2048  # 2kB total for code + RAM
+}
 
 ENTRY(_start)
 
 SECTIONS
 {
-	. = 0x80000000;
-
 	.text : ALIGN(16) {
 		__TEXT_BEGIN__ = .;
 		*(.runner_base)
@@ -19,15 +22,7 @@ SECTIONS
 		*(.out_jump.literal.*)
 		*(.out_jump.*)
 		__TEXT_END__ = .;
-	}
-
-	/DISCARD/ :
-	{
-		*(.interp)
-		*(.dynsym)
-		*(.dynstr)
-		*(.header)
-	} : phdr
+	} >TEXT
 
 	.data : ALIGN(16) {
 		__DATA_BEGIN__ = .;
@@ -49,24 +44,32 @@ SECTIONS
 		*(.got)
 		*(.got.*)
 		__DATA_END__ = .;
-	}
+	} >TEXT
 
-	.bss : ALIGN( 16 ) {
+	.bss : ALIGN(16) {
 		__BSS_BEGIN__ = .;
 		*(.bss)
 		*(.bss.*)
 		__BSS_END__ = .;
-	}
+	} >TEXT
 
-	.heap : ALIGN( 16 ) {
+	.heap : ALIGN(16) {
 		_sheap = .;
 		. = . + __heap_size;
 		_eheap = .;
-	}
+	} >TEXT
 
-	.stack : ALIGN( 16 ) {
+	.stack : ALIGN(16) {
 		_estack = .;
 		. = . + __stack_size;
 		_sstack = .;
-	}
+	} >TEXT
+
+	/DISCARD/ :
+	{
+		*(.interp)
+		*(.dynsym)
+		*(.dynstr)
+		*(.header)
+	} : phdr
 }

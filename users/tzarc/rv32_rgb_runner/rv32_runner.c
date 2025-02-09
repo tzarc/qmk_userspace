@@ -53,7 +53,7 @@ static inline RV32_RGB rgb_matrix_hsv_to_rgb(RV32_HSV hsv) {
     return rgb;
 }
 
-#define MAX_RGB_MATRIX_LED_COUNT 1024
+#define MAX_RGB_MATRIX_LED_COUNT 512
 
 static uint8_t time_offsets[MAX_RGB_MATRIX_LED_COUNT] = {0};
 
@@ -62,11 +62,14 @@ uint8_t  speed;
 uint32_t rgb_timer;
 
 void effect_init(void *params) {
+    extern int cpp_test(void);
+    int        f = cpp_test();
+
     static bool initial = false;
     if (!initial) {
         initial = true;
         for (uint16_t i = 0; i < MAX_RGB_MATRIX_LED_COUNT; i++) {
-            time_offsets[i] = rand();
+            time_offsets[i] = rand() + f;
         }
     }
 }

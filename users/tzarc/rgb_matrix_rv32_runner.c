@@ -12,8 +12,8 @@
 #include "rv32_rgb_runner/rv32_runner.h"
 
 #ifndef RGB_MATRIX_RV32_RUNNER_RAM
-#    define RGB_MATRIX_RV32_RUNNER_RAM 2048
-#endif // RGB_MATRIX_RV32_RUNNER_RAM
+#    define RGB_MATRIX_RV32_RUNNER_RAM 2048 // This must be kept in-sync with flatfile.lds, TEXT section length
+#endif                                      // RGB_MATRIX_RV32_RUNNER_RAM
 
 #define MINI_RV32_RAM_SIZE (RGB_MATRIX_RV32_RUNNER_RAM)
 
