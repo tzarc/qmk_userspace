@@ -61,6 +61,14 @@ RV32_HSV hsv;
 uint8_t  speed;
 uint32_t rgb_timer;
 
+void __attribute__((constructor)) effect_ctor(void) {
+    hsv.h     = 0;
+    hsv.s     = 255;
+    hsv.v     = 255;
+    speed     = 128;
+    rgb_timer = 0;
+}
+
 void effect_init(void *params) {
     static bool initial = false;
     if (!initial) {
