@@ -77,6 +77,15 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
 // clang-format on
 
 //----------------------------------------------------------
+// SOCD Cleaner (community module)
+#ifdef COMMUNITY_MODULE_SOCD_CLEANER_ENABLE
+socd_cleaner_t socd[] = {
+    {{KC_W, KC_S}, SOCD_CLEANER_LAST},
+    {{KC_A, KC_D}, SOCD_CLEANER_LAST},
+};
+#endif // COMMUNITY_MODULE_SOCD_CLEANER_ENABLE
+
+//----------------------------------------------------------
 // Layer naming
 
 const char *current_layer_name(void) {

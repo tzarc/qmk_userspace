@@ -7,3 +7,6 @@
 [submodule "qmk_firmware-mods/lib/lua"]
 	path = qmk_firmware-mods/lib/lua
 	url = https://github.com/lua/lua.git
+[submodule "modules/tzarc"]
+	path = modules/tzarc
+	url = https://github.com/tzarc/qmk_modules.git
