@@ -10,9 +10,9 @@ size: all
 	$(PREFIX)size --radix=10 $(PROJECT).elf
 
 PREFIX := riscv32-unknown-elf-
-CFLAGS := -fno-stack-protector
+CFLAGS := -fno-stack-protector -fno-common -flto=auto
 CFLAGS += -static-libgcc -fdata-sections -ffunction-sections
-CFLAGS += -g -O3 -march=rv32ima_zicsr -mabi=ilp32 -static
+CFLAGS += -g -Os -march=rv32ima_zicsr -mabi=ilp32 -static
 CXXFLAGS += -fno-rtti -fno-exceptions
 LDFLAGS := -T flatfile.lds -nostdlib -Wl,--gc-sections
 
@@ -40,8 +40,8 @@ $(PROJECT).elf : $(OBJS)
 	$(PREFIX)gcc -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
 $(PROJECT).debug.txt : $(PROJECT).elf
-	$(PREFIX)objdump -t $^ > $@
-	$(PREFIX)objdump -S $^ >> $@
+	$(PREFIX)objdump -wt $^ > $@
+	$(PREFIX)objdump -wdS $^ >> $@
 
 $(PROJECT).bin : $(PROJECT).elf
 	$(PREFIX)objcopy $^ -O binary $@

@@ -28,12 +28,16 @@ _shutdown:
 
 .global _api_table
 
+.weak ctors_thunk
+.weak dtors_thunk
 .weak effect_init_thunk
 .weak effect_begin_iter_thunk
 .weak effect_led_thunk
 .weak effect_end_iter_thunk
 
 _api_table:                             # API table for functions to invoke -- kicking off the core with t0 set to an index will invoke the corresponding API
+        .long ctors_thunk
+        .long dtors_thunk
         .long effect_init_thunk
         .long effect_begin_iter_thunk
         .long effect_led_thunk

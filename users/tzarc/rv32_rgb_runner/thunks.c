@@ -5,6 +5,27 @@ extern void effect_begin_iter(void *params, uint8_t led_min, uint8_t led_max) __
 extern void effect_led(void *params, uint8_t led_index) __attribute__((weak));
 extern void effect_end_iter(void *params) __attribute__((weak));
 
+static void __attribute__((noinline, section(".thunks.invoke_fptr_array"))) invoke_fptr_array(void *start, void *end) {
+    for (void (*p)(void) = (void (*)(void))start; p != (void (*)(void))end; p++) {
+        p();
+    }
+}
+
+void __attribute__((section(".thunks.ctors_thunk"))) ctors_thunk(void) {
+    extern uintptr_t __preinit_array_start;
+    extern uintptr_t __preinit_array_end;
+    invoke_fptr_array(&__preinit_array_start, &__preinit_array_end);
+    extern uintptr_t __init_array_start;
+    extern uintptr_t __init_array_end;
+    invoke_fptr_array(&__init_array_start, &__init_array_end);
+}
+
+void __attribute__((section(".thunks.dtors_thunk"))) dtors_thunk(void) {
+    extern uintptr_t __fini_array_start;
+    extern uintptr_t __fini_array_end;
+    invoke_fptr_array(&__fini_array_start, &__fini_array_end);
+}
+
 void __attribute__((section(".thunks.effect_init"))) effect_init_thunk(void) {
     if (!effect_init) return;
     register uintptr_t a0 asm("a0");

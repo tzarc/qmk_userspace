@@ -175,6 +175,7 @@ void rv32vm_effect_init_impl(effect_params_t* params) {
         memset(&rgb_core, 0, sizeof(rgb_core));
         memset(rgb_ram_area, 0, sizeof(rgb_ram_area));
         memcpy(rgb_ram_area, rv32_runner_bin, rv32_runner_bin_len);
+        rv32vm_invoke(RV32_EFFECT_CTORS);
     }
 
     if (!should_dump_exec_times && false) {
