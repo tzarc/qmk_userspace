@@ -8,6 +8,11 @@
 // #include "qp_lvgl.h"
 // #include "ui.h"
 
+#if !defined(COMMUNITY_MODULE_SOCD_CLEANER_ENABLE)
+#    define SOCDON KC_NO
+#    define SOCDOFF KC_NO
+#endif // !defined(COMMUNITY_MODULE_SOCD_CLEANER_ENABLE)
+
 #if defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
 #    include "filesystem.h"
 #endif // defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
