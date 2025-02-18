@@ -2,14 +2,18 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include <string.h>
 #include <stdbool.h>
-#include "quantum.h"
+#include <ch.h>
 #include "rgb_matrix.h"
 #include "debug.h"
 #include "rgb_matrix.h"
 #include "color.h"
+#include "timer.h"
+#include "sync_timer.h"
 #include <lib/lib8tion/lib8tion.h>
 #include "rv32_rgb_runner.inl.h"
 #include "rv32_rgb_runner/rv32_runner.h"
+
+extern int rand(void);
 
 #ifndef RGB_MATRIX_RV32_RUNNER_RAM
 #    define RGB_MATRIX_RV32_RUNNER_RAM 2048 // This must be kept in-sync with flatfile.lds, TEXT section length

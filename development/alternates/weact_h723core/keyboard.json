@@ -1,0 +1,19 @@
+{
+    "keyboard_name": "Onekey WeAct H723 Core",
+    "apa102": {
+        "clock_pin": "B13",
+        "data_pin": "A0"
+    },
+    "backlight": {
+        "pin": "B8"
+    },
+    "bootloader": "stm32-dfu",
+    "matrix_pins": {
+        "cols": ["A9"],
+        "rows": ["A10"]
+    },
+    "processor": "STM32H723",
+    "ws2812": {
+        "pin": "A0"
+    }
+}

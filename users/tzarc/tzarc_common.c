@@ -4,11 +4,9 @@
 #include <string.h>
 #include <quantum.h>
 #include <process_unicode_common.h>
-#include "keycodes.h"
 #include "timer.h"
 #include "tzarc.h"
 #include "tzarc_layout.h"
-#include "util.h"
 
 bool          config_enabled;
 typing_mode_t typing_mode;

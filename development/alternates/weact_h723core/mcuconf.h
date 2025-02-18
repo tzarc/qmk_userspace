@@ -1,0 +1,23 @@
+// Copyright 2025 Nick Brassel (@tzarc)
+// SPDX-License-Identifier: GPL-2.0-or-later
+#pragma once
+
+#include_next <mcuconf.h>
+
+#undef STM32_PLL1_DIVM_VALUE
+#undef STM32_PLL1_DIVN_VALUE
+#define STM32_PLL1_DIVM_VALUE 5
+#define STM32_PLL1_DIVN_VALUE 110
+
+#undef STM32_PLL2_DIVM_VALUE
+#undef STM32_PLL2_DIVN_VALUE
+#define STM32_PLL2_DIVM_VALUE 5
+#define STM32_PLL2_DIVN_VALUE 96
+
+#undef STM32_PLL3_DIVM_VALUE
+#undef STM32_PLL3_DIVN_VALUE
+#define STM32_PLL3_DIVM_VALUE 5
+#define STM32_PLL3_DIVN_VALUE 96
+
+#undef STM32_USBSEL
+#define STM32_USBSEL STM32_USBSEL_HSI48_CK
