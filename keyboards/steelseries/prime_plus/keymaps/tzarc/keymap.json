@@ -1,0 +1,10 @@
+{
+    "config": {
+        "features": {
+            "encoder_map": true,
+            "mousekey": true,
+            "debug_matrix_scan_rate": false,
+            "game_modes": false
+        }
+    }
+}
