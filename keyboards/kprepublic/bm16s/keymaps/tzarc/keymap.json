@@ -10,5 +10,5 @@
             "xap": true
         }
     },
-    "modules": ["hello_world2", "hello_world"]
+    "modules": ["qmk/hello_world"]
 }
