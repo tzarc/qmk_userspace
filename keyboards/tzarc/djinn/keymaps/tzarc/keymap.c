@@ -84,7 +84,7 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
 //----------------------------------------------------------
 // SOCD Cleaner (community module)
 #ifdef COMMUNITY_MODULE_SOCD_CLEANER_ENABLE
-socd_cleaner_t socd[] = {
+socd_cleaner_t socd_opposing_pairs[] = {
     {{KC_W, KC_S}, SOCD_CLEANER_LAST},
     {{KC_A, KC_D}, SOCD_CLEANER_LAST},
 };

@@ -128,6 +128,12 @@ void eeconfig_init_user(void) {
     eeconfig_init_keymap();
 }
 
+void konami_code_handler(void) {
+    dprintf("Konami code entered\n");
+    wait_ms(50);
+    reset_keyboard();
+}
+
 __attribute__((weak)) void tzarc_sendchar_hook(uint8_t c) {}
 
 int8_t tzarc_sendchar(uint8_t c) {
@@ -153,69 +159,6 @@ void keyboard_post_init_user(void) {
     keyboard_post_init_keymap();
 }
 
-#ifdef KONAMI_CODE_ENABLE
-static void konami_code_handler(void) {
-    dprintf("Konami code entered\n");
-    wait_ms(50);
-    reset_keyboard();
-}
-
-static bool process_record_konami_code(uint16_t keycode, keyrecord_t *record) {
-    static uint8_t        konami_index          = 0;
-    static const uint16_t konami_code[] PROGMEM = {KC_UP, KC_UP, KC_DOWN, KC_DOWN, KC_LEFT, KC_RIGHT, KC_LEFT, KC_RIGHT, KC_B, KC_A, KC_ENTER};
-
-    if (!record->event.pressed) {
-        switch (keycode) {
-            case QK_MOMENTARY ... QK_MOMENTARY_MAX:
-            case QK_DEF_LAYER ... QK_DEF_LAYER_MAX:
-            case QK_TOGGLE_LAYER ... QK_TOGGLE_LAYER_MAX:
-            case QK_ONE_SHOT_LAYER ... QK_ONE_SHOT_LAYER_MAX:
-            case QK_LAYER_TAP_TOGGLE ... QK_LAYER_TAP_TOGGLE_MAX:
-                // Messing with layers, ignore but don't reset the counter.
-                break;
-            case QK_MOD_TAP ... QK_MOD_TAP_MAX:
-                return process_record_konami_code(QK_MOD_TAP_GET_TAP_KEYCODE(keycode), record);
-            case QK_LAYER_TAP ... QK_LAYER_TAP_MAX:
-                return process_record_konami_code(QK_LAYER_TAP_GET_TAP_KEYCODE(keycode), record);
-            case QK_SWAP_HANDS ... QK_SWAP_HANDS_MAX:
-                return process_record_konami_code(QK_SWAP_HANDS_GET_TAP_KEYCODE(keycode), record);
-            case KC_KP_ENTER:
-            case KC_RETURN:
-            case QK_SPACE_CADET_RIGHT_SHIFT_ENTER:
-                return process_record_konami_code(KC_ENTER, record);
-            case KC_UP:
-            case KC_DOWN:
-            case KC_LEFT:
-            case KC_RIGHT:
-            case KC_B:
-            case KC_A:
-            case KC_ENTER:
-                if (keycode == pgm_read_word(&konami_code[konami_index])) {
-                    dprintf("Konami code: key released: %s\n", key_name(keycode, false));
-                    konami_index++;
-                    if (konami_index == ARRAY_SIZE(konami_code)) {
-                        konami_index = 0;
-                        konami_code_handler();
-                    }
-                } else {
-                    if (konami_index) {
-                        dprintf("Konami code: reset\n");
-                    }
-                    konami_index = 0;
-                }
-                break;
-            default:
-                if (konami_index) {
-                    dprintf("Konami code: reset\n");
-                }
-                konami_index = 0;
-                break;
-        }
-    }
-    return true;
-}
-#endif // KONAMI_CODE_ENABLE
-
 #ifndef GAME_MODES_ENABLE
 void diablo_automatic_stop(void) {}
 #endif // GAME_MODES_ENABLE
@@ -238,12 +181,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     bool is_shifted = (get_mods() | get_oneshot_mods()) & MOD_MASK_SHIFT;
     (void)is_shifted;
     // dprintf("Keycode: %s, pressed: %s, shifted: %s\n", key_name(keycode, is_shifted), record->event.pressed ? "true" : "false", is_shifted ? "true" : "false");
-
-#ifdef KONAMI_CODE_ENABLE
-    if (!process_record_konami_code(keycode, record)) {
-        return false;
-    }
-#endif // KONAMI_CODE_ENABLE
 
     switch (keycode) {
         case CHANGEMODE:

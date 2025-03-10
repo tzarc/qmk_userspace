@@ -10,3 +10,6 @@
 [submodule "modules/tzarc"]
 	path = modules/tzarc
 	url = https://github.com/tzarc/qmk_modules.git
+[submodule "modules/getreuer"]
+	path = modules/getreuer
+	url = https://github.com/getreuer/qmk-modules.git

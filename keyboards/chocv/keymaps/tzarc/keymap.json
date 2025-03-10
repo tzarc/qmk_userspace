@@ -1,7 +1,11 @@
 {
+    "modules": [
+        "tzarc/konami_code"
+    ],
     "config": {
         "features": {
-            "chunder": true,
+            "console": true,
+            "key_override": true,
             "unicode": true
         }
     },
