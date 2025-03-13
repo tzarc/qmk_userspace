@@ -5,9 +5,12 @@
 set -eEuo pipefail
 
 function fn_os() {
-    local os_name=$(uname -s | tr 'A-Z' 'a-z')
+    local os_name=$(echo ${1:-} | tr 'A-Z' 'a-z')
+    if [[ -z "$os_name" ]]; then
+        os_name=$(uname -s | tr 'A-Z' 'a-z')
+    fi
     case "$os_name" in
-    *darwin* | *macos*)
+    *darwin* | *macos* | *apple*)
         echo macos
         ;;
     *windows* | *mingw* | *w64*)
@@ -16,30 +19,46 @@ function fn_os() {
     *linux*)
         echo linux
         ;;
+    *none* | *unknown* | *picolibc* | *nano*)
+        echo baremetal
+        ;;
     *)
-        echo "unknown operating system '$os_name'" >&2
-        exit 1
+        echo unknown
         ;;
     esac
 }
 
 function fn_arch() {
-    local arch_name=$(uname -m | tr 'A-Z' 'a-z')
+    local arch_name=$(echo ${1:-} | tr 'A-Z' 'a-z')
+    if [[ -z "$arch_name" ]]; then
+        arch_name=$(uname -m | tr 'A-Z' 'a-z')
+    fi
     case "$arch_name" in
     *arm64* | *aarch64*)
         echo ARM64
+        ;;
+    *arm*)
+        echo ARM
+        ;;
+    *riscv32*)
+        echo RV32
+        ;;
+    *riscv64*)
+        echo RV64
+        ;;
+    *avr*)
+        echo AVR
         ;;
     *x86_64* | *x64*)
         echo X64
         ;;
     *)
-        echo unknown architecture $arch_name >&2
-        exit 1
+        echo unknown
         ;;
     esac
 }
 
-tag_name=${1:-v14.2.0-3}
+tag_name=${1:-v14.2.0-4}
 TOOLCHAIN_LOCATION=${TOOLCHAIN_LOCATION:-$HOME/.local/qmk/toolchains}
 
 echo OS: $(fn_os), Arch: $(fn_arch), tag: ${tag_name}
@@ -57,6 +76,6 @@ fi
 mkdir -p "$TOOLCHAIN_LOCATION"
 
 echo "Extracting toolchains" &&
-    tar -C "$TOOLCHAIN_LOCATION" -xf qmk_toolchains-*.tar.xz --strip-components=1
+    tar -C "$TOOLCHAIN_LOCATION" -axf qmk_toolchains-*.tar.* --strip-components=1
 
-rm qmk_toolchains-*.tar.xz
+rm qmk_toolchains-*.tar.*
