@@ -76,6 +76,6 @@ fi
 mkdir -p "$TOOLCHAIN_LOCATION"
 
 echo "Extracting toolchains" &&
-    tar -C "$TOOLCHAIN_LOCATION" -axf qmk_toolchains-*.tar.* --strip-components=1
+    tar xf qmk_toolchains-*.tar.* -C "$TOOLCHAIN_LOCATION" --strip-components=1
 
 rm qmk_toolchains-*.tar.*
