@@ -1,10 +1,18 @@
 #!/usr/bin/env sh
 
+# Windows doesn't like `/tmp` so we need to set a different temporary directory
+# and also set the `UV_INSTALL_DIR` to a location that doesn't pollute the user's
+# home directory.
+if [ "$(uname -o 2>/dev/null || true)" = "Msys" ]; then
+    export TMPDIR="$(cygpath -w "$TMP")"
+    export UV_INSTALL_DIR=/opt/uv
+fi
+
 # Install `uv` (or update as necessary)
 if [ -n "$(command -v curl 2>/dev/null || true)" ]; then
-    curl -LsSf https://astral.sh/uv/install.sh | sh
+    curl -LsSf https://astral.sh/uv/install.sh | TMPDIR=${TMPDIR:-} UV_INSTALL_DIR=${UV_INSTALL_DIR:-} sh
 elif [ -n "$(command -v wget 2>/dev/null || true)" ]; then
-    wget -qO- https://astral.sh/uv/install.sh | sh
+    wget -qO- https://astral.sh/uv/install.sh | TMPDIR=${TMPDIR:-} UV_INSTALL_DIR=${UV_INSTALL_DIR:-} sh
 else
     echo "Please install 'curl' or 'wget' to continue."
     exit 1
@@ -25,8 +33,20 @@ uv tool install --force --with pip --upgrade --python 3.13 qmk
 # QMK is installed to...
 QMK_TOOL_INSTALLDIR="$(uv tool dir)/qmk"
 
+# Convert it to a unix-style path if we're on Windows/Msys2
+if [ "$(uname -o 2>/dev/null || true)" = "Msys" ]; then
+    QMK_TOOL_INSTALLDIR="$(cygpath -u "$QMK_TOOL_INSTALLDIR")"
+fi
+
 # Activate the environment
-. "$QMK_TOOL_INSTALLDIR/bin/activate"
+if [ -e "$QMK_TOOL_INSTALLDIR/bin" ] ; then
+    . "$QMK_TOOL_INSTALLDIR/bin/activate"
+elif [ -e "$QMK_TOOL_INSTALLDIR/Scripts" ]; then
+    . "$QMK_TOOL_INSTALLDIR/Scripts/activate"
+else
+    echo "Could not find the QMK environment to activate."
+    exit 1
+fi
 
 # Install the QMK dependencies
 uv pip install --upgrade -r https://raw.githubusercontent.com/qmk/qmk_firmware/refs/heads/master/requirements.txt
