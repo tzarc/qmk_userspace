@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-set -eEuo pipefail
+set -eu
 
 # Windows doesn't like `/tmp` so we need to set a different temporary directory
 # and also set the `UV_INSTALL_DIR` to a location that doesn't pollute the user's
