@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 set -eu
 
@@ -10,7 +10,7 @@ if [ "$(uname -o 2>/dev/null || true)" = "Msys" ]; then
     export UV_INSTALL_DIR=/opt/uv
 fi
 
-function download_url() {
+download_url() {
     if [ -n "$(command -v curl 2>/dev/null || true)" ]; then
         curl -LsSf "$1"
     elif [ -n "$(command -v wget 2>/dev/null || true)" ]; then
@@ -21,9 +21,9 @@ function download_url() {
     fi
 }
 
-function fn_os() {
+fn_os() {
     local os_name=$(echo ${1:-} | tr 'A-Z' 'a-z')
-    if [[ -z "$os_name" ]]; then
+    if [ -z "$os_name" ]; then
         os_name=$(uname -s | tr 'A-Z' 'a-z')
     fi
     case "$os_name" in
@@ -42,9 +42,9 @@ function fn_os() {
     esac
 }
 
-function fn_arch() {
+fn_arch() {
     local arch_name=$(echo ${1:-} | tr 'A-Z' 'a-z')
-    if [[ -z "$arch_name" ]]; then
+    if [ -z "$arch_name" ]; then
         arch_name=$(uname -m | tr 'A-Z' 'a-z')
     fi
     case "$arch_name" in
@@ -91,7 +91,7 @@ if [ "$(uname -o 2>/dev/null || true)" = "Msys" ]; then
 fi
 
 # Activate the environment
-if [ -e "$QMK_TOOL_INSTALLDIR/bin" ] ; then
+if [ -e "$QMK_TOOL_INSTALLDIR/bin" ]; then
     . "$QMK_TOOL_INSTALLDIR/bin/activate"
 elif [ -e "$QMK_TOOL_INSTALLDIR/Scripts" ]; then
     . "$QMK_TOOL_INSTALLDIR/Scripts/activate"
@@ -120,7 +120,7 @@ if [ -z "$toolchain_url" ]; then
 fi
 
 # Clear out the toolchains
-if [[ -d "$toolchains_location" ]]; then
+if [ -d "$toolchains_location" ]; then
     echo "Removing old toolchains"
     rm -rf "$toolchains_location"
 fi
@@ -128,7 +128,7 @@ mkdir -p "$toolchains_location"
 
 # Download the toolchain release to the toolchains location
 echo "Downloading toolchain"
-download_url "$toolchain_url" > "$toolchains_location/$(basename "$toolchain_url")"
+download_url "$toolchain_url" >"$toolchains_location/$(basename "$toolchain_url")"
 
 # Extract the toolchain
 echo "Extracting toolchain"
@@ -145,7 +145,7 @@ fi
 
 # Download the flashing tools release to the toolchains location
 echo "Downloading flashing tools"
-download_url "$flashutils_url" > "$toolchains_location/$(basename "$flashutils_url")"
+download_url "$flashutils_url" >"$toolchains_location/$(basename "$flashutils_url")"
 
 # Extract the flashing tools
 echo "Extracting flashing tools"
