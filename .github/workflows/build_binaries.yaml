@@ -18,7 +18,7 @@ jobs:
         # Set up gcc 14.2.0
         apt update
         apt install jq curl xxd zstd -y
-        /__w/qmk_userspace/qmk_userspace/bin/deploy-toolchains.sh
+        /__w/qmk_userspace/qmk_userspace/bin/env-bootstrap.sh
         echo "$HOME/.local/qmk/toolchains/bin" >> $GITHUB_PATH
 
         # Ensure submodules are checked out
