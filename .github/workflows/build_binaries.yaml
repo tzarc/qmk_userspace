@@ -20,6 +20,7 @@ jobs:
         apt install jq curl xxd zstd -y
         /__w/qmk_userspace/qmk_userspace/bin/env-bootstrap.sh
         echo "$HOME/.local/qmk/distrib/bin" >> $GITHUB_PATH
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
 
         # Ensure submodules are checked out
         git config --global --add safe.directory /__w/qmk_userspace/qmk_userspace
