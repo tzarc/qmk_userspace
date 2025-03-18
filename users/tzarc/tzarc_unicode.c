@@ -37,6 +37,10 @@ void tap_code16_nomods(uint8_t kc) {
 }
 
 void tap_unicode_glyph_nomods(uint32_t glyph) {
+    if (glyph == 0xFFFD) {
+        return;
+    }
+
 #ifdef UNICODE_ENABLE
     uint8_t temp_mod = get_mods();
     clear_mods();
@@ -146,6 +150,36 @@ DEFINE_UNICODE_LUT_TRANSLATOR(unicode_lut_translator_aussie,
                               '0'     // 0
 );
 
+// https://xkcd.com/3054/
+DEFINE_UNICODE_LUT_TRANSLATOR(unicode_lut_translator_screamcipher,
+                              0xFFFD, // a = A (no diacritic)
+                              0x0307, // b = Ȧ
+                              0x0327, // c = A̧
+                              0x0331, // d = A̱
+                              0x0301, // e = Á
+                              0x032E, // f = A̮
+                              0x030B, // g = A̋
+                              0x0330, // h = A̰
+                              0x0309, // i = Ả
+                              0x0313, // j = A̓
+                              0x0323, // k = Ạ
+                              0x0306, // l = Ă
+                              0x030C, // m = Ǎ
+                              0x0302, // n = Â
+                              0x030A, // o = Å
+                              0x032F, // p = A̯
+                              0x0324, // q = A̤
+                              0x0311, // r = Ȃ
+                              0x0303, // s = Ã
+                              0x0304, // t = Ā
+                              0x0308, // u = Ä
+                              0x0300, // v = À
+                              0x030F, // w = Ȁ
+                              0x033D, // x = A̽
+                              0x0326, // y = A̦
+                              0x0338, // z = A̸
+);
+
 bool process_record_aussie(uint16_t keycode, keyrecord_t *record) {
     bool is_shifted = (get_mods() | get_oneshot_mods()) & MOD_MASK_SHIFT;
     if ((KC_A <= keycode) && (keycode <= KC_0)) {
@@ -212,6 +246,17 @@ bool process_record_zalgo(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
+bool process_record_screamcipher(uint16_t keycode, keyrecord_t *record) {
+    if ((KC_A <= keycode) && (keycode <= KC_Z)) {
+        if (record->event.pressed) {
+            tap_code16(S(KC_A));
+            process_record_glyph_replacement(keycode, record, unicode_lut_translator_screamcipher);
+            return false;
+        }
+    }
+    return true;
+}
+
 bool process_record_unicode(uint16_t keycode, keyrecord_t *record) {
     if (typing_mode == MODE_WIDE) {
         if (((KC_A <= keycode) && (keycode <= KC_0)) || keycode == KC_SPACE) {
@@ -236,6 +281,8 @@ bool process_record_unicode(uint16_t keycode, keyrecord_t *record) {
         return process_record_aussie(keycode, record);
     } else if (typing_mode == MODE_ZALGO) {
         return process_record_zalgo(keycode, record);
+    } else if (typing_mode == MODE_SCREAM) {
+        return process_record_screamcipher(keycode, record);
     }
 
     return true;

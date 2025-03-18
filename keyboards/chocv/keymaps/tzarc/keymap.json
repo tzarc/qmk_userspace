@@ -1,7 +1,4 @@
 {
-    "modules": [
-        "tzarc/konami_code"
-    ],
     "config": {
         "features": {
             "console": true,
@@ -9,5 +6,6 @@
             "unicode": true
         }
     },
-    "converter": "promicro_rp2040"
+    "converter": "promicro_rp2040",
+    "modules": ["tzarc/konami_code"]
 }

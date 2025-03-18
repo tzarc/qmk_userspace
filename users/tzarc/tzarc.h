@@ -37,6 +37,7 @@
     XM(MODE_REGIONAL, KC_4, /* dummy */, "regional")     \
     XM(MODE_AUSSIE, KC_5, /* dummy */, "Aussie")         \
     XM(MODE_ZALGO, KC_6, /* dummy */, "Zalgo")           \
+    XM(MODE_SCREAM, KC_7, /* dummy */, "Scream")         \
     /* Game-specific modes */                            \
     XM(MODE_WOW, KC_W, /* dummy */, "World of Warcraft") \
     XM(MODE_DIABLO, KC_D, /* dummy */, "Diablo")
