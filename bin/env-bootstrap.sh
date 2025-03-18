@@ -46,12 +46,13 @@ fi
 download_url() {
     local url=$1
     local filename=${2:-$(basename "$url")}
+    local quiet=''
     if [ -n "$(command -v curl 2>/dev/null || true)" ]; then
-        [ $filename = "-" ] || echo "Downloading '$url' => '$filename'" >&2
-        curl -LsSf -o "$filename" "$url"
+        [ $filename = "-" ] && quiet='-s' || echo "Downloading '$url' => '$filename'" >&2
+        curl -LSf $quiet -o "$filename" "$url"
     elif [ -n "$(command -v wget 2>/dev/null || true)" ]; then
-        [ $filename = "-" ] || echo "Downloading '$url' => '$filename'" >&2
-        wget -q "-O$filename" "$url"
+        [ $filename = "-" ] && quiet='-q' || echo "Downloading '$url' => '$filename'" >&2
+        wget $quiet "-O$filename" "$url"
     else
         echo "Please install 'curl' or 'wget' to continue." >&2
         exit 1
@@ -200,6 +201,7 @@ clean_tarballs() {
 clean_tarballs
 
 # Notify the user that they may need to restart their shell to get the `qmk` command
+hash -r
 echo
 echo "You may need to restart your shell to gain access to the 'qmk' command."
 echo "Alternatively, add "$(dirname "$(command -v qmk)")" to your \$PATH:"
