@@ -13,6 +13,7 @@ __pycache__
 
 # venv etc.
 /.direnv
+/.distrib
 
 # tzarc's cloned repo's
 /qmk_firmware
