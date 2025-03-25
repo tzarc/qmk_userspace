@@ -33,8 +33,12 @@
 #endif
 #define DEBOUNCE 12
 
-#include "enable_all_rgb_effects.h"
+#ifndef __AVR__
+#    include "enable_all_rgb_effects.h"
+#endif // !__AVR__
 
 // #define QUANTUM_PAINTER_DEBUG TRUE
 #define QUANTUM_PAINTER_SUPPORTS_256_PALETTE TRUE
 #define QUANTUM_PAINTER_SUPPORTS_NATIVE_COLORS TRUE
+
+#define SFDP_DEBUG_OUTPUT TRUE

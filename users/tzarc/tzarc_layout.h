@@ -62,6 +62,12 @@
 #    define XRGB_SPD KC_NO
 #endif
 
+#ifdef COMMUNITY_MODULE_SFDP_FLASH_ENABLE
+#    define SFDP_TEST KC_SFDP
+#else
+#    define SFDP_TEST KC_NO
+#endif
+
 #define FOREACH_CUSTOM_KEYCODE(X)    \
     X(CHANGEMODE, =, QK_USER_0)      \
     X(TIME_RESET, /**/, /**/)        \
@@ -218,13 +224,13 @@ enum { FOREACH_CUSTOM_LAYER(LAYER_ENUM) };
 #define ____________TZARC_6x4_RAISE_R1_R_________ KC_F6,        KC_F7,        KC_F8,        KC_F9,        KC_F10,       KC_F11
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | Y           | U           | Ｉ          | O           | P           | Backslash   |
-#define ____________TZARC_6x4_RAISE_R2_R_________ _______,      _______,      _______,      _______,      _______,      _______
+#define ____________TZARC_6x4_RAISE_R2_R_________ _______,      _______,      KC_F14,       KC_F15,       KC_F16,       _______
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | H           | J           | K           | L           | ;           | '           |
-#define ____________TZARC_6x4_RAISE_R3_R_________ KC_EQL,       QK_REP,       TZ_REP_2,     TZ_REP_3,     TZ_REP_4,     TZ_REP_5
+#define ____________TZARC_6x4_RAISE_R3_R_________ KC_EQL,       KC_F23,       KC_F17,       KC_F18,       KC_F19,       KC_F24
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | N           | M           | ,           | .           | /           | Enter       |
-#define ____________TZARC_6x4_RAISE_R4_R_________ KC_PLUS,      _______,      _______,      _______,      _______,      _______
+#define ____________TZARC_6x4_RAISE_R4_R_________ KC_PLUS,      _______,      KC_F20,       KC_F21,       KC_F22,       _______
 //                                               └─────────────┴─────────────┴─────────────┴─────────────┴─────────────┴─────────────┘
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -248,7 +254,7 @@ enum { FOREACH_CUSTOM_LAYER(LAYER_ENUM) };
 #define ____________TZARC_6x4_ADJUST_R1_R________ _______,      _______,      UC_NEXT,      DB_TOGG,      TIME_EEPRST,  TIME_RESET
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | Y           | U           | U           | O           | P           | Backslash   |
-#define ____________TZARC_6x4_ADJUST_R2_R________ _______,      _______,      _______,      _______,      _______,      _______
+#define ____________TZARC_6x4_ADJUST_R2_R________ _______,      _______,      _______,      _______,      _______,      SFDP_TEST
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | H           | J           | K           | L           | ;           | '           |
 #define ____________TZARC_6x4_ADJUST_R3_R________ _______,      XRGB_NXT,     XRGB_HUI,     XRGB_SAI,     XRGB_VAI,     XRGB_SPI

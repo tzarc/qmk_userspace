@@ -13,9 +13,13 @@
 #    define SOCDOFF KC_NO
 #endif // !defined(COMMUNITY_MODULE_SOCD_CLEANER_ENABLE)
 
-#if defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
+#if defined(FILESYSTEM_ENABLE) && defined(FLASH_DRIVER_SPI)
 #    include "filesystem.h"
-#endif // defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
+#endif // defined(FILESYSTEM_ENABLE) && defined(FLASH_DRIVER_SPI)
+
+#ifdef FLASH_DRIVER_SPI
+#    include "sfdp_flash.h"
+#endif // FLASH_DRIVER_SPI
 
 //----------------------------------------------------------
 // Key map
@@ -110,11 +114,15 @@ const char *current_layer_name(void) {
 //----------------------------------------------------------
 // Overrides
 
-#if defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
+#if defined(FILESYSTEM_ENABLE) && defined(FLASH_DRIVER_SPI)
 static bool is_mounted = false;
-#endif // defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
+#endif // defined(FILESYSTEM_ENABLE) && defined(FLASH_DRIVER_SPI)
 
 void keyboard_post_init_keymap(void) {
+#ifdef FLASH_DRIVER_SPI
+    sfdp_init();
+#endif // FLASH_DRIVER_SPI
+
     // Initialise the theme
     theme_init();
 
@@ -122,9 +130,9 @@ void keyboard_post_init_keymap(void) {
     keyboard_post_init_display();
     rgb_matrix_disable_noeeprom();
 
-#if defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
+#if defined(FILESYSTEM_ENABLE) && defined(FLASH_DRIVER_SPI)
     is_mounted = fs_init();
-#endif // defined(FILESYSTEM_ENABLE) && defined(EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN)
+#endif // defined(FILESYSTEM_ENABLE) && defined(FLASH_DRIVER_SPI)
 }
 
 bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {

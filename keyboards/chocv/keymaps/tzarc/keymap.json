@@ -3,7 +3,8 @@
         "features": {
             "console": true,
             "key_override": true,
-            "unicode": true
+            "unicode": true,
+            "xap": true
         }
     },
     "converter": "promicro_rp2040",
