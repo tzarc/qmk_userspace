@@ -26,8 +26,10 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
 }
 
 void eeconfig_init_keymap(void) {
+#ifdef RGBLIGHT_ENABLE
     // Set the default RGB color to white
     rgblight_sethsv(135, 255, 128);
     // Set the default RGB effect to static
     rgblight_mode(RGBLIGHT_MODE_STATIC_LIGHT);
+#endif
 }

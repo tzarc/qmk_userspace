@@ -31,6 +31,7 @@ KONAMI_CODE_ENABLE ?= no
 REPEAT_KEY_ENABLE ?= yes
 
 ifeq ($(strip $(PLATFORM_KEY)),chibios)
+	OPT ?= 2
 	CREATE_MAP = yes
 	EXTRAFLAGS = -fstack-usage
 	EXTRALDFLAGS = -Wl,--print-memory-usage
@@ -38,6 +39,7 @@ ifeq ($(strip $(PLATFORM_KEY)),chibios)
 	KONAMI_CODE_ENABLE ?= yes
 
 else ifeq ($(strip $(PLATFORM_KEY)),avr)
+	OPT ?= s
 	GAME_MODES_ENABLE = no
 	ifeq ($(strip $(PROTOCOL)),LUFA)
 		# Uses defaults as per rules.mk
