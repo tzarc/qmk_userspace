@@ -119,7 +119,7 @@ all-riot:
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Helpers
 
-.PHONY: rgb_effects generated-files format
+.PHONY: rgb_effects generated-files format env-info
 
 generated-files: rgb_effects
 
@@ -142,6 +142,20 @@ format-qmk-keyboards-tzarc:
 		$(ECHO) -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
 		clang-format -i "$(QMK_USERSPACE)/qmk_firmware/$$file" ; \
 	done
+
+env-info:
+	@echo
+	@env | sort
+	@echo
+	@command -v avr-gcc
+	@avr-gcc -v
+	@echo
+	@command -v arm-none-eabi-gcc
+	@arm-none-eabi-gcc -v
+	@echo
+	@command -v riscv32-unknown-elf-gcc
+	@riscv32-unknown-elf-gcc -v
+	@echo
 
 .PHONY: links link-hooks
 
