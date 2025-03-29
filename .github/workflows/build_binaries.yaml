@@ -18,7 +18,7 @@ jobs:
         # Set up newer gcc
         apt update
         apt install jq curl zstd git xxd -y
-        curl -fsSL https://raw.githubusercontent.com/qmk/qmk_firmware/bootstrap/util/env-bootstrap.sh | sh
+        curl -fsSL https://raw.githubusercontent.com/qmk/qmk_firmware/bootstrap/util/env-bootstrap.sh | sh -s -- --confirm
         echo "$HOME/.local/share/qmk/bin" >> $GITHUB_PATH
         echo "$HOME/.local/bin" >> $GITHUB_PATH
 
