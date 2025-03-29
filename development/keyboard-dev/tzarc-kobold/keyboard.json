@@ -6,6 +6,7 @@
     "build": {
         "lto": true
     },
+    "modules": [ "tzarc/experimental/filesystem"],
     "eeprom": {
         "driver": "wear_leveling",
         "wear_leveling": {

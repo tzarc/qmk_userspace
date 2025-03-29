@@ -205,6 +205,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } else {
                 if (timer_elapsed32(eeprst_key_timer) >= 500) {
                     eeconfig_init();
+                    mcu_reset();
                 }
             }
             return false;
