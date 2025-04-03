@@ -9,7 +9,6 @@
 
 import sys
 import asyncio
-import json
 import evdev
 from dbus_next.message import Message, MessageType
 from dbus_next.aio import MessageBus
@@ -27,15 +26,6 @@ async def invoke_kwin_method(bus, method_name, signature="", body=[]):
         )
     )
     return reply
-
-
-async def get_window_movement_shortcuts(bus):
-    reply = await invoke_kwin_method(bus, method_name="shortcutNames")
-
-    if reply.message_type == MessageType.ERROR:
-        raise Exception(reply.body)
-
-    print(json.dumps(reply.body, indent=2))
 
 
 async def invoke_kwin_shortcut(bus, shortcut_name):
@@ -80,7 +70,7 @@ async def listen_programmable_buttons_device(bus, device):
                         await invoke_kwin_shortcut(bus, shortcut)
                     else:
                         print(
-                            f"Unknown programmable button: {evdev.ecodes.KEY[event.code]}"
+                            f"Unknown programmable button: {evdev.ecodes.KEY[event.code]}", file=sys.stderr
                         )
 
 
@@ -88,46 +78,12 @@ async def listen_programmable_buttons(bus):
     # Listen for programmable button events
     devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
     for device in filter(lambda d: "Consumer Control" in d.name, devices):
-        print(device.path, device.name, device.phys)
         asyncio.ensure_future(listen_programmable_buttons_device(bus, device))
-
-
-script_arg_mapping = {
-    "listen": listen_programmable_buttons,
-    "p": "Window to Previous Screen",
-    "n": "Window to Next Screen",
-    "m": "Window Maximize",
-    "l": "Window Quick Tile Left",
-    "r": "Window Quick Tile Right",
-    "t": "Window Quick Tile Top",
-    "b": "Window Quick Tile Bottom",
-    "tl": "Window Quick Tile Top Left",
-    "tr": "Window Quick Tile Top Right",
-    "bl": "Window Quick Tile Bottom Left",
-    "br": "Window Quick Tile Bottom Right",
-}
 
 
 async def main():
     bus = await MessageBus().connect()
-    if len(sys.argv) < 2:
-        print("Usage: window-movement.py <shortcut>")
-        return
-
-    shortcut = sys.argv[1]
-
-    if shortcut not in script_arg_mapping:
-        print(f"Invalid shortcut: {shortcut}")
-        return
-
-    shortcut = script_arg_mapping[shortcut]
-    if callable(shortcut):
-        await shortcut(bus)
-    else:
-        print(f"Invoking shortcut: {shortcut}")
-        await invoke_kwin_shortcut(bus, shortcut)
-        loop = asyncio.get_event_loop()
-        loop.stop()
+    await listen_programmable_buttons(bus)
 
 
 loop = asyncio.new_event_loop()
