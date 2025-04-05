@@ -76,6 +76,7 @@ async def listen_programmable_buttons(bus):
 async def main():
     bus = await MessageBus().connect()
     await listen_programmable_buttons(bus)
+    await bus.wait_for_disconnect()
 
 
 loop = asyncio.new_event_loop()
