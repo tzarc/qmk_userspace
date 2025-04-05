@@ -29,9 +29,7 @@ async def invoke_kwin_method(bus, method_name, signature="", body=[]):
 
 
 async def invoke_kwin_shortcut(bus, shortcut_name):
-    reply = await invoke_kwin_method(
-        bus, method_name="invokeShortcut", signature="s", body=[shortcut_name]
-    )
+    reply = await invoke_kwin_method(bus, method_name="invokeShortcut", signature="s", body=[shortcut_name])
 
     if reply.message_type == MessageType.ERROR:
         raise Exception(reply.body)
@@ -53,9 +51,7 @@ programmable_button_mapping = {
 
 
 # Work out which keys to listen for
-listen_for = dict(
-    filter(lambda e: e[0].startswith("KEY_MACRO"), evdev.ecodes.ecodes.items())
-)
+listen_for = dict(filter(lambda e: e[0].startswith("KEY_MACRO"), evdev.ecodes.ecodes.items()))
 
 
 async def listen_programmable_buttons_device(bus, device):
@@ -64,14 +60,10 @@ async def listen_programmable_buttons_device(bus, device):
             if event.code in listen_for.values():
                 if event.value == 1:  # Key pressed
                     if evdev.ecodes.KEY[event.code] in programmable_button_mapping:
-                        shortcut = programmable_button_mapping[
-                            evdev.ecodes.KEY[event.code]
-                        ]
+                        shortcut = programmable_button_mapping[evdev.ecodes.KEY[event.code]]
                         await invoke_kwin_shortcut(bus, shortcut)
                     else:
-                        print(
-                            f"Unknown programmable button: {evdev.ecodes.KEY[event.code]}", file=sys.stderr
-                        )
+                        print(f"Unknown programmable button: {evdev.ecodes.KEY[event.code]}", file=sys.stderr)
 
 
 async def listen_programmable_buttons(bus):

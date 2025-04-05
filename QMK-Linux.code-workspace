@@ -4,54 +4,54 @@
             "name": "qmk_build",
             "path": ".",
             "settings": {
-                "python.pythonPath": "/home/nickb/qmk_build/.direnv/python-3.13/bin/python3"
+                "python.pythonPath": "/data/Dev/qmk_userspace/.direnv/python-3.13/bin/python3"
             }
         },
         {
             "name": "qmk_firmware",
             "path": "qmk_firmware",
             "settings": {
-                "python.pythonPath": "/home/nickb/qmk_build/.direnv/python-3.13/bin/python3"
+                "python.pythonPath": "/data/Dev/qmk_userspace/.direnv/python-3.13/bin/python3"
             }
         },
         {
             "name": "quantum-painter",
             "path": "qmk_firmware/quantum/painter",
             "settings": {
-                "python.pythonPath": "/home/nickb/qmk_build/.direnv/python-3.13/bin/python3"
+                "python.pythonPath": "/data/Dev/qmk_userspace/.direnv/python-3.13/bin/python3"
             }
         },
         {
             "name": "drivers-painter",
             "path": "qmk_firmware/drivers/painter",
             "settings": {
-                "python.pythonPath": "/home/nickb/qmk_build/.direnv/python-3.13/bin/python3"
+                "python.pythonPath": "/data/Dev/qmk_userspace/.direnv/python-3.13/bin/python3"
             }
         },
         {
             "name": "keyboards-tzarc",
             "path": "qmk_firmware/keyboards/tzarc",
             "settings": {
-                "python.pythonPath": "/home/nickb/qmk_build/.direnv/python-3.13/bin/python3"
+                "python.pythonPath": "/data/Dev/qmk_userspace/.direnv/python-3.13/bin/python3"
             }
         },
         {
             "name": "python-qmk",
             "path": "qmk_firmware/lib/python/qmk",
             "settings": {
-                "python.pythonPath": "/home/nickb/qmk_build/.direnv/python-3.13/bin/python3"
+                "python.pythonPath": "/data/Dev/qmk_userspace/.direnv/python-3.13/bin/python3"
             }
         }
     ],
     "settings": {
         "git.ignoreLimitWarning": true,
         "cortex-debug.variableUseNaturalFormat": false,
-        "python.defaultInterpreterPath": "/home/nickb/qmk_build/.direnv/python-3.13/bin/python3",
+        "python.defaultInterpreterPath": "/data/Dev/qmk_userspace/.direnv/python-3.13/bin/python3",
         "python.analysis.extraPaths": [
-            "/home/nickb/qmk_build/.direnv/python-3.13/lib/python3.13/site-packages",
-            "/home/nickb/qmk_build/qmk_firmware/lib/python"
+            "/data/Dev/qmk_userspace/.direnv/python-3.13/lib/python3.13/site-packages",
+            "/data/Dev/qmk_userspace/qmk_firmware/lib/python"
         ],
-        "ansible.python.interpreterPath": "/home/nickb/qmk_build/.direnv/python-3.13/bin/python3",
+        "ansible.python.interpreterPath": "/data/Dev/qmk_userspace/.direnv/python-3.13/bin/python3",
         "files.exclude": {
             "**/.cache": false,
             "**/.direnv": false,

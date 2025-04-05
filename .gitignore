@@ -29,6 +29,7 @@ alternates/qp_test/graphics/*.gif
 alternates/qp_test/graphics/*.png
 
 # Other junk
+.ruff_cache
 .cache
 .vscode/.cortex-debug*
 .vscode/ipch

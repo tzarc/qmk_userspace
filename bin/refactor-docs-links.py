@@ -26,22 +26,16 @@ docs_dir = qmk_firmware_dir / "docs"
 
 # -----------------------------------------------------------------------------------------------------------------------
 
-IMAGE_ELEMENT_PREFIX_PATTERN = re.compile(
-    r'(?P<imgprefix><img(?P<preamble>.*)src="(?P<url>[^"]+)")'
-)
+IMAGE_ELEMENT_PREFIX_PATTERN = re.compile(r'(?P<imgprefix><img(?P<preamble>.*)src="(?P<url>[^"]+)")')
 LINK_PATTERN = re.compile(r"(?P<mdlink>\[(?P<txt>[^)]+)\]\((?P<url>[^)]+)\))")
-SECTION_WITH_ID_PATTERN = re.compile(
-    r"(?P<mdheader>(?P<depth>#+)\s+(?P<title>.+)\s+(?P<linkmarker>\:\s*id=(?P<linkid>.*)))"
-)
+SECTION_WITH_ID_PATTERN = re.compile(r"(?P<mdheader>(?P<depth>#+)\s+(?P<title>.+)\s+(?P<linkmarker>\:\s*id=(?P<linkid>.*)))")
 SECTION_PATTERN = re.compile(r"(?P<mdheader>(?P<depth>#+)\s+(?P<title>.+))")
 
 INDENTED_ITEM_PATTERN = re.compile(r"^(?P<mditem>\>\s+(?P<text>.+))$", re.MULTILINE)
 QUERY_ITEM_PATTERN = re.compile(r"^(?P<mditem>\?\>\s+(?P<text>.+))$", re.MULTILINE)
 WARN_ITEM_PATTERN = re.compile(r"^(?P<mditem>\!\>\s+(?P<text>.+))$", re.MULTILINE)
 
-SUMMARY_XML_ELEMENT_PATTERN = re.compile(
-    r"(?P<mdsummary><summary>(?P<summary>.+)</summary>)"
-)
+SUMMARY_XML_ELEMENT_PATTERN = re.compile(r"(?P<mdsummary><summary>(?P<summary>.+)</summary>)")
 
 
 def replace_text_in_file(file, from_text, to_text):
@@ -54,14 +48,7 @@ def replace_text_in_file(file, from_text, to_text):
 
 
 def is_valid_file(f):
-    if (
-        not f
-        or not f.is_file()
-        or f.parent.stem == "ja"
-        or f.parent.stem == "zh-cn"
-        or f.stem == "__capabilities"
-        or f.stem == "__langs"
-    ):
+    if not f or not f.is_file() or f.parent.stem == "ja" or f.parent.stem == "zh-cn" or f.stem == "__capabilities" or f.stem == "__langs":
         return False
     return True
 
@@ -104,14 +91,10 @@ def determine_sections(file):
 
     for section in sections:
         if section["link_id"]:
-            section["new_section_header"] = (
-                f'{section["depth"]} {section["title"]} {{#{section["link_id"]}}}'
-            )
+            section["new_section_header"] = f"{section['depth']} {section['title']} {{#{section['link_id']}}}"
         else:
-            section["new_section_header"] = f'{section["depth"]} {section["title"]}'
-            section["link_id"] = re.sub(
-                "[^0-9a-zA-Z\-]+", "", section["title"].lower().replace(" ", "-")
-            )
+            section["new_section_header"] = f"{section['depth']} {section['title']}"
+            section["link_id"] = re.sub("[^0-9a-zA-Z\-]+", "", section["title"].lower().replace(" ", "-"))
             while "--" in section["link_id"]:
                 section["link_id"] = section["link_id"].replace("--", "-")
 
@@ -142,9 +125,7 @@ def replace_links(file, sections):
             link_id = None
 
             # If we have a direct link to a full URL, figure out the relative path
-            if url.startswith("http://docs.qmk.fm/") or url.startswith(
-                "https://docs.qmk.fm/"
-            ):
+            if url.startswith("http://docs.qmk.fm/") or url.startswith("https://docs.qmk.fm/"):
                 url, anchor = (url.split("#", 2) + [None])[:2]
                 if anchor and anchor[0] == "/":
                     url = anchor[1:]  # strip the leading / if present
@@ -168,19 +149,13 @@ def replace_links(file, sections):
             if url == "20230827":
                 pass
 
-            candidate_files = list(
-                filter(
-                    is_valid_file, list((qmk_firmware_dir / "docs").rglob(f"{url}.md"))
-                )
-            )
+            candidate_files = list(filter(is_valid_file, list((qmk_firmware_dir / "docs").rglob(f"{url}.md"))))
             if len(candidate_files) > 1:
                 raise ValueError(f"Multiple files found for {url}: {candidate_files}")
             elif len(candidate_files) > 0:
                 test_file = candidate_files[0]
                 if test_file is not None and test_file.exists():
-                    url = os.path.relpath(
-                        test_file, file.parent
-                    )  # pathlib Path.relative_to() doesn't work here?
+                    url = os.path.relpath(test_file, file.parent)  # pathlib Path.relative_to() doesn't work here?
 
             # Remove any trailing `.md`...again
             if url[-3:] == ".md":
@@ -214,9 +189,7 @@ def replace_sections(file, sections):
     with open(file, "r") as f:
         text = f.read()
         for section in sections.values():
-            text = text.replace(
-                section["old_section_header"], section["new_section_header"]
-            )
+            text = text.replace(section["old_section_header"], section["new_section_header"])
     with open(file, "w") as f:
         f.write(text)
 
@@ -231,9 +204,7 @@ def replace_image_prefixes(file):
     with open(file, "r") as f:
         text = f.read()
         for m in IMAGE_ELEMENT_PREFIX_PATTERN.finditer(text):
-            if not m.group("url").startswith("http") and not m.group("url").startswith(
-                "."
-            ):
+            if not m.group("url").startswith("http") and not m.group("url").startswith("."):
                 # Work out where the actual file is, including the relative path to the file linking to it
                 image = (qmk_firmware_dir / "docs" / m.group("url")).absolute()
                 rel_path = os.path.relpath(image, file.parent)
@@ -244,9 +215,7 @@ def replace_image_prefixes(file):
 
                 # Replace the image prefix with the relative path
                 preamble = m.group("preamble")
-                text = text.replace(
-                    m.group("imgprefix"), f'<img{preamble}src="{rel_path}"'
-                )
+                text = text.replace(m.group("imgprefix"), f'<img{preamble}src="{rel_path}"')
     with open(file, "w") as f:
         f.write(text)
 
@@ -261,13 +230,11 @@ def replace_indented_items(file):
     with open(file, "r") as f:
         text = f.read()
         for m in INDENTED_ITEM_PATTERN.finditer(text):
-            text = text.replace(m.group("mditem"), f'::: info\n{m.group("text")}\n:::')
+            text = text.replace(m.group("mditem"), f"::: info\n{m.group('text')}\n:::")
         for m in QUERY_ITEM_PATTERN.finditer(text):
-            text = text.replace(m.group("mditem"), f'::: tip\n{m.group("text")}\n:::')
+            text = text.replace(m.group("mditem"), f"::: tip\n{m.group('text')}\n:::")
         for m in WARN_ITEM_PATTERN.finditer(text):
-            text = text.replace(
-                m.group("mditem"), f'::: warning\n{m.group("text")}\n:::'
-            )
+            text = text.replace(m.group("mditem"), f"::: warning\n{m.group('text')}\n:::")
     with open(file, "w") as f:
         f.write(text)
 
@@ -299,9 +266,7 @@ def replace_details_block(file, lines, line_index):
 
         # If we got a summary, make sure we remember the text
         elif SUMMARY_XML_ELEMENT_PATTERN.match(lines[i].strip()):
-            summary = " " + SUMMARY_XML_ELEMENT_PATTERN.match(lines[i].strip()).group(
-                "summary"
-            )
+            summary = " " + SUMMARY_XML_ELEMENT_PATTERN.match(lines[i].strip()).group("summary")
             del lines[i]
             i -= 1
 
@@ -336,15 +301,9 @@ def replace_all_details_blocks(files):
         replace_details_blocks(file)
 
 
-TABS_START_PATTERN = re.compile(
-    r"^(?P<mdtabs>\<!--\s*tabs\s*:\s*start\s*--\>)", re.IGNORECASE
-)
-TABS_END_PATTERN = re.compile(
-    r"^(?P<mdtabs>\<!--\s*tabs\s*:\s*end\s*--\>)", re.IGNORECASE
-)
-TAB_TITLE_PATTERN = re.compile(
-    r"^(?P<mdtabtitle>#+\s*\*\*\s+(?P<title>.*)\s*\*\*)", re.IGNORECASE
-)
+TABS_START_PATTERN = re.compile(r"^(?P<mdtabs>\<!--\s*tabs\s*:\s*start\s*--\>)", re.IGNORECASE)
+TABS_END_PATTERN = re.compile(r"^(?P<mdtabs>\<!--\s*tabs\s*:\s*end\s*--\>)", re.IGNORECASE)
+TAB_TITLE_PATTERN = re.compile(r"^(?P<mdtabtitle>#+\s*\*\*\s+(?P<title>.*)\s*\*\*)", re.IGNORECASE)
 
 
 def replace_tabs_block(file, lines, line_index):
@@ -447,9 +406,7 @@ replace_text_in_file(
     "[Build Environment Setup](newbs_getting_started)",
 )
 
-replace_text_in_file(
-    qmk_firmware_dir / "docs" / "feature_stenography.md", "```mk", "```make"
-)
+replace_text_in_file(qmk_firmware_dir / "docs" / "feature_stenography.md", "```mk", "```make")
 
 replace_text_in_file(
     qmk_firmware_dir / "docs" / "newbs.md",

@@ -18,10 +18,13 @@ os.environ["ORIG_CWD"] = str(orig_cwd)
 os.chdir(qmk_firmware_path)
 os.environ["QMK_HOME"] = str(qmk_firmware_path)
 
+
 def unload_qmk_cli():
     cycles = 0
+
     def mods():
         return [m for m in sys.modules if m.startswith("milc") or m.startswith("qmk")]
+
     while len(mods()) > 0 and cycles < 25:
         for m in mods():
             try:
@@ -30,13 +33,16 @@ def unload_qmk_cli():
                 pass
         cycles += 1
 
+
 def run_command(args):
     try:
-        with patch.object(sys, 'argv', args):
+        with patch.object(sys, "argv", args):
             import milc
+
             milc.set_metadata()
             import qmk_cli.subcommands  # noqa: F401
             import qmk.cli  # noqa: F401
+
             rc = milc.cli()
             if rc is False:
                 sys.exit(1)
@@ -47,6 +53,7 @@ def run_command(args):
 
     finally:
         unload_qmk_cli()
+
 
 for line in fileinput.input():
     run_command(shlex.split(line.strip()))

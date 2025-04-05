@@ -135,6 +135,10 @@ format:
 		$(ECHO) -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
 		qmk format-json -i "$$file" ; \
 	done
+	@git ls-files | grep -E '\.py$$' | while read file ; do \
+		$(ECHO) -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
+		ruff format --quiet --line-length 160 "$$file" ; \
+	done
 	@make -C $(QMK_USERSPACE)/modules/tzarc
 
 format-qmk-keyboards-tzarc:
