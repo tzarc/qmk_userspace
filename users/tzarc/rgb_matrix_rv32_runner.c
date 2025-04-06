@@ -74,7 +74,15 @@ static rv32vm_ecall_result_t rv32vm_ecall_handler(void) {
                 .s = rgb_matrix_config.hsv.s,
                 .v = rgb_matrix_config.hsv.v,
             };
-            rgb_core.regs[rv32reg_x10_a0] = *(uint32_t*)&hsv;
+            union {
+                uint32_t raw;
+                RV32_HSV hsv;
+            } out = {
+                .hsv.h = hsv.h,
+                .hsv.s = hsv.s,
+                .hsv.v = hsv.v,
+            };
+            rgb_core.regs[rv32reg_x10_a0] = out.raw;
         } break;
         case RV32_ECALL_RGB_MATRIX_CONFIG_SPEED:
             rgb_core.regs[rv32reg_x10_a0] = rgb_matrix_config.speed;
@@ -96,10 +104,13 @@ static rv32vm_ecall_result_t rv32vm_ecall_handler(void) {
             break;
         case RV32_ECALL_HSV_TO_RGB: {
             RV32_HSV hsv;
-            *(uint32_t*)&hsv              = rgb_core.regs[rv32reg_x10_a0];
-            RGB      rgb                  = hsv_to_rgb((HSV){.h = hsv.h, .s = hsv.s, .v = hsv.v});
-            RV32_RGB rgb_out              = {.r = rgb.r, .g = rgb.g, .b = rgb.b};
-            rgb_core.regs[rv32reg_x10_a0] = *(uint32_t*)&rgb_out;
+            *(uint32_t*)&hsv = rgb_core.regs[rv32reg_x10_a0];
+            RGB rgb          = hsv_to_rgb((HSV){.h = hsv.h, .s = hsv.s, .v = hsv.v});
+            union {
+                uint32_t raw;
+                RV32_RGB rgb;
+            } out                         = {.rgb.r = rgb.r, .rgb.g = rgb.g, .rgb.b = rgb.b};
+            rgb_core.regs[rv32reg_x10_a0] = out.raw;
         } break;
         case RV32_ECALL_TIMER_READ32:
             rgb_core.regs[rv32reg_x10_a0] = sync_timer_read32();

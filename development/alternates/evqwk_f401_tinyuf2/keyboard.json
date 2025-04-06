@@ -1,0 +1,38 @@
+{
+    "manufacturer": "Tzarc",
+    "keyboard_name": "EVQWK Test Board STM32F401 TinyUF2",
+    "maintainer": "tzarc",
+    "bootloader": "tinyuf2",
+    "development_board": "blackpill_f401",
+    "eeprom": {
+        "driver": "transient"
+    },
+    "encoder": {
+        "rotary": [
+            {"pin_a": "B0", "pin_b": "B1", "resolution": 2},
+            {"pin_a": "B8", "pin_b": "B9", "resolution": 2}
+        ]
+    },
+    "features": {
+        "console": true,
+        "encoder": true
+    },
+    "matrix_pins": {
+        "direct": [
+            ["A2", "A3"]
+        ]
+    },
+    "usb": {
+        "device_version": "1.0.0",
+        "pid": "0x9999",
+        "vid": "0xFEED"
+    },
+    "layouts": {
+        "LAYOUT": {
+            "layout": [
+                {"matrix": [0, 0], "x": 0, "y": 0},
+                {"matrix": [0, 1], "x": 1, "y": 0}
+            ]
+        }
+    }
+}

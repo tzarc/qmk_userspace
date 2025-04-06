@@ -203,6 +203,7 @@ LINKED_BOARD_DEFS := \
 	cyclone!keyboards/tzarc/cyclone!default!development/keyboard-dev/tzarc-cyclone \
 	kobold!keyboards/tzarc/kobold!default!development/keyboard-dev/tzarc-kobold \
 	\
+	evqwk_f401_tinyuf2!keyboards/tzarc/evqwk_f401_tinyuf2!default!development/alternates/evqwk_f401_tinyuf2 \
 	weact_h723core!keyboards/handwired/onekey/weact_h723core!console!development/alternates/weact_h723core \
 	f411_tinyuf2_filesystem!keyboards/handwired/onekey/f411_tinyuf2_filesystem!reset!development/alternates/f411_tinyuf2_filesystem \
 	disco_f723!keyboards/handwired/onekey/disco_f723!console!development/alternates/disco_f723 \
