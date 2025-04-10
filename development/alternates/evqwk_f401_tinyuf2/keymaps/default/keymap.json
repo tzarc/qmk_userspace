@@ -1,10 +1,9 @@
 {
     "config": {
         "features": {
+            "encoder_map": true,
             "extrakey": true,
-            "mousekey": true,
-            "encoder_map": true
+            "mousekey": true
         }
     }
 }
-

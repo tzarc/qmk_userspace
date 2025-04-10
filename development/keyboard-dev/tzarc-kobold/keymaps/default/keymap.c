@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include QMK_KEYBOARD_H
 
+#ifndef COMMUNITY_MODULE_FILESYSTEM_ENABLE
+#    define FS_DUMP KC_NO
+#endif
+
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT_ortho_4x4(

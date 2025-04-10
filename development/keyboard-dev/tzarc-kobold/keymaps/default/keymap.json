@@ -1,6 +1,7 @@
 {
     "config": {
         "features": {
+            "console": true,
             "debug_matrix_scan_rate": true,
             "quantum_painter": true
         }

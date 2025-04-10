@@ -1,7 +1,7 @@
 {
     "folders": [
         {
-            "name": "qmk_build",
+            "name": "qmk_userspace",
             "path": ".",
             "settings": {
                 "python.pythonPath": "/data/Dev/qmk_userspace/.direnv/python-3.13/bin/python3"
