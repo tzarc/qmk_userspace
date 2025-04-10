@@ -6,5 +6,5 @@
             "quantum_painter": true
         }
     },
-    "modules": ["tzarc/globe_key"]
+    "modules": ["tzarc/globe_key", "getreuer/mouse_turbo_click"]
 }

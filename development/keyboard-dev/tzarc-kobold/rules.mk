@@ -1,5 +1,8 @@
-OPT = 2
 QUANTUM_PAINTER_DRIVERS = sh1106_i2c
 
 FLASH_DRIVER = spi
 FILESYSTEM_DRIVER = lfs_spi_flash
+
+XAP_ENABLE = yes
+
+OPT = 2
