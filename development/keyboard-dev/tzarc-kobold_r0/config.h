@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
-// Hardware-specific definitions
+// Configurables
 #define RGB_ENABLE_PIN C11
 
 // WS2812 Configuration
@@ -28,5 +28,16 @@
 #define EXTERNAL_FLASH_SPI_CLOCK_DIVISOR 4     // (160MHz/4) => 40MHz
 #define EXTERNAL_FLASH_SIZE (16 * 1024 * 1024) // 128Mb/16MB capacity
 
-// We can store as many layers as we like.
+// I2C Configuration (@1MHz)
+#define I2C_DRIVER I2CD1
+#define I2C1_SCL_PIN A15
+#define I2C1_SCL_PAL_MODE 4
+#define I2C1_SDA_PIN B7
+#define I2C1_SDA_PAL_MODE 4
+#define I2C1_TIMINGR_PRESC 0b0001
+#define I2C1_TIMINGR_SCLDEL 0b1011
+#define I2C1_TIMINGR_SDADEL 0b0011
+#define I2C1_TIMINGR_SCLH 0b00001111
+#define I2C1_TIMINGR_SCLL 0b00100101
+
 #define DYNAMIC_KEYMAP_LAYER_COUNT 32

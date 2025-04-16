@@ -1,6 +1,7 @@
 {
     "manufacturer": "Tzarc",
     "keyboard_name": "Kobold",
+    "url": "https://github.com/tzarc/keyboards/tree/main/Kobold",
     "maintainer": "tzarc",
     "bootloader": "stm32-dfu",
     "build": {
@@ -15,16 +16,13 @@
     },
     "features": {
         "bootmagic": true,
-        "console": true,
-        "rgb_matrix": true,
-        "usbpd": true
+        "rgb_matrix": true
     },
     "matrix_pins": {
         "direct": [
-            ["B14", "C6", "B9", "F1", "B13", "B15", "C13", "C15", "B12", "B0", "A2", "A0", "B11", "A4", "A3", "A1"]
+            ["B14", "C6", "B9", "B7", "B13", "B15", "C13", "C15", "B12", "B0", "A2", "A0", "B11", "A4", "A3", "A1"]
         ]
     },
-    "modules": ["tzarc/experimental/filesystem"],
     "processor": "STM32G431",
     "rgb_matrix": {
         "driver": "ws2812",
@@ -48,14 +46,14 @@
         ]
     },
     "usb": {
-        "device_version": "0.0.1",
-        "pid": "0xFFCC",
+        "pid": "0x4921",
         "vid": "0x1209"
     },
     "ws2812": {
         "driver": "pwm",
         "pin": "B5"
     },
+    "community_layouts": ["ortho_4x4"],
     "layouts": {
         "LAYOUT_ortho_4x4": {
             "layout": [

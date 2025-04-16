@@ -10,3 +10,7 @@
 // Used for NOR Flash
 #undef STM32_SPI_USE_SPI1
 #define STM32_SPI_USE_SPI1 TRUE
+
+// Used for V/I sensor and OLED
+#undef STM32_I2C_USE_I2C1
+#define STM32_I2C_USE_I2C1 TRUE
