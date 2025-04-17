@@ -3,7 +3,8 @@
 
 all: test
 
-include rules.mk
+.PHONY: generated-files all test clean
+generated-files: keycode_lookup.c
 
 keycode_lookup: generated-files
 	@gcc -DKEYCODE_TESTS -o keycode_lookup keycode_lookup.c
@@ -13,3 +14,6 @@ test: keycode_lookup
 
 clean:
 	@rm -f keycode_lookup keycode_lookup.c
+
+keycode_lookup.c: make_keycode_lookup.py keycode_lookup.c.j2
+	@python3 make_keycode_lookup.py > keycode_lookup.c

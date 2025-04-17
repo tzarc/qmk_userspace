@@ -55,12 +55,14 @@ listen_for = dict(filter(lambda e: e[0].startswith("KEY_MACRO"), evdev.ecodes.ec
 
 listening_devices = {}
 
+
 async def remove_device(device):
-    print(f'Device closed: {device.name}', file=sys.stderr)
+    print(f"Device closed: {device.name}", file=sys.stderr)
     d = listening_devices.pop(device.path, None)
     if d:
         d.close()
         del d
+
 
 async def listen_programmable_buttons_device(bus, device):
     try:
@@ -76,14 +78,15 @@ async def listen_programmable_buttons_device(bus, device):
     except OSError as e:
         if e.errno == 19:  # No such device
             # Device disconnected
-            print(f'Device disconnected: {device.name}\n{e}', file=sys.stderr)
+            print(f"Device disconnected: {device.name}\n{e}", file=sys.stderr)
         else:
-            print(f'Unknown error: {device.name}\n{e}', file=sys.stderr)
+            print(f"Unknown error: {device.name}\n{e}", file=sys.stderr)
     except Exception as e:
-        print(f'Unknown error: {device.name}\n{e}', file=sys.stderr)
+        print(f"Unknown error: {device.name}\n{e}", file=sys.stderr)
     finally:
         # Clean up the device
         asyncio.ensure_future(remove_device(device))
+
 
 async def listen_programmable_buttons(bus):
     # Listen for programmable button events
