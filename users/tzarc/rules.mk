@@ -77,6 +77,8 @@ endif
 
 #OPT = 0
 
+OPT_DEFS += -fsanitize=undefined
+
 ifeq ($(strip $(RGB_MATRIX_ENABLE)),yes)
 ifeq ($(strip $(RGB_MATRIX_RV32)),yes)
 	RGB_MATRIX_CUSTOM_USER = yes

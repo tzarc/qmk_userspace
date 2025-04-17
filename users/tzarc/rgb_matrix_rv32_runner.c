@@ -103,9 +103,11 @@ static rv32vm_ecall_result_t rv32vm_ecall_handler(void) {
             rgb_core.regs[rv32reg_x10_a0] = sin8(rgb_core.regs[rv32reg_x10_a0]);
             break;
         case RV32_ECALL_HSV_TO_RGB: {
-            RV32_HSV hsv;
-            *(uint32_t*)&hsv = rgb_core.regs[rv32reg_x10_a0];
-            RGB rgb          = hsv_to_rgb((HSV){.h = hsv.h, .s = hsv.s, .v = hsv.v});
+            union {
+                uint32_t raw;
+                RV32_HSV hsv;
+            } in    = {.raw = rgb_core.regs[rv32reg_x10_a0]};
+            RGB rgb = hsv_to_rgb((HSV){.h = in.hsv.h, .s = in.hsv.s, .v = in.hsv.v});
             union {
                 uint32_t raw;
                 RV32_RGB rgb;

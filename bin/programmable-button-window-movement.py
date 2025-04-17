@@ -53,29 +53,53 @@ programmable_button_mapping = {
 # Work out which keys to listen for
 listen_for = dict(filter(lambda e: e[0].startswith("KEY_MACRO"), evdev.ecodes.ecodes.items()))
 
+listening_devices = {}
+
+async def remove_device(device):
+    print(f'Device closed: {device.name}', file=sys.stderr)
+    d = listening_devices.pop(device.path, None)
+    if d:
+        d.close()
+        del d
 
 async def listen_programmable_buttons_device(bus, device):
-    async for event in device.async_read_loop():
-        if isinstance(event, evdev.events.InputEvent):
-            if event.code in listen_for.values():
-                if event.value == 1:  # Key pressed
-                    if evdev.ecodes.KEY[event.code] in programmable_button_mapping:
-                        shortcut = programmable_button_mapping[evdev.ecodes.KEY[event.code]]
-                        await invoke_kwin_shortcut(bus, shortcut)
-                    else:
-                        print(f"Unknown programmable button: {evdev.ecodes.KEY[event.code]}", file=sys.stderr)
-
+    try:
+        async for event in device.async_read_loop():
+            if isinstance(event, evdev.events.InputEvent):
+                if event.code in listen_for.values():
+                    if event.value == 1:  # Key pressed
+                        if evdev.ecodes.KEY[event.code] in programmable_button_mapping:
+                            shortcut = programmable_button_mapping[evdev.ecodes.KEY[event.code]]
+                            await invoke_kwin_shortcut(bus, shortcut)
+                        else:
+                            print(f"Unknown programmable button: {evdev.ecodes.KEY[event.code]}", file=sys.stderr)
+    except OSError as e:
+        if e.errno == 19:  # No such device
+            # Device disconnected
+            print(f'Device disconnected: {device.name}\n{e}', file=sys.stderr)
+        else:
+            print(f'Unknown error: {device.name}\n{e}', file=sys.stderr)
+    except Exception as e:
+        print(f'Unknown error: {device.name}\n{e}', file=sys.stderr)
+    finally:
+        # Clean up the device
+        asyncio.ensure_future(remove_device(device))
 
 async def listen_programmable_buttons(bus):
     # Listen for programmable button events
     devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
     for device in filter(lambda d: "Consumer Control" in d.name, devices):
+        if device.path in listening_devices:
+            continue
+        listening_devices[device.path] = device
         asyncio.ensure_future(listen_programmable_buttons_device(bus, device))
 
 
 async def main():
     bus = await MessageBus().connect()
-    await listen_programmable_buttons(bus)
+    while bus.connected:
+        await listen_programmable_buttons(bus)
+        await asyncio.sleep(1)
     await bus.wait_for_disconnect()
 
 
