@@ -77,7 +77,7 @@ endif
 
 #OPT = 0
 
-OPT_DEFS += -fsanitize=undefined
+#OPT_DEFS += -fsanitize=undefined
 
 ifeq ($(strip $(RGB_MATRIX_ENABLE)),yes)
 ifeq ($(strip $(RGB_MATRIX_RV32)),yes)

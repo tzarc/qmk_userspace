@@ -17,9 +17,9 @@
 #    include "filesystem.h"
 #endif // defined(FILESYSTEM_ENABLE) && defined(FLASH_DRIVER_SPI)
 
-#ifdef FLASH_DRIVER_SPI
+#if defined(FLASH_DRIVER_SPI) && defined(COMMUNITY_MODULE_SFDP_FLASH_ENABLE)
 #    include "sfdp_flash.h"
-#endif // FLASH_DRIVER_SPI
+#endif // defined(FLASH_DRIVER_SPI) && defined(COMMUNITY_MODULE_SFDP_FLASH_ENABLE)
 
 //----------------------------------------------------------
 // Key map
@@ -119,9 +119,9 @@ static bool is_mounted = false;
 #endif // defined(FILESYSTEM_ENABLE) && defined(FLASH_DRIVER_SPI)
 
 void keyboard_post_init_keymap(void) {
-#ifdef FLASH_DRIVER_SPI
+#if defined(FLASH_DRIVER_SPI) && defined(COMMUNITY_MODULE_SFDP_FLASH_ENABLE)
     sfdp_init();
-#endif // FLASH_DRIVER_SPI
+#endif // defined(FLASH_DRIVER_SPI) && defined(COMMUNITY_MODULE_SFDP_FLASH_ENABLE)
 
     // Initialise the theme
     theme_init();
