@@ -1,6 +1,7 @@
 // Copyright 2022-2025 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include <stdio.h>
+#include <locale.h>
 
 #include "lfs.h"
 
@@ -212,6 +213,8 @@ bool run_test(void) {
 }
 
 int main(void) {
+    setlocale(LC_NUMERIC, "");
+
     prep_test();
 
     long i = 0;
@@ -245,7 +248,7 @@ int main(void) {
                 printf("%s %5d", j == 0 ? "" : ",", locals.erase_counts[j]);
             }
             printf("\n\n");
-            printf("Hit write endurance after %ld iterations, %ld bytes written\n", i, byte_counter);
+            printf("Hit write endurance after %'ld iterations, %'ld bytes written\n", i, byte_counter);
             break;
         }
     }

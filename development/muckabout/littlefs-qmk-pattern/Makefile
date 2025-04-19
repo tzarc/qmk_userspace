@@ -1,12 +1,14 @@
 # Copyright 2022-2024 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
-TARGET_EXEC ?= littlefs-endurance
+TARGET_EXEC ?= littlefs-qmk-pattern
 
 BUILD_DIR ?= .build
 SRC_DIRS ?= src
 
 SRCS := $(shell find $(SRC_DIRS) \( -name *.cpp -or -name *.cxx -or -name *.cc -or -name *.c -or -name *.s \))
 HDRS := $(shell find $(SRC_DIRS) \( -name *.hpp -or -name *.hxx -or -name *.hh -or -name *.h \))
+
+LIBS := -lc -lrt
 
 LITTLEFS_PATH := ../../../modules/tzarc/experimental/filesystem/littlefs
 
@@ -31,8 +33,8 @@ OBJCOPY = objcopy
 OBJDUMP = objdump
 SIZE = size
 
-OPT_FLAGS = -g -O0
-CFLAGS_BASE ?= $(OPT_FLAGS) -DLFS_NO_DEBUG -DLFS_NO_WARN -DLFS_NO_ERROR
+OPT_FLAGS = -g -O3
+CFLAGS_BASE ?= $(OPT_FLAGS) -DLFS_NO_DEBUG -DLFS_NO_WARN -DLFS_NO_ERROR -D_POSIX_SOURCE -D_GNU_SOURCE -D_POSIX_C_SOURCE=199309L
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
 LDFLAGS ?= $(OPT_FLAGS)
@@ -60,7 +62,7 @@ endef
 $(foreach src,$(SRCS) $(HDRS),$(eval $(call setup_formatter,$(src))))
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
-	$(CC) $(OBJS) -o $@ $(LDFLAGS)
+	$(CC) $(OBJS) -o $@ $(LDFLAGS) $(LIBS)
 
 # assembly
 $(BUILD_DIR)/%.s.o: %.s compile_commands.json

@@ -166,6 +166,13 @@
             "cwd": "${workspaceFolder}/development/muckabout/arena"
         },
         {
+            "name": "(gdb) littlefs-qmk-pattern",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/development/muckabout/littlefs-qmk-pattern/littlefs-qmk-pattern",
+            "cwd": "${workspaceFolder}/development/muckabout/littlefs-qmk-pattern"
+        },
+        {
             "name": "(gdb) gen_circ",
             "type": "lldb",
             "request": "launch",
