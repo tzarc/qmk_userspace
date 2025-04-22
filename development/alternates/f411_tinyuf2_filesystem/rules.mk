@@ -1,5 +1,5 @@
 FLASH_DRIVER = spi
-FILESYSTEM_DRIVER = lfs_spi_flash
+FILESYSTEM_DRIVER = lfs_flash
 
 VPATH += \
 		$(QMK_USERSPACE)/qmk_firmware-mods \

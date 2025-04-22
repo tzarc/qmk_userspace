@@ -5,13 +5,13 @@
 # cat .build/obj_tzarc_djinn_rev2_tzarc/tzarc_unicode.i | sed -e 's@^#.*@@g' -e 's@^\s*//.*@@g' -e '/^\s*$/d' | clang-format
 OPT_DEFS += -save-temps=obj
 
-TOP_SYMBOLS = 25
+TOP_SYMBOLS = 80
 NKRO_ENABLE ?= no
 COMMAND_ENABLE = no
 SPACE_CADET_ENABLE ?= no
 MAGIC_ENABLE ?= no
 CONSOLE_ENABLE ?= yes
-LTO_ENABLE ?= yes
+LTO_ENABLE := no
 DEBUG_MATRIX_SCAN_RATE_ENABLE ?= yes
 BOOTMAGIC_ENABLE ?= yes
 EXTRAKEY_ENABLE ?= yes

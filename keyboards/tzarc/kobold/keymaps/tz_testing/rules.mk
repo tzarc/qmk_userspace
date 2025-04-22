@@ -1,1 +1,2 @@
-FILESYSTEM_DRIVER = lfs_spi_flash
+FILESYSTEM_DRIVER = lfs_flash
+TOP_SYMBOLS = 25

@@ -28,9 +28,9 @@ typedef struct testrun_t {
     lfs_file_t file;
     int       *erase_counts;
 
-    bool endurance_hit;
-    int erase_limit;
-    int max_erases;
+    bool   endurance_hit;
+    int    erase_limit;
+    int    max_erases;
     size_t total_bytes_written;
 } testrun_t;
 
@@ -52,7 +52,7 @@ int ram_erase(const struct lfs_config *c, lfs_block_t block) {
     if (locals.max_erases < locals.erase_counts[block]) {
         locals.max_erases = locals.erase_counts[block];
     }
-    if(locals.erase_counts[block] >= locals.erase_limit) {
+    if (locals.erase_counts[block] >= locals.erase_limit) {
         locals.endurance_hit = true;
     }
     return 0;
@@ -110,7 +110,7 @@ void prepare_buffers(size_t block_count, size_t block_size, size_t lookahead_siz
     locals.erase_counts  = calloc(sizeof(int), block_count);
 }
 
-struct lfs_config *prepare_config(int erase_limit, size_t block_count, size_t block_size, size_t lookahead_size, size_t buffer_size) {
+struct lfs_config *prepare_config(int erase_limit, size_t block_count, size_t block_size, size_t lookahead_size, size_t buffer_size, uint8_t prog_size) {
     prepare_buffers(block_count, block_size, lookahead_size, buffer_size);
     locals.erase_limit = erase_limit;
 
@@ -125,7 +125,7 @@ struct lfs_config *prepare_config(int erase_limit, size_t block_count, size_t bl
         .read_buffer      = locals.read_buf,
         .read_size        = buffer_size,
         .prog_buffer      = locals.prog_buf,
-        .prog_size        = 1,
+        .prog_size        = prog_size,
         .lookahead_buffer = locals.lookahead_buf,
         .lookahead_size   = lookahead_size,
         .block_size       = block_size,
@@ -162,11 +162,11 @@ static qmk_file_pattern_t qmk_file_patterns[] = {
     {"ee/stenomode",        1,    10,    0},
     {"ee/rgb_matrix",       8, 20000,    0},
     {"ee/haptic",           4,    40,    0},
-    {"layers/key00",      276,    60,    0}, // 6 * 23 * 2
-    {"layers/key01",      276,    20,    0}, // 6 * 23 * 2
-    {"layers/key02",      276,    20,    0}, // 6 * 23 * 2
-    {"layers/key03",      276,    10,    0}, // 6 * 23 * 2
-    {"layers/key04",      276,    10,    0}, // 6 * 23 * 2
+    {"layers/key00",       17,    60,    0}, // 6 * 23 * 2
+    {"layers/key01",        9,    20,    0}, // 6 * 23 * 2
+    {"layers/key02",        9,    20,    0}, // 6 * 23 * 2
+    {"layers/key03",        5,    10,    0}, // 6 * 23 * 2
+    {"layers/key04",        5,    10,    0}, // 6 * 23 * 2
 };
 // clang-format on
 
@@ -174,7 +174,7 @@ static const size_t qmk_file_patterns_count = sizeof(qmk_file_patterns) / sizeof
 
 qmk_file_pattern_t *get_pattern(int freq) {
     int freq_counter = 0;
-    for(int i = 0; i < qmk_file_patterns_count; ++i) {
+    for (int i = 0; i < qmk_file_patterns_count; ++i) {
         freq_counter += qmk_file_patterns[i].write_freq;
         if (freq_counter >= freq) {
             return &qmk_file_patterns[i];
@@ -193,17 +193,21 @@ int main(int argc, char *argv[]) {
 
     struct timespec ts;
     srand(clock_gettime(CLOCK_MONOTONIC, &ts) ? rand() : (unsigned)ts.tv_nsec);
-    // clang-format off
-    // clang-format on
 
     // 8kB EEPROM
-    //struct lfs_config *cfg = prepare_config(100000, 64, 128, 128, 128);
+    struct lfs_config *cfg = prepare_config(100000, 64, 128, 128, 128, 1);
+
+    // 32kB EEPROM
+    // struct lfs_config *cfg = prepare_config(100000, 256, 128, 128, 128, 1);
+
+    // M95256 32kB EEPROM, 4mil writes
+    // struct lfs_config *cfg = prepare_config(4000000, 256, 128, 128, 128, 1);
 
     // 1MB NOR Flash
-    //struct lfs_config *cfg = prepare_config(10000, 256, 4096, 256, 256);
+    // struct lfs_config *cfg = prepare_config(10000, 256, 4096, 256, 256, 1);
 
     // 16MB NOR Flash
-    struct lfs_config *cfg = prepare_config(10000, 256*16, 4096, 256, 256);
+    // struct lfs_config *cfg = prepare_config(10000, 256*16, 4096, 256, 256, 1);
 
     if (cfg == NULL) {
         fprintf(stderr, "Failed to allocate memory for config\n");
@@ -242,7 +246,7 @@ int main(int argc, char *argv[]) {
         }
 
         size_t files_written = 0;
-        while(!locals.endurance_hit) {
+        while (!locals.endurance_hit) {
             char                buf[16];
             qmk_file_pattern_t *pattern = get_random_pattern(total_freq_count);
 
@@ -281,7 +285,7 @@ int main(int argc, char *argv[]) {
                 printf("Total bytes written: %'zu\n", locals.total_bytes_written);
                 printf("Max erases: %'d\n", locals.max_erases);
                 printf("----------------------\n");
-                for(int i = 0; i < qmk_file_patterns_count; ++i) {
+                for (int i = 0; i < qmk_file_patterns_count; ++i) {
                     printf("%s: %'zu writes\n", qmk_file_patterns[i].filename, qmk_file_patterns[i].write_count);
                 }
             }

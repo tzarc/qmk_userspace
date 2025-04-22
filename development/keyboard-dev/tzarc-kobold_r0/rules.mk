@@ -1,7 +1,7 @@
 QUANTUM_PAINTER_DRIVERS = sh1106_i2c
 
 FLASH_DRIVER = spi
-FILESYSTEM_DRIVER = lfs_spi_flash
+FILESYSTEM_DRIVER = lfs_flash
 
 XAP_ENABLE = yes
 

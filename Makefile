@@ -190,6 +190,7 @@ BOARD_DEFS := \
 	geekboards!geekboards/macropad_v2!tzarc \
 	iris!keebio/iris/rev4!tzarc \
 	jj40!kprepublic/jj40!tzarc \
+	kobold!tzarc/kobold/r1!tzarc \
 	luddite!40percentclub/luddite!tzarc \
 	mysterium!coseyfannitutti/mysterium!tzarc \
 	mysterium-dad!coseyfannitutti/mysterium!dad \
@@ -201,7 +202,6 @@ BOARD_DEFS := \
 # short name ! keyboard path ! keymap name ! link source ! link target
 LINKED_BOARD_DEFS := \
 	cyclone!keyboards/tzarc/cyclone!default!development/keyboard-dev/tzarc-cyclone \
-	kobold!keyboards/tzarc/kobold!default!development/keyboard-dev/tzarc-kobold \
 	\
 	evqwk_f401_tinyuf2!keyboards/tzarc/evqwk_f401_tinyuf2!default!development/alternates/evqwk_f401_tinyuf2 \
 	weact_h723core!keyboards/handwired/onekey/weact_h723core!console!development/alternates/weact_h723core \

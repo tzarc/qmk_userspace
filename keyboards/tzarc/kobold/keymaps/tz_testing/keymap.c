@@ -21,6 +21,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
+/*
 void eeconfig_init_user(void) {
     debug_enable = true;
     rgb_matrix_mode(RGB_MATRIX_SOLID_COLOR);
@@ -38,7 +39,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch(keycode) {
         case EE_CLR:
         {
-            return true;
             if (record->event.pressed) {
                 eeconfig_init();
                 should_reset_at = timer_read32() + 2000;
@@ -54,3 +54,4 @@ void housekeeping_task_user(void) {
         mcu_reset();
     }
 }
+*/

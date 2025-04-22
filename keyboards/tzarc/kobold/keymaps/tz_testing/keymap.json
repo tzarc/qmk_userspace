@@ -2,7 +2,9 @@
     "config": {
         "features": {
             "console": true,
-            "debug_matrix_scan_rate": true
+            "debug_matrix_scan_rate": true,
+            "dynamic_keymap": true,
+            "xap": true
         }
     },
     "modules": ["tzarc/globe_key", "getreuer/mouse_turbo_click", "tzarc/experimental/filesystem", "tzarc/experimental/sfdp_flash"]
