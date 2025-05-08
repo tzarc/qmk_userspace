@@ -11,9 +11,14 @@ __pycache__
 *.bin
 *.uf2
 
+# clangd
+compile_commands.json
+.clangd/
+.cache/
+
 # venv etc.
-/.direnv
-/.distrib
+.direnv
+.distrib
 
 # tzarc's cloned repo's
 /qmk_firmware
@@ -30,7 +35,6 @@ alternates/qp_test/graphics/*.png
 
 # Other junk
 .ruff_cache
-.cache
 .vscode/.cortex-debug*
 .vscode/ipch
 compile_commands.json
