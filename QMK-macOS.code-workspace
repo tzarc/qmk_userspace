@@ -1,7 +1,7 @@
 {
     "folders": [
         {
-            "name": "qmk_build",
+            "name": "qmk_userspace",
             "path": "."
         },
         {
@@ -28,11 +28,20 @@
     "settings": {
         "git.ignoreLimitWarning": true,
         "cortex-debug.variableUseNaturalFormat": false,
-        "python.defaultInterpreterPath": "/Users/nickb/Code/qmk_build/.direnv/python-3.13/bin/python",
+        "python.defaultInterpreterPath": "/Users/nickb/qmk_userspace/.direnv/python-3.13/bin/python3",
+        "python.analysis.typeCheckingMode": "standard",
+        "python.analysis.languageServerMode": "full",
         "python.analysis.extraPaths": [
-            "/Users/nickb/Code/qmk_build/.direnv/python-3.13/lib/python3.13/site-packages",
-            "/Users/nickb/Code/qmk_build/qmk_firmware/lib/python"
+            "/Users/nickb/qmk_userspace/.direnv/python-3.13/lib/python3.13/site-packages",
+            "/Users/nickb/qmk_userspace/qmk_firmware/lib/python"
         ],
+        "python.analysis.aiCodeActions": {
+            "convertFormatString": true,
+            "convertLambdaToNamedFunction": true,
+            "generateDocstring": true,
+            "generateSymbol": true,
+            "implementAbstractClasses": true
+        },
         "files.exclude": {
             "**/.cache": false,
             "**/.direnv": false,
@@ -43,8 +52,7 @@
         "files.watcherExclude": {
             "**/.cache/**": true,
             "**/.direnv/**": true,
-            "**/.git/objects/**": true,
-            "**/.git/subtree-cache/**": true,
+            "**/.git/**": true,
             "**/node_modules/*/**": true
         },
         "clangd.inactiveRegions.opacity": 0.50,
@@ -53,16 +61,6 @@
             "info.json": "jsonc",
             "keyboard.json": "jsonc"
         },
-        "json.schemas": [
-            {
-                "fileMatch": ["keymap.json"],
-                "url": "./qmk_firmware/data/schemas/keymap.jsonschema"
-            },
-            {
-                "fileMatch": ["info.json", "keyboard.json"],
-                "url": "./qmk_firmware/data/schemas/keyboard.jsonschema"
-            }
-        ],
         "clangd.arguments": [
             "--header-insertion=never"
         ],

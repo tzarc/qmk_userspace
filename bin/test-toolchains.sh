@@ -27,15 +27,17 @@ else
         docker run --rm -it -v $(realpath .distrib):/opt/qmk -v $(realpath "$this_script"):/test-toolchains.sh $distro bash -c "/test-toolchains.sh inner"
     }
 
-    test_distro debian:12
-    test_distro debian:11
+    test_distro archlinux:latest
+
+    test_distro debian:9
     test_distro debian:10
+    test_distro debian:11
+    test_distro debian:12
 
     test_distro fedora:36
     test_distro fedora:37
     test_distro fedora:38
     test_distro fedora:39
     test_distro fedora:40
-
-    test_distro archlinux:latest
+    test_distro fedora:41
 fi

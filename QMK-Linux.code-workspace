@@ -2,56 +2,46 @@
     "folders": [
         {
             "name": "qmk_userspace",
-            "path": ".",
-            "settings": {
-                "python.pythonPath": "/data/Dev/qmk_userspace/.direnv/python-3.13/bin/python3"
-            }
+            "path": "."
         },
         {
             "name": "qmk_firmware",
-            "path": "qmk_firmware",
-            "settings": {
-                "python.pythonPath": "/data/Dev/qmk_userspace/.direnv/python-3.13/bin/python3"
-            }
+            "path": "qmk_firmware"
         },
         {
             "name": "quantum-painter",
-            "path": "qmk_firmware/quantum/painter",
-            "settings": {
-                "python.pythonPath": "/data/Dev/qmk_userspace/.direnv/python-3.13/bin/python3"
-            }
+            "path": "qmk_firmware/quantum/painter"
         },
         {
             "name": "drivers-painter",
-            "path": "qmk_firmware/drivers/painter",
-            "settings": {
-                "python.pythonPath": "/data/Dev/qmk_userspace/.direnv/python-3.13/bin/python3"
-            }
+            "path": "qmk_firmware/drivers/painter"
         },
         {
             "name": "keyboards-tzarc",
-            "path": "qmk_firmware/keyboards/tzarc",
-            "settings": {
-                "python.pythonPath": "/data/Dev/qmk_userspace/.direnv/python-3.13/bin/python3"
-            }
+            "path": "qmk_firmware/keyboards/tzarc"
         },
         {
             "name": "python-qmk",
-            "path": "qmk_firmware/lib/python/qmk",
-            "settings": {
-                "python.pythonPath": "/data/Dev/qmk_userspace/.direnv/python-3.13/bin/python3"
-            }
+            "path": "qmk_firmware/lib/python/qmk"
         }
     ],
     "settings": {
         "git.ignoreLimitWarning": true,
         "cortex-debug.variableUseNaturalFormat": false,
         "python.defaultInterpreterPath": "/data/Dev/qmk_userspace/.direnv/python-3.13/bin/python3",
+        "python.analysis.typeCheckingMode": "standard",
+        "python.analysis.languageServerMode": "full",
         "python.analysis.extraPaths": [
             "/data/Dev/qmk_userspace/.direnv/python-3.13/lib/python3.13/site-packages",
             "/data/Dev/qmk_userspace/qmk_firmware/lib/python"
         ],
-        "ansible.python.interpreterPath": "/data/Dev/qmk_userspace/.direnv/python-3.13/bin/python3",
+        "python.analysis.aiCodeActions": {
+            "convertFormatString": true,
+            "convertLambdaToNamedFunction": true,
+            "generateDocstring": true,
+            "generateSymbol": true,
+            "implementAbstractClasses": true
+        },
         "files.exclude": {
             "**/.cache": false,
             "**/.direnv": false,
@@ -71,16 +61,6 @@
             "info.json": "jsonc",
             "keyboard.json": "jsonc"
         },
-        "json.schemas": [
-            {
-                "fileMatch": ["keymap.json"],
-                "url": "./qmk_firmware/data/schemas/keymap.jsonschema"
-            },
-            {
-                "fileMatch": ["info.json", "keyboard.json"],
-                "url": "./qmk_firmware/data/schemas/keyboard.jsonschema"
-            }
-        ],
         "clangd.arguments": [
             "--header-insertion=never"
         ],

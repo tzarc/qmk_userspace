@@ -7,6 +7,6 @@
             "xap": true
         }
     },
-    "converter": "promicro_rp2040",
-    "modules": ["tzarc/konami_code"]
+    "converter": "sparkfun_pm2040",
+    "modules": ["tzarc/konami_code", "tzarc/experimental/lua_keymap"]
 }

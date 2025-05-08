@@ -86,6 +86,7 @@
     X(TZ_REP_5, /**/, /**/)          \
     X(TZ_TM0, /**/, /**/)            \
     X(TZ_TM1, /**/, /**/)            \
+    X(TZ_CUST1, /**/, /**/)          \
     X(TZ_TBMS1, /**/, /**/)
 #define KEYCODE_ENUM(kc, eq, val) kc eq val,
 
@@ -569,11 +570,11 @@ enum { FOREACH_CUSTOM_LAYER(LAYER_ENUM) };
 ////////////////////////////////////////////////////////////////////////////////
 // Layer D
 //                                                      ┌─────────────┬─────────────┬─────────────┬─────────────┐
-#define ____________TZARC_4x4_MACROPAD_D_R1_____________ KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS
+#define ____________TZARC_4x4_MACROPAD_D_R1_____________ KC_TRNS,      KC_TRNS,      KC_TRNS,      TZ_CUST1
 //                                                      ├─────────────┼─────────────┼─────────────┼─────────────┤
-#define ____________TZARC_4x4_MACROPAD_D_R2_____________ KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS
+#define ____________TZARC_4x4_MACROPAD_D_R2_____________ KC_TRNS,      KC_TRNS,      XRGB_HUD,     XRGB_HUI
 //                                                      ├─────────────┼─────────────┼─────────────┼─────────────┤
-#define ____________TZARC_4x4_MACROPAD_D_R3_____________ KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS
+#define ____________TZARC_4x4_MACROPAD_D_R3_____________ KC_TRNS,      KC_TRNS,      XRGB_PRV,     XRGB_NXT
 //                                                      ├─────────────┼─────────────┼─────────────┼─────────────┤
 #define ____________TZARC_4x4_MACROPAD_D_R4_____________ KC_TRNS,      DB_TOGG,      TIME_EEPRST,  TIME_RESET
 //                                                      └─────────────┴─────────────┴─────────────┴─────────────┘

@@ -153,14 +153,14 @@ static qmk_file_pattern_t qmk_file_patterns[] = {
     {"ee/default_layer",    4,    20,    0},
     {"ee/keymap",           4,    40,    0},
     {"ee/keyboard",         4,    40,    0},
-    {"ee/user",             4,  1000,    0},
+    {"ee/user",             4,   300,    0},
     {"ee/handedness",       1,    10,    0},
     {"ee/keymap_hash",      4,    10,    0},
     {"ee/audio",            4,    10,    0},
     {"ee/unicodemode",      4,    10,    0},
     {"ee/backlight",        4,    10,    0},
     {"ee/stenomode",        1,    10,    0},
-    {"ee/rgb_matrix",       8, 20000,    0},
+    {"ee/rgb_matrix",       8,  2000,    0},
     {"ee/haptic",           4,    40,    0},
     {"layers/key00",       17,    60,    0}, // 6 * 23 * 2
     {"layers/key01",        9,    20,    0}, // 6 * 23 * 2
@@ -194,8 +194,11 @@ int main(int argc, char *argv[]) {
     struct timespec ts;
     srand(clock_gettime(CLOCK_MONOTONIC, &ts) ? rand() : (unsigned)ts.tv_nsec);
 
+    // MCU flash (8x1kB sectors)
+    struct lfs_config *cfg = prepare_config(10000, 8, 1024, 128, 128, 8);
+
     // 8kB EEPROM
-    struct lfs_config *cfg = prepare_config(100000, 64, 128, 128, 128, 1);
+    // struct lfs_config *cfg = prepare_config(100000, 64, 128, 128, 128, 1);
 
     // 32kB EEPROM
     // struct lfs_config *cfg = prepare_config(100000, 256, 128, 128, 128, 1);

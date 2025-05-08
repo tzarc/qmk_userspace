@@ -37,3 +37,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 };
 // clang-format on
+
+void eeconfig_init_keymap(void) {
+#ifdef RGB_MATRIX_ENABLE
+    rgb_matrix_mode(RGB_MATRIX_SOLID_COLOR);
+    // rgb_matrix_sethsv(140, 255, 60);
+    rgb_matrix_enable();
+#endif
+}
