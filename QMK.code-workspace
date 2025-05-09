@@ -55,14 +55,30 @@
             "**/.git/**": true,
             "**/node_modules/*/**": true
         },
-        "clangd.inactiveRegions.opacity": 0.50,
+        "clangd.inactiveRegions.opacity": 0.5,
         "files.associations": {
             "keymap.json": "jsonc",
             "info.json": "jsonc",
             "keyboard.json": "jsonc"
         },
-        "clangd.arguments": [
-            "--header-insertion=never"
-        ],
+        "clangd.arguments": ["--header-insertion=never"],
+        "json.schemas": [
+            {
+                "fileMatch": ["qmk.json"],
+                "url": "./qmk_firmware/data/schemas/user_repo_v1_1.jsonschema"
+            },
+            {
+                "fileMatch": ["qmk_module.json"],
+                "url": "./qmk_firmware/data/schemas/community_module.jsonschema"
+            },
+            {
+                "fileMatch": ["keyboard.json", "info.json"],
+                "url": "./qmk_firmware/data/schemas/keyboard.jsonschema"
+            },
+            {
+                "fileMatch": ["keymap.json"],
+                "url": "./qmk_firmware/data/schemas/keymap.jsonschema"
+            }
+        ]
     }
 }
