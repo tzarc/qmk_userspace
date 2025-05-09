@@ -16,6 +16,10 @@
             "justMyCode": false,
             "cwd": "${workspaceFolder:qmk_userspace}/qmk_firmware",
             "request": "launch",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.venv/bin/python3"
+            },
+            "program": "${workspaceFolder:qmk_userspace}/.venv/bin/qmk",
             "args": [
                 "generate-community-modules-h",
                 "-kb",
@@ -24,13 +28,7 @@
                 "-",
                 "../keyboards/tzarc/djinn/keymaps/tzarc/keymap.json"
             ],
-            "console": "integratedTerminal",
-            "linux": {
-                "program": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/qmk",
-                "env": {
-                    "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/python3"
-                }
-            }
+            "console": "integratedTerminal"
         },
         {
             "name": "Python: qmk generate-rules-mk -kb tzarc/djinn/rev2 -o - ../keyboards/tzarc/djinn/keymaps/tzarc/keymap.json",
@@ -38,6 +36,10 @@
             "justMyCode": false,
             "cwd": "${workspaceFolder:qmk_userspace}/qmk_firmware",
             "request": "launch",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.venv/bin/python3"
+            },
+            "program": "${workspaceFolder:qmk_userspace}/.venv/bin/qmk",
             "args": [
                 "generate-rules-mk",
                 "-kb",
@@ -46,13 +48,7 @@
                 "-",
                 "../keyboards/tzarc/djinn/keymaps/tzarc/keymap.json"
             ],
-            "console": "integratedTerminal",
-            "linux": {
-                "program": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/qmk",
-                "env": {
-                    "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/python3"
-                }
-            }
+            "console": "integratedTerminal"
         },
         {
             "name": "Python: qmk generate-keycodes --version latest -o quantum/keycodes.h",
@@ -60,6 +56,10 @@
             "justMyCode": false,
             "cwd": "${workspaceFolder:qmk_userspace}/qmk_firmware",
             "request": "launch",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.venv/bin/python3"
+            },
+            "program": "${workspaceFolder:qmk_userspace}/.venv/bin/qmk",
             "args": [
                 "generate-keycodes",
                 "--version",
@@ -67,13 +67,7 @@
                 "-o",
                 "quantum/keycodes.h"
             ],
-            "console": "integratedTerminal",
-            "linux": {
-                "program": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/qmk",
-                "env": {
-                    "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/python3"
-                }
-            }
+            "console": "integratedTerminal"
         },
         {
             "name": "Python: qmk -v license-check -a users/tzarc/tzarc_unicode.c users/tzarc/tzarc_wow.c",
@@ -81,6 +75,10 @@
             "justMyCode": false,
             "cwd": "${workspaceFolder:qmk_userspace}",
             "request": "launch",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.venv/bin/python3"
+            },
+            "program": "${workspaceFolder:qmk_userspace}/.venv/bin/qmk",
             "args": [
                 "-v",
                 "license-check",
@@ -88,13 +86,7 @@
                 "users/tzarc/tzarc_unicode.c",
                 "users/tzarc/tzarc_wow.c"
             ],
-            "console": "integratedTerminal",
-            "linux": {
-                "program": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/qmk",
-                "env": {
-                    "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/python3"
-                }
-            }
+            "console": "integratedTerminal"
         },
         {
             "name": "Python: qmk similarity -kb bm16s",
@@ -102,18 +94,12 @@
             "justMyCode": false,
             "cwd": "${workspaceFolder:qmk_userspace}",
             "request": "launch",
-            "args": [
-                "similarity",
-                "-kb",
-                "bm16s"
-            ],
-            "console": "integratedTerminal",
-            "linux": {
-                "program": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/qmk",
-                "env": {
-                    "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/python3"
-                }
-            }
+            "env": {
+                "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.venv/bin/python3"
+            },
+            "program": "${workspaceFolder:qmk_userspace}/.venv/bin/qmk",
+            "args": ["similarity", "-kb", "bm16s"],
+            "console": "integratedTerminal"
         },
         {
             "name": "Python: convert *.so to *.qke (convert-binary.py)",
@@ -141,6 +127,10 @@
             "justMyCode": false,
             "cwd": "${workspaceFolder:qmk_userspace}",
             "request": "launch",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.venv/bin/python3"
+            },
+            "program": "${workspaceFolder:qmk_userspace}/.venv/bin/qmk",
             "args": [
                 "compile",
                 "--clean",
@@ -150,13 +140,7 @@
                 "-km",
                 "default"
             ],
-            "console": "integratedTerminal",
-            "linux": {
-                "program": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/qmk",
-                "env": {
-                    "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/python3"
-                }
-            }
+            "console": "integratedTerminal"
         },
         {
             "name": "(gdb) arena",

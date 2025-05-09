@@ -28,12 +28,12 @@
     "settings": {
         "git.ignoreLimitWarning": true,
         "cortex-debug.variableUseNaturalFormat": false,
-        "python.defaultInterpreterPath": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/python3",
+        "python.defaultInterpreterPath": "${workspaceFolder:qmk_userspace}/.venv/bin/python3",
         "python.analysis.typeCheckingMode": "standard",
         "python.analysis.languageServerMode": "full",
         "python.analysis.extraPaths": [
-            "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/lib/python3.13/site-packages",
-            "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/lib/python"
+            "${workspaceFolder:qmk_userspace}/.venv/lib/python3.13/site-packages",
+            "${workspaceFolder:qmk_userspace}/.venv/lib/python"
         ],
         "python.analysis.aiCodeActions": {
             "convertFormatString": true,

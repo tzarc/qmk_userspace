@@ -11,8 +11,8 @@ if [[ ! -z "${SIZE_REGRESSION_EXECUTING:-}" ]]; then
     exit 0
 fi
 
-if [[ -z "$(which python3 | grep '/.direnv/')" ]]; then
-    # Skip if we're not running python under direnv
+if [[ -z "$(which python3 | grep '/.venv/')" ]]; then
+    # Skip if we're not running python under venv
     exit 0
 fi
 
@@ -21,16 +21,15 @@ if [ "${1:-}" = "" -o "${1:-}" != "${2:-}" ]; then
     this_script=$(realpath "${BASH_SOURCE[0]}")
     script_dir=$(dirname "$this_script")
     firmware_dir=$(realpath "$script_dir/../qmk_firmware")
-    direnv_dir=$(realpath "$script_dir/../.direnv")
+    venv_dir=$(realpath "$script_dir/../.venv")
 
-    # If we have a valid direnv and valid qmk_firmware, do the actual processing
-    if [[ -d "$direnv_dir" ]] && [[ -d "$firmware_dir" ]]; then
+    # If we have a valid venv and valid qmk_firmware, do the actual processing
+    if [[ -d "$venv_dir" ]] && [[ -d "$firmware_dir" ]]; then
         # Everything here happens within qmk_firmware
         cd "$firmware_dir"
 
         # Figure out and enter the qmk venv
-        activation_script=$(ls -1 "$direnv_dir/"*"/bin/activate" | sort | head -n1)
-        source "$activation_script"
+        source "$venv_dir/bin/activate"
 
         # Ensure we have uv available
         [[ ! -z "$(which uv)" ]] || pip install uv

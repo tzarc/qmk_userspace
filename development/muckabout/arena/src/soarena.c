@@ -332,14 +332,14 @@ static void test_allocation(Arena *arena) {
 
 static void test_client_static_arena(void) {
     static uint8_t alignas(max_align_t) static_pool[BUFSIZ];
-    Arena *const static_arena = soarena_new(static_pool, sizeof static_pool);
+    Arena *const   static_arena = soarena_new(static_pool, sizeof static_pool);
 
     puts("---- Using a statically-allocated arena ----");
     test_allocation(static_arena);
 }
 
 static void test_client_automatic_arena(void) {
-    uint8_t alignas(max_align_t) thread_local_pool[BUFSIZ];
+    uint8_t      alignas(max_align_t) thread_local_pool[BUFSIZ];
     Arena *const thread_local_arena = soarena_new(thread_local_pool, sizeof thread_local_pool);
 
     puts("---- Using an automatically-allocated arena ----");

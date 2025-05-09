@@ -39,7 +39,7 @@ def run_command(args):
         with patch.object(sys, "argv", args):
             import milc
 
-            milc.set_metadata()
+            milc.cli.milc_options()
             import qmk_cli.subcommands  # noqa: F401
             import qmk.cli  # noqa: F401
 
