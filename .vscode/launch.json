@@ -14,7 +14,7 @@
             "name": "Python: qmk generate-community-modules-h -kb tzarc/djinn/rev2 -o - ../keyboards/tzarc/djinn/keymaps/tzarc/keymap.json",
             "type": "debugpy",
             "justMyCode": false,
-            "cwd": "${workspaceRoot}/qmk_firmware",
+            "cwd": "${workspaceFolder:qmk_userspace}/qmk_firmware",
             "request": "launch",
             "args": [
                 "generate-community-modules-h",
@@ -26,9 +26,9 @@
             ],
             "console": "integratedTerminal",
             "linux": {
-                "program": "${workspaceRoot}/.direnv/python-3.13/bin/qmk",
+                "program": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/qmk",
                 "env": {
-                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.13/bin/python3"
+                    "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/python3"
                 }
             }
         },
@@ -36,7 +36,7 @@
             "name": "Python: qmk generate-rules-mk -kb tzarc/djinn/rev2 -o - ../keyboards/tzarc/djinn/keymaps/tzarc/keymap.json",
             "type": "debugpy",
             "justMyCode": false,
-            "cwd": "${workspaceRoot}/qmk_firmware",
+            "cwd": "${workspaceFolder:qmk_userspace}/qmk_firmware",
             "request": "launch",
             "args": [
                 "generate-rules-mk",
@@ -48,9 +48,9 @@
             ],
             "console": "integratedTerminal",
             "linux": {
-                "program": "${workspaceRoot}/.direnv/python-3.13/bin/qmk",
+                "program": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/qmk",
                 "env": {
-                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.13/bin/python3"
+                    "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/python3"
                 }
             }
         },
@@ -58,7 +58,7 @@
             "name": "Python: qmk generate-keycodes --version latest -o quantum/keycodes.h",
             "type": "debugpy",
             "justMyCode": false,
-            "cwd": "${workspaceRoot}/qmk_firmware",
+            "cwd": "${workspaceFolder:qmk_userspace}/qmk_firmware",
             "request": "launch",
             "args": [
                 "generate-keycodes",
@@ -69,9 +69,9 @@
             ],
             "console": "integratedTerminal",
             "linux": {
-                "program": "${workspaceRoot}/.direnv/python-3.13/bin/qmk",
+                "program": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/qmk",
                 "env": {
-                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.13/bin/python3"
+                    "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/python3"
                 }
             }
         },
@@ -79,7 +79,7 @@
             "name": "Python: qmk -v license-check -a users/tzarc/tzarc_unicode.c users/tzarc/tzarc_wow.c",
             "type": "debugpy",
             "justMyCode": false,
-            "cwd": "${workspaceRoot}",
+            "cwd": "${workspaceFolder:qmk_userspace}",
             "request": "launch",
             "args": [
                 "-v",
@@ -90,9 +90,9 @@
             ],
             "console": "integratedTerminal",
             "linux": {
-                "program": "${workspaceRoot}/.direnv/python-3.13/bin/qmk",
+                "program": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/qmk",
                 "env": {
-                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.13/bin/python3"
+                    "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/python3"
                 }
             }
         },
@@ -100,7 +100,7 @@
             "name": "Python: qmk similarity -kb bm16s",
             "type": "debugpy",
             "justMyCode": false,
-            "cwd": "${workspaceRoot}",
+            "cwd": "${workspaceFolder:qmk_userspace}",
             "request": "launch",
             "args": [
                 "similarity",
@@ -109,9 +109,9 @@
             ],
             "console": "integratedTerminal",
             "linux": {
-                "program": "${workspaceRoot}/.direnv/python-3.13/bin/qmk",
+                "program": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/qmk",
                 "env": {
-                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.13/bin/python3"
+                    "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/python3"
                 }
             }
         },
@@ -119,9 +119,9 @@
             "name": "Python: convert *.so to *.qke (convert-binary.py)",
             "type": "debugpy",
             "justMyCode": true,
-            "cwd": "${workspaceRoot}/development/muckabout/dynamic-so",
+            "cwd": "${workspaceFolder:qmk_userspace}/development/muckabout/dynamic-so",
             "request": "launch",
-            "program": "${workspaceRoot}/development/muckabout/dynamic-so/convert-binary.py",
+            "program": "${workspaceFolder:qmk_userspace}/development/muckabout/dynamic-so/convert-binary.py",
             "args": ["dynamic_lib.so"],
             "console": "integratedTerminal"
         },
@@ -129,9 +129,9 @@
             "name": "Python: convert *.so to *.qke (lief-test.py)",
             "type": "debugpy",
             "justMyCode": true,
-            "cwd": "${workspaceRoot}/development/muckabout/dynamic-so",
+            "cwd": "${workspaceFolder:qmk_userspace}/development/muckabout/dynamic-so",
             "request": "launch",
-            "program": "${workspaceRoot}/development/muckabout/dynamic-so/lief-test.py",
+            "program": "${workspaceFolder:qmk_userspace}/development/muckabout/dynamic-so/lief-test.py",
             "args": ["dynamic_lib.so"],
             "console": "integratedTerminal"
         },
@@ -139,7 +139,7 @@
             "name": "Python: qmk compile --clean --compiledb -kb bm16s -km default",
             "type": "debugpy",
             "justMyCode": false,
-            "cwd": "${workspaceRoot}",
+            "cwd": "${workspaceFolder:qmk_userspace}",
             "request": "launch",
             "args": [
                 "compile",
@@ -152,9 +152,9 @@
             ],
             "console": "integratedTerminal",
             "linux": {
-                "program": "${workspaceRoot}/.direnv/python-3.13/bin/qmk",
+                "program": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/qmk",
                 "env": {
-                    "PYTHONPATH": "${workspaceRoot}/.direnv/python-3.13/bin/python3"
+                    "PYTHONPATH": "${workspaceFolder:qmk_userspace}/.direnv/python-3.13.1/bin/python3"
                 }
             }
         },
@@ -162,84 +162,84 @@
             "name": "(gdb) arena",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/development/muckabout/arena/arena",
-            "cwd": "${workspaceFolder}/development/muckabout/arena"
+            "program": "${workspaceFolder:qmk_userspace}/development/muckabout/arena/arena",
+            "cwd": "${workspaceFolder:qmk_userspace}/development/muckabout/arena"
         },
         {
             "name": "(gdb) littlefs-qmk-pattern",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/development/muckabout/littlefs-qmk-pattern/littlefs-qmk-pattern",
-            "cwd": "${workspaceFolder}/development/muckabout/littlefs-qmk-pattern"
+            "program": "${workspaceFolder:qmk_userspace}/development/muckabout/littlefs-qmk-pattern/littlefs-qmk-pattern",
+            "cwd": "${workspaceFolder:qmk_userspace}/development/muckabout/littlefs-qmk-pattern"
         },
         {
             "name": "(gdb) gen_circ",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/development/muckabout/gen_circ/gen_circ",
-            "cwd": "${workspaceFolder}/development/muckabout/gen_circ"
+            "program": "${workspaceFolder:qmk_userspace}/development/muckabout/gen_circ/gen_circ",
+            "cwd": "${workspaceFolder:qmk_userspace}/development/muckabout/gen_circ"
         },
         {
             "name": "(gdb) littlefs-endurance",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/development/muckabout/littlefs-endurance/littlefs-endurance",
-            "cwd": "${workspaceFolder}/development/muckabout/littlefs-endurance"
+            "program": "${workspaceFolder:qmk_userspace}/development/muckabout/littlefs-endurance/littlefs-endurance",
+            "cwd": "${workspaceFolder:qmk_userspace}/development/muckabout/littlefs-endurance"
         },
         {
             "name": "(gdb) rle",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/development/muckabout/rle/rle",
+            "program": "${workspaceFolder:qmk_userspace}/development/muckabout/rle/rle",
             "args": ["-h"],
-            "cwd": "${workspaceFolder}/development/muckabout/rle"
+            "cwd": "${workspaceFolder:qmk_userspace}/development/muckabout/rle"
         },
         {
             "name": "(gdb) rle16",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/development/muckabout/rle16/rle",
+            "program": "${workspaceFolder:qmk_userspace}/development/muckabout/rle16/rle",
             "args": ["-h"],
-            "cwd": "${workspaceFolder}/development/muckabout/rle16"
+            "cwd": "${workspaceFolder:qmk_userspace}/development/muckabout/rle16"
         },
         {
             "name": "(gdb) Launch encoder_split_no_left",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/qmk_firmware/.build/test/encoder_split_no_left.elf",
+            "program": "${workspaceFolder:qmk_userspace}/qmk_firmware/.build/test/encoder_split_no_left.elf",
             "args": [],
-            "cwd": "${workspaceFolder}/qmk_firmware/.build/test"
+            "cwd": "${workspaceFolder:qmk_userspace}/qmk_firmware/.build/test"
         },
         {
             "name": "ST-Link (handwired/onekey F723 reset keymap, cortex-debug)",
             "type": "cortex-debug",
             "request": "attach",
-            "cwd": "${workspaceRoot}/qmk_firmware",
+            "cwd": "${workspaceFolder:qmk_userspace}/qmk_firmware",
             "servertype": "stutil",
             "device": "STM32F723",
-            "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_onekey_disco_f723_reset.elf",
-            "svdPath": "${workspaceRoot}/svd/STM32F7x3.svd"
+            "executable": "${workspaceFolder:qmk_userspace}/qmk_firmware/.build/handwired_onekey_disco_f723_reset.elf",
+            "svdPath": "${workspaceFolder:qmk_userspace}/svd/STM32F7x3.svd"
         },
         {
             "name": "ST-Link (handwired/onekey H723 reset keymap, cortex-debug)",
             "type": "cortex-debug",
             "request": "attach",
-            "cwd": "${workspaceRoot}/qmk_firmware",
+            "cwd": "${workspaceFolder:qmk_userspace}/qmk_firmware",
             "servertype": "stutil",
             "device": "STM32H723",
-            "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_onekey_nucleo_h723zg_reset.elf",
-            "svdPath": "${workspaceRoot}/svd/STM32H723.svd"
+            "executable": "${workspaceFolder:qmk_userspace}/qmk_firmware/.build/handwired_onekey_nucleo_h723zg_reset.elf",
+            "svdPath": "${workspaceFolder:qmk_userspace}/svd/STM32H723.svd"
         },
         {
             "name": "Black Magic Probe (qp_test, cortex-debug)",
             "type": "cortex-debug",
             "request": "attach",
-            "cwd": "${workspaceRoot}/qmk_firmware",
-            "svdPath": "${workspaceRoot}/svd/STM32F401.svd",
+            "cwd": "${workspaceFolder:qmk_userspace}/qmk_firmware",
+            "svdPath": "${workspaceFolder:qmk_userspace}/svd/STM32F401.svd",
             "servertype": "bmp",
             "interface": "swd",
             "device": "STM32F401",
-            "executable": "${workspaceRoot}/qmk_firmware/.build/qp_test_default.elf",
+            "executable": "${workspaceFolder:qmk_userspace}/qmk_firmware/.build/qp_test_default.elf",
             "linux": {
                 "BMPGDBSerialPort": "/dev/ttyACM2"
             },
@@ -254,12 +254,12 @@
             "name": "Black Magic Probe (f411_tinyuf2_filesystem, cortex-debug)",
             "type": "cortex-debug",
             "request": "attach",
-            "cwd": "${workspaceRoot}/qmk_firmware",
-            "svdPath": "${workspaceRoot}/svd/STM32F401.svd",
+            "cwd": "${workspaceFolder:qmk_userspace}/qmk_firmware",
+            "svdPath": "${workspaceFolder:qmk_userspace}/svd/STM32F401.svd",
             "servertype": "bmp",
             "interface": "swd",
             "device": "STM32F401",
-            "executable": "${workspaceRoot}/qmk_firmware/.build/handwired_onekey_f411_tinyuf2_filesystem_reset.elf",
+            "executable": "${workspaceFolder:qmk_userspace}/qmk_firmware/.build/handwired_onekey_f411_tinyuf2_filesystem_reset.elf",
             "linux": {
                 "BMPGDBSerialPort": "/dev/ttyACM2"
             },

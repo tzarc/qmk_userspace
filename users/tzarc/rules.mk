@@ -42,6 +42,7 @@ ifeq ($(strip $(PLATFORM_KEY)),chibios)
 else ifeq ($(strip $(PLATFORM_KEY)),avr)
 	OPT ?= s
 	GAME_MODES_ENABLE = no
+    UNICODE_ENABLE = no
 	ifeq ($(strip $(PROTOCOL)),LUFA)
 		# Uses defaults as per rules.mk
 	else ifeq ($(strip $(PROTOCOL)),VUSB)
