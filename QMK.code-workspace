@@ -57,9 +57,11 @@
         },
         "clangd.inactiveRegions.opacity": 0.5,
         "files.associations": {
-            "keymap.json": "jsonc",
+            "keyboard.json": "jsonc",
             "info.json": "jsonc",
-            "keyboard.json": "jsonc"
+            "keymap.json": "jsonc",
+            "qmk.json": "jsonc",
+            "qmk_module.json": "jsonc"
         },
         "clangd.arguments": ["--header-insertion=never"],
         "json.schemas": [
