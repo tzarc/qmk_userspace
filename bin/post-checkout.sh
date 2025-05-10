@@ -38,13 +38,6 @@ if [ "${1:-}" = "" -o "${1:-}" != "${2:-}" ]; then
         # Upgrade QMK CLI and all other deps
         uv pip install --upgrade pip uv -r "$script_dir/../python-requirements.txt"
 
-        # Install the pre-commit hooks
-        hash -r
-        pre-commit install
-        pushd "$module_dir" >/dev/null 2>&1
-        pre-commit install
-        popd >/dev/null 2>&1
-
         # Determine all the submodules we expect, as well as the ones we found on-disk
         actual_submodules=$(git -C "$firmware_dir" submodule --quiet foreach --recursive git rev-parse --show-toplevel | sed -e "s@${firmware_dir}/@@g")
         found_submodules=$(find lib -type f -name .git | while read p; do echo $(dirname $p); done)
@@ -68,6 +61,15 @@ if [ "${1:-}" = "" -o "${1:-}" != "${2:-}" ]; then
 
         # Reconfigure git submodules
         git -C "$firmware_dir" submodule update --jobs $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) --init --recursive
+
+        # Install the pre-commit hooks
+        hash -r
+        pushd "$script_dir/../" >/dev/null 2>&1
+        pre-commit install -f
+        popd >/dev/null 2>&1
+        pushd "$script_dir/../modules/tzarc" >/dev/null 2>&1
+        pre-commit install -f
+        popd >/dev/null 2>&1
 
         # Drop out of the qmk venv
         deactivate
