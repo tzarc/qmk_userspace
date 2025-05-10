@@ -13,8 +13,14 @@ import asyncio
 
 async def main() -> None:
     bus = await MessageBus().connect()
-    introspection = await bus.introspect("org.freedesktop.PowerManagement", "/org/freedesktop/PowerManagement/Inhibit")
-    obj = bus.get_proxy_object("org.freedesktop.PowerManagement", "/org/freedesktop/PowerManagement/Inhibit", introspection)
+    introspection = await bus.introspect(
+        "org.freedesktop.PowerManagement", "/org/freedesktop/PowerManagement/Inhibit"
+    )
+    obj = bus.get_proxy_object(
+        "org.freedesktop.PowerManagement",
+        "/org/freedesktop/PowerManagement/Inhibit",
+        introspection,
+    )
 
     # Connect to the Inhibit interface and register a signal handler
     iface_inhibit = obj.get_interface("org.freedesktop.PowerManagement.Inhibit")
@@ -31,7 +37,9 @@ async def main() -> None:
     # Connect to the Properties interface and register a signal handler
     iface_props = obj.get_interface("org.freedesktop.DBus.Properties")
 
-    def on_properties_changed(interface_name: str, changed_properties, invalidated_properties) -> None:
+    def on_properties_changed(
+        interface_name: str, changed_properties, invalidated_properties
+    ) -> None:
         for changed, variant in changed_properties.items():
             print(f"property changed: {changed} - {variant.value}")
 

@@ -14,7 +14,7 @@ from dbus_next.message import Message, MessageType
 from dbus_next.aio import MessageBus
 
 
-async def invoke_kwin_method(bus, method_name: str, signature: str="", body=[]):
+async def invoke_kwin_method(bus, method_name: str, signature: str = "", body=[]):
     reply = await bus.call(
         Message(
             destination="org.kde.kglobalaccel",
@@ -29,7 +29,9 @@ async def invoke_kwin_method(bus, method_name: str, signature: str="", body=[]):
 
 
 async def invoke_kwin_shortcut(bus, shortcut_name: str):
-    reply = await invoke_kwin_method(bus, method_name="invokeShortcut", signature="s", body=[shortcut_name])
+    reply = await invoke_kwin_method(
+        bus, method_name="invokeShortcut", signature="s", body=[shortcut_name]
+    )
 
     if reply.message_type == MessageType.ERROR:
         raise Exception(reply.body)
@@ -51,7 +53,9 @@ programmable_button_mapping = {
 
 
 # Work out which keys to listen for
-listen_for = dict(filter(lambda e: e[0].startswith("KEY_MACRO"), evdev.ecodes.ecodes.items()))
+listen_for = dict(
+    filter(lambda e: e[0].startswith("KEY_MACRO"), evdev.ecodes.ecodes.items())
+)
 
 listening_devices = {}
 
@@ -71,10 +75,15 @@ async def listen_programmable_buttons_device(bus, device) -> None:
                 if event.code in listen_for.values():
                     if event.value == 1:  # Key pressed
                         if evdev.ecodes.KEY[event.code] in programmable_button_mapping:
-                            shortcut = programmable_button_mapping[evdev.ecodes.KEY[event.code]]
+                            shortcut = programmable_button_mapping[
+                                evdev.ecodes.KEY[event.code]
+                            ]
                             await invoke_kwin_shortcut(bus, shortcut)
                         else:
-                            print(f"Unknown programmable button: {evdev.ecodes.KEY[event.code]}", file=sys.stderr)
+                            print(
+                                f"Unknown programmable button: {evdev.ecodes.KEY[event.code]}",
+                                file=sys.stderr,
+                            )
     except OSError as e:
         if e.errno == 19:  # No such device
             # Device disconnected

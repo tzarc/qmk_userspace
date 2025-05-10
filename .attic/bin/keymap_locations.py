@@ -8,13 +8,18 @@ qmk_cli_path = qmk_firmware_path / "lib/python"
 
 sys.path.append(str(qmk_cli_path))
 
+from qmk.keymap import locate_keymap  # noqa: E402
+from qmk.path import (  # noqa: E402
+    is_under_qmk_userspace,
+    under_qmk_userspace,
+    is_under_qmk_firmware,
+    under_qmk_firmware,
+)
+
 orig_cwd = os.getcwd()
 os.environ["ORIG_CWD"] = str(orig_cwd)
 os.chdir(qmk_firmware_path)
 os.environ["QMK_HOME"] = str(qmk_firmware_path)
-
-from qmk.keymap import locate_keymap  # noqa: E402
-from qmk.path import is_under_qmk_userspace, under_qmk_userspace, is_under_qmk_firmware, under_qmk_firmware  # noqa: E402
 
 for kbkm in sys.argv:
     try:

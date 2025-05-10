@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import datetime
-import os
 import shlex
 import subprocess
 import re
@@ -16,10 +15,18 @@ target_ref = sys.argv[1] if len(sys.argv) > 1 else None
 
 this_year = datetime.date.today().year
 
-spdx_line = re.compile(r"Copyright (?P<startyear>\d+).*tzarc.*$", re.IGNORECASE | re.MULTILINE)
+spdx_line = re.compile(
+    r"Copyright (?P<startyear>\d+).*tzarc.*$", re.IGNORECASE | re.MULTILINE
+)
 
 
-def _run(command, capture_output: bool=True, combined_output: bool=False, text: bool=True, **kwargs):
+def _run(
+    command,
+    capture_output: bool = True,
+    combined_output: bool = False,
+    text: bool = True,
+    **kwargs,
+):
     if isinstance(command, str):
         command = shlex.split(command)
     if capture_output:
@@ -34,12 +41,27 @@ def _run(command, capture_output: bool=True, combined_output: bool=False, text: 
     return subprocess.run(command, **kwargs)
 
 
-git_command = "git ls-files" if target_ref is None else f"git diff --name-only {target_ref}"
+git_command = (
+    "git ls-files" if target_ref is None else f"git diff --name-only {target_ref}"
+)
 diff_list = _run(git_command).stdout.strip().split("\n")
 diff_list.extend(_run(f"{git_command} --cached").stdout.strip().split("\n"))
 diff_list = list(sorted(set(diff_list)))
 
-source_files = [".sh", ".py", ".c", ".cxx", ".cpp", ".cc", ".h", ".hxx", ".hpp", ".hh", ".inl", ".mk"]
+source_files = [
+    ".sh",
+    ".py",
+    ".c",
+    ".cxx",
+    ".cpp",
+    ".cc",
+    ".h",
+    ".hxx",
+    ".hpp",
+    ".hh",
+    ".inl",
+    ".mk",
+]
 
 for diff_entry in [Path(p) for p in diff_list]:
     if diff_entry.is_file() and diff_entry.suffix in source_files:

@@ -6,12 +6,14 @@
 # ------------------------------------------------------------------------------#
 # vim: set fileencoding=utf8 :
 
-import sys, re, os
+import sys
+import re
+import os
 from itertools import chain, groupby
 import squarify
 
 from bokeh.plotting import figure, show, output_file, ColumnDataSource
-from bokeh.models import HoverTool, LabelSet
+from bokeh.models import HoverTool
 from bokeh.models.mappers import CategoricalColorMapper
 from bokeh.palettes import Category10
 from bokeh.layouts import column
@@ -30,7 +32,9 @@ class Objectfile:
         self.children = []
 
     def __repr__(self) -> str:
-        return "<Objectfile {} {:x} {:x} {} {}>".format(self.section, self.offset, self.size, self.path, repr(self.children))
+        return "<Objectfile {} {:x} {:x} {} {}>".format(
+            self.section, self.offset, self.size, self.path, repr(self.children)
+        )
 
 
 def parseSections(fd):
@@ -44,18 +48,23 @@ def parseSections(fd):
     # skip until memory map is found
     found = False
     while True:
-        l = sys.stdin.readline()
-        if not l:
+        line = sys.stdin.readline()
+        if not line:
             break
-        if l.strip() == "Memory Configuration":
+        if line.strip() == "Memory Configuration":
             found = True
             break
     if not found:
         return None
 
     # long section names result in a linebreak afterwards
-    sectionre = re.compile("(?P<section>.+?|.{14,}\n)[ ]+0x(?P<offset>[0-9a-f]+)[ ]+0x(?P<size>[0-9a-f]+)(?:[ ]+(?P<comment>.+))?\n+", re.I)
-    subsectionre = re.compile("[ ]{16}0x(?P<offset>[0-9a-f]+)[ ]+(?P<function>.+)\n+", re.I)
+    sectionre = re.compile(
+        "(?P<section>.+?|.{14,}\n)[ ]+0x(?P<offset>[0-9a-f]+)[ ]+0x(?P<size>[0-9a-f]+)(?:[ ]+(?P<comment>.+))?\n+",
+        re.I,
+    )
+    subsectionre = re.compile(
+        "[ ]{16}0x(?P<offset>[0-9a-f]+)[ ]+(?P<function>.+)\n+", re.I
+    )
     s = sys.stdin.read()
     pos = 0
     while True:
@@ -97,18 +106,24 @@ def parseSections(fd):
 def main() -> None:
     sections = parseSections(sys.stdin)
     if sections is None:
-        print("start of memory config not found, did you invoke the compiler/linker with LANG=C?")
+        print(
+            "start of memory config not found, did you invoke the compiler/linker with LANG=C?"
+        )
         return
 
     sectionWhitelist = {".text", ".data", ".bss", ".rodata"}
     plots = []
-    whitelistedSections = list(filter(lambda x: x.section in sectionWhitelist, sections))
+    whitelistedSections = list(
+        filter(lambda x: x.section in sectionWhitelist, sections)
+    )
     allObjects = list(chain(*map(lambda x: x.children, whitelistedSections)))
     allFiles = list(set(map(lambda x: x.basepath, allObjects)))
     for s in whitelistedSections:
         objects = s.children
         groupsize = {}
-        for k, g in groupby(sorted(objects, key=lambda x: x.basepath), lambda x: x.basepath):
+        for k, g in groupby(
+            sorted(objects, key=lambda x: x.basepath), lambda x: x.basepath
+        ):
             groupsize[k] = sum(map(lambda x: x.size, g))
         objects.sort(reverse=True, key=lambda x: x.size)
         values = list(map(lambda x: x.size, objects))
@@ -119,7 +134,7 @@ def main() -> None:
         width = 1000
         height = 1000
         values = squarify.normalize_sizes(values, width, height)
-        rects = squarify.squarify(values, x, y, width, height)
+        # rects = squarify.squarify(values, x, y, width, height)
         padded_rects = squarify.padded_squarify(values, x, y, width, height)
 
         # plot with bokeh
@@ -133,8 +148,17 @@ def main() -> None:
         recth = list(map(lambda x: x["dy"], padded_rects))
         files = list(map(lambda x: x.basepath, objects))
         size = list(map(lambda x: x.size, objects))
-        children = list(map(lambda x: ",".join(map(lambda x: x[1], x.children)) if x.children else x.section, objects))
-        legend = list(map(lambda x: "{} ({})".format(x.basepath, groupsize[x.basepath]), objects))
+        children = list(
+            map(
+                lambda x: ",".join(map(lambda x: x[1], x.children))
+                if x.children
+                else x.section,
+                objects,
+            )
+        )
+        legend = list(
+            map(lambda x: "{} ({})".format(x.basepath, groupsize[x.basepath]), objects)
+        )
         source = ColumnDataSource(
             data=dict(
                 left=left,
@@ -174,7 +198,15 @@ def main() -> None:
 
         palette = Category10[10]
         mapper = CategoricalColorMapper(palette=palette, factors=allFiles)
-        p.rect(x="x", y="y", width="width", height="height", source=source, color={"field": "file", "transform": mapper}, legend="legend")
+        p.rect(
+            x="x",
+            y="y",
+            width="width",
+            height="height",
+            source=source,
+            color={"field": "file", "transform": mapper},
+            legend="legend",
+        )
 
         # set up legend, must be done after plotting
         p.legend.location = "top_left"
