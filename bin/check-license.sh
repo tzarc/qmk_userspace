@@ -10,17 +10,17 @@ this_script=$(realpath "${BASH_SOURCE[0]}")
 script_dir=$(dirname "$this_script")
 
 license_check() {
-    cat - | grep '\(Makefile.*\|Dockerfile.*\|\.\(c\|cpp\|h\|hpp\|mk\|sh\|py\|cmd\)\)$' | grep -v 'lib/lua' | grep -v 'board\.\(c\|h\|mk\)$' | grep -v '\(ch\|hal\|mcu\)conf\.h$' | grep -v '\.\(qgf\|qff\)\.\(c\|h\)$' | while read file ; do
-    if [[ -e "$file" ]] ; then
-        if [[ -z "$(cat "$file" | head -n${max_search_lines} | grep -E 'Copyright\s+[-0-9]+')" ]] ; then
-            echo "Missing license header: $(realpath $file)"
-            exitcode=1
-        elif [[ -z "$(cat "$file" | head -n${max_search_lines} | grep "SPDX-License-Identifier")" ]] ; then
-            echo "Missing license identifier: $(realpath $file)"
-            exitcode=1
+    cat - | grep '\(Makefile.*\|Dockerfile.*\|\.\(c\|cpp\|h\|hpp\|mk\|sh\|py\|cmd\)\)$' | grep -v 'lib/lua' | grep -v 'board\.\(c\|h\|mk\)$' | grep -v '\(ch\|hal\|mcu\)conf\.h$' | grep -v '\.\(qgf\|qff\)\.\(c\|h\)$' | while read file; do
+        if [[ -e $file ]]; then
+            if [[ -z "$(cat "$file" | head -n${max_search_lines} | grep -E 'Copyright\s+[-0-9]+')" ]]; then
+                echo "Missing license header: $(realpath $file)"
+                exitcode=1
+            elif [[ -z "$(cat "$file" | head -n${max_search_lines} | grep "SPDX-License-Identifier")" ]]; then
+                echo "Missing license identifier: $(realpath $file)"
+                exitcode=1
+            fi
         fi
-    fi
-done
+    done
 }
 
 cd $script_dir/..

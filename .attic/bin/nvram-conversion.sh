@@ -18,7 +18,7 @@ git checkout -f develop
 git branch -D $target_branch || true
 git checkout -f -b $target_branch develop
 
-if [[ "$target_branch" != "$(git branch --show-current)" ]]; then
+if [[ $target_branch != "$(git branch --show-current)" ]]; then
     echo "Expected branch '$target_branch', was branch '$(git branch --show-current)'" >&2
     exit 1
 fi

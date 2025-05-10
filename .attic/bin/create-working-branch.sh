@@ -18,7 +18,7 @@ target_qmk="develop"
 target_chibios="svn-mirror/stable_21.11.x"
 target_chibios_contrib="mirror/chibios-21.11.x"
 
-if [ ! -z ${upgrade_chibios:-} ] ; then
+if [ ! -z ${upgrade_chibios:-} ]; then
     target_branch="generated-chibios-master-upgrade"
     target_qmk="develop"
 
@@ -50,29 +50,29 @@ hard_reset() {
     pcmd git clean -xfd
     pcmd git remote set-url origin git@github.com:tzarc/$repo_name.git
     pcmd git remote set-url origin git@github.com:tzarc/$repo_name.git --push
-    pcmd git remote set-url upstream git@github.com:$repo_upstream/$repo_name.git \
-        || pcmd git remote add upstream git@github.com:$repo_upstream/$repo_name.git
+    pcmd git remote set-url upstream git@github.com:$repo_upstream/$repo_name.git ||
+        pcmd git remote add upstream git@github.com:$repo_upstream/$repo_name.git
     pcmd git remote set-url upstream git@github.com:tzarc/$repo_name.git --push
-    pcmd git remote set-url qmk git@github.com:qmk/$repo_name.git \
-        || pcmd git remote add qmk git@github.com:qmk/$repo_name.git
+    pcmd git remote set-url qmk git@github.com:qmk/$repo_name.git ||
+        pcmd git remote add qmk git@github.com:qmk/$repo_name.git
     pcmd git remote set-url qmk git@github.com:tzarc/$repo_name.git --push
-    pcmd git fetch qmk $repo_branch \
-        || pcmd git fetch $repo_upstream $repo_branch \
-        || pcmd git fetch origin $repo_branch
+    pcmd git fetch qmk $repo_branch ||
+        pcmd git fetch $repo_upstream $repo_branch ||
+        pcmd git fetch origin $repo_branch
     pcmd git clean -xfd
     pcmd git checkout -f qmk/$repo_branch
     pcmd git branch -D $repo_branch || true
     pcmd git checkout -b $repo_branch
-    pcmd git reset --hard qmk/$repo_branch \
-        || pcmd git reset --hard $repo_upstream/$repo_branch \
-        || pcmd git reset --hard origin/$repo_branch \
-        || pcmd git reset --hard $repo_branch
+    pcmd git reset --hard qmk/$repo_branch ||
+        pcmd git reset --hard $repo_upstream/$repo_branch ||
+        pcmd git reset --hard origin/$repo_branch ||
+        pcmd git reset --hard $repo_branch
     pcmd git push origin $repo_branch --force-with-lease
     pcmd git branch -D $target_branch || true
     pcmd git checkout -b $target_branch
-    pcmd git reset --hard qmk/$repo_branch \
-        || pcmd git reset --hard origin/$repo_branch \
-        || pcmd git reset --hard $repo_branch
+    pcmd git reset --hard qmk/$repo_branch ||
+        pcmd git reset --hard origin/$repo_branch ||
+        pcmd git reset --hard $repo_branch
 }
 
 upgrade-chibios() {
@@ -82,7 +82,7 @@ upgrade-chibios() {
 
     pushd "$script_dir/qmk_firmware/lib/chibios"
     hard_reset ChibiOS ChibiOS $target_chibios
-    if [[ ! -z "$(git remote -v | grep origin | grep push | grep tzarc)" ]] ; then
+    if [[ -n "$(git remote -v | grep origin | grep push | grep tzarc)" ]]; then
         pcmd git push origin $target_branch --set-upstream --force
     else
         echo "Failed to push to tzarc/ChibiOS" >&2
@@ -92,7 +92,7 @@ upgrade-chibios() {
 
     pushd "$script_dir/qmk_firmware/lib/chibios-contrib"
     hard_reset ChibiOS ChibiOS-Contrib $target_chibios_contrib
-    if [[ ! -z "$(git remote -v | grep origin | grep push | grep tzarc)" ]] ; then
+    if [[ -n "$(git remote -v | grep origin | grep push | grep tzarc)" ]]; then
         pcmd git push origin $target_branch --set-upstream --force
     else
         echo "Failed to push to tzarc/ChibiOS-Contrib" >&2
@@ -107,15 +107,15 @@ upgrade-chibios() {
 }
 
 disable_chconf_extras() {
-    for chconf in $(find "$script_dir/qmk_firmware/platforms" "$script_dir/qmk_firmware/keyboards" -name chconf.h) ; do
-        cat "$chconf" \
-            | sed \
+    for chconf in $(find "$script_dir/qmk_firmware/platforms" "$script_dir/qmk_firmware/keyboards" -name chconf.h); do
+        cat "$chconf" |
+            sed \
                 -e 's@#define CH_CFG_USE_OBJ_CACHES\(\s\+\)TRUE@#define CH_CFG_USE_OBJ_CACHES\1FALSE@g' \
                 -e 's@#define CH_CFG_USE_DELEGATES\(\s\+\)TRUE@#define CH_CFG_USE_DELEGATES\1FALSE@g' \
                 -e 's@#define CH_CFG_USE_JOBS\(\s\+\)TRUE@#define CH_CFG_USE_JOBS\1FALSE@g' \
                 -e 's@#define CH_CFG_USE_FACTORY\(\s\+\)TRUE@#define CH_CFG_USE_FACTORY\1FALSE@g' \
                 -e 's@#define CH_CFG_USE_MEMCORE\(\s\+\)FALSE@#define CH_CFG_USE_MEMCORE\1TRUE@g' \
-            > "${chconf}.new"
+                >"${chconf}.new"
         mv "${chconf}.new" "${chconf}"
     done
 }
@@ -125,19 +125,19 @@ upgrade-chibios-confs() {
 
     OIFS=$IFS
     IFS=$'\n'
-    for file in $(find "$script_dir/qmk_firmware/keyboards" "$script_dir/qmk_firmware/platforms" -name 'chconf.h') ; do
+    for file in $(find "$script_dir/qmk_firmware/keyboards" "$script_dir/qmk_firmware/platforms" -name 'chconf.h'); do
         echo $file
 
         sed -i 's@#define CH_CFG_USE_JOBS\s*TRUE@#define CH_CFG_USE_JOBS FALSE@g' "$file"
         sed -i 's@#define CH_CFG_USE_FACTORY\s*TRUE@#define CH_CFG_USE_FACTORY FALSE@g' "$file"
         sed -i 's@#define CH_CFG_USE_MEMCORE\s*FALSE@#define CH_CFG_USE_MEMCORE TRUE@g' "$file"
 
-        if ! grep -q include_next "$file" ; then
-            echo '#define CH_CFG_USE_OBJ_CACHES FALSE' >> "$file"
-            echo '#define CH_CFG_USE_DELEGATES FALSE' >> "$file"
-            echo '#define CH_CFG_USE_JOBS FALSE' >> "$file"
-            echo '#define CH_CFG_USE_FACTORY FALSE' >> "$file"
-            echo '#define CH_CFG_USE_MEMCORE TRUE' >> "$file"
+        if ! grep -q include_next "$file"; then
+            echo '#define CH_CFG_USE_OBJ_CACHES FALSE' >>"$file"
+            echo '#define CH_CFG_USE_DELEGATES FALSE' >>"$file"
+            echo '#define CH_CFG_USE_JOBS FALSE' >>"$file"
+            echo '#define CH_CFG_USE_FACTORY FALSE' >>"$file"
+            echo '#define CH_CFG_USE_MEMCORE TRUE' >>"$file"
         fi
     done
     IFS=$OIFS
@@ -173,11 +173,11 @@ upgrade-chibios
 popd
 
 pushd "$script_dir/qmk_firmware"
-for pr in ${prs_to_apply[@]} ; do
+for pr in ${prs_to_apply[@]}; do
     echo -e "\e[38;5;203mPR $pr\e[0m"
     set +e
     pcmd hub merge https://github.com/qmk/qmk_firmware/pull/${pr}
-    if [[ $? != 0 ]] ; then
+    if [[ $? != 0 ]]; then
         echo "Error during merge, please fix and hit ENTER:"
         read DUMMY
     fi
@@ -188,14 +188,14 @@ done
 popd
 
 pushd "$script_dir/qmk_firmware"
-for hash in ${cherry_picks[@]} ; do
+for hash in ${cherry_picks[@]}; do
     echo -e "\e[38;5;203mCherry-picking $hash\e[0m"
     pcmd git cherry-pick $hash
     pcmd make git-submodule
 done
 popd
 
-if [ ! -z ${upgrade_chibios_confs:-} ] ; then
+if [ ! -z ${upgrade_chibios_confs:-} ]; then
     upgrade-chibios-confs
 fi
 

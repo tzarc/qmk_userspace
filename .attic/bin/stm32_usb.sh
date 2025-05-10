@@ -85,7 +85,7 @@ function markdown_table() {
     echo -n "|"
     for family in $(echo "${!families[@]}" | tr ' ' '\n' | sort | uniq); do echo -n " ---- |"; done
     echo
-    for ((i = 1; i <= $maxlen; i++)); do
+    for ((i = 1; i <= maxlen; i++)); do
         echo -n "|"
         for family in $(echo "${!families[@]}" | tr ' ' '\n' | sort | uniq); do
             local thislen=$(echo ${chips[$family]} | wc -w)
@@ -101,11 +101,11 @@ function markdown_table() {
 }
 
 {
-echo "### USB:"
-echo
-peripheral_targets USB | markdown_table
-echo
-echo "### OTG:"
-echo
-peripheral_targets OTG | markdown_table
+    echo "### USB:"
+    echo
+    peripheral_targets USB | markdown_table
+    echo
+    echo "### OTG:"
+    echo
+    peripheral_targets OTG | markdown_table
 } | tee "$script_dir/stm32_usb.md"

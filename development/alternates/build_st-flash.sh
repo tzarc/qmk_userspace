@@ -10,11 +10,11 @@ script_dir=$(dirname "$this_script")
 
 sudo apt install -y build-essential cmake libusb-1.0 libusb-1.0-0-dev
 
-[ -d "$script_dir/stlink-repo/.git" ] \
-	|| git clone https://github.com/texane/stlink.git "$script_dir/stlink-repo"
+[ -d "$script_dir/stlink-repo/.git" ] ||
+    git clone https://github.com/texane/stlink.git "$script_dir/stlink-repo"
 
-[ -d "$script_dir/stlink-build" ] \
-	|| mkdir -p "$script_dir/stlink-build"
+[ -d "$script_dir/stlink-build" ] ||
+    mkdir -p "$script_dir/stlink-build"
 
 cd "$script_dir/stlink-repo"
 git checkout -- .

@@ -6,7 +6,7 @@ umask 022
 
 set -eEuo pipefail
 
-if [[ ! -z "${SIZE_REGRESSION_EXECUTING:-}" ]]; then
+if [[ -n ${SIZE_REGRESSION_EXECUTING:-} ]]; then
     # Skip executing if we're doing size regression analysis
     exit 0
 fi
@@ -25,7 +25,7 @@ if [ "${1:-}" = "" -o "${1:-}" != "${2:-}" ]; then
     venv_dir=$(realpath "$script_dir/../.venv")
 
     # If we have a valid venv and valid qmk_firmware, do the actual processing
-    if [[ -d "$venv_dir" ]] && [[ -d "$firmware_dir" ]]; then
+    if [[ -d $venv_dir ]] && [[ -d $firmware_dir ]]; then
         # Everything here happens within qmk_firmware
         cd "$firmware_dir"
 
@@ -33,7 +33,7 @@ if [ "${1:-}" = "" -o "${1:-}" != "${2:-}" ]; then
         source "$venv_dir/bin/activate"
 
         # Ensure we have uv available
-        [[ ! -z "$(which uv)" ]] || pip install uv
+        [[ -n "$(which uv)" ]] || pip install uv
 
         # Upgrade QMK CLI and all other deps
         uv pip install --upgrade pip uv -r "$script_dir/../python-requirements.txt"
@@ -49,9 +49,9 @@ if [ "${1:-}" = "" -o "${1:-}" != "${2:-}" ]; then
 
         # Remove any submodules that are no longer in use
         while read remove; do
-            if [[ "$remove" != "" ]] && [[ "$remove" != "." ]] && [[ "$remove" != ".." ]]; then
+            if [[ $remove != "" ]] && [[ $remove != "." ]] && [[ $remove != ".." ]]; then
                 this_dir=$(realpath "$firmware_dir/$remove")
-                if [[ $(realpath "$firmware_dir") != $(realpath "$this_dir") ]] && [[ -f "$this_dir/.git" ]] && [[ ! -z $(cat "$this_dir/.git" | head -n1 | grep '^gitdir:' || true) ]]; then
+                if [[ $(realpath "$firmware_dir") != $(realpath "$this_dir") ]] && [[ -f "$this_dir/.git" ]] && [[ -n $(cat "$this_dir/.git" | head -n1 | grep '^gitdir:' || true) ]]; then
                     echo -n "Removing ${remove}... " >&2
                     rm -rf "$this_dir"
                     echo "done." >&2

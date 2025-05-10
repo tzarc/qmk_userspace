@@ -10,8 +10,8 @@ script_dir="$(realpath "$(dirname "$this_script")")"
 userspace_dir="$(realpath "$script_dir/..")"
 
 # Ensure we have access to the qmk venv if it exists
-venv_activate_path=$(find $userspace_dir -path '*/.direnv/python*/bin/*' -name activate | head -n1)
-if [[ ! -z "${venv_activate_path:-}" ]]; then
+venv_activate_path=$(find $userspace_dir -path '*/.venv/bin/*' -name activate | head -n1)
+if [[ -n ${venv_activate_path:-} ]]; then
     echo "Activating environment: $venv_activate_path"
     source "$venv_activate_path"
 fi
@@ -40,7 +40,7 @@ unset USE_RAMDISK
 unset DOCKER_PREFIX
 unset TARGET_PR_NUMBER
 TARGET_BRANCH="develop"
-while [[ -n "${1:-}" ]]; do
+while [[ -n ${1:-} ]]; do
     case "$1" in
     --ramdisk)
         USE_RAMDISK=1
@@ -67,7 +67,7 @@ while [[ -n "${1:-}" ]]; do
     shift
 done
 
-if [[ -z "${TARGET_PR_NUMBER:-}" ]]; then
+if [[ -z ${TARGET_PR_NUMBER:-} ]]; then
     errcho "No PR number specified"
     errcho
     usage
@@ -78,15 +78,15 @@ build_dir=$(mktemp -d -p "$HOME/.local/" -t qmk.XXX)
 # Set up the build directory
 cleanup() {
     cd "$userspace_dir"
-    if [[ -z "${FIRST_INIT:-}" ]]; then
-        if [[ -d "$build_dir" ]]; then
+    if [[ -z ${FIRST_INIT:-} ]]; then
+        if [[ -d $build_dir ]]; then
             echo "Entering shell so that extra investigation can occur..."
             echo "Current directory: $(pwd)"
             echo "Verification directory: $build_dir"
             bash
         fi
     fi
-    if [[ -n "${USE_RAMDISK:-}" ]]; then
+    if [[ -n ${USE_RAMDISK:-} ]]; then
         while [[ -n "$(mount | grep " $build_dir ")" ]]; do
             errcho "Waiting for $build_dir to unmount..."
             sleep 1
@@ -94,7 +94,7 @@ cleanup() {
             sleep 1
         done
     fi
-    if [[ -d "$build_dir" ]]; then
+    if [[ -d $build_dir ]]; then
         sleep 1
         rm -rf --one-file-system "$build_dir"
     fi
@@ -144,8 +144,8 @@ main() {
     export FIRST_INIT=1
     cleanup
     unset FIRST_INIT
-    [[ -d "$build_dir" ]] || mkdir -p "$build_dir"
-    if [[ -n "${USE_RAMDISK:-}" ]]; then
+    [[ -d $build_dir ]] || mkdir -p "$build_dir"
+    if [[ -n ${USE_RAMDISK:-} ]]; then
         sudo mount -t tmpfs tmpfs "$build_dir"
     fi
     cd "$build_dir"
@@ -176,7 +176,7 @@ main() {
     # Generate the list of targets
     targets=$(build_targets | sort | uniq | xargs echo)
 
-    if [[ -z "${targets:-}" ]]; then
+    if [[ -z ${targets:-} ]]; then
         errcho "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
         errcho "@@ No targets found in diff! @@"
         errcho "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
