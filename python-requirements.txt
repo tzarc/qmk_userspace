@@ -8,6 +8,7 @@ compiledb
 fnvhash
 ghapi
 mpire
+pre-commit
 profilehooks
 pyelftools
 python-sqlite-cache

@@ -19,7 +19,7 @@ os.chdir(qmk_firmware_path)
 os.environ["QMK_HOME"] = str(qmk_firmware_path)
 
 
-def unload_qmk_cli():
+def unload_qmk_cli() -> None:
     cycles = 0
 
     def mods():
@@ -34,7 +34,7 @@ def unload_qmk_cli():
         cycles += 1
 
 
-def run_command(args):
+def run_command(args) -> None:
     try:
         with patch.object(sys, "argv", args):
             import milc

@@ -19,7 +19,7 @@ this_year = datetime.date.today().year
 spdx_line = re.compile(r"Copyright (?P<startyear>\d+).*tzarc.*$", re.IGNORECASE | re.MULTILINE)
 
 
-def _run(command, capture_output=True, combined_output=False, text=True, **kwargs):
+def _run(command, capture_output: bool=True, combined_output: bool=False, text: bool=True, **kwargs):
     if isinstance(command, str):
         command = shlex.split(command)
     if capture_output:

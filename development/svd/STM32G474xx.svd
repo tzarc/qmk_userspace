@@ -1333,7 +1333,7 @@
                      <access>read-only</access>
                   </field>
 				  <field>
-                     <name>BK_ECC</name>  
+                     <name>BK_ECC</name>
                      <description>BK_ECC</description>
                      <bitOffset>21</bitOffset>
                      <bitWidth>1</bitWidth>
@@ -1351,22 +1351,22 @@
                      <description>ECCIE</description>
                      <bitOffset>24</bitOffset>
                      <bitWidth>1</bitWidth>
-                     <access>read-write</access>        
+                     <access>read-write</access>
                   </field>
 				  <field>
                      <name>ECCC2</name>
                      <description>ECC correction</description>
                      <bitOffset>28</bitOffset>
                      <bitWidth>1</bitWidth>
-                     <access>read-write</access>        
+                     <access>read-write</access>
                   </field>
 				   <field>
                      <name>ECCD2</name>
                      <description>ECC2 detection</description>
                      <bitOffset>29</bitOffset>
                      <bitWidth>1</bitWidth>
-                     <access>read-write</access>        
-                  </field>										 
+                     <access>read-write</access>
+                  </field>
                   <field>
                      <name>ECCC</name>
                      <description>ECC correction</description>
@@ -5819,8 +5819,8 @@
             </register>
          </registers>
       </peripheral>
- 
-      <peripheral>     
+
+      <peripheral>
          <name>GPIOA</name>
          <description>General-purpose I/Os</description>
          <groupName>GPIO</groupName>
@@ -24860,7 +24860,7 @@
                </fields>
             </register>
          </registers>
-      </peripheral>	  	  	
+      </peripheral>
       <peripheral>
          <name>SYSCFG</name>
          <description>System configuration controller</description>
@@ -24870,7 +24870,7 @@
             <offset>0x0</offset>
             <size>0x2A</size>
             <usage>registers</usage>
-         </addressBlock>             
+         </addressBlock>
      <registers>
             <register>
                <name>MEMRMP</name>
@@ -25396,9 +25396,9 @@
                      <bitWidth>8</bitWidth>
                   </field>
                </fields>
-            </register>										
+            </register>
          </registers>
-     </peripheral>	    	  
+     </peripheral>
 	<peripheral>
          <name>VREFBUF</name>
          <description>Voltage reference buffer</description>
@@ -25408,8 +25408,8 @@
             <offset>0x0</offset>
             <size>0x1D0</size>
             <usage>registers</usage>
-         </addressBlock>	  
-        <registers>			
+         </addressBlock>
+        <registers>
             <register>
                <name>VREFBUF_CSR</name>
                <displayName>VREFBUF_CSR</displayName>
@@ -25465,8 +25465,8 @@
                   </field>
                </fields>
             </register>
-        </registers>	
-    </peripheral>											
+        </registers>
+    </peripheral>
 	<peripheral>
          <name>COMP</name>
          <description>Comparator control and status register</description>
@@ -25491,7 +25491,7 @@
             <name>COMP7</name>
             <description>COMP7</description>
             <value>66</value>
-        </interrupt>		 	 
+        </interrupt>
         <registers>
             <register>
                <name>COMP_C1CSR</name>
@@ -25579,7 +25579,7 @@
                      <access>read-write</access>
                   </field>
                </fields>
-            </register>						
+            </register>
             <register>
                <name>COMP_C2CSR</name>
                <displayName>COMP_C2CSR</displayName>
@@ -25667,7 +25667,7 @@
                   </field>
                </fields>
             </register>
-			
+
             <register>
                <name>COMP_C3CSR</name>
                <displayName>COMP_C3CSR</displayName>
@@ -25755,7 +25755,7 @@
                   </field>
                </fields>
             </register>
-			
+
             <register>
                <name>COMP_C4CSR</name>
                <displayName>COMP_C4CSR</displayName>
@@ -25843,7 +25843,7 @@
                   </field>
                </fields>
             </register>
-			
+
             <register>
                <name>COMP_C5CSR</name>
                <displayName>COMP_C5CSR</displayName>
@@ -25931,7 +25931,7 @@
                   </field>
                </fields>
             </register>
-			
+
             <register>
                <name>COMP_C6CSR</name>
                <displayName>COMP_C6CSR</displayName>
@@ -26019,7 +26019,7 @@
                   </field>
                </fields>
             </register>
-			
+
             <register>
                <name>COMP_C7CSR</name>
                <displayName>COMP_C7CSR</displayName>
@@ -26106,9 +26106,9 @@
                      <access>read-write</access>
                   </field>
                </fields>
-            </register>			
-        </registers>	
-    </peripheral>		         
+            </register>
+        </registers>
+    </peripheral>
     <peripheral>
          <name>OPAMP</name>
          <description>Operational amplifiers</description>
@@ -26215,7 +26215,7 @@
                   </field>
                </fields>
             </register>
-			
+
             <register>
                <name>OPAMP2_CSR</name>
                <displayName>OPAMP2_CSR</displayName>
@@ -26311,7 +26311,7 @@
                   </field>
                </fields>
             </register>
-			
+
             <register>
                <name>OPAMP3_CSR</name>
                <displayName>OPAMP3_CSR</displayName>
@@ -26407,7 +26407,7 @@
                   </field>
                </fields>
             </register>
-			
+
             <register>
                <name>OPAMP4_CSR</name>
                <displayName>OPAMP4_CSR</displayName>
@@ -26503,7 +26503,7 @@
                   </field>
                </fields>
             </register>
-			
+
             <register>
                <name>OPAMP5_CSR</name>
                <displayName>OPAMP5_CSR</displayName>
@@ -26599,7 +26599,7 @@
                   </field>
                </fields>
             </register>
-			
+
             <register>
                <name>OPAMP6_CSR</name>
                <displayName>OPAMP6_CSR</displayName>
@@ -26695,7 +26695,7 @@
                   </field>
                </fields>
             </register>
-			
+
             <register>
                <name>OPAMP1_TCMR</name>
                <displayName>OPAMP1_TCMR</displayName>
@@ -26743,7 +26743,7 @@
                   </field>
                </fields>
             </register>
-			
+
             <register>
                <name>OPAMP2_TCMR</name>
                <displayName>OPAMP2_TCMR</displayName>
@@ -26791,7 +26791,7 @@
                   </field>
                </fields>
             </register>
-			
+
             <register>
                <name>OPAMP3_TCMR</name>
                <displayName>OPAMP3_TCMR</displayName>
@@ -26839,7 +26839,7 @@
                   </field>
                </fields>
             </register>
-			
+
             <register>
                <name>OPAMP4_TCMR</name>
                <displayName>OPAMP4_TCMR</displayName>
@@ -26887,7 +26887,7 @@
                   </field>
                </fields>
             </register>
-			
+
             <register>
                <name>OPAMP5_TCMR</name>
                <displayName>OPAMP5_TCMR</displayName>
@@ -26935,7 +26935,7 @@
                   </field>
                </fields>
             </register>
-			
+
             <register>
                <name>OPAMP6_TCMR</name>
                <displayName>OPAMP6_TCMR</displayName>
@@ -26982,9 +26982,9 @@
                      <bitWidth>1</bitWidth>
                   </field>
                </fields>
-            </register>					
-      </registers>	
-    </peripheral>					            
+            </register>
+      </registers>
+    </peripheral>
       <peripheral>
          <name>HRTIM_Master</name>
          <description>High Resolution Timer: Master       Timers</description>
@@ -49759,7 +49759,7 @@
       <peripheral derivedFrom="ADC1">
          <name>ADC2</name>
          <baseAddress>0x50000100</baseAddress>
-      </peripheral>     
+      </peripheral>
       <peripheral>
          <name>ADC3</name>
          <description>Analog-to-Digital Converter</description>
@@ -54610,7 +54610,7 @@
                </fields>
             </register>
          </registers>
-      </peripheral>      
+      </peripheral>
       <peripheral>
          <name>NVIC</name>
          <description>Nested Vectored Interrupt       Controller</description>
@@ -55741,7 +55741,7 @@
                <size>0x20</size>
                <access>read-write</access>
                <resetValue>0x00000000</resetValue>
-            </register> 
+            </register>
            <register>
                <name>STIR</name>
                <displayName>STIR</displayName>
@@ -55758,7 +55758,7 @@
                      <bitWidth>9</bitWidth>
                   </field>
                </fields>
-          </register>			
+          </register>
          </registers>
       </peripheral>
       <peripheral>

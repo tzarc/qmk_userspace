@@ -11,9 +11,9 @@
     <fpuPresent>true</fpuPresent>
     <nvicPrioBits>4</nvicPrioBits>
     <vendorSystickConfig>false</vendorSystickConfig>
-  </cpu>  
-  <addressUnitBits>8</addressUnitBits> 
-  <width>32</width> 
+  </cpu>
+  <addressUnitBits>8</addressUnitBits>
+  <width>32</width>
   <size>0x20</size>
   <resetValue>0x0</resetValue>
   <resetMask>0xFFFFFFFF</resetMask>
@@ -1603,7 +1603,7 @@
         <name>ADC3</name>
         <description>ADC3 global interrupt</description>
         <value>127</value>
-      </interrupt>    
+      </interrupt>
     </peripheral>
     <peripheral>
       <name>ADC12_Common</name>
@@ -1889,11 +1889,11 @@
             </field>
           </fields>
         </register>
-      </registers>    
+      </registers>
     </peripheral>
     <peripheral derivedFrom="ADC12_Common">
       <name>ADC3_Common</name>
-      <baseAddress>0x58026300</baseAddress>        
+      <baseAddress>0x58026300</baseAddress>
     </peripheral>
     <peripheral>
       <name>AXI</name>
@@ -4409,7 +4409,7 @@
           </fields>
         </register>
       </registers>
-    </peripheral>  
+    </peripheral>
     <peripheral>
       <name>DAC</name>
       <description>DAC</description>
@@ -5149,7 +5149,7 @@
                      <description>Allow D1 domain debug in Standby mode</description>
                      <bitOffset>2</bitOffset>
                      <bitWidth>1</bitWidth>
-                  </field>                 
+                  </field>
 				  <field>
                      <name>DBGSLPD2</name>
                      <description> Allow D2 domain debug in Sleep mode</description>
@@ -5179,7 +5179,7 @@
                      <description>Allow debug in D3 Standby mode</description>
                      <bitOffset>8</bitOffset>
                      <bitWidth>1</bitWidth>
-                  </field>				
+                  </field>
 				  <field>
                      <name>TRACECLKEN</name>
                      <description>Trace port clock enable</description>
@@ -5203,7 +5203,7 @@
                      <description>External trigger output enable</description>
                      <bitOffset>28</bitOffset>
                      <bitWidth>1</bitWidth>
-                  </field>				  
+                  </field>
                </fields>
             </register>
             <register>
@@ -5220,9 +5220,9 @@
                      <description>WWDG1 stop in debug</description>
                      <bitOffset>6</bitOffset>
                      <bitWidth>1</bitWidth>
-                  </field>                                                 
+                  </field>
                </fields>
-            </register>  
+            </register>
             <register>
                <name>APB3FZ2</name>
                <displayName>APB3FZ2</displayName>
@@ -5237,9 +5237,9 @@
                      <description>WWDG1 stop in debug</description>
                      <bitOffset>6</bitOffset>
                      <bitWidth>1</bitWidth>
-                  </field>                                                     
+                  </field>
                </fields>
-            </register>			
+            </register>
 			<register>
                <name>APB1LFZ1</name>
                <displayName>APB1LFZ1</displayName>
@@ -5314,7 +5314,7 @@
                      <description>WWDG2 stop in debug</description>
                      <bitOffset>11</bitOffset>
                      <bitWidth>1</bitWidth>
-                  </field>				  
+                  </field>
 				  <field>
                      <name>DBG_I2C1</name>
                      <description> I2C1 SMBUS timeout stop in debug </description>
@@ -5332,9 +5332,9 @@
                      <description> I2C3 SMBUS timeout stop in debug</description>
                      <bitOffset>23</bitOffset>
                      <bitWidth>1</bitWidth>
-                  </field>				   
+                  </field>
                </fields>
-            </register> 
+            </register>
             <register>
                <name>APB1LFZ2</name>
                <displayName>APB1LFZ2</displayName>
@@ -5427,9 +5427,9 @@
                      <description> I2C3 SMBUS timeout stop in debug</description>
                      <bitOffset>23</bitOffset>
                      <bitWidth>1</bitWidth>
-                  </field>                  
+                  </field>
                </fields>
-            </register>				
+            </register>
             <register>
                <name>APB2FZ1</name>
                <displayName>APB2FZ1</displayName>
@@ -5474,9 +5474,9 @@
                      <description> HRTIM stop in debug</description>
                      <bitOffset>29</bitOffset>
                      <bitWidth>1</bitWidth>
-                  </field>				  
+                  </field>
                </fields>
-            </register>	
+            </register>
             <register>
                <name>APB2FZ2</name>
                <displayName>APB2FZ2</displayName>
@@ -5521,9 +5521,9 @@
                      <description>HRTIM stop in debug</description>
                      <bitOffset>29</bitOffset>
                      <bitWidth>1</bitWidth>
-                  </field>				  
+                  </field>
                </fields>
-            </register>			
+            </register>
             <register>
                <name>APB4FZ1</name>
                <displayName>APB4FZ1</displayName>
@@ -5580,7 +5580,7 @@
                      <description> Independent watchdog for D2 stop in debug</description>
                      <bitOffset>19</bitOffset>
                      <bitWidth>1</bitWidth>
-                  </field>					  
+                  </field>
                </fields>
             </register>
             <register>
@@ -5639,9 +5639,9 @@
                      <description> LS watchdog for D2 stop in debug</description>
                      <bitOffset>19</bitOffset>
                      <bitWidth>1</bitWidth>
-                  </field>				  
+                  </field>
                </fields>
-            </register>			
+            </register>
          </registers>
     </peripheral>
 	<peripheral>
@@ -6132,7 +6132,7 @@
         </register>
       </registers>
     </peripheral>
-    <peripheral> 
+    <peripheral>
       <name>DELAY_Block_SDMMC1</name>
       <description>DELAY_Block_SDMMC1</description>
       <groupName>DLYB</groupName>
@@ -6655,7 +6655,7 @@
               <bitWidth>6</bitWidth>
             </field>
           </fields>
-        </register>     
+        </register>
 		<register>
           <name>CH2CFGR1</name>
           <displayName>CH2CFGR1</displayName>
@@ -6829,7 +6829,7 @@
               <bitWidth>6</bitWidth>
             </field>
           </fields>
-        </register>        
+        </register>
 		<register>
           <name>CH3CFGR1</name>
           <displayName>CH3CFGR1</displayName>
@@ -7003,7 +7003,7 @@
               <bitWidth>6</bitWidth>
             </field>
           </fields>
-        </register>        
+        </register>
 		<register>
           <name>CH4CFGR1</name>
           <displayName>CH4CFGR1</displayName>
@@ -7177,7 +7177,7 @@
               <bitWidth>6</bitWidth>
             </field>
           </fields>
-        </register>        
+        </register>
 		<register>
           <name>CH5CFGR1</name>
           <displayName>CH5CFGR1</displayName>
@@ -7351,7 +7351,7 @@
               <bitWidth>6</bitWidth>
             </field>
           </fields>
-        </register>            
+        </register>
 		<register>
           <name>CH6CFGR1</name>
           <displayName>CH6CFGR1</displayName>
@@ -7525,7 +7525,7 @@
               <bitWidth>6</bitWidth>
             </field>
           </fields>
-        </register> 
+        </register>
         <register>
           <name>CH7CFGR1</name>
           <displayName>CH7CFGR1</displayName>
@@ -7699,7 +7699,7 @@
               <bitWidth>6</bitWidth>
             </field>
           </fields>
-        </register>     
+        </register>
         <register>
           <name>DFSDM_FLT0CR1</name>
           <displayName>DFSDM_FLT0CR1</displayName>
@@ -16235,7 +16235,7 @@
     <peripheral derivedFrom="DELAY_Block_SDMMC1">
       <name>Delay_Block_OCTOSPI1</name>
       <baseAddress>0x52006000</baseAddress>
-    </peripheral>	
+    </peripheral>
     <peripheral derivedFrom="DELAY_Block_SDMMC1">
       <name>Delay_Block_OCTOSPI2</name>
       <baseAddress>0x5200B000</baseAddress>
@@ -16290,7 +16290,7 @@
         <name>EXTI15_10</name>
         <description>EXTI Line[15:10] interrupts</description>
         <value>40</value>
-      </interrupt>  
+      </interrupt>
       <interrupt>
         <name>WKUP</name>
         <description>WKUP1 to WKUP6 pins</description>
@@ -32863,7 +32863,7 @@
     <peripheral derivedFrom="GPIOA">
       <name>GPIOH</name>
       <baseAddress>0x58021C00</baseAddress>
-    </peripheral>   
+    </peripheral>
     <peripheral derivedFrom="GPIOA">
       <name>GPIOJ</name>
       <baseAddress>0x58022400</baseAddress>
@@ -51734,7 +51734,7 @@
           </fields>
         </register>
       </registers>
-    </peripheral>	
+    </peripheral>
     <peripheral>
       <name>MPU</name>
       <description>Memory protection unit</description>
@@ -53653,12 +53653,12 @@
         <offset>0x0</offset>
         <size>0x1000</size>
         <usage>registers</usage>
-      </addressBlock> 
+      </addressBlock>
       <interrupt>
         <name>OCTOSPI1</name>
         <description>OCTOSPI1 global interrupt</description>
         <value>92</value>
-      </interrupt>	  
+      </interrupt>
       <registers>
         <register>
           <name>CR</name>
@@ -54568,7 +54568,7 @@
       </registers>
     </peripheral>
 	<peripheral derivedFrom="OCTOSPI1">
-      <name>OCTOSPI2</name>    
+      <name>OCTOSPI2</name>
       <baseAddress>0x5200A000</baseAddress>
       <interrupt>
         <name>OCTOSPI2</name>
@@ -65885,7 +65885,7 @@
           </fields>
         </register>
       </registers>
-    </peripheral>        
+    </peripheral>
     <peripheral derivedFrom="OTG1_HS_PWRCLK">
       <name>OTG2_HS_PWRCLK</name>
       <baseAddress>0x40080E00</baseAddress>
@@ -78138,7 +78138,7 @@
         <name>SAI4</name>
         <description>SAI4 global interrupt</description>
         <value>146</value>
-      </interrupt>   
+      </interrupt>
     </peripheral>
     <peripheral>
       <name>SCB</name>
@@ -78855,7 +78855,7 @@
         </register>
       </registers>
     </peripheral>
-    <peripheral> 
+    <peripheral>
       <name>SDMMC1</name>
       <description>SDMMC1</description>
       <groupName>SDMMC</groupName>
@@ -80266,7 +80266,7 @@
     </peripheral>
 	<peripheral derivedFrom="SDMMC1">
       <name>SDMMC2</name>
-      <baseAddress>0x48022400</baseAddress>      
+      <baseAddress>0x48022400</baseAddress>
       <interrupt>
         <name>SDMMC2</name>
         <description>SDMMC2 global interrupt</description>
@@ -80665,7 +80665,7 @@
               <bitWidth>13</bitWidth>
             </field>
           </fields>
-        </register>      
+        </register>
       </registers>
     </peripheral>
     <peripheral>
@@ -87739,7 +87739,7 @@
           </fields>
         </register>
       </registers>
-    </peripheral>       
+    </peripheral>
     <peripheral>
       <name>USART1</name>
       <description>Universal synchronous asynchronous receiver

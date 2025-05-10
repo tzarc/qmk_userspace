@@ -11,7 +11,7 @@ from dbus_next.aio import MessageBus
 import asyncio
 
 
-async def main():
+async def main() -> None:
     bus = await MessageBus().connect()
     introspection = await bus.introspect("org.freedesktop.PowerManagement", "/org/freedesktop/PowerManagement/Inhibit")
     obj = bus.get_proxy_object("org.freedesktop.PowerManagement", "/org/freedesktop/PowerManagement/Inhibit", introspection)
@@ -19,7 +19,7 @@ async def main():
     # Connect to the Inhibit interface and register a signal handler
     iface_inhibit = obj.get_interface("org.freedesktop.PowerManagement.Inhibit")
 
-    def on_inhibit_changed(arg):
+    def on_inhibit_changed(arg) -> None:
         pass
 
     iface_inhibit.on_has_inhibit_changed(on_inhibit_changed)
@@ -31,7 +31,7 @@ async def main():
     # Connect to the Properties interface and register a signal handler
     iface_props = obj.get_interface("org.freedesktop.DBus.Properties")
 
-    def on_properties_changed(interface_name, changed_properties, invalidated_properties):
+    def on_properties_changed(interface_name: str, changed_properties, invalidated_properties) -> None:
         for changed, variant in changed_properties.items():
             print(f"property changed: {changed} - {variant.value}")
 

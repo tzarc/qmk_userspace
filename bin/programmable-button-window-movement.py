@@ -14,7 +14,7 @@ from dbus_next.message import Message, MessageType
 from dbus_next.aio import MessageBus
 
 
-async def invoke_kwin_method(bus, method_name, signature="", body=[]):
+async def invoke_kwin_method(bus, method_name: str, signature: str="", body=[]):
     reply = await bus.call(
         Message(
             destination="org.kde.kglobalaccel",
@@ -28,7 +28,7 @@ async def invoke_kwin_method(bus, method_name, signature="", body=[]):
     return reply
 
 
-async def invoke_kwin_shortcut(bus, shortcut_name):
+async def invoke_kwin_shortcut(bus, shortcut_name: str):
     reply = await invoke_kwin_method(bus, method_name="invokeShortcut", signature="s", body=[shortcut_name])
 
     if reply.message_type == MessageType.ERROR:
@@ -56,7 +56,7 @@ listen_for = dict(filter(lambda e: e[0].startswith("KEY_MACRO"), evdev.ecodes.ec
 listening_devices = {}
 
 
-async def remove_device(device):
+async def remove_device(device) -> None:
     print(f"Device closed: {device.name}", file=sys.stderr)
     d = listening_devices.pop(device.path, None)
     if d:
@@ -64,7 +64,7 @@ async def remove_device(device):
         del d
 
 
-async def listen_programmable_buttons_device(bus, device):
+async def listen_programmable_buttons_device(bus, device) -> None:
     try:
         async for event in device.async_read_loop():
             if isinstance(event, evdev.events.InputEvent):
@@ -88,7 +88,7 @@ async def listen_programmable_buttons_device(bus, device):
         asyncio.ensure_future(remove_device(device))
 
 
-async def listen_programmable_buttons(bus):
+async def listen_programmable_buttons(bus) -> None:
     # Listen for programmable button events
     devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
     for device in filter(lambda d: "Consumer Control" in d.name, devices):
@@ -98,7 +98,7 @@ async def listen_programmable_buttons(bus):
         asyncio.ensure_future(listen_programmable_buttons_device(bus, device))
 
 
-async def main():
+async def main() -> None:
     bus = await MessageBus().connect()
     while bus.connected:
         await listen_programmable_buttons(bus)

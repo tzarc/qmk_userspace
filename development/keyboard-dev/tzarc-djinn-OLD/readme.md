@@ -4,8 +4,8 @@
 
 The Djinn is a 64-key split keyboard -- dual 4x7 with a 4-key thumb cluster and encoders. It also has a 5-way tactile switch under the thumb. Oh, and two displays.
 
-Keyboard Maintainer: [tzarc](https://github.com/tzarc)  
-Hardware Supported: Djinn: rev1, rev2  
+Keyboard Maintainer: [tzarc](https://github.com/tzarc)
+Hardware Supported: Djinn: rev1, rev2
 Hardware Availability: [Open-source](https://github.com/tzarc/djinn)
 
 Make example for this keyboard (after setting up your build environment):

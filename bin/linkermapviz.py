@@ -18,7 +18,7 @@ from bokeh.layouts import column
 
 
 class Objectfile:
-    def __init__(self, section, offset, size, comment):
+    def __init__(self, section, offset: int, size: int, comment: str) -> None:
         self.section = section.strip()
         self.offset = offset
         self.size = size
@@ -29,7 +29,7 @@ class Objectfile:
             self.basepath = os.path.basename(self.path[0])
         self.children = []
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<Objectfile {} {:x} {:x} {} {}>".format(self.section, self.offset, self.size, self.path, repr(self.children))
 
 
@@ -94,7 +94,7 @@ def parseSections(fd):
     return sections
 
 
-def main():
+def main() -> None:
     sections = parseSections(sys.stdin)
     if sections is None:
         print("start of memory config not found, did you invoke the compiler/linker with LANG=C?")

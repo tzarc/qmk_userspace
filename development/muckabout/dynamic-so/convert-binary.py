@@ -39,7 +39,7 @@ reloc_section_names = [".rel.text", ".rel.data", ".rel.nonresident", ".rel.dyn",
 
 
 class SectionAddr:
-    def __init__(self, addr: int | None = None):
+    def __init__(self, addr: int | None = None) -> None:
         self.addr = addr
         self.section_name = None
         self.section_id = 0  # i.e. null
@@ -81,7 +81,7 @@ class SectionAddr:
 
 
 class PackedReloc:
-    def __init__(self, type: int, offset: SectionAddr, target: SectionAddr | None = None):
+    def __init__(self, type: int, offset: SectionAddr, target: SectionAddr | None = None) -> None:
         self.type = type
         self.offset = offset
         self.target = target
@@ -161,7 +161,7 @@ with open(args.elf, "rb") as f:
 
     relocs = []
 
-    def parse_relocs(section_name):
+    def parse_relocs(section_name: str) -> None:
         print("Parsing relocs for " + section_name)
         section = elffile.get_section_by_name(section_name)
 

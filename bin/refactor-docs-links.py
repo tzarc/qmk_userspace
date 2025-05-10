@@ -4,7 +4,7 @@ import os, subprocess, shlex, sys, re
 from pathlib import Path
 
 
-def _run(command, capture_output=True, combined_output=False, text=True, **kwargs):
+def _run(command, capture_output: bool=True, combined_output: bool=False, text: bool=True, **kwargs):
     if isinstance(command, str):
         command = shlex.split(command)
     if capture_output:
@@ -38,16 +38,16 @@ WARN_ITEM_PATTERN = re.compile(r"^(?P<mditem>\!\>\s+(?P<text>.+))$", re.MULTILIN
 SUMMARY_XML_ELEMENT_PATTERN = re.compile(r"(?P<mdsummary><summary>(?P<summary>.+)</summary>)")
 
 
-def replace_text_in_file(file, from_text, to_text):
+def replace_text_in_file(file, from_text, to_text) -> None:
     file = Path(file).absolute()
-    with open(file, "r") as f:
+    with open(file) as f:
         text = f.read()
         text = text.replace(from_text, to_text)
     with open(file, "w") as f:
         f.write(text)
 
 
-def is_valid_file(f):
+def is_valid_file(f) -> bool:
     if not f or not f.is_file() or f.parent.stem == "ja" or f.parent.stem == "zh-cn" or f.stem == "__capabilities" or f.stem == "__langs":
         return False
     return True
@@ -60,7 +60,7 @@ def files_list():
 
 def determine_sections(file):
     sections = []
-    with open(file, "r") as f:
+    with open(file) as f:
         for line in f.readlines():
             m = SECTION_WITH_ID_PATTERN.match(line)
             if m:
@@ -94,7 +94,7 @@ def determine_sections(file):
             section["new_section_header"] = f"{section['depth']} {section['title']} {{#{section['link_id']}}}"
         else:
             section["new_section_header"] = f"{section['depth']} {section['title']}"
-            section["link_id"] = re.sub("[^0-9a-zA-Z\-]+", "", section["title"].lower().replace(" ", "-"))
+            section["link_id"] = re.sub(r"[^0-9a-zA-Z\-]+", "", section["title"].lower().replace(" ", "-"))
             while "--" in section["link_id"]:
                 section["link_id"] = section["link_id"].replace("--", "-")
 
@@ -115,7 +115,7 @@ def determine_all_sections(files):
 
 def replace_links(file, sections):
     file = Path(file).absolute()
-    with open(file, "r") as f:
+    with open(file) as f:
         replacements = {}
         text = f.read()
         for m in LINK_PATTERN.finditer(text):
@@ -179,14 +179,14 @@ def replace_links(file, sections):
     pass
 
 
-def replace_all_links(files, sections):
+def replace_all_links(files, sections) -> None:
     for file in files:
         replace_links(file, sections)
 
 
-def replace_sections(file, sections):
+def replace_sections(file, sections) -> None:
     file = Path(file).absolute()
-    with open(file, "r") as f:
+    with open(file) as f:
         text = f.read()
         for section in sections.values():
             text = text.replace(section["old_section_header"], section["new_section_header"])
@@ -194,14 +194,14 @@ def replace_sections(file, sections):
         f.write(text)
 
 
-def replace_all_sections(files, sections):
+def replace_all_sections(files, sections) -> None:
     for file in files:
         replace_sections(file, sections)
 
 
-def replace_image_prefixes(file):
+def replace_image_prefixes(file) -> None:
     file = Path(file).absolute()
-    with open(file, "r") as f:
+    with open(file) as f:
         text = f.read()
         for m in IMAGE_ELEMENT_PREFIX_PATTERN.finditer(text):
             if not m.group("url").startswith("http") and not m.group("url").startswith("."):
@@ -220,14 +220,14 @@ def replace_image_prefixes(file):
         f.write(text)
 
 
-def replace_all_image_prefixes(files):
+def replace_all_image_prefixes(files) -> None:
     for file in files:
         replace_image_prefixes(file)
 
 
-def replace_indented_items(file):
+def replace_indented_items(file) -> None:
     file = Path(file).absolute()
-    with open(file, "r") as f:
+    with open(file) as f:
         text = f.read()
         for m in INDENTED_ITEM_PATTERN.finditer(text):
             text = text.replace(m.group("mditem"), f"::: info\n{m.group('text')}\n:::")
@@ -239,7 +239,7 @@ def replace_indented_items(file):
         f.write(text)
 
 
-def replace_all_indented_items(files):
+def replace_all_indented_items(files) -> None:
     for file in files:
         replace_indented_items(file)
 
@@ -282,9 +282,9 @@ def replace_details_block(file, lines, line_index):
     return lines, i, depth
 
 
-def replace_details_blocks(file):
+def replace_details_blocks(file) -> None:
     file = Path(file).absolute()
-    with open(file, "r") as f:
+    with open(file) as f:
         lines = f.read().split("\n")
         i = 0
         while i < len(lines):
@@ -296,7 +296,7 @@ def replace_details_blocks(file):
         f.write("\n".join(lines))
 
 
-def replace_all_details_blocks(files):
+def replace_all_details_blocks(files) -> None:
     for file in files:
         replace_details_blocks(file)
 
@@ -306,13 +306,13 @@ TABS_END_PATTERN = re.compile(r"^(?P<mdtabs>\<!--\s*tabs\s*:\s*end\s*--\>)", re.
 TAB_TITLE_PATTERN = re.compile(r"^(?P<mdtabtitle>#+\s*\*\*\s+(?P<title>.*)\s*\*\*)", re.IGNORECASE)
 
 
-def replace_tabs_block(file, lines, line_index):
+def replace_tabs_block(file, lines, line_index) -> None:
     pass
 
 
-def replace_tabs_blocks(file):
+def replace_tabs_blocks(file) -> None:
     file = Path(file).absolute()
-    with open(file, "r") as f:
+    with open(file) as f:
         lines = f.read().split("\n")
         i = 0
         while i < len(lines):
@@ -324,7 +324,7 @@ def replace_tabs_blocks(file):
         f.write("\n".join(lines))
 
 
-def replace_all_tabs_blocks(files):
+def replace_all_tabs_blocks(files) -> None:
     for file in files:
         replace_tabs_blocks(file)
 

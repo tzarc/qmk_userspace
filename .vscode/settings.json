@@ -12,5 +12,5 @@
         "files.trimTrailingWhitespace": false
     },
     "C_Cpp.codeAnalysis.clangTidy.enabled": true,
-    "C_Cpp.codeAnalysis.clangTidy.useBuildPath": true
+    "C_Cpp.codeAnalysis.clangTidy.useBuildPath": true,
 }
