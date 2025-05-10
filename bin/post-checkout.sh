@@ -62,14 +62,16 @@ if [ "${1:-}" = "" -o "${1:-}" != "${2:-}" ]; then
         # Reconfigure git submodules
         git -C "$firmware_dir" submodule update --jobs $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null) --init --recursive
 
-        # Install the pre-commit hooks
+        # Install the git hooks
         hash -r
-        pushd "$script_dir/../" >/dev/null 2>&1
-        pre-commit install -f
-        popd >/dev/null 2>&1
-        pushd "$script_dir/../modules/tzarc" >/dev/null 2>&1
-        pre-commit install -f
-        popd >/dev/null 2>&1
+        pushd "$script_dir/../" >/dev/null 2>&1 &&
+            pre-commit install -f &&
+            popd >/dev/null 2>&1
+        pushd "$script_dir/../modules/tzarc" >/dev/null 2>&1 &&
+            pre-commit install -f &&
+            popd >/dev/null 2>&1
+        [[ -L "$firmware_dir/.git/hooks/post-checkout" ]] ||
+            ln -sf "$script_dir/post-checkout.sh" "$firmware_dir/.git/hooks/post-checkout"
 
         # Drop out of the qmk venv
         deactivate
