@@ -21,6 +21,7 @@ if [ "${1:-}" = "" -o "${1:-}" != "${2:-}" ]; then
     this_script=$(realpath "${BASH_SOURCE[0]}")
     script_dir=$(dirname "$this_script")
     firmware_dir=$(realpath "$script_dir/../qmk_firmware")
+    module_dir=$(realpath "$script_dir/../modules/tzarc")
     venv_dir=$(realpath "$script_dir/../.venv")
 
     # If we have a valid venv and valid qmk_firmware, do the actual processing
@@ -36,6 +37,13 @@ if [ "${1:-}" = "" -o "${1:-}" != "${2:-}" ]; then
 
         # Upgrade QMK CLI and all other deps
         uv pip install --upgrade pip uv -r "$script_dir/../python-requirements.txt"
+
+        # Install the pre-commit hooks
+        hash -r
+        pre-commit install
+        pushd "$module_dir" >/dev/null 2>&1
+        pre-commit install
+        popd >/dev/null 2>&1
 
         # Determine all the submodules we expect, as well as the ones we found on-disk
         actual_submodules=$(git -C "$firmware_dir" submodule --quiet foreach --recursive git rev-parse --show-toplevel | sed -e "s@${firmware_dir}/@@g")
