@@ -105,6 +105,3 @@ $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h:
 
 endif
 endif
-
-
-include $(QMK_USERSPACE)/qmk_firmware-mods/builddefs/common_features_mod.mk
