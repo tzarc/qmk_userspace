@@ -16,16 +16,29 @@ if [[ -z "$(which python3 | grep '/.venv/')" ]]; then
     exit 0
 fi
 
-if [ "${1:-}" = "" -o "${1:-}" != "${2:-}" ]; then
-    # Work out where we are
-    this_script=$(realpath "${BASH_SOURCE[0]}")
-    script_dir=$(dirname "$this_script")
-    firmware_dir=$(realpath "$script_dir/../qmk_firmware")
-    module_dir=$(realpath "$script_dir/../modules/tzarc")
-    venv_dir=$(realpath "$script_dir/../.venv")
+# Work out where we are
+this_script=$(realpath "${BASH_SOURCE[0]}")
+script_dir=$(dirname "$this_script")
+firmware_dir=$(realpath "$script_dir/../qmk_firmware")
+module_dir=$(realpath "$script_dir/../modules/tzarc")
+venv_dir=$(realpath "$script_dir/../.venv")
 
-    # If we have a valid venv and valid qmk_firmware, do the actual processing
-    if [[ -d $venv_dir ]] && [[ -d $firmware_dir ]]; then
+# If we have a valid venv and valid qmk_firmware, do the actual processing
+if [[ -d $venv_dir ]] && [[ -d $firmware_dir ]]; then
+    if [ "${1:-}" = "update" ]; then
+        # Figure out and enter the qmk venv
+        source "$venv_dir/bin/activate"
+
+        pushd "$script_dir/../" >/dev/null 2>&1 &&
+            pre-commit autoupdate &&
+            popd >/dev/null 2>&1
+        pushd "$script_dir/../modules/tzarc" >/dev/null 2>&1 &&
+            pre-commit autoupdate &&
+            popd >/dev/null 2>&1
+
+        # Drop out of the qmk venv
+        deactivate
+    elif [ "${1:-}" = "" -o "${1:-}" != "${2:-}" ]; then # Either no-arguments, or args 1&2 are different (i.e. git checkout decided to change the working tree)
         # Everything here happens within qmk_firmware
         cd "$firmware_dir"
 
