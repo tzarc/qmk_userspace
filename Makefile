@@ -47,26 +47,28 @@ $(QMK_USERSPACE)/qmk_cli:
 		&& git pull --ff-only \
 		&& git sshsign
 
+$(QMK_USERSPACE)/qmk_compiler:
+	git clone --depth=1 https://github.com/qmk/qmk_compiler.git $(QMK_USERSPACE)/qmk_compiler \
+		&& cd $(QMK_USERSPACE)/qmk_compiler \
+		&& git pull --ff-only \
+		&& git sshsign
+
 qmk_firmware: $(QMK_USERSPACE)/qmk_firmware
 qmk_userspace: $(QMK_USERSPACE)/qmk_userspace
 qmk-dot-github: $(QMK_USERSPACE)/qmk-dot-github
 qmk_cli: $(QMK_USERSPACE)/qmk_cli
+qmk_compiler: $(QMK_USERSPACE)/qmk_compiler
 
 .PHONY: repositories
-repositories: qmk_firmware qmk_userspace qmk-dot-github qmk_cli
+repositories: qmk_firmware qmk_userspace qmk-dot-github qmk_cli qmk_compiler
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # CLI testing
 
 .PHONY: cli_build
-cli_build: qmk_cli
-	cd $(QMK_USERSPACE)/qmk_cli \
-		&& python3 -m pip install --upgrade pip \
-		&& python3 -m pip install -r requirements-dev.txt \
-		&& python3 -m build \
-		&& python3 -m pip uninstall -y qmk \
-		&& python3 -m pip install dist/qmk-*.whl \
-		&& qmk --version
+cli_build: qmk_cli qmk_firmware
+	uv pip install -r $(QMK_USERSPACE)/qmk_firmware/requirements-dev.txt \
+		&& uv pip install -e $(QMK_USERSPACE)/qmk_cli
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Cleaning

@@ -27,6 +27,7 @@ compile_commands.json
 /qmk-dot-github
 /qmk_cli
 /qmk_base_container
+/qmk_compiler
 
 # Don't need source images
 users-tzarc/graphics/src/*.gif
