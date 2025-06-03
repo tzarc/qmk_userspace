@@ -1,4 +1,13 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# Copyright 2025 Nick Brassel (@tzarc)
+# SPDX-License-Identifier: GPL-2.0-or-later
+# /// script
+# requires-python = ">=3.13"
+# dependencies = [
+#     "qmk",
+# ]
+# ///
+
 import os
 import sys
 from pathlib import Path

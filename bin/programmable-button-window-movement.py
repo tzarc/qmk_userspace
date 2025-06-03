@@ -1,4 +1,6 @@
 #!/usr/bin/env -S uv run --script
+# Copyright 2025 Nick Brassel (@tzarc)
+# SPDX-License-Identifier: GPL-2.0-or-later
 # /// script
 # requires-python = ">=3.13"
 # dependencies = [

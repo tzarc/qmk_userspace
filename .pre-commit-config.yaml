@@ -57,6 +57,7 @@ repos:
       - id: remove-tabs
         exclude: \.svd$|[mM]akefile[^\/]*$|.*\.mk$
       - id: insert-license
+        name: Insert License Header (C/C++ files)
         exclude: |
           (?x)(
             debugging.c|
@@ -67,3 +68,11 @@ repos:
             )$
         args: [--allow-past-years, --license-filepath=.license-header, --comment-style=//]
         types_or: [c, c++]
+      - id: insert-license
+        name: Insert License Header (Python files)
+        exclude: |
+          (?x)(
+              linkermapviz\.py
+              )$
+        args: [--allow-past-years, --license-filepath=.license-header, --comment-style=#, --no-extra-eol]
+        types_or: [python]
