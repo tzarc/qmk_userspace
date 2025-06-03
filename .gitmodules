@@ -1,9 +1,9 @@
 [submodule "modules/tzarc"]
-	path = modules/tzarc
-	url = https://github.com/tzarc/qmk_modules.git
+    path = modules/tzarc
+    url = https://github.com/tzarc/qmk_modules.git
 [submodule "modules/getreuer"]
-	path = modules/getreuer
-	url = https://github.com/getreuer/qmk-modules.git
+    path = modules/getreuer
+    url = https://github.com/getreuer/qmk-modules.git
 [submodule "modules/drashna"]
-	path = modules/drashna
-	url = https://github.com/drashna/qmk_modules.git
+    path = modules/drashna
+    url = https://github.com/drashna/qmk_modules.git
