@@ -79,29 +79,3 @@ endif
 #OPT = 0
 
 #OPT_DEFS += -fsanitize=undefined
-
-ifeq ($(strip $(RGB_MATRIX_ENABLE)),yes)
-ifeq ($(strip $(RGB_MATRIX_RV32)),yes)
-	RGB_MATRIX_CUSTOM_USER = yes
-	RV32_VM_ENABLE = yes
-	SRC += rgb_matrix_rv32_runner.c
-
-generated-files: $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h
-
-$(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h: $(wildcard $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner/*.c)
-$(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h: $(wildcard $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner/*.S)
-$(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h: $(wildcard $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner/*.h)
-$(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h: $(wildcard $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner/*.lds)
-$(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h: $(QMK_USERSPACE)/users/tzarc/rules.mk
-$(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h: $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner/Makefile
-$(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h: $(QMK_USERSPACE)/qmk_firmware-mods/lib/mini-rv32ima/mini-rv32ima/mini-rv32ima.h
-
-$(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h:
-	@$(MAKE) -C $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner
-	[ ! -f $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h ] || rm -f $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h
-	@cd $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner && \
-		xxd -i rv32_runner.bin $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h
-	sed -i 's@unsigned@static const unsigned@g' $(QMK_USERSPACE)/users/tzarc/rv32_rgb_runner.inl.h
-
-endif
-endif

@@ -1,3 +1,0 @@
-{
-    "modules": ["getreuer/socd_cleaner", "tzarc/experimental/sfdp_flash", "tzarc/experimental/filesystem", "tzarc/experimental/lua_keymap"]
-}
