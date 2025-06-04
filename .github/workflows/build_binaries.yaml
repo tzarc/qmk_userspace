@@ -45,7 +45,7 @@ jobs:
 
         # Dump out QMK doctor
         echo '# QMK Doctor #####################################################################################################################################'
-        qmk doctor
+        qmk doctor || true
 
   publish:
     name: QMK Userspace Publish
