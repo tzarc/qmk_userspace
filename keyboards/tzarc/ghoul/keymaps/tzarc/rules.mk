@@ -15,5 +15,5 @@ MOUSE_SHARED_EP = yes
 
 #QUANTUM_PAINTER_DRIVERS += surface
 
-NVM_DRIVER = custom
-FILESYSTEM_DRIVER = lfs_flash
+#NVM_DRIVER = custom
+#FILESYSTEM_DRIVER = lfs_flash

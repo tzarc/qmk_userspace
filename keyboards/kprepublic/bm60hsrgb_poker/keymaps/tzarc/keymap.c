@@ -5,6 +5,6 @@
 #include "layouts/60_ansi/tzarc/keymap.c"
 
 void keyboard_post_init_keymap(void) {
-    rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_MULTISPLASH);
+    rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
     rgb_matrix_sethsv(212, 255, 255);
 }
