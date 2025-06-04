@@ -16,27 +16,35 @@ jobs:
         set -e
 
         # Set up newer gcc
+        echo '# Prerequisites ##################################################################################################################################'
         apt update
         apt install jq curl zstd git xxd -y
+
+        echo '# Bootstrapper ###################################################################################################################################'
         curl -fsSL https://install.qmk.fm/ | sh -s -- --confirm
 
         # Ensure the path is correctly set up in this shell, as well as subsequent shells.
+        echo '# $PATH ##########################################################################################################################################'
         export PATH="$HOME/.local/bin:$PATH"
         export PATH="$HOME/.local/share/qmk/bin:$PATH"
         echo "$HOME/.local/bin" >> $GITHUB_PATH
         echo "$HOME/.local/share/qmk/bin" >> $GITHUB_PATH
 
         # Ensure submodules are checked out
+        echo '# Submodules #####################################################################################################################################'
         git config --global --add safe.directory /__w/qmk_userspace/qmk_userspace
         git submodule update --init --recursive --depth=1 --force
 
         # Set up any symlinks required for the makefile
+        echo '# Symlinks #######################################################################################################################################'
         make links
 
         # Dump out environmental information
+        echo '# Environment ####################################################################################################################################'
         make env-info
 
         # Dump out QMK doctor
+        echo '# QMK Doctor #####################################################################################################################################'
         qmk doctor
 
   publish:
