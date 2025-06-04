@@ -36,6 +36,9 @@ jobs:
         # Dump out environmental information
         make env-info
 
+        # Dump out QMK doctor
+        qmk doctor
+
   publish:
     name: QMK Userspace Publish
     uses: qmk/.github/.github/workflows/qmk_userspace_publish.yml@main
