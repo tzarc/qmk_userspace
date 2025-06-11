@@ -9,18 +9,6 @@
             "path": "qmk_firmware"
         },
         {
-            "name": "quantum-painter",
-            "path": "qmk_firmware/quantum/painter"
-        },
-        {
-            "name": "drivers-painter",
-            "path": "qmk_firmware/drivers/painter"
-        },
-        {
-            "name": "keyboards-tzarc",
-            "path": "qmk_firmware/keyboards/tzarc"
-        },
-        {
             "name": "python-qmk",
             "path": "qmk_firmware/lib/python/qmk"
         }
@@ -32,7 +20,12 @@
         "python.analysis.typeCheckingMode": "standard",
         "python.analysis.languageServerMode": "full",
         "python.analysis.extraPaths": [
+            "${workspaceFolder:qmk_firmware}/lib/python",
+            "${workspaceFolder:qmk_userspace}/.direnv/uv/tools/qmk/lib/python3.13/site-packages",
+            "${workspaceFolder:qmk_userspace}/.direnv/uv/tools/qmk/lib/python3/site-packages",
+            "${workspaceFolder:qmk_userspace}/.direnv/uv/tools/qmk/lib/python",
             "${workspaceFolder:qmk_userspace}/.venv/lib/python3.13/site-packages",
+            "${workspaceFolder:qmk_userspace}/.venv/lib/python3/site-packages",
             "${workspaceFolder:qmk_userspace}/.venv/lib/python"
         ],
         "python.analysis.aiCodeActions": {
@@ -43,6 +36,8 @@
             "implementAbstractClasses": true
         },
         "files.exclude": {
+            "**/.distrib": false,
+            "**/.venv": false,
             "**/.cache": false,
             "**/.direnv": false,
             "**/.bin": false,
@@ -50,6 +45,8 @@
             "**/.uf2": false
         },
         "files.watcherExclude": {
+            "**/.distrib/**": true,
+            "**/.venv/**": true,
             "**/.cache/**": true,
             "**/.direnv/**": true,
             "**/.git/**": true,

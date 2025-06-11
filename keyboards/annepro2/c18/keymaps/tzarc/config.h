@@ -13,3 +13,5 @@
 
 #undef WEAR_LEVELING_BACKING_SIZE
 #define WEAR_LEVELING_BACKING_SIZE 512
+
+#include "undef_rgb_effects.h"

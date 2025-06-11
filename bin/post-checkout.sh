@@ -20,7 +20,6 @@ fi
 this_script=$(realpath "${BASH_SOURCE[0]}")
 script_dir=$(dirname "$this_script")
 firmware_dir=$(realpath "$script_dir/../qmk_firmware")
-module_dir=$(realpath "$script_dir/../modules/tzarc")
 venv_dir=$(realpath "$script_dir/../.venv")
 
 # If we have a valid venv and valid qmk_firmware, do the actual processing
@@ -45,11 +44,8 @@ if [[ -d $venv_dir ]] && [[ -d $firmware_dir ]]; then
         # Figure out and enter the qmk venv
         source "$venv_dir/bin/activate"
 
-        # Ensure we have uv available
-        [[ -n "$(which uv)" ]] || pip install uv
-
         # Upgrade QMK CLI and all other deps
-        uv pip install --upgrade pip uv -r "$script_dir/../python-requirements.txt"
+        uv pip install --upgrade pip -r "$script_dir/../python-requirements.txt"
 
         # Determine all the submodules we expect, as well as the ones we found on-disk
         actual_submodules=$(git -C "$firmware_dir" submodule --quiet foreach --recursive git rev-parse --show-toplevel | sed -e "s@${firmware_dir}/@@g")
