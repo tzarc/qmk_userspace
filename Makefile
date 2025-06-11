@@ -70,6 +70,11 @@ cli_build: qmk_cli qmk_firmware
 	uv pip install -r $(QMK_USERSPACE)/qmk_firmware/requirements-dev.txt \
 		&& uv pip install -e $(QMK_USERSPACE)/qmk_cli
 
+.PHONY: cli_reinstall
+cli_reinstall:
+	uv pip install qmk --force-reinstall \
+		&& post-checkout.sh
+
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Cleaning
 
