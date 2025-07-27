@@ -41,6 +41,12 @@ $(QMK_USERSPACE)/qmk-dot-github:
 		&& git pull --ff-only \
 		&& git sshsign
 
+$(QMK_USERSPACE)/qmk_base_container:
+	git clone --depth=1 https://github.com/qmk/qmk_base_container.git $(QMK_USERSPACE)/qmk_base_container \
+		&& cd $(QMK_USERSPACE)/qmk_base_container \
+		&& git pull --ff-only \
+		&& git sshsign
+
 $(QMK_USERSPACE)/qmk_cli:
 	git clone --depth=1 https://github.com/qmk/qmk_cli.git $(QMK_USERSPACE)/qmk_cli \
 		&& cd $(QMK_USERSPACE)/qmk_cli \
@@ -56,11 +62,12 @@ $(QMK_USERSPACE)/qmk_compiler:
 qmk_firmware: $(QMK_USERSPACE)/qmk_firmware
 qmk_userspace: $(QMK_USERSPACE)/qmk_userspace
 qmk-dot-github: $(QMK_USERSPACE)/qmk-dot-github
+qmk_base_container: $(QMK_USERSPACE)/qmk_base_container
 qmk_cli: $(QMK_USERSPACE)/qmk_cli
 qmk_compiler: $(QMK_USERSPACE)/qmk_compiler
 
 .PHONY: repositories
-repositories: qmk_firmware qmk_userspace qmk-dot-github qmk_cli qmk_compiler
+repositories: qmk_firmware qmk_userspace qmk-dot-github qmk_base_container qmk_cli qmk_compiler
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # CLI testing
