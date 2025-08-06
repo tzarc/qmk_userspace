@@ -61,6 +61,7 @@ repos:
         exclude: |
           (?x)(
             debugging.c|
+            utest.h|
             (mcu|hal|ch)conf.h|
             board.[ch]|
             \.q[gf]f\.[ch]|
