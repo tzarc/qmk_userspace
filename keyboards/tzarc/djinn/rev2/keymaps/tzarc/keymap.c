@@ -79,9 +79,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // clang-format off
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
     [LAYER_BASE]   = { ENCODER_CCW_CW(TZ_ENC1L, TZ_ENC1R), ENCODER_CCW_CW(TZ_ENC2L, TZ_ENC2R) },
-    [LAYER_LOWER]  = { ENCODER_CCW_CW(XRGB_HUD, XRGB_HUI), ENCODER_CCW_CW(XRGB_SAD, XRGB_SAI) },
-    [LAYER_RAISE]  = { ENCODER_CCW_CW(XRGB_VAD, XRGB_VAI), ENCODER_CCW_CW(XRGB_SPD, XRGB_SPI) },
-    [LAYER_ADJUST] = { ENCODER_CCW_CW(XRGB_PRV, XRGB_NXT), ENCODER_CCW_CW(KC_LEFT, KC_RIGHT)  },
+    [LAYER_LOWER]  = { ENCODER_CCW_CW(RGB_HUD, RGB_HUI),   ENCODER_CCW_CW(RGB_SAD, RGB_SAI)   },
+    [LAYER_RAISE]  = { ENCODER_CCW_CW(RGB_VAD, RGB_VAI),   ENCODER_CCW_CW(RGB_SPD, RGB_SPI)   },
+    [LAYER_ADJUST] = { ENCODER_CCW_CW(RGB_PRV, RGB_NXT),   ENCODER_CCW_CW(KC_LEFT, KC_RIGHT)  },
 };
 // clang-format on
 
@@ -144,12 +144,12 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
             return false;
         case TZ_ENC1L:
             if (record->event.pressed) {
-                tap_code16(KC_MS_WH_UP);
+                tap_code16(MS_WHLU);
             }
             return false;
         case TZ_ENC1R:
             if (record->event.pressed) {
-                tap_code16(KC_MS_WH_DOWN);
+                tap_code16(MS_WHLD);
             }
             return false;
         case TZ_ENC2P:

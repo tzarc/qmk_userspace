@@ -1,5 +1,5 @@
 {
     "config": {
-        "bootloader": "tinyuf2",
+        "bootloader": "tinyuf2"
     }
 }

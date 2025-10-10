@@ -5,7 +5,8 @@
             "key_override": true,
             "unicode": true,
             "xap": true
-        }
+        },
+        "pin_compatible": "promicro"
     },
     "converter": "sparkfun_pm2040",
     "modules": ["tzarc/konami_code", "tzarc/experimental/lua_keymap"]

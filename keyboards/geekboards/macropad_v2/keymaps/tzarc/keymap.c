@@ -7,8 +7,8 @@
 // clang-format off
 const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     LAYOUT_ortho_2x4(
-        KC_GLOBE, XRGB_NXT, XRGB_PRV, QK_BOOT,
-        KC_C,     KC_F,     KC_N,     KC_Q
+        KC_GLOBE, RGB_NXT, RGB_PRV, QK_BOOT,
+        KC_C,     KC_F,    KC_N,    KC_Q
     )
 };
 // clang-format on

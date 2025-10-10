@@ -25,41 +25,47 @@
 #endif
 
 #if defined(RGB_MATRIX_ENABLE)
-#    define XRGB_TOG RM_TOGG
-#    define XRGB_NXT RM_NEXT
-#    define XRGB_PRV RM_PREV
-#    define XRGB_HUI RM_HUEU
-#    define XRGB_HUD RM_HUED
-#    define XRGB_SAI RM_SATU
-#    define XRGB_SAD RM_SATD
-#    define XRGB_VAI RM_VALU
-#    define XRGB_VAD RM_VALD
-#    define XRGB_SPI RM_SPDU
-#    define XRGB_SPD RM_SPDD
+#    define RGB_TOG RM_TOGG
+#    define RGB_NXT RM_NEXT
+#    define RGB_PRV RM_PREV
+#    define RGB_HUI RM_HUEU
+#    define RGB_HUD RM_HUED
+#    define RGB_SAI RM_SATU
+#    define RGB_SAD RM_SATD
+#    define RGB_VAI RM_VALU
+#    define RGB_VAD RM_VALD
+#    define RGB_SPI RM_SPDU
+#    define RGB_SPD RM_SPDD
+#    define RGB_MOD RM_NEXT
+#    define RGB_RMOD RM_PREV
 #elif defined(RGBLIGHT_ENABLE)
-#    define XRGB_TOG UG_TOGG
-#    define XRGB_NXT UG_NEXT
-#    define XRGB_PRV UG_PREV
-#    define XRGB_HUI UG_HUEU
-#    define XRGB_HUD UG_HUED
-#    define XRGB_SAI UG_SATU
-#    define XRGB_SAD UG_SATD
-#    define XRGB_VAI UG_VALU
-#    define XRGB_VAD UG_VALD
-#    define XRGB_SPI UG_SPDU
-#    define XRGB_SPD UG_SPDD
+#    define RGB_TOG UG_TOGG
+#    define RGB_NXT UG_NEXT
+#    define RGB_PRV UG_PREV
+#    define RGB_HUI UG_HUEU
+#    define RGB_HUD UG_HUED
+#    define RGB_SAI UG_SATU
+#    define RGB_SAD UG_SATD
+#    define RGB_VAI UG_VALU
+#    define RGB_VAD UG_VALD
+#    define RGB_SPI UG_SPDU
+#    define RGB_SPD UG_SPDD
+#    define RGB_MOD UG_NEXT
+#    define RGB_RMOD UG_PREV
 #else
-#    define XRGB_TOG KC_NO
-#    define XRGB_NXT KC_NO
-#    define XRGB_PRV KC_NO
-#    define XRGB_HUI KC_NO
-#    define XRGB_HUD KC_NO
-#    define XRGB_SAI KC_NO
-#    define XRGB_SAD KC_NO
-#    define XRGB_VAI KC_NO
-#    define XRGB_VAD KC_NO
-#    define XRGB_SPI KC_NO
-#    define XRGB_SPD KC_NO
+#    define RGB_TOG KC_NO
+#    define RGB_NXT KC_NO
+#    define RGB_PRV KC_NO
+#    define RGB_HUI KC_NO
+#    define RGB_HUD KC_NO
+#    define RGB_SAI KC_NO
+#    define RGB_SAD KC_NO
+#    define RGB_VAI KC_NO
+#    define RGB_VAD KC_NO
+#    define RGB_SPI KC_NO
+#    define RGB_SPD KC_NO
+#    define RGB_MOD KC_NO
+#    define RGB_RMOD KC_NO
 #endif
 
 #ifdef COMMUNITY_MODULE_SFDP_FLASH_ENABLE
@@ -258,10 +264,10 @@ enum { FOREACH_CUSTOM_LAYER(LAYER_ENUM) };
 #define ____________TZARC_6x4_ADJUST_R2_R________ _______,      _______,      _______,      _______,      _______,      SFDP_TEST
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | H           | J           | K           | L           | ;           | '           |
-#define ____________TZARC_6x4_ADJUST_R3_R________ _______,      XRGB_NXT,     XRGB_HUI,     XRGB_SAI,     XRGB_VAI,     XRGB_SPI
+#define ____________TZARC_6x4_ADJUST_R3_R________ _______,      RGB_NXT,      RGB_HUI,      RGB_SAI,      RGB_VAI,      RGB_SPI
 //                                               ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
 //                                               | N           | M           | ,           | .           | /           | Enter       |
-#define ____________TZARC_6x4_ADJUST_R4_R________ XRGB_TOG,     XRGB_PRV,     XRGB_HUD,     XRGB_SAD,     XRGB_VAD,     XRGB_SPD
+#define ____________TZARC_6x4_ADJUST_R4_R________ RGB_TOG,      RGB_PRV,      RGB_HUD,      RGB_SAD,      RGB_VAD,      RGB_SPD
 //                                               └─────────────┴─────────────┴─────────────┴─────────────┴─────────────┴─────────────┘
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -482,11 +488,11 @@ enum { FOREACH_CUSTOM_LAYER(LAYER_ENUM) };
 //                                               └────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────────────────┘
 //                                               ┌──────────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬──────────────────┐
 //                                               | Tab              | Q          | W          | E          | R          | T          | Y          | U          | I          | O          | P          |  [         |  ]         |  \               |
-#define ____________TZARC_ADJUST_R3_ALPHA________ _______,           XRGB_NXT,    XRGB_HUI,    XRGB_SAI,    XRGB_VAI,    XRGB_SPI,    _______,     KC_F14,      KC_F15,      KC_F16,      _______,     KC_F23,      KC_F24,      _______
+#define ____________TZARC_ADJUST_R3_ALPHA________ _______,           RGB_NXT,     RGB_HUI,     RGB_SAI,     RGB_VAI,     RGB_SPI,     _______,     KC_F14,      KC_F15,      KC_F16,      _______,     KC_F23,      KC_F24,      _______
 //                                               └──────────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴──────────────────┘
 //                                               ┌─────────────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬─────────────┬─────────────┬──────────────────────────┐
 //                                               | Caps Lock           | A          | S          | D          | F          | G          | H          | J          | K          | L          | ;           | "           | Enter                    |
-#define ____________TZARC_ADJUST_R4_ALPHA________ KC_CAPS,              XRGB_PRV,    XRGB_HUD,    XRGB_SAD,    XRGB_VAD,    XRGB_SPD,    _______,     KC_F17,      KC_F18,      KC_F19,       _______,     _______,      _______
+#define ____________TZARC_ADJUST_R4_ALPHA________ KC_CAPS,              RGB_PRV,     RGB_HUD,     RGB_SAD,     RGB_VAD,     RGB_SPD,     _______,     KC_F17,      KC_F18,      KC_F19,       _______,     _______,      _______
 //                                               └─────────────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴────────────┴─────────────┴─────────────┴──────────────────────────┘
 //                                               ┌────────────────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬────────────┬──────────────────────────────────────┐
 //                                               | LShift                 | Z          | X          | C          | V          | B          | N          | M          | ,          | .          | /          | RShift                               |
@@ -572,9 +578,9 @@ enum { FOREACH_CUSTOM_LAYER(LAYER_ENUM) };
 //                                                      ┌─────────────┬─────────────┬─────────────┬─────────────┐
 #define ____________TZARC_4x4_MACROPAD_D_R1_____________ KC_TRNS,      KC_TRNS,      KC_TRNS,      TZ_CUST1
 //                                                      ├─────────────┼─────────────┼─────────────┼─────────────┤
-#define ____________TZARC_4x4_MACROPAD_D_R2_____________ KC_TRNS,      KC_TRNS,      XRGB_HUD,     XRGB_HUI
+#define ____________TZARC_4x4_MACROPAD_D_R2_____________ KC_TRNS,      KC_TRNS,      RGB_HUD,      RGB_HUI
 //                                                      ├─────────────┼─────────────┼─────────────┼─────────────┤
-#define ____________TZARC_4x4_MACROPAD_D_R3_____________ KC_TRNS,      KC_TRNS,      XRGB_PRV,     XRGB_NXT
+#define ____________TZARC_4x4_MACROPAD_D_R3_____________ KC_TRNS,      KC_TRNS,      RGB_PRV,      RGB_NXT
 //                                                      ├─────────────┼─────────────┼─────────────┼─────────────┤
 #define ____________TZARC_4x4_MACROPAD_D_R4_____________ KC_TRNS,      DB_TOGG,      TIME_EEPRST,  TIME_RESET
 //                                                      └─────────────┴─────────────┴─────────────┴─────────────┘

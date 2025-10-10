@@ -9,10 +9,10 @@
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [LAYER_BASE] = LAYOUT(
-        KC_MS_BTN1, KC_MS_BTN3, KC_MS_BTN2, // L, M, R
-            LT(LAYER_RAISE, KC_MS_BTN5),    //    F
-            LT(LAYER_LOWER, KC_MS_BTN4),    //    B
-                    TIME_RESET              //   CPI
+           MS_BTN1, MS_BTN3, MS_BTN2,  // L, M, R
+            LT(LAYER_RAISE, MS_BTN5),  //    F
+            LT(LAYER_LOWER, MS_BTN4),  //    B
+                    TIME_RESET         //   CPI
     ),
     [LAYER_LOWER] = LAYOUT(
         TZ_TBMS1, KC_TRNS, KC_TRNS,
@@ -36,7 +36,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 #if defined(ENCODER_MAP_ENABLE)
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
-    [LAYER_BASE]   = {ENCODER_CCW_CW(KC_MS_WH_UP, KC_MS_WH_DOWN)},
+    [LAYER_BASE]   = {ENCODER_CCW_CW(MS_WHLU, MS_WHLD)},
     [LAYER_LOWER]  = {ENCODER_CCW_CW(RGB_HUD, RGB_HUI)},
     [LAYER_RAISE]  = {ENCODER_CCW_CW(RGB_MOD, RGB_RMOD)},
     [LAYER_ADJUST] = {ENCODER_CCW_CW(KC_NO, KC_NO)},
@@ -65,10 +65,10 @@ static bool gesture_mode(layer_state_t state) {
 
 bool pre_process_record_keymap(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        case LT(LAYER_LOWER, KC_MS_BTN4):
+        case LT(LAYER_LOWER, MS_BTN4):
             lower_pressed = record->event.pressed;
             break;
-        case LT(LAYER_RAISE, KC_MS_BTN5):
+        case LT(LAYER_RAISE, MS_BTN5):
             raise_pressed = record->event.pressed;
             break;
     }
@@ -100,11 +100,11 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
                 turbo_mouse_next_trigger = now + prng(turbo_mouse_low_rng, turbo_mouse_high_rng);
 
                 // Inform the OS that we've got a keydown event
-                register_code(KC_MS_BTN1);
+                register_code(MS_BTN1);
             } else {
                 // If the release happened within the initial hold period, then stop the timer and tap the key as per normal
                 if ((now < turbo_mouse_next_trigger && !turbo_mouse_released) || turbo_mouse_auto_registered) {
-                    unregister_code(KC_MS_BTN1);
+                    unregister_code(MS_BTN1);
                     turbo_mouse_auto_registered = false;
                 }
             }
@@ -153,16 +153,16 @@ void housekeeping_task_keymap(void) {
         // Check if we've not yet released due to the initial hold period
         if (!turbo_mouse_released) {
             // ...if we haven't, then we release the key.
-            unregister_code(KC_MS_BTN1);
+            unregister_code(MS_BTN1);
             turbo_mouse_released        = true;
             turbo_mouse_auto_registered = false;
         } else {
             // Toggle the keypress with random timing below
             if (!turbo_mouse_auto_registered) {
-                register_code(KC_MS_BTN1);
+                register_code(MS_BTN1);
                 turbo_mouse_auto_registered = true;
             } else {
-                unregister_code(KC_MS_BTN1);
+                unregister_code(MS_BTN1);
                 turbo_mouse_auto_registered = false;
             }
         }
