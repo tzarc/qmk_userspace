@@ -16,7 +16,7 @@ MCU_SERIES = STM32F4xx
 # Linker script to use
 # - it should exist either in <chibios>/os/common/ports/ARMCMx/compilers/GCC/ld/
 #   or <keyboard_dir>/ld/
-MCU_LDSCRIPT = STM32F469xI
+MCU_LDSCRIPT = STM32F469xI_tinyuf2
 
 # Startup code to use
 #  - it should exist in <chibios>/os/common/startup/ARMCMx/compilers/GCC/mk/
@@ -32,5 +32,5 @@ USE_FPU = YES
 DFU_ARGS = -d 0483:df11 -a 0 -s 0x08000000:leave
 DFU_SUFFIX_ARGS = -v 0483 -p df11
 
-# Address of the booloader in system memory
-STM32_BOOTLOADER_ADDRESS = 0x1FFF0000
+# Set the UF2 bootloader type
+UF2_FAMILY = STM32F4

@@ -1,6 +1,6 @@
 {
-    "keyboard_name": "Discovery F469I + DSI",
-    "bootloader": "stm32-dfu",
+    "keyboard_name": "Discovery F469I",
+    "bootloader": "tinyuf2",
     "matrix_pins": {
         "cols": ["A9"],
         "rows": ["A10"]

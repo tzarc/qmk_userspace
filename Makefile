@@ -65,6 +65,12 @@ $(QMK_USERSPACE)/qmk_api:
 		&& git pull --ff-only \
 		&& git sshsign
 
+$(QMK_USERSPACE)/chibios-maintenance:
+	git clone --depth=1 https://github.com/qmk/chibios-maintenance.git $(QMK_USERSPACE)/chibios-maintenance \
+		&& cd $(QMK_USERSPACE)/chibios-maintenance \
+		&& git pull --ff-only \
+		&& git sshsign
+
 qmk_firmware: $(QMK_USERSPACE)/qmk_firmware
 qmk_userspace: $(QMK_USERSPACE)/qmk_userspace
 qmk-dot-github: $(QMK_USERSPACE)/qmk-dot-github
@@ -72,9 +78,10 @@ qmk_base_container: $(QMK_USERSPACE)/qmk_base_container
 qmk_cli: $(QMK_USERSPACE)/qmk_cli
 qmk_compiler: $(QMK_USERSPACE)/qmk_compiler
 qmk_api: $(QMK_USERSPACE)/qmk_api
+chibios-maintenance: $(QMK_USERSPACE)/chibios-maintenance
 
 .PHONY: repositories
-repositories: qmk_firmware qmk_userspace qmk-dot-github qmk_base_container qmk_cli qmk_compiler qmk_api
+repositories: qmk_firmware qmk_userspace qmk-dot-github qmk_base_container qmk_cli qmk_compiler qmk_api chibios-maintenance
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # CLI testing
@@ -224,7 +231,7 @@ BOARD_DEFS := \
 LINKED_BOARD_DEFS := \
 	cyclone!keyboards/tzarc/cyclone!default!development/keyboard-dev/tzarc-cyclone \
 	\
-	f469_dsi!keyboards/handwired/onekey/f469_dsi!default!development/alternates/f469_dsi \
+	f469_disco!keyboards/handwired/onekey/f469_disco!default!development/alternates/f469_disco \
 	evqwk_f401_tinyuf2!keyboards/tzarc/evqwk_f401_tinyuf2!default!development/alternates/evqwk_f401_tinyuf2 \
 	weact_h723core!keyboards/handwired/onekey/weact_h723core!console!development/alternates/weact_h723core \
 	f411_tinyuf2_filesystem!keyboards/handwired/onekey/f411_tinyuf2_filesystem!reset!development/alternates/f411_tinyuf2_filesystem \
