@@ -231,7 +231,7 @@ BOARD_DEFS := \
 LINKED_BOARD_DEFS := \
 	cyclone!keyboards/tzarc/cyclone!default!development/keyboard-dev/tzarc-cyclone \
 	\
-	f469_disco!keyboards/handwired/onekey/f469_disco!default!development/alternates/f469_disco \
+	f469_disco!keyboards/handwired/onekey/f469_disco!reset!development/alternates/f469_disco \
 	evqwk_f401_tinyuf2!keyboards/tzarc/evqwk_f401_tinyuf2!default!development/alternates/evqwk_f401_tinyuf2 \
 	weact_h723core!keyboards/handwired/onekey/weact_h723core!console!development/alternates/weact_h723core \
 	f411_tinyuf2_filesystem!keyboards/handwired/onekey/f411_tinyuf2_filesystem!reset!development/alternates/f411_tinyuf2_filesystem \

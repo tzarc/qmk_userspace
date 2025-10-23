@@ -11,5 +11,9 @@
     },
     "eeprom": {
         "driver": "transient"
+    },
+    "features": {
+        "console": true,
+        "debug_matrix_scan_rate": true
     }
 }
