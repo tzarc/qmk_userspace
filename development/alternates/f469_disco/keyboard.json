@@ -1,6 +1,13 @@
 {
     "keyboard_name": "Discovery F469I",
     "bootloader": "tinyuf2",
+    "eeprom": {
+        "driver": "transient"
+    },
+    "features": {
+        "console": true,
+        "debug_matrix_scan_rate": true
+    },
     "matrix_pins": {
         "direct": [
             ["A0"]
@@ -8,12 +15,5 @@
     },
     "ws2812": {
         "pin": "A8"
-    },
-    "eeprom": {
-        "driver": "transient"
-    },
-    "features": {
-        "console": true,
-        "debug_matrix_scan_rate": true
     }
 }
