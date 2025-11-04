@@ -69,9 +69,9 @@ void SDRAM_Init(void) {
         {GPIOH, 12}, {GPIOH, 13}, {GPIOH, 14}, {GPIOH, 15},
         {GPIOI, 0},  {GPIOI, 1},  {GPIOI, 2},  {GPIOI, 3},
         {GPIOI, 6},  {GPIOI, 7},  {GPIOI, 9},  {GPIOI, 10},
-        // Control signals
-        {GPIOH, 3},  {GPIOH, 5},  {GPIOF, 11}, {GPIOG, 15},
-        {GPIOG, 8},  {GPIOC, 3},
+        // Control signals (SDNE0, SDCKE0, SDNRAS, SDNCAS, SDCLK, SDNWE)
+        {GPIOH, 3},  {GPIOH, 2},  {GPIOF, 11}, {GPIOG, 15},
+        {GPIOG, 8},  {GPIOC, 0},
         // Byte masks
         {GPIOE, 0},  {GPIOE, 1},  {GPIOI, 4},  {GPIOI, 5}
     };
