@@ -83,7 +83,7 @@ void SDRAM_Init(void) {
 
     // 3. FMC SDRAM Control Register
     uint32_t sdcr_config = (1 << FMC_SDCR1_RPIPE_Pos) |  // RPIPE: 1 HCLK clock cycle delay
-                           (0 << FMC_SDCR1_RBURST_Pos) | // RBURST: Single read requests
+                           (1 << FMC_SDCR1_RBURST_Pos) | // RBURST: Read burst enabled
                            (2 << FMC_SDCR1_SDCLK_Pos) |  // SDCLK: HCLK/2 = 90MHz
                            (0 << FMC_SDCR1_WP_Pos) |     // WP: Write protection disabled
                            (3 << FMC_SDCR1_CAS_Pos) |    // CAS: 3 cycles
