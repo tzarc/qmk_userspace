@@ -142,12 +142,12 @@ void SDRAM_Init(void) {
     //   Bit  [3]   = Burst Type: 0 = Sequential
     //   Bits [6:4] = CAS Latency: 011 = 3 cycles
     //   Bits [8:7] = Operating Mode: 00 = Standard
-    //   Bit  [9]   = Write Burst Mode: 0 = Programmed burst length
+    //   Bit  [9]   = Write Burst Mode: 1 = Single location access
     static const uint32_t SDRAM_MODE_BURST_LENGTH_1          = 0x0000;
     static const uint32_t SDRAM_MODE_BURST_TYPE_SEQUENTIAL   = 0x0000;
     static const uint32_t SDRAM_MODE_CAS_LATENCY_3           = 0x0030;
     static const uint32_t SDRAM_MODE_OPERATING_MODE_STANDARD = 0x0000;
-    static const uint32_t SDRAM_MODE_WRITEBURST_MODE_SINGLE  = 0x0000;
+    static const uint32_t SDRAM_MODE_WRITEBURST_MODE_SINGLE  = 0x0200;
 
     uint32_t mode_register = SDRAM_MODE_BURST_LENGTH_1 | SDRAM_MODE_BURST_TYPE_SEQUENTIAL | SDRAM_MODE_CAS_LATENCY_3 | SDRAM_MODE_OPERATING_MODE_STANDARD | SDRAM_MODE_WRITEBURST_MODE_SINGLE;
 
