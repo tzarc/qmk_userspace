@@ -225,6 +225,7 @@ BOARD_DEFS := \
 	one2mini!ducky/one2mini/1861st!tzarc \
 	planck!planck/rev6_drop!tzarc \
 	sat75!cannonkeys/satisfaction75/rev1!tzarc \
+	prime!keyboards/steelseries/prime!tzarc \
 	prime_plus!keyboards/steelseries/prime_plus!tzarc
 
 # short name ! keyboard path ! keymap name ! link source ! link target

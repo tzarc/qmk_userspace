@@ -19,6 +19,7 @@
         ["tzarc/ghoul/rev1/stm32", "tzarc"],
         ["tzarc/ghoul/rev1/rp2040", "tzarc"],
         ["chocv", "tzarc"],
+        ["steelseries/prime", "tzarc"],
         ["steelseries/prime_plus", "tzarc"]
     ]
 }
