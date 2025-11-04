@@ -15,6 +15,8 @@ void SDRAM_Init(void);
 void SDRAM_SanityTest(void);
 void SDRAM_RunTests(void);
 
+bool dsi_test_read_panel_id(void);
+
 void keyboard_pre_init_kb() {
     keyboard_pre_init_user();
 }
@@ -29,6 +31,7 @@ void housekeeping_task_kb(void) {
         SDRAM_Init();
         SDRAM_SanityTest();
         SDRAM_RunTests();
+        dsi_test_read_panel_id();
     }
 }
 

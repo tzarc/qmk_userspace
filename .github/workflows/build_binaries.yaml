@@ -8,7 +8,7 @@ permissions:
 jobs:
   build:
     name: QMK Userspace Build
-    uses: qmk/.github/.github/workflows/qmk_userspace_build.yml@main
+    uses: qmk/.github/.github/workflows/qmk_userspace_build.yml@bootstrap-upgrade
     with:
       qmk_repo: qmk/qmk_firmware
       qmk_ref: develop

@@ -25,48 +25,48 @@ endif
 # Repositories
 
 $(QMK_USERSPACE)/qmk_firmware:
-	git clone --depth=1 https://github.com/tzarc/qmk_firmware.git $(QMK_USERSPACE)/qmk_firmware \
+	git clone https://github.com/tzarc/qmk_firmware.git $(QMK_USERSPACE)/qmk_firmware \
 		&& cd $(QMK_USERSPACE)/qmk_firmware \
 		&& git sshsign
 
 $(QMK_USERSPACE)/qmk_userspace:
-	git clone --depth=1 https://github.com/qmk/qmk_userspace.git $(QMK_USERSPACE)/qmk_userspace \
+	git clone https://github.com/qmk/qmk_userspace.git $(QMK_USERSPACE)/qmk_userspace \
 		&& cd $(QMK_USERSPACE)/qmk_userspace \
 		&& git pull --ff-only \
 		&& git sshsign
 
 $(QMK_USERSPACE)/qmk-dot-github:
-	git clone --depth=1 https://github.com/qmk/.github.git $(QMK_USERSPACE)/qmk-dot-github \
+	git clone https://github.com/qmk/.github.git $(QMK_USERSPACE)/qmk-dot-github \
 		&& cd $(QMK_USERSPACE)/qmk-dot-github \
 		&& git pull --ff-only \
 		&& git sshsign
 
 $(QMK_USERSPACE)/qmk_base_container:
-	git clone --depth=1 https://github.com/qmk/qmk_base_container.git $(QMK_USERSPACE)/qmk_base_container \
+	git clone https://github.com/qmk/qmk_base_container.git $(QMK_USERSPACE)/qmk_base_container \
 		&& cd $(QMK_USERSPACE)/qmk_base_container \
 		&& git pull --ff-only \
 		&& git sshsign
 
 $(QMK_USERSPACE)/qmk_cli:
-	git clone --depth=1 https://github.com/qmk/qmk_cli.git $(QMK_USERSPACE)/qmk_cli \
+	git clone https://github.com/qmk/qmk_cli.git $(QMK_USERSPACE)/qmk_cli \
 		&& cd $(QMK_USERSPACE)/qmk_cli \
 		&& git pull --ff-only \
 		&& git sshsign
 
 $(QMK_USERSPACE)/qmk_compiler:
-	git clone --depth=1 https://github.com/qmk/qmk_compiler.git $(QMK_USERSPACE)/qmk_compiler \
+	git clone https://github.com/qmk/qmk_compiler.git $(QMK_USERSPACE)/qmk_compiler \
 		&& cd $(QMK_USERSPACE)/qmk_compiler \
 		&& git pull --ff-only \
 		&& git sshsign
 
 $(QMK_USERSPACE)/qmk_api:
-	git clone --depth=1 https://github.com/qmk/qmk_api.git $(QMK_USERSPACE)/qmk_api \
+	git clone https://github.com/qmk/qmk_api.git $(QMK_USERSPACE)/qmk_api \
 		&& cd $(QMK_USERSPACE)/qmk_api \
 		&& git pull --ff-only \
 		&& git sshsign
 
 $(QMK_USERSPACE)/chibios-maintenance:
-	git clone --depth=1 https://github.com/qmk/chibios-maintenance.git $(QMK_USERSPACE)/chibios-maintenance \
+	git clone https://github.com/qmk/chibios-maintenance.git $(QMK_USERSPACE)/chibios-maintenance \
 		&& cd $(QMK_USERSPACE)/chibios-maintenance \
 		&& git pull --ff-only \
 		&& git sshsign

@@ -34,3 +34,5 @@ DFU_SUFFIX_ARGS = -v 0483 -p df11
 
 # Set the UF2 bootloader type
 UF2_FAMILY = STM32F4
+
+SRC += dsi_display.c
