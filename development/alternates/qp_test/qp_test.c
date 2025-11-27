@@ -37,7 +37,7 @@ painter_image_handle_t loading;
 painter_font_handle_t thintel;
 painter_font_handle_t bmpfont;
 
-static uint32_t delayed_test(uint32_t trigger_time, void* cb_arg) {
+static uint32_t delayed_test(uint32_t trigger_time, void *cb_arg) {
     uint16_t        timeout = (uint16_t)(uintptr_t)cb_arg;
     static uint32_t last    = 0;
     uint32_t        now     = timer_read32();
@@ -112,7 +112,7 @@ void init_and_clear(painter_device_t device, painter_rotation_t rotation) {
     //    defer_exec(100, renderer, &render_state);
 }
 
-void draw_test(painter_device_t device, const char* name, uint32_t now) {
+void draw_test(painter_device_t device, const char *name, uint32_t now) {
     uint16_t width;
     uint16_t height;
     qp_get_geometry(device, &width, &height, NULL, NULL, NULL);
@@ -157,8 +157,8 @@ void keyboard_post_init_kb(void) {
 
     // wait_ms(10000);
 
-    defer_exec(3000, delayed_test, (void*)(uint16_t)3000);
-    defer_exec(2900, delayed_test, (void*)(uint16_t)2900);
+    defer_exec(3000, delayed_test, (void *)(uint16_t)3000);
+    defer_exec(2900, delayed_test, (void *)(uint16_t)2900);
 
     test_image = qp_load_image_mem(gfx_test_image);
     test_anim  = qp_load_image_mem(gfx_test_anim);

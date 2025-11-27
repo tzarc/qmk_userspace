@@ -2,21 +2,21 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "stream.h"
 
-int16_t mem_get(stream_t* stream) {
-    memory_stream_t* s = (memory_stream_t*)stream;
+int16_t mem_get(stream_t *stream) {
+    memory_stream_t *s = (memory_stream_t *)stream;
     if (s->position >= s->length) return RLE_EOF;
     return s->buffer[s->position++];
 }
 
-bool mem_put(stream_t* stream, int16_t c) {
-    memory_stream_t* s = (memory_stream_t*)stream;
+bool mem_put(stream_t *stream, int16_t c) {
+    memory_stream_t *s = (memory_stream_t *)stream;
     if (s->position >= s->length) return false;
     s->buffer[s->position++] = (uint16_t)c;
     return true;
 }
 
-int mem_seek(stream_t* stream, int offset, int origin) {
-    memory_stream_t* s = (memory_stream_t*)stream;
+int mem_seek(stream_t *stream, int offset, int origin) {
+    memory_stream_t *s = (memory_stream_t *)stream;
     switch (origin) {
         case SEEK_SET:
             s->position = offset;
@@ -33,17 +33,17 @@ int mem_seek(stream_t* stream, int offset, int origin) {
     return 0;
 }
 
-int mem_tell(stream_t* stream) {
-    memory_stream_t* s = (memory_stream_t*)stream;
+int mem_tell(stream_t *stream) {
+    memory_stream_t *s = (memory_stream_t *)stream;
     return s->position;
 }
 
-bool mem_is_eof(stream_t* stream) {
-    memory_stream_t* s = (memory_stream_t*)stream;
+bool mem_is_eof(stream_t *stream) {
+    memory_stream_t *s = (memory_stream_t *)stream;
     return s->position >= s->length;
 }
 
-memory_stream_t make_memory_stream(void STREAM_MEM_PTR* buffer, int length) {
+memory_stream_t make_memory_stream(void STREAM_MEM_PTR *buffer, int length) {
     memory_stream_t stream = {
         .base =
             {
@@ -53,7 +53,7 @@ memory_stream_t make_memory_stream(void STREAM_MEM_PTR* buffer, int length) {
                 .tell   = mem_tell,
                 .is_eof = mem_is_eof,
             },
-        .buffer   = (uint8_t STREAM_MEM_PTR*)buffer,
+        .buffer   = (uint8_t STREAM_MEM_PTR *)buffer,
         .length   = length,
         .position = 0,
     };
@@ -61,34 +61,34 @@ memory_stream_t make_memory_stream(void STREAM_MEM_PTR* buffer, int length) {
 }
 
 #ifdef RLE_HAS_FILE_IO
-int16_t file_get(stream_t* stream) {
-    file_stream_t* s = (file_stream_t*)stream;
+int16_t file_get(stream_t *stream) {
+    file_stream_t *s = (file_stream_t *)stream;
     int            c = fgetc(s->file);
     if (c < 0 || feof(s->file)) return RLE_EOF;
     return (uint16_t)c;
 }
 
-bool file_put(stream_t* stream, int16_t c) {
-    file_stream_t* s = (file_stream_t*)stream;
+bool file_put(stream_t *stream, int16_t c) {
+    file_stream_t *s = (file_stream_t *)stream;
     return fputc(c, s->file) == c;
 }
 
-int file_seek(stream_t* stream, int offset, int origin) {
-    file_stream_t* s = (file_stream_t*)stream;
+int file_seek(stream_t *stream, int offset, int origin) {
+    file_stream_t *s = (file_stream_t *)stream;
     return fseek(s->file, offset, origin);
 }
 
-int file_tell(stream_t* stream) {
-    file_stream_t* s = (file_stream_t*)stream;
+int file_tell(stream_t *stream) {
+    file_stream_t *s = (file_stream_t *)stream;
     return (int)ftell(s->file);
 }
 
-bool file_is_eof(stream_t* stream) {
-    file_stream_t* s = (file_stream_t*)stream;
+bool file_is_eof(stream_t *stream) {
+    file_stream_t *s = (file_stream_t *)stream;
     return (bool)feof(s->file);
 }
 
-file_stream_t make_file_stream(FILE* f) {
+file_stream_t make_file_stream(FILE *f) {
     file_stream_t stream = {
         .base =
             {

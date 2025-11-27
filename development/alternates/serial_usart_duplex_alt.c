@@ -20,7 +20,7 @@
 #    define SERIAL_USART_TX_PIN SOFT_SERIAL_PIN
 #endif
 
-static inline void sdClear(SerialDriver* driver) {
+static inline void sdClear(SerialDriver *driver) {
     while (sdGetTimeout(driver, TIME_IMMEDIATE) != MSG_TIMEOUT) {
         // Do nothing with the data
     }
@@ -92,7 +92,7 @@ void soft_serial_target_init(void) {
 
 void handle_soft_serial_slave(void) {
     uint8_t                   sstd_index = sdGet(&SERIAL_USART_DRIVER); // first chunk is always transaction id
-    split_transaction_desc_t* trans      = &split_transaction_table[sstd_index];
+    split_transaction_desc_t *trans      = &split_transaction_table[sstd_index];
 
     // Always write back the sstd_index as part of a basic handshake
     sstd_index ^= HANDSHAKE_MAGIC;
@@ -129,7 +129,7 @@ int soft_serial_transaction(int index) {
     uint8_t sstd_index = index;
 
     if (sstd_index > NUM_TOTAL_TRANSACTIONS) return TRANSACTION_TYPE_ERROR;
-    split_transaction_desc_t* trans = &split_transaction_table[sstd_index];
+    split_transaction_desc_t *trans = &split_transaction_table[sstd_index];
     msg_t                     res   = 0;
 
     if (!trans->status) return TRANSACTION_TYPE_ERROR; // not registered

@@ -56,7 +56,7 @@ void tzarc_wow_init(void) {
     memset(&wow_config, 0, sizeof(wow_config));
 }
 
-bool process_record_wow(uint16_t keycode, keyrecord_t* record) {
+bool process_record_wow(uint16_t keycode, keyrecord_t *record) {
     // If it's keys we don't care about, exit.
     if (!((WOW_KEY_MIN <= keycode && keycode <= WOW_KEY_MAX) || keycode == QK_GRAVE_ESCAPE || (TZ_ENC_FIRST <= keycode && keycode <= TZ_ENC_LAST))) {
         return true;

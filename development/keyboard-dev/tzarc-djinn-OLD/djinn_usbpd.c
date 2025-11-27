@@ -4,7 +4,7 @@
 #include "quantum.h"
 #include "djinn.h"
 
-const char* usbpd_str(usbpd_allowance_t allowance) {
+const char *usbpd_str(usbpd_allowance_t allowance) {
     switch (allowance) {
         default:
         case USBPD_500MA:

@@ -12,7 +12,7 @@ extern painter_device_t lcd;
 void matrix_wait_for_interrupt(void);
 
 void        usbpd_update(void);
-const char* usbpd_str(usbpd_allowance_t allowance);
+const char *usbpd_str(usbpd_allowance_t allowance);
 
 //----------------------------------------------------------
 // Runtime data sync -- keyboard
@@ -29,4 +29,4 @@ extern kb_runtime_config kb_state;
 
 void kb_state_update(void);
 void kb_state_sync(void);
-void kb_state_sync_slave(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer);
+void kb_state_sync_slave(uint8_t m2s_size, const void *m2s_buffer, uint8_t s2m_size, void *s2m_buffer);

@@ -34,7 +34,7 @@ static THD_FUNCTION(WorkerThread, arg) {
     promise_t *promise = (promise_t *)arg;
 
     printf("Worker: Starting computation...\n");
-    chThdSleepMilliseconds(2000);  // Simulate 2 seconds of work
+    chThdSleepMilliseconds(2000); // Simulate 2 seconds of work
 
     int result = 42;
     printf("Worker: Computation complete, fulfilling promise with %d\n", result);
@@ -54,7 +54,7 @@ static THD_FUNCTION(ErrorThread, arg) {
     promise_t *promise = (promise_t *)arg;
 
     printf("Error worker: Starting operation...\n");
-    chThdSleepMilliseconds(1000);  // Simulate 1 second of work before failure
+    chThdSleepMilliseconds(1000); // Simulate 1 second of work before failure
 
     const char *error_msg = "Operation failed";
     printf("Error worker: Operation failed, rejecting promise\n");
@@ -254,7 +254,7 @@ void example_polling_future(void) {
     printf("Main: Polling for completion...\n");
     while (future_is_pending(&future)) {
         printf("Main: Still pending...\n");
-        chThdSleepMilliseconds(500);  // Could do other work here
+        chThdSleepMilliseconds(500); // Could do other work here
     }
 
     // Check final state and retrieve result

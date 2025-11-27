@@ -178,56 +178,56 @@ typedef struct GEN_QUEUE_T {
 #undef GEN_QUEUE_LOCK
 #ifdef GEN_QUEUE_USE_LOCKING
 #    define GEN_QUEUE_LOCK GEN_QUEUE_PREFIX_NAME(queue_lock)
-extern void GEN_QUEUE_LOCK(GEN_QUEUE_T* queue) __attribute__((weak));
+extern void GEN_QUEUE_LOCK(GEN_QUEUE_T *queue) __attribute__((weak));
 #endif // GEN_QUEUE_USE_LOCKING
 
 #undef GEN_QUEUE_UNLOCK
 #ifdef GEN_QUEUE_USE_LOCKING
 #    define GEN_QUEUE_UNLOCK GEN_QUEUE_PREFIX_NAME(queue_unlock)
-extern void GEN_QUEUE_UNLOCK(GEN_QUEUE_T* queue) __attribute__((weak));
+extern void GEN_QUEUE_UNLOCK(GEN_QUEUE_T *queue) __attribute__((weak));
 #endif // GEN_QUEUE_USE_LOCKING
 
 #undef GEN_QUEUE_VALUE_COPY
 #ifdef GEN_QUEUE_USE_COPY_MOVE_DESTROY
 #    define GEN_QUEUE_VALUE_COPY GEN_QUEUE_PREFIX_NAME(queue_value_copy)
-extern void GEN_QUEUE_VALUE_COPY(const GEN_QUEUE_VALUE_TYPE* src, GEN_QUEUE_VALUE_TYPE* dest) __attribute__((weak));
+extern void GEN_QUEUE_VALUE_COPY(const GEN_QUEUE_VALUE_TYPE *src, GEN_QUEUE_VALUE_TYPE *dest) __attribute__((weak));
 #endif // GEN_QUEUE_USE_COPY_MOVE_DESTROY
 
 #undef GEN_QUEUE_VALUE_MOVE
 #ifdef GEN_QUEUE_USE_COPY_MOVE_DESTROY
 #    define GEN_QUEUE_VALUE_MOVE GEN_QUEUE_PREFIX_NAME(queue_value_move)
-extern void GEN_QUEUE_VALUE_MOVE(GEN_QUEUE_VALUE_TYPE* src, GEN_QUEUE_VALUE_TYPE* dest) __attribute__((weak));
+extern void GEN_QUEUE_VALUE_MOVE(GEN_QUEUE_VALUE_TYPE *src, GEN_QUEUE_VALUE_TYPE *dest) __attribute__((weak));
 #endif // GEN_QUEUE_USE_COPY_MOVE_DESTROY
 
 #undef GEN_QUEUE_VALUE_DESTROY
 #ifdef GEN_QUEUE_USE_COPY_MOVE_DESTROY
 #    define GEN_QUEUE_VALUE_DESTROY GEN_QUEUE_PREFIX_NAME(queue_value_destroy)
-extern void GEN_QUEUE_VALUE_DESTROY(GEN_QUEUE_VALUE_TYPE* value) __attribute__((weak));
+extern void GEN_QUEUE_VALUE_DESTROY(GEN_QUEUE_VALUE_TYPE *value) __attribute__((weak));
 #endif // GEN_QUEUE_USE_COPY_MOVE_DESTROY
 
 #undef GEN_QUEUE_INIT
 #define GEN_QUEUE_INIT GEN_QUEUE_PREFIX_NAME(queue_init)
-void GEN_QUEUE_INIT(GEN_QUEUE_T* queue);
+void GEN_QUEUE_INIT(GEN_QUEUE_T *queue);
 
 #undef GEN_QUEUE_ADVANCE_WRITER_NOLOCK
 #define GEN_QUEUE_ADVANCE_WRITER_NOLOCK GEN_QUEUE_PREFIX_NAME(queue_advance_writer_nolock)
-void GEN_QUEUE_ADVANCE_WRITER_NOLOCK(GEN_QUEUE_T* queue);
+void GEN_QUEUE_ADVANCE_WRITER_NOLOCK(GEN_QUEUE_T *queue);
 
 #undef GEN_QUEUE_ADVANCE_READER_NOLOCK
 #define GEN_QUEUE_ADVANCE_READER_NOLOCK GEN_QUEUE_PREFIX_NAME(queue_advance_reader_nolock)
-void GEN_QUEUE_ADVANCE_READER_NOLOCK(GEN_QUEUE_T* queue);
+void GEN_QUEUE_ADVANCE_READER_NOLOCK(GEN_QUEUE_T *queue);
 
 #undef GEN_QUEUE_CLEAR_NOLOCK
 #define GEN_QUEUE_CLEAR_NOLOCK GEN_QUEUE_PREFIX_NAME(queue_clear_nolock)
-bool GEN_QUEUE_CLEAR_NOLOCK(GEN_QUEUE_T* queue);
+bool GEN_QUEUE_CLEAR_NOLOCK(GEN_QUEUE_T *queue);
 
 #undef GEN_QUEUE_CLEAR
 #define GEN_QUEUE_CLEAR GEN_QUEUE_PREFIX_NAME(queue_clear)
-bool GEN_QUEUE_CLEAR(GEN_QUEUE_T* queue);
+bool GEN_QUEUE_CLEAR(GEN_QUEUE_T *queue);
 
 #undef GEN_QUEUE_DATA
 #define GEN_QUEUE_DATA GEN_QUEUE_PREFIX_NAME(queue_data)
-void* GEN_QUEUE_DATA(GEN_QUEUE_T* queue);
+void *GEN_QUEUE_DATA(GEN_QUEUE_T *queue);
 
 #undef GEN_QUEUE_DATA_SIZE
 #define GEN_QUEUE_DATA_SIZE GEN_QUEUE_PREFIX_NAME(queue_data_size)
@@ -235,51 +235,51 @@ size_t GEN_QUEUE_DATA_SIZE(void);
 
 #undef GEN_QUEUE_FULL_NOLOCK
 #define GEN_QUEUE_FULL_NOLOCK GEN_QUEUE_PREFIX_NAME(queue_full_nolock)
-bool GEN_QUEUE_FULL_NOLOCK(GEN_QUEUE_T* queue);
+bool GEN_QUEUE_FULL_NOLOCK(GEN_QUEUE_T *queue);
 
 #undef GEN_QUEUE_FULL
 #define GEN_QUEUE_FULL GEN_QUEUE_PREFIX_NAME(queue_full)
-bool GEN_QUEUE_FULL(GEN_QUEUE_T* queue);
+bool GEN_QUEUE_FULL(GEN_QUEUE_T *queue);
 
 #undef GEN_QUEUE_EMPTY_NOLOCK
 #define GEN_QUEUE_EMPTY_NOLOCK GEN_QUEUE_PREFIX_NAME(queue_empty_nolock)
-bool GEN_QUEUE_EMPTY_NOLOCK(GEN_QUEUE_T* queue);
+bool GEN_QUEUE_EMPTY_NOLOCK(GEN_QUEUE_T *queue);
 
 #undef GEN_QUEUE_EMPTY
 #define GEN_QUEUE_EMPTY GEN_QUEUE_PREFIX_NAME(queue_empty)
-bool GEN_QUEUE_EMPTY(GEN_QUEUE_T* queue);
+bool GEN_QUEUE_EMPTY(GEN_QUEUE_T *queue);
 
 #undef GEN_QUEUE_PUSH_NOLOCK
 #define GEN_QUEUE_PUSH_NOLOCK GEN_QUEUE_PREFIX_NAME(queue_push_nolock)
-bool GEN_QUEUE_PUSH_NOLOCK(GEN_QUEUE_T* queue, const GEN_QUEUE_VALUE_TYPE* entry);
+bool GEN_QUEUE_PUSH_NOLOCK(GEN_QUEUE_T *queue, const GEN_QUEUE_VALUE_TYPE *entry);
 
 #undef GEN_QUEUE_PUSH
 #define GEN_QUEUE_PUSH GEN_QUEUE_PREFIX_NAME(queue_push)
-bool GEN_QUEUE_PUSH(GEN_QUEUE_T* queue, const GEN_QUEUE_VALUE_TYPE* entry);
+bool GEN_QUEUE_PUSH(GEN_QUEUE_T *queue, const GEN_QUEUE_VALUE_TYPE *entry);
 
 #undef GEN_QUEUE_POP_NOLOCK
 #define GEN_QUEUE_POP_NOLOCK GEN_QUEUE_PREFIX_NAME(queue_pop_nolock)
-bool GEN_QUEUE_POP_NOLOCK(GEN_QUEUE_T* queue, GEN_QUEUE_VALUE_TYPE* entry);
+bool GEN_QUEUE_POP_NOLOCK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry);
 
 #undef GEN_QUEUE_POP
 #define GEN_QUEUE_POP GEN_QUEUE_PREFIX_NAME(queue_pop)
-bool GEN_QUEUE_POP(GEN_QUEUE_T* queue, GEN_QUEUE_VALUE_TYPE* entry);
+bool GEN_QUEUE_POP(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry);
 
 #undef GEN_QUEUE_ENQUEUE_NOLOCK
 #define GEN_QUEUE_ENQUEUE_NOLOCK GEN_QUEUE_PREFIX_NAME(queue_enqueue_nolock)
-bool GEN_QUEUE_ENQUEUE_NOLOCK(GEN_QUEUE_T* queue, GEN_QUEUE_VALUE_TYPE* entry);
+bool GEN_QUEUE_ENQUEUE_NOLOCK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry);
 
 #undef GEN_QUEUE_ENQUEUE
 #define GEN_QUEUE_ENQUEUE GEN_QUEUE_PREFIX_NAME(queue_enqueue)
-bool GEN_QUEUE_ENQUEUE(GEN_QUEUE_T* queue, GEN_QUEUE_VALUE_TYPE* entry);
+bool GEN_QUEUE_ENQUEUE(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry);
 
 #undef GEN_QUEUE_DEQUEUE_NOLOCK
 #define GEN_QUEUE_DEQUEUE_NOLOCK GEN_QUEUE_PREFIX_NAME(queue_dequeue_nolock)
-bool GEN_QUEUE_DEQUEUE_NOLOCK(GEN_QUEUE_T* queue, GEN_QUEUE_VALUE_TYPE* entry);
+bool GEN_QUEUE_DEQUEUE_NOLOCK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry);
 
 #undef GEN_QUEUE_DEQUEUE
 #define GEN_QUEUE_DEQUEUE GEN_QUEUE_PREFIX_NAME(queue_dequeue)
-bool GEN_QUEUE_DEQUEUE(GEN_QUEUE_T* queue, GEN_QUEUE_VALUE_TYPE* entry);
+bool GEN_QUEUE_DEQUEUE(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry);
 
 #ifndef GEN_QUEUE_NO_IMPL
 
@@ -331,11 +331,11 @@ bool GEN_QUEUE_DEQUEUE(GEN_QUEUE_T* queue, GEN_QUEUE_VALUE_TYPE* entry);
             } while (0)
 #    endif
 
-void GEN_QUEUE_INIT(GEN_QUEUE_T* queue) {
+void GEN_QUEUE_INIT(GEN_QUEUE_T *queue) {
     memset(GEN_QUEUE_DATA(queue), 0, GEN_QUEUE_DATA_SIZE());
 }
 
-void GEN_QUEUE_ADVANCE_WRITER_NOLOCK(GEN_QUEUE_T* queue) {
+void GEN_QUEUE_ADVANCE_WRITER_NOLOCK(GEN_QUEUE_T *queue) {
     ++queue->data.write_idx;
     if (queue->data.write_idx >= GEN_QUEUE_NUM_ENTRIES) {
         queue->data.write_idx = 0;
@@ -343,14 +343,14 @@ void GEN_QUEUE_ADVANCE_WRITER_NOLOCK(GEN_QUEUE_T* queue) {
     }
 }
 
-void GEN_QUEUE_ADVANCE_READER_NOLOCK(GEN_QUEUE_T* queue) {
+void GEN_QUEUE_ADVANCE_READER_NOLOCK(GEN_QUEUE_T *queue) {
     ++queue->data.read_idx;
     if (queue->data.read_idx >= GEN_QUEUE_NUM_ENTRIES) {
         queue->data.read_idx = 0;
     }
 }
 
-bool GEN_QUEUE_CLEAR_NOLOCK(GEN_QUEUE_T* queue) {
+bool GEN_QUEUE_CLEAR_NOLOCK(GEN_QUEUE_T *queue) {
     while (!GEN_QUEUE_EMPTY_NOLOCK(queue)) {
         GEN_QUEUE_VALUE_DESTROY_WRAP(&queue->data.items[queue->data.read_idx].value);
         GEN_QUEUE_ADVANCE_READER_NOLOCK(queue);
@@ -359,44 +359,44 @@ bool GEN_QUEUE_CLEAR_NOLOCK(GEN_QUEUE_T* queue) {
     return true;
 }
 
-bool GEN_QUEUE_CLEAR(GEN_QUEUE_T* queue) {
+bool GEN_QUEUE_CLEAR(GEN_QUEUE_T *queue) {
     GEN_QUEUE_LOCK_WRAP(queue);
     bool r = GEN_QUEUE_CLEAR(queue);
     GEN_QUEUE_UNLOCK_WRAP(queue);
     return r;
 }
 
-void* GEN_QUEUE_DATA(GEN_QUEUE_T* queue) {
+void *GEN_QUEUE_DATA(GEN_QUEUE_T *queue) {
     return &queue->data;
 }
 
 size_t GEN_QUEUE_DATA_SIZE(void) {
-    return (sizeof(((GEN_QUEUE_T*)NULL)->data));
+    return (sizeof(((GEN_QUEUE_T *)NULL)->data));
 }
 
-bool GEN_QUEUE_FULL_NOLOCK(GEN_QUEUE_T* queue) {
+bool GEN_QUEUE_FULL_NOLOCK(GEN_QUEUE_T *queue) {
     return (queue->data.write_idx % GEN_QUEUE_NUM_ENTRIES) == ((queue->data.read_idx + GEN_QUEUE_NUM_ENTRIES - 1) % GEN_QUEUE_NUM_ENTRIES);
 }
 
-bool GEN_QUEUE_FULL(GEN_QUEUE_T* queue) {
+bool GEN_QUEUE_FULL(GEN_QUEUE_T *queue) {
     GEN_QUEUE_LOCK_WRAP(queue);
     bool r = GEN_QUEUE_FULL_NOLOCK(queue);
     GEN_QUEUE_UNLOCK_WRAP(queue);
     return r;
 }
 
-bool GEN_QUEUE_EMPTY_NOLOCK(GEN_QUEUE_T* queue) {
+bool GEN_QUEUE_EMPTY_NOLOCK(GEN_QUEUE_T *queue) {
     return (queue->data.write_idx % GEN_QUEUE_NUM_ENTRIES) == (queue->data.read_idx % GEN_QUEUE_NUM_ENTRIES);
 }
 
-bool GEN_QUEUE_EMPTY(GEN_QUEUE_T* queue) {
+bool GEN_QUEUE_EMPTY(GEN_QUEUE_T *queue) {
     GEN_QUEUE_LOCK_WRAP(queue);
     bool r = GEN_QUEUE_EMPTY_NOLOCK(queue);
     GEN_QUEUE_UNLOCK_WRAP(queue);
     return r;
 }
 
-bool GEN_QUEUE_PUSH_NOLOCK(GEN_QUEUE_T* queue, const GEN_QUEUE_VALUE_TYPE* entry) {
+bool GEN_QUEUE_PUSH_NOLOCK(GEN_QUEUE_T *queue, const GEN_QUEUE_VALUE_TYPE *entry) {
     if (GEN_QUEUE_FULL_NOLOCK(queue)) {
         return false;
     }
@@ -407,14 +407,14 @@ bool GEN_QUEUE_PUSH_NOLOCK(GEN_QUEUE_T* queue, const GEN_QUEUE_VALUE_TYPE* entry
     return true;
 }
 
-bool GEN_QUEUE_PUSH(GEN_QUEUE_T* queue, const GEN_QUEUE_VALUE_TYPE* entry) {
+bool GEN_QUEUE_PUSH(GEN_QUEUE_T *queue, const GEN_QUEUE_VALUE_TYPE *entry) {
     GEN_QUEUE_LOCK_WRAP(queue);
     bool r = GEN_QUEUE_PUSH_NOLOCK(queue, entry);
     GEN_QUEUE_UNLOCK_WRAP(queue);
     return r;
 }
 
-bool GEN_QUEUE_POP_NOLOCK(GEN_QUEUE_T* queue, GEN_QUEUE_VALUE_TYPE* entry) {
+bool GEN_QUEUE_POP_NOLOCK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry) {
     if (GEN_QUEUE_EMPTY_NOLOCK(queue)) {
         return false;
     }
@@ -424,14 +424,14 @@ bool GEN_QUEUE_POP_NOLOCK(GEN_QUEUE_T* queue, GEN_QUEUE_VALUE_TYPE* entry) {
     return true;
 }
 
-bool GEN_QUEUE_POP(GEN_QUEUE_T* queue, GEN_QUEUE_VALUE_TYPE* entry) {
+bool GEN_QUEUE_POP(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry) {
     GEN_QUEUE_LOCK_WRAP(queue);
     bool r = GEN_QUEUE_POP_NOLOCK(queue, entry);
     GEN_QUEUE_UNLOCK_WRAP(queue);
     return r;
 }
 
-bool GEN_QUEUE_ENQUEUE_NOLOCK(GEN_QUEUE_T* queue, GEN_QUEUE_VALUE_TYPE* entry) {
+bool GEN_QUEUE_ENQUEUE_NOLOCK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry) {
     if (GEN_QUEUE_FULL_NOLOCK(queue)) {
         return false;
     }
@@ -442,14 +442,14 @@ bool GEN_QUEUE_ENQUEUE_NOLOCK(GEN_QUEUE_T* queue, GEN_QUEUE_VALUE_TYPE* entry) {
     return true;
 }
 
-bool GEN_QUEUE_ENQUEUE(GEN_QUEUE_T* queue, GEN_QUEUE_VALUE_TYPE* entry) {
+bool GEN_QUEUE_ENQUEUE(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry) {
     GEN_QUEUE_LOCK_WRAP(queue);
     bool r = GEN_QUEUE_ENQUEUE_NOLOCK(queue, entry);
     GEN_QUEUE_UNLOCK_WRAP(queue);
     return r;
 }
 
-bool GEN_QUEUE_DEQUEUE_NOLOCK(GEN_QUEUE_T* queue, GEN_QUEUE_VALUE_TYPE* entry) {
+bool GEN_QUEUE_DEQUEUE_NOLOCK(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry) {
     if (GEN_QUEUE_EMPTY_NOLOCK(queue)) {
         return false;
     }
@@ -459,7 +459,7 @@ bool GEN_QUEUE_DEQUEUE_NOLOCK(GEN_QUEUE_T* queue, GEN_QUEUE_VALUE_TYPE* entry) {
     return true;
 }
 
-bool GEN_QUEUE_DEQUEUE(GEN_QUEUE_T* queue, GEN_QUEUE_VALUE_TYPE* entry) {
+bool GEN_QUEUE_DEQUEUE(GEN_QUEUE_T *queue, GEN_QUEUE_VALUE_TYPE *entry) {
     GEN_QUEUE_LOCK_WRAP(queue);
     bool r = GEN_QUEUE_DEQUEUE_NOLOCK(queue, entry);
     GEN_QUEUE_UNLOCK_WRAP(queue);

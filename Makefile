@@ -114,8 +114,6 @@ distclean: userspace_clean
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Container management
 
-CONTAINER_PREAMBLE := export HOME="/tmp"; export PATH="/tmp/.local/bin:\$$PATH"; python3 -m pip install --upgrade pip; python3 -m pip install -r requirements-dev.txt
-
 .PHONY: format-core pytest format-and-pytest
 format-core:
 	make -C $(QMK_USERSPACE)/qmk_firmware format-core
@@ -129,7 +127,7 @@ format-and-pytest:
 .PHONY: format-keyboards-tzarc
 format-keyboards-tzarc:
 	cd $(QMK_USERSPACE)/qmk_firmware \
-		&& RUNTIME=docker ./util/docker_cmd.sh bash -lic "$(CONTAINER_PREAMBLE); qmk format-c \$$(find keyboards/tzarc \( -name '*.c' -o -name '*.h' \) -and -not -name '*.qgf.*' -and -not -name '*.qff.*' -and -not -name '*conf.h' -and -not -name 'board.h')"
+		&& RUNTIME=docker ./util/docker_cmd.sh bash -c "qmk format-c \$$(find keyboards/tzarc \( -name '*.c' -o -name '*.h' \) -and -not -name '*.qgf.*' -and -not -name '*.qff.*' -and -not -name '*conf.h' -and -not -name 'board.h')"
 
 .PHONY: all-vusb all-lufa all-chibios all-riot
 all-vusb:
@@ -155,7 +153,7 @@ rgb_effects:
 	@"$(QMK_USERSPACE)/bin/generate_rgb_effects.py" > "$(QMK_USERSPACE)/users/tzarc/enable_all_rgb_effects.h"
 
 format:
-	@git ls-files | grep -E '\.(c|h|cpp|hpp|cxx|hxx|inc|inl)$$' | grep -vE '\.q[gf]f\.' | grep -vE '(ch|hal|mcu)conf\.h$$' | grep -vE 'board.[ch]$$' | grep -vE '.inl.h$$' | grep -vE 'mini-rv32ima.h$$' | while read file ; do \
+	@git ls-files | grep -E '\.(c|h|cpp|hpp|cxx|hxx|inc|inl)$$' | grep -vE '\.q[gf]f\.' | grep -vE '(ch|hal|mcu)conf\.h$$' | grep -vE 'board.[ch]$$' | grep -vE '.inl.h$$' | grep -vE 'mini-rv32ima.h$$' | grep -vE 'utest.h$$' | while read file ; do \
 		$(ECHO) -e "\e[38;5;14mFormatting: $$file\e[0m" ; \
 		clang-format -i "$$file" ; \
 	done

@@ -88,8 +88,7 @@ static void dsi_generic_write(uint8_t cmd, const uint8_t *params, uint8_t len) {
 }
 
 // Minimal OTM8009A initialization to enable CMD2 and allow ID reads
-__attribute__((used))
-static bool otm8009a_enable_cmd2(void) {
+__attribute__((used)) static bool otm8009a_enable_cmd2(void) {
     dprintf("Enabling OTM8009A CMD2 mode...\n");
 
     // Check GPSR before we start
@@ -97,7 +96,7 @@ static bool otm8009a_enable_cmd2(void) {
 
     // Step 1: Send NOP to shift address to 0x00
     dprintf("  Sending NOP (0x00)...\n");
-    dsi_dcs_write_0param(0x00);  // NOP
+    dsi_dcs_write_0param(0x00); // NOP
     chThdSleepMilliseconds(1);
     dprintf("    GPSR: 0x%08lX\n", (unsigned long)DSI->GPSR);
 
@@ -110,7 +109,7 @@ static bool otm8009a_enable_cmd2(void) {
 
     // Step 3: Send NOP to shift address to 0x80
     dprintf("  Sending NOP with param 0x80...\n");
-    dsi_dcs_write_1param(0x00, 0x80);  // NOP with parameter 0x80
+    dsi_dcs_write_1param(0x00, 0x80); // NOP with parameter 0x80
     chThdSleepMilliseconds(1);
     dprintf("    GPSR: 0x%08lX\n", (unsigned long)DSI->GPSR);
 
@@ -126,7 +125,7 @@ static bool otm8009a_enable_cmd2(void) {
 }
 
 bool dsi_test_read_panel_id(void) {
-    uint8_t panel_id[3] = {0, 0, 0};
+    uint8_t  panel_id[3] = {0, 0, 0};
     uint32_t timeout;
 
     dprintf("Step 0: Configuring display GPIO pins...\n");
@@ -142,8 +141,8 @@ bool dsi_test_read_panel_id(void) {
     palSetPadMode(GPIOJ, 2, PAL_MODE_ALTERNATE(13) | PAL_STM32_OSPEED_HIGHEST);
 
     // Verify configuration
-    dprintf("  GPIOJ->MODER[2]: 0x%lX (should be 2=AF)\n", (unsigned long)((GPIOJ->MODER >> (2*2)) & 0x3));
-    dprintf("  GPIOJ->AFR[0][2]: 0x%lX (should be 13)\n", (unsigned long)((GPIOJ->AFRL >> (2*4)) & 0xF));
+    dprintf("  GPIOJ->MODER[2]: 0x%lX (should be 2=AF)\n", (unsigned long)((GPIOJ->MODER >> (2 * 2)) & 0x3));
+    dprintf("  GPIOJ->AFR[0][2]: 0x%lX (should be 13)\n", (unsigned long)((GPIOJ->AFRL >> (2 * 4)) & 0xF));
 
     // Reset the display
     palSetPad(GPIOH, 7);
@@ -156,19 +155,17 @@ bool dsi_test_read_panel_id(void) {
 
     dprintf("Step 1: Enabling DSI and LTDC clocks...\n");
     // Enable DSI and LTDC clocks
-    RCC->APB2ENR |= RCC_APB2ENR_DSIEN;   // Enable DSI clock
-    RCC->APB2ENR |= RCC_APB2ENR_LTDCEN;  // Enable LTDC clock
+    RCC->APB2ENR |= RCC_APB2ENR_DSIEN;  // Enable DSI clock
+    RCC->APB2ENR |= RCC_APB2ENR_LTDCEN; // Enable LTDC clock
 
     // Check RCC status
-    dprintf("RCC->CR: 0x%08lX (HSE: %s)\n",
-            (unsigned long)RCC->CR,
-            (RCC->CR & RCC_CR_HSERDY) ? "ready" : "NOT READY");
+    dprintf("RCC->CR: 0x%08lX (HSE: %s)\n", (unsigned long)RCC->CR, (RCC->CR & RCC_CR_HSERDY) ? "ready" : "NOT READY");
     dprintf("RCC->APB2ENR: 0x%08lX\n", (unsigned long)RCC->APB2ENR);
 
     // Configure PLLSAIDIVR for 62.5MHz output (125MHz / 2)
     // This is used for LTDC pixel clock
     RCC->DCKCFGR &= ~RCC_DCKCFGR_PLLSAIDIVR_Msk;
-    RCC->DCKCFGR |= RCC_DCKCFGR_PLLSAIDIVR_0;  // Divide by 2
+    RCC->DCKCFGR |= RCC_DCKCFGR_PLLSAIDIVR_0; // Divide by 2
 
     dprintf("Step 2: Resetting DSI peripheral...\n");
     RCC->APB2RSTR |= RCC_APB2RSTR_DSIRST;
@@ -237,17 +234,14 @@ bool dsi_test_read_panel_id(void) {
     // IDF = 2 (register value 1, since 0=/1, 1=/2, 2=/3, etc.)
     // NDIV = 125
     // ODF = 1 (register value 0, since 0=/1, 1=/2, 2=/4, 3=/8)
-    uint32_t wrpcr_val = (125U << DSI_WRPCR_PLL_NDIV_Pos) |   // NDIV = 125
-                         (1U << DSI_WRPCR_PLL_IDF_Pos) |      // IDF = /2
-                         (0U << DSI_WRPCR_PLL_ODF_Pos) |      // ODF = /1
-                         DSI_WRPCR_REGEN |                     // Keep regulator enabled
-                         DSI_WRPCR_PLLEN;                      // Enable PLL
+    uint32_t wrpcr_val = (125U << DSI_WRPCR_PLL_NDIV_Pos) | // NDIV = 125
+                         (1U << DSI_WRPCR_PLL_IDF_Pos) |    // IDF = /2
+                         (0U << DSI_WRPCR_PLL_ODF_Pos) |    // ODF = /1
+                         DSI_WRPCR_REGEN |                  // Keep regulator enabled
+                         DSI_WRPCR_PLLEN;                   // Enable PLL
 
     dprintf("Writing WRPCR: 0x%08lX\n", (unsigned long)wrpcr_val);
-    dprintf("  NDIV=%lu, IDF=%lu, ODF=%lu\n",
-            (wrpcr_val >> DSI_WRPCR_PLL_NDIV_Pos) & 0x1FF,
-            (wrpcr_val >> DSI_WRPCR_PLL_IDF_Pos) & 0xF,
-            (wrpcr_val >> DSI_WRPCR_PLL_ODF_Pos) & 0x3);
+    dprintf("  NDIV=%lu, IDF=%lu, ODF=%lu\n", (wrpcr_val >> DSI_WRPCR_PLL_NDIV_Pos) & 0x1FF, (wrpcr_val >> DSI_WRPCR_PLL_IDF_Pos) & 0xF, (wrpcr_val >> DSI_WRPCR_PLL_ODF_Pos) & 0x3);
 
     DSI->WRPCR = wrpcr_val;
 
@@ -303,12 +297,12 @@ bool dsi_test_read_panel_id(void) {
     dprintf("  PCONFR: 0x%08lX\n", (unsigned long)DSI->PCONFR);
 
     // Configure PHY timings for 500 Mbps
-    DSI->PCTLR |= DSI_PCTLR_DEN;  // Digital enable
-    DSI->PCTLR |= DSI_PCTLR_CKE;  // Clock enable
+    DSI->PCTLR |= DSI_PCTLR_DEN; // Digital enable
+    DSI->PCTLR |= DSI_PCTLR_CKE; // Clock enable
 
     // Clock lane configuration
     DSI->CLCR &= ~(DSI_CLCR_DPCC | DSI_CLCR_ACR);
-    DSI->CLCR |= DSI_CLCR_DPCC;  // Enable D-PHY clock control
+    DSI->CLCR |= DSI_CLCR_DPCC; // Enable D-PHY clock control
 
     // Calculate and set Unit Interval (UIX4) for PHY timing
     // UIX4 = (4000000 * IDF * (1 << ODF)) / ((HSE_kHz) * NDIV)
@@ -324,28 +318,28 @@ bool dsi_test_read_panel_id(void) {
     dprintf("  PCTLR: 0x%08lX\n", (unsigned long)DSI->PCTLR);
 
     // Configure flow control for command mode
-    DSI->CMCR = DSI_CMCR_TEARE |       // Enable tearing effect acknowledge
-                DSI_CMCR_ARE   |       // Enable acknowledge request
-                DSI_CMCR_GSW0TX |      // Generic short write 0 in low-power
-                DSI_CMCR_GSW1TX |      // Generic short write 1 in low-power
-                DSI_CMCR_GSW2TX |      // Generic short write 2 in low-power
-                DSI_CMCR_GSR0TX |      // Generic short read 0 in low-power
-                DSI_CMCR_GSR1TX |      // Generic short read 1 in low-power
-                DSI_CMCR_GSR2TX |      // Generic short read 2 in low-power
-                DSI_CMCR_GLWTX  |      // Generic long write in low-power
-                DSI_CMCR_DSW0TX |      // DCS short write 0 in low-power
-                DSI_CMCR_DSW1TX |      // DCS short write 1 in low-power
-                DSI_CMCR_DSR0TX |      // DCS short read in low-power
-                DSI_CMCR_DLWTX  |      // DCS long write in low-power
-                DSI_CMCR_MRDPS;        // Max read packet size in low-power
+    DSI->CMCR = DSI_CMCR_TEARE |  // Enable tearing effect acknowledge
+                DSI_CMCR_ARE |    // Enable acknowledge request
+                DSI_CMCR_GSW0TX | // Generic short write 0 in low-power
+                DSI_CMCR_GSW1TX | // Generic short write 1 in low-power
+                DSI_CMCR_GSW2TX | // Generic short write 2 in low-power
+                DSI_CMCR_GSR0TX | // Generic short read 0 in low-power
+                DSI_CMCR_GSR1TX | // Generic short read 1 in low-power
+                DSI_CMCR_GSR2TX | // Generic short read 2 in low-power
+                DSI_CMCR_GLWTX |  // Generic long write in low-power
+                DSI_CMCR_DSW0TX | // DCS short write 0 in low-power
+                DSI_CMCR_DSW1TX | // DCS short write 1 in low-power
+                DSI_CMCR_DSR0TX | // DCS short read in low-power
+                DSI_CMCR_DLWTX |  // DCS long write in low-power
+                DSI_CMCR_MRDPS;   // Max read packet size in low-power
 
     // Enable low-power mode for commands
-    DSI->LPMCR = DSI_LPMCR_VLPSIZE_Msk |  // Max VACT size for low-power
-                 DSI_LPMCR_LPSIZE_Msk;     // Max packet size for low-power
+    DSI->LPMCR = DSI_LPMCR_VLPSIZE_Msk | // Max VACT size for low-power
+                 DSI_LPMCR_LPSIZE_Msk;   // Max packet size for low-power
 
     dprintf("Step 7: Configuring virtual channel...\n");
     // Configure virtual channel and DPI color coding
-    DSI->GVCIDR = 0;  // Virtual channel ID 0
+    DSI->GVCIDR = 0; // Virtual channel ID 0
 
     // Enable regulators and wait
     chThdSleepMilliseconds(20);
@@ -358,9 +352,7 @@ bool dsi_test_read_panel_id(void) {
         chThdSleepMicroseconds(100);
         timeout--;
     }
-    dprintf("  GPSR before sleep out: 0x%08lX (CMDFE: %s)\n",
-            (unsigned long)DSI->GPSR,
-            (DSI->GPSR & DSI_GPSR_CMDFE) ? "empty" : "NOT empty");
+    dprintf("  GPSR before sleep out: 0x%08lX (CMDFE: %s)\n", (unsigned long)DSI->GPSR, (DSI->GPSR & DSI_GPSR_CMDFE) ? "empty" : "NOT empty");
 
     if (timeout == 0) {
         dprintf("  WARNING: Command FIFO not empty\n");
@@ -378,8 +370,8 @@ bool dsi_test_read_panel_id(void) {
     dprintf("Step 9: Reading panel IDs (before CMD2/Display ON)...\n");
 
     // Clear error flags before starting reads
-    DSI->ISR[0] = 0xFFFFFFFF;  // Clear all ISR0 errors
-    DSI->ISR[1] = 0xFFFFFFFF;  // Clear all ISR1 errors
+    DSI->ISR[0] = 0xFFFFFFFF; // Clear all ISR0 errors
+    DSI->ISR[1] = 0xFFFFFFFF; // Clear all ISR1 errors
     dprintf("  Cleared ISR error flags\n");
 
     // Clear any stale data in read FIFO
@@ -396,9 +388,9 @@ bool dsi_test_read_panel_id(void) {
 
     // Read ID1 (0xDA) - should return 0x40 for OTM8009A
     dprintf("Reading ID1 (0xDA)...\n");
-    DSI->GHCR = (0x06U) |                         // DT: DCS Short Read
-                (0U << 6) |                        // VCID: 0
-                (0xDAU << 8);                      // Command: Read ID1
+    DSI->GHCR = (0x06U) |     // DT: DCS Short Read
+                (0U << 6) |   // VCID: 0
+                (0xDAU << 8); // Command: Read ID1
 
     // Give panel time to process command
     chThdSleepMilliseconds(10);
@@ -411,20 +403,15 @@ bool dsi_test_read_panel_id(void) {
     }
 
     dprintf("GPSR: 0x%08lX (timeout=%lu)\n", (unsigned long)DSI->GPSR, (unsigned long)timeout);
-    dprintf("  GPSR bits: CMDFE=%d, CMDFF=%d, PWRFE=%d, PWRFF=%d, PRDFE=%d, PRDFF=%d, RCB=%d\n",
-            !!(DSI->GPSR & DSI_GPSR_CMDFE), !!(DSI->GPSR & DSI_GPSR_CMDFF),
-            !!(DSI->GPSR & DSI_GPSR_PWRFE), !!(DSI->GPSR & DSI_GPSR_PWRFF),
-            !!(DSI->GPSR & DSI_GPSR_PRDFE), !!(DSI->GPSR & DSI_GPSR_PRDFF),
-            !!(DSI->GPSR & DSI_GPSR_RCB));
+    dprintf("  GPSR bits: CMDFE=%d, CMDFF=%d, PWRFE=%d, PWRFF=%d, PRDFE=%d, PRDFF=%d, RCB=%d\n", !!(DSI->GPSR & DSI_GPSR_CMDFE), !!(DSI->GPSR & DSI_GPSR_CMDFF), !!(DSI->GPSR & DSI_GPSR_PWRFE), !!(DSI->GPSR & DSI_GPSR_PWRFF), !!(DSI->GPSR & DSI_GPSR_PRDFE), !!(DSI->GPSR & DSI_GPSR_PRDFF), !!(DSI->GPSR & DSI_GPSR_RCB));
 
     // Check for errors
     dprintf("  ISR0: 0x%08lX, ISR1: 0x%08lX\n", (unsigned long)DSI->ISR[0], (unsigned long)DSI->ISR[1]);
 
     if (timeout > 0 && !(DSI->GPSR & DSI_GPSR_PRDFE)) {
-
         // Read all FIFO entries to see if there are multiple packets
         uint32_t fifo_data[10];
-        int fifo_count = 0;
+        int      fifo_count = 0;
         while (!(DSI->GPSR & DSI_GPSR_PRDFE) && fifo_count < 10) {
             fifo_data[fifo_count] = DSI->GPDR;
             dprintf("  FIFO[%d]: 0x%08lX\n", fifo_count, (unsigned long)fifo_data[fifo_count]);
@@ -443,8 +430,8 @@ bool dsi_test_read_panel_id(void) {
 
         // Parse the DSI response packet
         // Format: [DT][VC+WC][Data...][ECC]
-        uint8_t dt = data0 & 0x3F;  // Data type in bits 5:0
-        uint8_t wc = (data0 >> 8) & 0xFF;  // Word count
+        uint8_t dt = data0 & 0x3F;        // Data type in bits 5:0
+        uint8_t wc = (data0 >> 8) & 0xFF; // Word count
 
         dprintf("  Packet DT: 0x%02X, WC: %u\n", dt, wc);
 
@@ -480,9 +467,7 @@ bool dsi_test_read_panel_id(void) {
 
     // Read ID2 (0xDB) - should return 0x00
     dprintf("Reading ID2 (0xDB)...\n");
-    DSI->GHCR = (0x06U) |
-                (0U << 6) |
-                (0xDBU << 8);
+    DSI->GHCR = (0x06U) | (0U << 6) | (0xDBU << 8);
 
     timeout = 10000;
     while ((DSI->GPSR & DSI_GPSR_PRDFE) && timeout > 0) {
@@ -526,9 +511,7 @@ bool dsi_test_read_panel_id(void) {
 
     // Read ID3 (0xDC) - should return 0x80
     dprintf("Reading ID3 (0xDC)...\n");
-    DSI->GHCR = (0x06U) |
-                (0U << 6) |
-                (0xDCU << 8);
+    DSI->GHCR = (0x06U) | (0U << 6) | (0xDCU << 8);
 
     timeout = 10000;
     while ((DSI->GPSR & DSI_GPSR_PRDFE) && timeout > 0) {

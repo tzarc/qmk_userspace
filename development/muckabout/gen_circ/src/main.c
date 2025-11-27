@@ -25,23 +25,23 @@
 static event_queue_t queue;
 static queue_t       q;
 
-void print_lock_stats(event_queue_t* queue) {
+void print_lock_stats(event_queue_t *queue) {
     printf("     Locks: %d, Unlocks; %d, Level: %d\n", queue->lock_count, queue->unlock_count, queue->level);
 }
 
-void event_queue_lock(event_queue_t* queue) {
+void event_queue_lock(event_queue_t *queue) {
     ++queue->lock_count;
     ++queue->level;
     print_lock_stats(queue);
 }
 
-void event_queue_unlock(event_queue_t* queue) {
+void event_queue_unlock(event_queue_t *queue) {
     ++queue->unlock_count;
     --queue->level;
     print_lock_stats(queue);
 }
 
-int main(int argc, const char* argv[]) {
+int main(int argc, const char *argv[]) {
     event_queue_init(&queue);
     queue_init(&q);
 

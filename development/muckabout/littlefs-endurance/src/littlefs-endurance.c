@@ -60,23 +60,23 @@ static struct {
     uint8_t    barrier7[SPACING + 64 - ((sizeof(int) * BLOCK_COUNT) % 64)];
 } locals;
 
-int ram_read(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, void* buffer, lfs_size_t size) {
+int ram_read(const struct lfs_config *c, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size) {
     memcpy(buffer, locals.ramdisk[block] + off, size);
     return 0;
 }
 
-int ram_prog(const struct lfs_config* c, lfs_block_t block, lfs_off_t off, const void* buffer, lfs_size_t size) {
+int ram_prog(const struct lfs_config *c, lfs_block_t block, lfs_off_t off, const void *buffer, lfs_size_t size) {
     memcpy(locals.ramdisk[block] + off, buffer, size);
     return 0;
 }
 
-int ram_erase(const struct lfs_config* c, lfs_block_t block) {
+int ram_erase(const struct lfs_config *c, lfs_block_t block) {
     locals.erase_counts[block]++;
     memset(locals.ramdisk[block], 0xFF, c->block_size);
     return 0;
 }
 
-int ram_sync(const struct lfs_config* c) {
+int ram_sync(const struct lfs_config *c) {
     return 0;
 }
 
@@ -188,7 +188,7 @@ bool run_test(void) {
 
             _Static_assert(BYTES_PER_SLICE % sizeof(uint64_t) == 0, "BYTES_PER_SLICE must be a multiple of 8");
             for (int j = 0; j < BYTES_PER_SLICE; j += sizeof(uint64_t))
-                *(uint64_t*)&value[j] = splitmix64_next();
+                *(uint64_t *)&value[j] = splitmix64_next();
 
             err = LFS_API_CALL(lfs_file_write, &locals.lfs, &locals.file, value, BYTES_PER_SLICE);
             if (err < 0) {

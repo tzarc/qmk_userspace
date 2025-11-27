@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "rle16.h"
 
-bool rle16_decode(stream16_t* in_stream, stream16_t* out_stream, void* ctx) {
-    int32_t (*get)(stream16_t* stream, void* ctx)         = in_stream->get;
-    bool (*put)(stream16_t* stream, int32_t c, void* ctx) = out_stream->put;
+bool rle16_decode(stream16_t *in_stream, stream16_t *out_stream, void *ctx) {
+    int32_t (*get)(stream16_t *stream, void *ctx)         = in_stream->get;
+    bool (*put)(stream16_t *stream, int32_t c, void *ctx) = out_stream->put;
     int32_t c;
     size_t  i, cnt;
     while (1) {
@@ -30,8 +30,8 @@ bool rle16_decode(stream16_t* in_stream, stream16_t* out_stream, void* ctx) {
 }
 
 #ifdef RLE_ENCODER
-static bool rle16_append_words(stream16_t* out_stream, uint16_t* buf, size_t len, void* ctx) {
-    bool (*put)(stream16_t* stream, int32_t c, void* ctx) = out_stream->put;
+static bool rle16_append_words(stream16_t *out_stream, uint16_t *buf, size_t len, void *ctx) {
+    bool (*put)(stream16_t *stream, int32_t c, void *ctx) = out_stream->put;
     int i;
     if (!put(out_stream, (int32_t)(32767 + len), ctx)) return false;
     for (i = 0; i < len; i++) {
@@ -40,9 +40,9 @@ static bool rle16_append_words(stream16_t* out_stream, uint16_t* buf, size_t len
     return true;
 }
 
-bool rle16_encode(stream16_t* in_stream, stream16_t* out_stream, void* ctx) {
-    int32_t (*get)(stream16_t* stream, void* ctx)         = in_stream->get;
-    bool (*put)(stream16_t* stream, int32_t c, void* ctx) = out_stream->put;
+bool rle16_encode(stream16_t *in_stream, stream16_t *out_stream, void *ctx) {
+    int32_t (*get)(stream16_t *stream, void *ctx)         = in_stream->get;
+    bool (*put)(stream16_t *stream, int32_t c, void *ctx) = out_stream->put;
     uint16_t buf[65536];
     size_t   len    = 0;
     bool     repeat = false;

@@ -6,10 +6,10 @@
 static int    chunder_data = 5;
 static int    chunder_bss;
 static int    chunder_nonresident __attribute__((section(".nonresident.chunder1")))     = 0x12345678;
-static int*   chunder_nonresident_ptr __attribute__((section(".nonresident.chunder2"))) = &chunder_nonresident;
+static int   *chunder_nonresident_ptr __attribute__((section(".nonresident.chunder2"))) = &chunder_nonresident;
 static host_t qmk;
 
-bool process_record_user(uint16_t keycode, keyrecord_t* record) {
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return qmk->is_keyboard_left() || qmk->is_keyboard_master();
 }
 
@@ -30,7 +30,7 @@ __attribute__((constructor(101))) void init101(void) {
     chunder_data = 101;
 }
 
-bool keymap_init(host_t qmk_in, keymap_t* keymap_out) {
+bool keymap_init(host_t qmk_in, keymap_t *keymap_out) {
     qmk         = qmk_in;
     *keymap_out = &keymap;
     return true;

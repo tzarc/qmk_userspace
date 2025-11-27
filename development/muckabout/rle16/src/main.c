@@ -6,11 +6,11 @@
 #include "rle16.h"
 #include "stream16.h"
 
-int main(int argc, const char* argv[]) {
+int main(int argc, const char *argv[]) {
     bool        help        = false;
     bool        decode      = false;
-    const char* input_file  = NULL;
-    const char* output_file = NULL;
+    const char *input_file  = NULL;
+    const char *output_file = NULL;
     for (int i = 0; i < argc; ++i) {
         if (argv[i][0] == '-') {
             switch (argv[i][1]) {
@@ -47,16 +47,16 @@ int main(int argc, const char* argv[]) {
         return 0;
     }
 
-    FILE* input  = (input_file && strcmp(input_file, "-") != 0) ? fopen(input_file, "rb") : stdin;
-    FILE* output = (output_file && strcmp(output_file, "-") != 0) ? fopen(output_file, "wb") : stdout;
+    FILE *input  = (input_file && strcmp(input_file, "-") != 0) ? fopen(input_file, "rb") : stdin;
+    FILE *output = (output_file && strcmp(output_file, "-") != 0) ? fopen(output_file, "wb") : stdout;
 
     file_stream16_t in_stream  = make_file_stream16(input);
     file_stream16_t out_stream = make_file_stream16(output);
 
     if (decode) {
-        rle16_decode((stream16_t*)&in_stream, (stream16_t*)&out_stream, NULL);
+        rle16_decode((stream16_t *)&in_stream, (stream16_t *)&out_stream, NULL);
     } else {
-        rle16_encode((stream16_t*)&in_stream, (stream16_t*)&out_stream, NULL);
+        rle16_encode((stream16_t *)&in_stream, (stream16_t *)&out_stream, NULL);
     }
 
     return 0;

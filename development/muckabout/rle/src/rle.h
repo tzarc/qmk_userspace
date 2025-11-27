@@ -4,8 +4,8 @@
 
 #include "stream.h"
 
-bool rle_decode(stream_t* in_stream, stream_t* out_stream);
+bool rle_decode(stream_t *in_stream, stream_t *out_stream);
 
 #ifdef RLE_ENCODER
-bool rle_encode(stream_t* in_stream, stream_t* out_stream);
+bool rle_encode(stream_t *in_stream, stream_t *out_stream);
 #endif // RLE_ENCODER

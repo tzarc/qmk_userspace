@@ -12,8 +12,8 @@ void promise_new(future_state_s *shared_state, void *result_buffer, size_t resul
     if (!shared_state || !promise || !future) return;
 
     // Initialize ChibiOS synchronization primitives
-    chMtxObjectInit(&shared_state->mutex);   // Protects state transitions and data
-    chBSemObjectInit(&shared_state->signal, true);  // Binary semaphore starts taken (will be signaled on completion)
+    chMtxObjectInit(&shared_state->mutex);         // Protects state transitions and data
+    chBSemObjectInit(&shared_state->signal, true); // Binary semaphore starts taken (will be signaled on completion)
 
     // Initialize state to pending
     shared_state->state = FUTURE_STATE_PENDING;

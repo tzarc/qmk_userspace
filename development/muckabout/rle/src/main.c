@@ -5,11 +5,11 @@
 #include "keycodes.h"
 #include "rle.h"
 
-int main(int argc, const char* argv[]) {
+int main(int argc, const char *argv[]) {
     bool        help        = false;
     bool        decode      = false;
-    const char* input_file  = NULL;
-    const char* output_file = NULL;
+    const char *input_file  = NULL;
+    const char *output_file = NULL;
     for (int i = 0; i < argc; ++i) {
         if (argv[i][0] == '-') {
             switch (argv[i][1]) {
@@ -46,16 +46,16 @@ int main(int argc, const char* argv[]) {
         return 0;
     }
 
-    FILE* input  = (input_file && strcmp(input_file, "-") != 0) ? fopen(input_file, "rb") : stdin;
-    FILE* output = (output_file && strcmp(output_file, "-") != 0) ? fopen(output_file, "wb") : stdout;
+    FILE *input  = (input_file && strcmp(input_file, "-") != 0) ? fopen(input_file, "rb") : stdin;
+    FILE *output = (output_file && strcmp(output_file, "-") != 0) ? fopen(output_file, "wb") : stdout;
 
     file_stream_t in_stream  = make_file_stream(input);
     file_stream_t out_stream = make_file_stream(output);
 
     if (decode) {
-        rle_decode((stream_t*)&in_stream, (stream_t*)&out_stream);
+        rle_decode((stream_t *)&in_stream, (stream_t *)&out_stream);
     } else {
-        rle_encode((stream_t*)&in_stream, (stream_t*)&out_stream);
+        rle_encode((stream_t *)&in_stream, (stream_t *)&out_stream);
     }
 
     return 0;

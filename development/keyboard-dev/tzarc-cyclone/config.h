@@ -145,7 +145,7 @@
     do {                                                                                                \
         if (CH_DBG_ENABLE_CHECKS != FALSE) {                                                            \
             if (!(c)) {                                                                                 \
-                extern void chibi_debug_check_hook(const char* func, const char* condition, int value); \
+                extern void chibi_debug_check_hook(const char *func, const char *condition, int value); \
                 chibi_debug_check_hook(__func__, (#c), (c));                                            \
                 chSysHalt(__func__);                                                                    \
             }                                                                                           \
@@ -156,7 +156,7 @@
     do {                                                                                                                     \
         if (CH_DBG_ENABLE_ASSERTS != FALSE) {                                                                                \
             if (!(c)) {                                                                                                      \
-                extern void chibi_debug_assert_hook(const char* func, const char* condition, int value, const char* reason); \
+                extern void chibi_debug_assert_hook(const char *func, const char *condition, int value, const char *reason); \
                 chibi_debug_assert_hook(__func__, (#c), (c), (r));                                                           \
                 chSysHalt(__func__);                                                                                         \
             }                                                                                                                \

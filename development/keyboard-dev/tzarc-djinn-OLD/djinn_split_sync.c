@@ -50,7 +50,7 @@ void kb_state_sync(void) {
     }
 }
 
-void kb_state_sync_slave(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
+void kb_state_sync_slave(uint8_t m2s_size, const void *m2s_buffer, uint8_t s2m_size, void *s2m_buffer) {
     if (m2s_size == sizeof(kb_runtime_config)) {
         memcpy(&kb_state, m2s_buffer, sizeof(kb_runtime_config));
         last_slave_sync_time = timer_read32();

@@ -76,15 +76,15 @@ typedef enum {
  * Direct access to fields should not be performed by users.
  */
 typedef struct {
-    mutex_t            mutex;               ///< Protects state transitions and data access
-    binary_semaphore_t signal;              ///< Signals completion to waiting threads
-    future_state_t     state;               ///< Current state (pending/fulfilled/rejected)
-    void              *result_buffer;       ///< Buffer for successful result data
-    void              *error_buffer;        ///< Buffer for error data
-    size_t             result_buffer_size;  ///< Maximum size of result buffer
-    size_t             error_buffer_size;   ///< Maximum size of error buffer
-    size_t             result_size;         ///< Actual size of stored result
-    size_t             error_size;          ///< Actual size of stored error
+    mutex_t            mutex;              ///< Protects state transitions and data access
+    binary_semaphore_t signal;             ///< Signals completion to waiting threads
+    future_state_t     state;              ///< Current state (pending/fulfilled/rejected)
+    void              *result_buffer;      ///< Buffer for successful result data
+    void              *error_buffer;       ///< Buffer for error data
+    size_t             result_buffer_size; ///< Maximum size of result buffer
+    size_t             error_buffer_size;  ///< Maximum size of error buffer
+    size_t             result_size;        ///< Actual size of stored result
+    size_t             error_size;         ///< Actual size of stored error
 } future_state_s;
 
 /**
@@ -99,7 +99,7 @@ typedef struct {
  * - Retrieve the result or error value
  */
 typedef struct future_t {
-    future_state_s *shared;  ///< Pointer to shared state
+    future_state_s *shared; ///< Pointer to shared state
 } future_t;
 
 /**
@@ -111,7 +111,7 @@ typedef struct future_t {
  * Promises can only be fulfilled or rejected once. Subsequent attempts will fail.
  */
 typedef struct promise_t {
-    future_state_s *shared;  ///< Pointer to shared state
+    future_state_s *shared; ///< Pointer to shared state
 } promise_t;
 
 /**

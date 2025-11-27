@@ -4,8 +4,8 @@
 
 #include "stream16.h"
 
-bool rle16_decode(stream16_t* in_stream, stream16_t* out_stream, void* ctx);
+bool rle16_decode(stream16_t *in_stream, stream16_t *out_stream, void *ctx);
 
 #ifdef RLE_ENCODER
-bool rle16_encode(stream16_t* in_stream, stream16_t* out_stream, void* ctx);
+bool rle16_encode(stream16_t *in_stream, stream16_t *out_stream, void *ctx);
 #endif // RLE_ENCODER
