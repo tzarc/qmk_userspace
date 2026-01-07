@@ -201,6 +201,11 @@ link-hooks:
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Builds
 
+# link name ! link source ! link target
+LINK_DEFS := \
+    native_protocol!development/muckabout/native/native_protocol!tmk_core/protocol/native \
+    native_platform!development/muckabout/native/native_platform!platforms/native
+
 # short name ! keyboard path ! keymap name
 BOARD_DEFS := \
 	annepro2!annepro2/c18!tzarc \
@@ -322,6 +327,37 @@ generated-files: links
 endef
 $(foreach board_entry,$(LINKED_BOARD_DEFS),$(eval $(call handle_board_entry,$(board_entry))))
 $(foreach board_entry,$(LINKED_BOARD_DEFS),$(eval $(call handle_linked_board_entry,$(board_entry))))
+
+define handle_link_entry
+link_name_$1 := $$(word 1,$$(subst !, ,$1))
+link_source_$1 := $$(word 2,$$(subst !, ,$1))
+link_target_$1 := $$(word 3,$$(subst !, ,$1))
+
+.PHONY: links link_$$(link_target_$1) unlinks unlink_$$(link_target_$1)
+
+links: link_$$(link_target_$1)
+link_$$(link_target_$1): qmk_firmware
+	@if [ ! -L "$(QMK_USERSPACE)/qmk_firmware/$$(link_target_$1)" ] ; then \
+		$(ECHO) -e "\e[38;5;14mSymlinking: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
+		mkdir -p $$(shell dirname "$(QMK_USERSPACE)/qmk_firmware/$$(link_target_$1)") ; \
+		ln -sf $(QMK_USERSPACE)/$$(link_source_$1) $(QMK_USERSPACE)/qmk_firmware/$$(link_target_$1) ; \
+		if [ -z "$$(grep -P '^$$(link_target_$1)$$$$' $(QMK_USERSPACE)/qmk_firmware/.git/info/exclude 2>/dev/null)" ] ; then \
+			$(ECHO) $$(link_target_$1) >> $(QMK_USERSPACE)/qmk_firmware/.git/info/exclude ; \
+		fi ; \
+	fi
+
+unlinks: unlink_$$(link_target_$1)
+unlink_$$(link_target_$1): qmk_firmware
+	@if [ -L "$(QMK_USERSPACE)/qmk_firmware/$$(link_target_$1)" ] ; then \
+		$(ECHO) -e "\e[38;5;14mRemoving symlink: $$(link_source_$1) -> $$(link_target_$1)\e[0m" ; \
+		rm $(QMK_USERSPACE)/qmk_firmware/$$(link_target_$1) || true; \
+		$(SED) -i "\@^$$(link_target_$1)@d" $(QMK_USERSPACE)/qmk_firmware/.git/info/exclude; \
+	fi
+
+clean: unlink_$$(link_target_$1)
+distclean: unlink_$$(link_target_$1)
+endef
+$(foreach link_entry,$(LINK_DEFS),$(eval $(call handle_link_entry,$(link_entry))))
 
 .PHONY: djinn
 djinn: NO_COMPILEDB=true
