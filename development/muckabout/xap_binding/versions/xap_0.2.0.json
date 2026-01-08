@@ -1,0 +1,561 @@
+{
+    "version": "0.2.0",
+    "define": "XAP_ROUTE",
+    "documentation": {
+        "order": [
+            "page_header",
+            "type_docs",
+            "!type_docs.md.j2",
+            "term_definitions",
+            "!term_definitions.md.j2",
+            "request_response",
+            "reserved_tokens",
+            "response_flags",
+            "!response_flags.md.j2",
+            "example_conversation",
+            "routes",
+            "!routes.md.j2",
+            "broadcast_messages",
+            "!broadcast_messages.md.j2"
+        ],
+        "page_header": "# QMK Firmware XAP Specs\n\nThis document describes the requirements of the QMK XAP (\"extensible application protocol\") API.",
+        "type_docs": "## Types\n\n**All integral types are little-endian.**",
+        "term_definitions": "## Definitions\n\nThis list defines the terms used across the entire set of XAP protocol documentation.",
+        "request_response": "## Requests and Responses\n\nCommunication generally follows a request/response pattern.\n\nEach request needs to include a _token_ -- this `u16` value prefixes each outbound request from the host application and its corresponding response.\nThis allows response messages to be correlated with their request, even if multiple host applications are communicating with the firmware simultaneously.\nHost applications should randomly generate a token ID for **every** outbound request, unless using a reserved token defined below.\nTo ensure host interoperability, valid token values are within the range `0x0100`-`0xFFFF`.\n\nThis token is followed by a `u8` signifying the length of data in the request.",
+        "reserved_tokens": "Two token values are reserved: `0xFFFE` and `0xFFFF`:\n* `0xFFFE`: A message sent by a host application may use this token if no response is to be sent -- a \"fire and forget\" message.\n* `0xFFFF`: Signifies a \"broadcast\" message sent by the firmware without prompting from the host application. Broadcast messages are defined later in this document.\n\nAny request will generate at least one corresponding response, with the exception of messages using reserved tokens. Maximum total message length is 128 bytes due to RAM constraints.",
+        "response_flags": "Response messages will always be prefixed by the originating request _token_, directly followed by that request's _response flags_, then the response payload length:",
+        "example_conversation": "### Example \"conversation\":\n\n**Request** -- version query:\n\n| Byte | 0 | 1 | 2 | 3 | 4 |\n| --- | --- | --- | --- | --- | --- |\n| **Purpose** | Token | Token | Payload Length | Route | Route |\n| **Value** | `0x43` | `0x2B` | `0x02` | `0x00` | `0x00` |\n\n**Response** -- matching token, successful flag, payload of `0x03170192` = 3.17.192:\n\n| Byte | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| **Purpose** | Token | Token | Response Flags | Payload Length | Payload | Payload | Payload | Payload |\n| **Value** | `0x43` | `0x2B` | `0x01` | `0x04` | `0x92` | `0x01` | `0x17` | `0x03` |",
+        "routes": "## Routes\n\nSubsystem validity should be queried through the \u201cEnabled-in-firmware subsystem query\u201d under the QMK subsystem (route=0x00,0x01).\nThis is the primary method for determining if a subsystem has been enabled in the running firmware.",
+        "broadcast_messages": "## Broadcast messages\n\nBroadcast messages may be sent by the firmware to the host, without a corresponding inbound request. Each broadcast message uses the token `0xFFFF`, and does not expect a response from the host. Tokens are followed by an _ID_ signifying the type of broadcast, then the response _payload_ length, and finally the corresponding _payload_."
+    },
+    "type_docs": {
+        "u8": "An unsigned 8-bit integral (octet, or byte), commonly seen as `uint8_t` from _stdint.h_.",
+        "u16": "An unsigned 16-bit integral, commonly seen as `uint16_t` from _stdint.h_.",
+        "u32": "An unsigned 32-bit integral, commonly seen as `uint32_t` from _stdint.h_.",
+        "type[n]": "An array of `type`, with array extent of `N` -- e.g. `u8[2]` signifies two consecutive octets.",
+        "bool": "Data type that contains values 0 and 1. Implemented as an alias of `u8`.",
+        "u64": "An unsigned 64-bit integral, commonly seen as `uint64_t` from _stdint.h_.",
+        "struct{}": "A structure of data, packing different objects together. Data is \"compacted\" -- there are no padding bytes between fields. Equivalent to a packed C-style `struct`. The order in which they're defined matches the order of the data in the response packet."
+    },
+    "term_definitions": {
+        "Subsystem": "A high-level area of functionality within XAP.",
+        "Route": "A sequence of _IDs_ describing the route to invoke a _handler_.",
+        "Handler": "A piece of code that is executed when a specific _route_ is received.",
+        "Response": "The data sent back to the host during execution of a _handler_.",
+        "Payload": "Any received data appended to the _route_, which gets delivered to the _handler_ when received.",
+        "Capability": "A way to determine if certain functionality is enabled in the firmware. Any _subsystem_ that provides build-time restriction of functionality must provide a _route_ for a _capabilities query_.",
+        "Secure Route": "A _route_ which has potentially destructive consequences, necessitating prior approval by the user before executing.",
+        "Unlock sequence": "A physical sequence initiated by the user to enable execution of  _secure routes_."
+    },
+    "type_definitions": {
+        "identifier": {
+            "name": "ID",
+            "description": "A single octet / 8-bit byte, representing Subsystem or Route index.",
+            "type": "u8"
+        },
+        "response_flags": {
+            "name": "Response Flags",
+            "description": "An `u8` containing the status of the request.",
+            "type": "u8"
+        },
+        "token": {
+            "name": "Token",
+            "description": "A `u16` associated with a specific request as well as its corresponding response. Valid token values are within the range `0x0100`-`0xFFFF`.",
+            "type": "u16"
+        },
+        "request_header": {
+            "name": "Request Header",
+            "description": "Packet format for inbound data.",
+            "type": "struct",
+            "struct_length": 3,
+            "struct_members": [
+                {
+                    "type": "token",
+                    "name": "token"
+                },
+                {
+                    "type": "u8",
+                    "name": "length"
+                }
+            ]
+        },
+        "response_header": {
+            "name": "Response Header",
+            "description": "Packet format for outbound data.",
+            "type": "struct",
+            "struct_length": 4,
+            "struct_members": [
+                {
+                    "type": "token",
+                    "name": "token"
+                },
+                {
+                    "type": "response_flags",
+                    "name": "flags"
+                },
+                {
+                    "type": "u8",
+                    "name": "length"
+                }
+            ]
+        },
+        "broadcast_header": {
+            "name": "Broadcast Header",
+            "description": "Packet format for broadcast messages.",
+            "type": "struct",
+            "struct_length": 4,
+            "struct_members": [
+                {
+                    "type": "token",
+                    "name": "token"
+                },
+                {
+                    "type": "u8",
+                    "name": "type"
+                },
+                {
+                    "type": "u8",
+                    "name": "length"
+                }
+            ]
+        }
+    },
+    "response_flags": {
+        "define_prefix": "XAP_RESPONSE_FLAG",
+        "bits": {
+            "0": {
+                "name": "Success",
+                "define": "SUCCESS",
+                "description": "When this bit is set, the request was successfully handled. If not set, all payload data should be disregarded, and the request retried if appropriate (with a new token)."
+            },
+            "1": {
+                "name": "Secure Failure",
+                "description": "When this bit is set, the requested _route_ was marked _secure_ but an _unlock sequence_ has not completed.",
+                "define": "SECURE_FAILURE"
+            },
+            "2": {
+                "name": "",
+                "description": "",
+                "define": "-"
+            },
+            "3": {
+                "name": "",
+                "description": "",
+                "define": "-"
+            },
+            "4": {
+                "name": "",
+                "description": "",
+                "define": "-"
+            },
+            "5": {
+                "name": "",
+                "description": "",
+                "define": "-"
+            },
+            "6": {
+                "name": "",
+                "description": "",
+                "define": "-"
+            },
+            "7": {
+                "name": "",
+                "description": "",
+                "define": "-"
+            }
+        }
+    },
+    "routes": {
+        "0x00": {
+            "type": "router",
+            "name": "XAP",
+            "define": "XAP",
+            "description": "This subsystem is always present, and provides the ability to query information about the XAP protocol of the connected device.",
+            "routes": {
+                "0x00": {
+                    "type": "command",
+                    "name": "Version Query",
+                    "define": "VERSION_QUERY",
+                    "description": "XAP protocol version query.\n\n* Returns the BCD-encoded version in the format of XX.YY.ZZZZ => `0xXXYYZZZZ`\n    * e.g. 3.2.115 will match `0x03020115`, or bytes {0x15,0x01,0x02,0x03}.",
+                    "return_type": "u32",
+                    "return_purpose": "bcd-version",
+                    "return_constant": "XAP_BCD_VERSION"
+                },
+                "0x01": {
+                    "type": "command",
+                    "name": "Capabilities Query",
+                    "define": "CAPABILITIES_QUERY",
+                    "description": "XAP subsystem capabilities query. Each bit should be considered as a \"usable\" route within this subsystem.",
+                    "return_type": "u32",
+                    "return_purpose": "capabilities",
+                    "return_constant": "XAP_ROUTE_XAP_CAPABILITIES"
+                },
+                "0x02": {
+                    "type": "command",
+                    "name": "Enabled subsystem query",
+                    "define": "SUBSYSTEM_QUERY",
+                    "description": "XAP protocol subsystem query. Each bit should be considered as a \"usable\" subsystem. For example, checking `(value & (1 << XAP_ROUTE_QMK) != 0)` means the QMK subsystem is enabled and available for querying.",
+                    "return_type": "u32",
+                    "return_purpose": "capabilities",
+                    "return_constant": "XAP_ROUTE_CAPABILITIES"
+                },
+                "0x03": {
+                    "type": "command",
+                    "name": "Secure Status",
+                    "define": "SECURE_STATUS",
+                    "description": "Query secure route status\n\n* 0 means secure routes are disabled\n* 1 means unlock sequence initiated but incomplete\n* 2 means secure routes are allowed\n* any other value should be interpreted as disabled",
+                    "return_type": "u8",
+                    "return_execute": "secure_status"
+                },
+                "0x04": {
+                    "type": "command",
+                    "name": "Secure Unlock",
+                    "define": "SECURE_UNLOCK",
+                    "description": "Initiate secure route unlock sequence",
+                    "return_execute": "secure_unlock"
+                },
+                "0x05": {
+                    "type": "command",
+                    "name": "Secure Lock",
+                    "define": "SECURE_LOCK",
+                    "description": "Disable secure routes",
+                    "return_execute": "secure_lock"
+                }
+            }
+        },
+        "0x01": {
+            "type": "router",
+            "name": "QMK",
+            "define": "QMK",
+            "description": "This subsystem is always present, and provides the ability to address QMK-specific functionality.",
+            "routes": {
+                "0x00": {
+                    "type": "command",
+                    "name": "Version Query",
+                    "define": "VERSION_QUERY",
+                    "description": "QMK protocol version query.\n\n* Returns the BCD-encoded version in the format of XX.YY.ZZZZ => `0xXXYYZZZZ`\n    * e.g. 3.2.115 will match `0x03020115`, or bytes {0x15,0x01,0x02,0x03}.",
+                    "return_type": "u32",
+                    "return_purpose": "bcd-version",
+                    "return_constant": "QMK_BCD_VERSION"
+                },
+                "0x01": {
+                    "type": "command",
+                    "name": "Capabilities Query",
+                    "define": "CAPABILITIES_QUERY",
+                    "description": "QMK subsystem capabilities query. Each bit should be considered as a \"usable\" route within this subsystem.",
+                    "return_type": "u32",
+                    "return_purpose": "capabilities",
+                    "return_constant": "XAP_ROUTE_QMK_CAPABILITIES"
+                },
+                "0x02": {
+                    "type": "command",
+                    "name": "Board identifiers",
+                    "define": "BOARD_IDENTIFIERS",
+                    "description": "Retrieves the set of identifying information for the board.",
+                    "return_type": "struct",
+                    "return_struct_length": 10,
+                    "return_struct_members": [
+                        {
+                            "type": "u16",
+                            "name": "Vendor ID"
+                        },
+                        {
+                            "type": "u16",
+                            "name": "Product ID"
+                        },
+                        {
+                            "type": "u16",
+                            "name": "Product Version"
+                        },
+                        {
+                            "type": "u32",
+                            "name": "QMK Unique Identifier"
+                        }
+                    ],
+                    "return_constant": [
+                        "VENDOR_ID",
+                        "PRODUCT_ID",
+                        "DEVICE_VER",
+                        "XAP_KEYBOARD_IDENTIFIER"
+                    ]
+                },
+                "0x03": {
+                    "type": "command",
+                    "name": "Board Manufacturer",
+                    "define": "BOARD_MANUFACTURER",
+                    "description": "Retrieves the name of the manufacturer",
+                    "return_type": "string",
+                    "return_constant": "QSTR(MANUFACTURER)"
+                },
+                "0x04": {
+                    "type": "command",
+                    "name": "Product Name",
+                    "define": "PRODUCT_NAME",
+                    "description": "Retrieves the product name",
+                    "return_type": "string",
+                    "return_constant": "QSTR(PRODUCT)"
+                },
+                "0x05": {
+                    "type": "command",
+                    "name": "Config Blob Length",
+                    "define": "CONFIG_BLOB_LEN",
+                    "description": "Retrieves the length of the configuration data bundled within the firmware",
+                    "return_type": "u16",
+                    "return_constant": "CONFIG_BLOB_GZ_LEN"
+                },
+                "0x06": {
+                    "type": "command",
+                    "name": "Config Blob Chunk",
+                    "define": "CONFIG_BLOB_CHUNK",
+                    "description": "Retrieves a chunk of the configuration data bundled within the firmware",
+                    "request_type": "u16",
+                    "request_purpose": "offset",
+                    "return_type": "u8[32]",
+                    "return_execute": "get_config_blob_chunk"
+                },
+                "0x07": {
+                    "type": "command",
+                    "name": "Jump to bootloader",
+                    "define": "BOOTLOADER_JUMP",
+                    "permissions": "secure",
+                    "enable_if_preprocessor": "defined(BOOTLOADER_JUMP_SUPPORTED)",
+                    "description": "Jump to bootloader\n\nMay not be present - if QMK capabilities query returns \u201ctrue\u201d, then jump to bootloader is supported\n\n* 0 means secure routes are disabled, and should be considered as a failure\n* 1 means successful, board will jump to bootloader",
+                    "return_type": "u8",
+                    "return_execute": "request_bootloader_jump"
+                },
+                "0x08": {
+                    "type": "command",
+                    "name": "Hardware Identifier",
+                    "define": "HARDWARE_ID",
+                    "description": "Retrieves a unique identifier for the board.",
+                    "return_type": "u32[4]",
+                    "return_execute": "get_hardware_id"
+                },
+                "0x09": {
+                    "type": "command",
+                    "name": "Reinitialize EEPROM",
+                    "define": "EEPROM_RESET",
+                    "permissions": "secure",
+                    "enable_if_preprocessor": "!defined(NO_RESET)",
+                    "description": "Reinitializes the keyboard's EEPROM (persistent memory)\n\nMay not be present - if QMK capabilities query returns \u201ctrue\u201d, then reinitialize is supported\n\n* 0 means secure routes are disabled, and should be considered as a failure\n* 1 means successful, board will reinitialize and then reboot",
+                    "return_type": "u8",
+                    "return_execute": "request_eeprom_reset"
+                }
+            }
+        },
+        "0x02": {
+            "type": "router",
+            "name": "Keyboard",
+            "define": "KB",
+            "description": "This subsystem is always present, and reserved for vendor-specific functionality. No routes are defined by XAP.",
+            "routes": {}
+        },
+        "0x03": {
+            "type": "router",
+            "name": "User",
+            "define": "USER",
+            "description": "This subsystem is always present, and reserved for user-specific functionality. No routes are defined by XAP.",
+            "routes": {}
+        },
+        "0x04": {
+            "type": "router",
+            "name": "Keymap",
+            "define": "KEYMAP",
+            "description": "This subsystem allows for query of currently configured keycodes.",
+            "routes": {
+                "0x01": {
+                    "type": "command",
+                    "name": "Capabilities Query",
+                    "define": "CAPABILITIES_QUERY",
+                    "description": "Keymap subsystem capabilities query. Each bit should be considered as a \"usable\" route within this subsystem.",
+                    "return_type": "u32",
+                    "return_purpose": "capabilities",
+                    "return_constant": "XAP_ROUTE_KEYMAP_CAPABILITIES"
+                },
+                "0x02": {
+                    "type": "command",
+                    "name": "Get Layer Count",
+                    "define": "GET_LAYER_COUNT",
+                    "description": "Query maximum number of layers that can be addressed within the keymap.",
+                    "return_type": "u8",
+                    "return_execute": "keymap_get_layer_count"
+                },
+                "0x03": {
+                    "type": "command",
+                    "name": "Get Keycode",
+                    "define": "GET_KEYMAP_KEYCODE",
+                    "description": "Query the Keycode at the requested location.",
+                    "request_type": "struct",
+                    "request_struct_length": 3,
+                    "request_struct_members": [
+                        {
+                            "type": "u8",
+                            "name": "Layer"
+                        },
+                        {
+                            "type": "u8",
+                            "name": "Row"
+                        },
+                        {
+                            "type": "u8",
+                            "name": "Column"
+                        }
+                    ],
+                    "return_type": "u16",
+                    "return_execute": "get_keymap_keycode"
+                },
+                "0x04": {
+                    "type": "command",
+                    "name": "Get Encoder Keycode",
+                    "define": "GET_ENCODER_KEYCODE",
+                    "description": "Query the Keycode at the requested location.",
+                    "enable_if_preprocessor": "defined(ENCODER_MAP_ENABLE)",
+                    "request_type": "struct",
+                    "request_struct_length": 3,
+                    "request_struct_members": [
+                        {
+                            "type": "u8",
+                            "name": "Layer"
+                        },
+                        {
+                            "type": "u8",
+                            "name": "Encoder"
+                        },
+                        {
+                            "type": "u8",
+                            "name": "Clockwise"
+                        }
+                    ],
+                    "return_type": "u16",
+                    "return_execute": "get_encoder_keycode"
+                }
+            }
+        },
+        "0x05": {
+            "type": "router",
+            "name": "Remapping",
+            "define": "REMAPPING",
+            "description": "This subsystem allows for live reassignment of keycodes without rebuilding the firmware.",
+            "enable_if_preprocessor": "defined(DYNAMIC_KEYMAP_ENABLE)",
+            "routes": {
+                "0x01": {
+                    "type": "command",
+                    "name": "Capabilities Query",
+                    "define": "CAPABILITIES_QUERY",
+                    "description": "Remapping subsystem capabilities query. Each bit should be considered as a \"usable\" route within this subsystem.",
+                    "return_type": "u32",
+                    "return_purpose": "capabilities",
+                    "return_constant": "XAP_ROUTE_REMAPPING_CAPABILITIES"
+                },
+                "0x02": {
+                    "type": "command",
+                    "name": "Get Layer Count",
+                    "define": "GET_DYNAMIC_LAYER_COUNT",
+                    "description": "Query maximum number of layers that can be addressed within the keymap.",
+                    "return_type": "u8",
+                    "return_constant": "DYNAMIC_KEYMAP_LAYER_COUNT"
+                },
+                "0x03": {
+                    "type": "command",
+                    "name": "Set Keycode",
+                    "define": "SET_KEYMAP_KEYCODE",
+                    "description": "Modify the Keycode at the requested location.",
+                    "permissions": "secure",
+                    "request_type": "struct",
+                    "request_struct_length": 5,
+                    "request_struct_members": [
+                        {
+                            "type": "u8",
+                            "name": "Layer"
+                        },
+                        {
+                            "type": "u8",
+                            "name": "Row"
+                        },
+                        {
+                            "type": "u8",
+                            "name": "Column"
+                        },
+                        {
+                            "type": "u16",
+                            "name": "Keycode"
+                        }
+                    ],
+                    "return_execute": "dynamic_keymap_set_keycode"
+                },
+                "0x04": {
+                    "type": "command",
+                    "name": "Set Encoder Keycode",
+                    "define": "SET_ENCODER_KEYCODE",
+                    "permissions": "secure",
+                    "description": "Modify the Keycode at the requested location.",
+                    "enable_if_preprocessor": "defined(ENCODER_MAP_ENABLE)",
+                    "request_type": "struct",
+                    "request_struct_length": 5,
+                    "request_struct_members": [
+                        {
+                            "type": "u8",
+                            "name": "Layer"
+                        },
+                        {
+                            "type": "u8",
+                            "name": "Encoder"
+                        },
+                        {
+                            "type": "u8",
+                            "name": "Clockwise"
+                        },
+                        {
+                            "type": "u16",
+                            "name": "Keycode"
+                        }
+                    ],
+                    "return_execute": "dynamic_encoder_set_keycode"
+                }
+            }
+        },
+        "0x06": {
+            "type": "router",
+            "name": "Lighting",
+            "define": "LIGHTING",
+            "description": "This subsystem allows for control over the lighting subsystem.",
+            "routes": {
+                "0x01": {
+                    "type": "command",
+                    "name": "Capabilities Query",
+                    "define": "CAPABILITIES_QUERY",
+                    "description": "Lighting subsystem capabilities query. Each bit should be considered as a \"usable\" route within this subsystem.",
+                    "return_type": "u32",
+                    "return_purpose": "capabilities",
+                    "return_constant": "XAP_ROUTE_LIGHTING_CAPABILITIES"
+                }
+            }
+        }
+    },
+    "broadcast_messages": {
+        "define_prefix": "XAP_BROADCAST",
+        "messages": {
+            "0x00": {
+                "name": "Log message",
+                "define": "LOG_MESSAGE",
+                "description": "Replicates and replaces the same functionality as if using the standard QMK `CONSOLE_ENABLE = yes` in `rules.mk`. Normal prints within the firmware will manifest as log messages broadcast to the host. `hid_listen` will not be functional with XAP enabled.\n\nLog message payloads include `u8[Length]` containing the text, where the length of the text is the _broadcast_header.length_ field.\n\n**Example Log Broadcast** -- log message \"Hello QMK!\"\n\n| Byte | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| **Purpose** | Token | Token | Broadcast Type | Length | Payload | Payload | Payload | Payload | Payload | Payload | Payload | Payload | Payload | Payload |\n| **Value** | `0xFF` | `0xFF` | `0x00` | `0x0A`(10) | `0x48`(H) | `0x65`(e) | `0x6C`(l) | `0x6C`(l) | `0x6F`(o) | `0x20`(&nbsp;) | `0x51`(Q) | `0x4D`(M) | `0x4B`(K) | `0x21`(!) |"
+            },
+            "0x01": {
+                "name": "Secure Status",
+                "define": "SECURE_STATUS",
+                "description": "Secure status has changed. Payloads include a `u8` matching a 'Secure Status' request.\n\n**Example Secure Status Broadcast** -- secure \"Unlocking\"\n\n| Byte | 0 | 1 | 2 | 3 | 4 |\n| --- | --- | --- | --- | --- | --- |\n| **Purpose** | Token | Token | Broadcast Type | Length | Secure Status |\n| **Value** | `0xFF` | `0xFF` | `0x01` | `0x01` | `0x01` |",
+                "return_type": "u8"
+            },
+            "0x02": {
+                "name": "Keyboard",
+                "define": "KB",
+                "description": "Reserved for vendor-specific functionality. No messages are defined by XAP."
+            },
+            "0x03": {
+                "name": "User",
+                "define": "USER",
+                "description": "Reserved for user-specific functionality. No messages are defined by XAP."
+            }
+        }
+    }
+}
