@@ -50,15 +50,15 @@
 #define STM32_SW                            STM32_SW_PLL
 #define STM32_PLLSRC                        STM32_PLLSRC_HSE
 #define STM32_PLLM_VALUE                    8
-#define STM32_PLLN_VALUE                    336
+#define STM32_PLLN_VALUE                    360
 #define STM32_PLLP_VALUE                    2
 #define STM32_PLLQ_VALUE                    7
 #define STM32_PLLI2SN_VALUE                 192
 #define STM32_PLLI2SR_VALUE                 2
 #define STM32_PLLI2SQ_VALUE                 4
-#define STM32_PLLSAIN_VALUE                 250
-#define STM32_PLLSAIR_VALUE                 2
-#define STM32_PLLSAIP_VALUE                 4
+#define STM32_PLLSAIN_VALUE                 384
+#define STM32_PLLSAIR_VALUE                 4
+#define STM32_PLLSAIP_VALUE                 8
 #define STM32_PLLSAIQ_VALUE                 4
 #define STM32_HPRE                          STM32_HPRE_DIV1
 #define STM32_PPRE1                         STM32_PPRE1_DIV4
@@ -70,9 +70,9 @@
 #define STM32_MCO2SEL                       STM32_MCO2SEL_PLLI2S
 #define STM32_MCO2PRE                       STM32_MCO2PRE_DIV1
 #define STM32_I2SSRC                        STM32_I2SSRC_PLLI2S
-#define STM32_SAI1SEL                       STM32_SAI2SEL_PLLR
-#define STM32_SAI2SEL                       STM32_SAI2SEL_PLLR
-#define STM32_CK48MSEL                      STM32_CK48MSEL_PLL
+#define STM32_SAI1SEL                       STM32_SAI1SEL_PLLSAI
+#define STM32_SAI2SEL                       STM32_SAI2SEL_PLLSAI
+#define STM32_CK48MSEL                      STM32_CK48MSEL_PLLALT
 
 /*
  * IRQ system settings.

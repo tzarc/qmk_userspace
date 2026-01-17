@@ -162,10 +162,10 @@ bool dsi_test_read_panel_id(void) {
     dprintf("RCC->CR: 0x%08lX (HSE: %s)\n", (unsigned long)RCC->CR, (RCC->CR & RCC_CR_HSERDY) ? "ready" : "NOT READY");
     dprintf("RCC->APB2ENR: 0x%08lX\n", (unsigned long)RCC->APB2ENR);
 
-    // Configure PLLSAIDIVR for 62.5MHz output (125MHz / 2)
-    // This is used for LTDC pixel clock
+    // Configure PLLSAIDIVR for 24MHz LTDC pixel clock (96MHz / 4)
+    // PLLSAIR output = 384MHz / 4 = 96MHz, then /4 = 24MHz
     RCC->DCKCFGR &= ~RCC_DCKCFGR_PLLSAIDIVR_Msk;
-    RCC->DCKCFGR |= RCC_DCKCFGR_PLLSAIDIVR_0; // Divide by 2
+    RCC->DCKCFGR |= RCC_DCKCFGR_PLLSAIDIVR_0; // Divide by 4 (bits [17:16] = 01)
 
     dprintf("Step 2: Resetting DSI peripheral...\n");
     RCC->APB2RSTR |= RCC_APB2RSTR_DSIRST;
@@ -208,11 +208,12 @@ bool dsi_test_read_panel_id(void) {
     }
 
     dprintf("Step 4: Configuring DSI PLL...\n");
-    // Configure DSI PLL
+    // Configure DSI PLL per DESIGN.md clock configuration
     // Input: 8MHz HSE
-    // VCO = (8MHz / 2) × 2 × 125 = 1000MHz
-    // Lane bit rate = 1000MHz / 2 / 1 = 500 Mbps
-    // Byte clock = 62.5MHz
+    // IDF = 1: VCO in = 8MHz / 1 = 8MHz
+    // NDIV = 50: VCO = 8MHz × 50 = 400MHz
+    // ODF = 1: PHY = 400MHz / 1 = 400MHz
+    // Lane byte clock = 400MHz / 8 = 50MHz
 
     // Disable PLL first
     DSI->WRPCR &= ~DSI_WRPCR_PLLEN;
@@ -231,14 +232,14 @@ bool dsi_test_read_panel_id(void) {
     dprintf("WRPCR before config: 0x%08lX\n", (unsigned long)DSI->WRPCR);
 
     // Configure PLL
-    // IDF = 2 (register value 1, since 0=/1, 1=/2, 2=/3, etc.)
-    // NDIV = 125
+    // IDF = 1 (register value 0, since 0=/1, 1=/2, 2=/3, etc.)
+    // NDIV = 50
     // ODF = 1 (register value 0, since 0=/1, 1=/2, 2=/4, 3=/8)
-    uint32_t wrpcr_val = (125U << DSI_WRPCR_PLL_NDIV_Pos) | // NDIV = 125
-                         (1U << DSI_WRPCR_PLL_IDF_Pos) |    // IDF = /2
-                         (0U << DSI_WRPCR_PLL_ODF_Pos) |    // ODF = /1
-                         DSI_WRPCR_REGEN |                  // Keep regulator enabled
-                         DSI_WRPCR_PLLEN;                   // Enable PLL
+    uint32_t wrpcr_val = (50U << DSI_WRPCR_PLL_NDIV_Pos) | // NDIV = 50
+                         (0U << DSI_WRPCR_PLL_IDF_Pos) |   // IDF = /1
+                         (0U << DSI_WRPCR_PLL_ODF_Pos) |   // ODF = /1
+                         DSI_WRPCR_REGEN |                 // Keep regulator enabled
+                         DSI_WRPCR_PLLEN;                  // Enable PLL
 
     dprintf("Writing WRPCR: 0x%08lX\n", (unsigned long)wrpcr_val);
     dprintf("  NDIV=%lu, IDF=%lu, ODF=%lu\n", (wrpcr_val >> DSI_WRPCR_PLL_NDIV_Pos) & 0x1FF, (wrpcr_val >> DSI_WRPCR_PLL_IDF_Pos) & 0xF, (wrpcr_val >> DSI_WRPCR_PLL_ODF_Pos) & 0x3);
@@ -276,8 +277,8 @@ bool dsi_test_read_panel_id(void) {
     DSI->CR |= DSI_CR_EN;
 
     // CRITICAL: Configure TX Escape Clock Divider (required for command mode)
-    // Lane byte clock = 62.5 MHz, target TX Escape clock = 15.62 MHz
-    // Divider = 62500 / 15620 = 4
+    // Lane byte clock = 50 MHz, target TX Escape clock = 12.5 MHz per DESIGN.md
+    // Divider = 50MHz / 12.5MHz = 4
     DSI->CCR = 4U << DSI_CCR_TXECKDIV_Pos;
     dprintf("  TX Escape Clock Divider: 4 (DSI->CCR = 0x%08lX)\n", (unsigned long)DSI->CCR);
 
@@ -306,10 +307,10 @@ bool dsi_test_read_panel_id(void) {
 
     // Calculate and set Unit Interval (UIX4) for PHY timing
     // UIX4 = (4000000 * IDF * (1 << ODF)) / ((HSE_kHz) * NDIV)
-    // IDF=2, ODF=1, NDIV=125, HSE=8000 kHz
-    // UIX4 = (4000000 * 2 * 1) / (8000 * 125) = 8
+    // IDF=1, ODF=0 (÷1), NDIV=50, HSE=8000 kHz
+    // UIX4 = (4000000 * 1 * 1) / (8000 * 50) = 10
     DSI->WPCR[0] &= ~DSI_WPCR0_UIX4;
-    DSI->WPCR[0] |= 8U;
+    DSI->WPCR[0] |= 10U;
 
     DSI->CLTCR = 0x00000707;
     DSI->DLTCR = 0x00000707;

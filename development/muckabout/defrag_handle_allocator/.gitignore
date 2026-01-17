@@ -1,8 +1,0 @@
-defrag_handle_allocator
-test_defrag_allocator
-.cache
-.build
-compile_commands.json
-*.gcda
-*.gcno
-*.gcov
