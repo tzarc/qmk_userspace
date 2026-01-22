@@ -17,7 +17,15 @@
             ]
         }
     },
-    "postCreateCommand": "${containerWorkspaceFolder}/.devcontainer/setup.sh ${containerWorkspaceFolder}"
+    "postCreateCommand": "${containerWorkspaceFolder}/.devcontainer/setup.sh ${containerWorkspaceFolder}",
+
+    "runArgs": [
+        "--privileged"
+    ],
+
+    "mounts": [
+        "type=bind,source=/dev/bus/usb,target=/dev/bus/usb"
+    ]
 
     // Features to add to the dev container. More info: https://containers.dev/features.
     // "features": {},

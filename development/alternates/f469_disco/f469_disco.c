@@ -26,12 +26,27 @@ void housekeeping_task_kb(void) {
     housekeeping_task_user();
 
     static bool has_tested_ram = false;
-    if (timer_read32() > 4000 && !has_tested_ram) {
+    static uint32_t last_print = 0;
+    uint32_t now = timer_read32();
+
+    // Heartbeat every second to verify task is running
+    if (now - last_print > 1000) {
+        last_print = now;
+        dprintf("Housekeeping alive: %lu ms\n", (unsigned long)now);
+    }
+
+    if (now > 4000 && !has_tested_ram) {
         has_tested_ram = true;
+        dprintf("\n=== Starting SDRAM and Display Tests ===\n");
         SDRAM_Init();
+        dprintf("SDRAM_Init complete\n");
         SDRAM_SanityTest();
+        dprintf("SDRAM_SanityTest complete\n");
         SDRAM_RunTests();
+        dprintf("SDRAM_RunTests complete\n");
+        dprintf("About to call dsi_test_read_panel_id()...\n");
         dsi_test_read_panel_id();
+        dprintf("dsi_test_read_panel_id() returned\n");
     }
 }
 
