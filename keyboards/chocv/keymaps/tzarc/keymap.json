@@ -9,5 +9,5 @@
         "pin_compatible": "promicro"
     },
     "converter": "sparkfun_pm2040",
-    "modules": ["tzarc/konami_code", "tzarc/experimental/lua_keymap"]
+    "modules": ["tzarc/konami_code", "tzarc/experimental/lua_keymap", "tzarc/mousegrid"]
 }

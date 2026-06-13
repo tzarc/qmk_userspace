@@ -65,6 +65,12 @@ $(QMK_USERSPACE)/qmk_api:
 		&& git pull --ff-only \
 		&& git sshsign
 
+$(QMK_USERSPACE)/qmk_udev:
+	git clone https://github.com/qmk/qmk_udev.git $(QMK_USERSPACE)/qmk_udev \
+		&& cd $(QMK_USERSPACE)/qmk_udev \
+		&& git pull --ff-only \
+		&& git sshsign
+
 $(QMK_USERSPACE)/chibios-maintenance:
 	git clone https://github.com/qmk/chibios-maintenance.git $(QMK_USERSPACE)/chibios-maintenance \
 		&& cd $(QMK_USERSPACE)/chibios-maintenance \
@@ -78,10 +84,11 @@ qmk_base_container: $(QMK_USERSPACE)/qmk_base_container
 qmk_cli: $(QMK_USERSPACE)/qmk_cli
 qmk_compiler: $(QMK_USERSPACE)/qmk_compiler
 qmk_api: $(QMK_USERSPACE)/qmk_api
+qmk_udev: $(QMK_USERSPACE)/qmk_udev
 chibios-maintenance: $(QMK_USERSPACE)/chibios-maintenance
 
 .PHONY: repositories
-repositories: qmk_firmware qmk_userspace qmk-dot-github qmk_base_container qmk_cli qmk_compiler qmk_api chibios-maintenance
+repositories: qmk_firmware qmk_userspace qmk-dot-github qmk_base_container qmk_cli qmk_compiler qmk_api qmk_udev chibios-maintenance
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # CLI testing
@@ -131,16 +138,16 @@ format-keyboards-tzarc:
 
 .PHONY: all-vusb all-lufa all-chibios all-riot
 all-vusb:
-	qmk mass-compile -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || $(ECHO) 2) -f protocol=VUSB
+	qmk mass-compile -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || $(ECHO) 2) -f protocol==VUSB
 
 all-lufa:
-	qmk mass-compile -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || $(ECHO) 2) -f protocol=LUFA
+	qmk mass-compile -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || $(ECHO) 2) -f protocol==LUFA
 
 all-chibios:
-	qmk mass-compile -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || $(ECHO) 2) -f protocol=ChibiOS
+	qmk mass-compile -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || $(ECHO) 2) -f protocol==ChibiOS
 
 all-riot:
-	qmk mass-compile -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || $(ECHO) 2) -f protocol=RIOT
+	qmk mass-compile -j$(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || $(ECHO) 2) -f protocol==RIOT
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Helpers

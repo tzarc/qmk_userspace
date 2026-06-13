@@ -298,3 +298,11 @@ void housekeeping_task_user(void) {
     housekeeping_task_keymap();
     tzarc_eeprom_task();
 }
+
+void __attribute__((used)) raw_hid_receive(uint8_t *data, uint8_t length) {
+    // Your code goes here
+    // `data` is a pointer to the buffer containing the received HID report
+    // `length` is the length of the report - always `RAW_EPSIZE`
+    (void)data;
+    (void)length;
+}

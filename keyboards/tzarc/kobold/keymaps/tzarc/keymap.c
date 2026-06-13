@@ -21,8 +21,9 @@ void housekeeping_task_keymap(void) {
     }
     last_read = timer_read32();
 
-    static int16_t voltage_readings[100] = {0};
-    static int16_t current_readings[100] = {0};
+    #define NUM_SLOTS 20
+    static int16_t voltage_readings[NUM_SLOTS] = {0};
+    static int16_t current_readings[NUM_SLOTS] = {0};
     static int32_t voltage_sum           = 0;
     static int32_t current_sum           = 0;
 
@@ -42,11 +43,11 @@ void housekeeping_task_keymap(void) {
     current_sum += current_ma;
 
     // Increment the read index
-    current_slot = (current_slot + 1) % 100;
+    current_slot = (current_slot + 1) % NUM_SLOTS;
 
-    if (current_slot == 99) {
-        int16_t voltage_avg = voltage_sum / 100;
-        int16_t current_avg = current_sum / 100;
+    if (current_slot == NUM_SLOTS - 1) {
+        int16_t voltage_avg = voltage_sum / NUM_SLOTS;
+        int16_t current_avg = current_sum / NUM_SLOTS;
         voltage_mv          = (2 * (3300 * voltage_avg)) / ADC_SATURATION;
         current_ma          = (3300 * current_avg) / ADC_SATURATION / 10; // current is wrongly at a 10x multiplier in Kobold R1, so divide by 10
         dprintf("Voltage: %dmV -- Current: %dmA\n", (int)voltage_mv, (int)current_ma);

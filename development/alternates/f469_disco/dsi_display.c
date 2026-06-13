@@ -162,9 +162,39 @@ static uint8_t dsi_dcs_read_1byte(uint8_t cmd) {
                 (unsigned long)DSI->ISR[0], (unsigned long)DSI->ISR[1]);
     }
 
-    // For a DCS Read Response, the data is in byte 0
-    // (Based on observation: 0x80 appeared in byte[0])
-    return byte0;
+    // DSI Short Read Response format:
+    // Byte 0: Data ID (packet type: 0x11/0x12=generic, 0x21/0x22=DCS)
+    // Byte 1: Actual data (for 1-byte response)
+    // Byte 2+: ECC or additional data
+    //
+    // Check packet type and extract data accordingly
+    if (byte0 == 0x21 || byte0 == 0x11) {
+        // Short read response with 1 byte - data is in byte1
+        dprintf("      Short read response (DT=0x%02X), data=0x%02X\n", byte0, byte1);
+        return byte1;
+    } else if (byte0 == 0x22 || byte0 == 0x12) {
+        // Short read response with 2 bytes - first data byte is in byte1
+        dprintf("      Short read response 2-byte (DT=0x%02X), data=0x%02X\n", byte0, byte1);
+        return byte1;
+    } else if (byte0 == 0x02) {
+        // Acknowledge and Error Report - no data
+        dprintf("      Acknowledge/Error (DT=0x%02X)\n", byte0);
+        return 0xFF;
+    } else {
+        // Unknown packet type - panel may return raw data in byte0
+        // NT35510/OTM8009A sometimes doesn't use standard DSI packet format
+        dprintf("      Unknown response format, bytes: 0x%02X 0x%02X 0x%02X 0x%02X\n", byte0, byte1, byte2, byte3);
+        // Return first non-zero byte as the data
+        if (byte0 != 0) {
+            dprintf("      Returning byte0=0x%02X as data\n", byte0);
+            return byte0;
+        } else if (byte1 != 0) {
+            dprintf("      Returning byte1=0x%02X as data\n", byte1);
+            return byte1;
+        }
+        dprintf("      All bytes zero, returning 0x00\n");
+        return byte0;
+    }
 }
 
 // Minimal OTM8009A initialization to enable CMD2 and allow ID reads
@@ -204,7 +234,7 @@ __attribute__((used)) static bool otm8009a_enable_cmd2(void) {
     return true;
 }
 
-bool dsi_test_read_panel_id(void) {
+__attribute__((used)) bool dsi_test_read_panel_id(void) {
     //uint8_t  panel_id[3] = {0, 0, 0};
     uint32_t timeout;
 
@@ -520,70 +550,186 @@ bool dsi_test_read_panel_id(void) {
     // Wait for DSI to stabilize
     chThdSleepMilliseconds(20);
 
-    dprintf("Step 10: Initializing OTM8009A panel...\n");
+    dprintf("Step 10: Initializing NT35510 panel...\n");
 
-    // OTM8009A initialization sequence (simplified from ST reference)
-    // Enable CMD2
-    dprintf("  Enabling CMD2...\n");
-    dsi_dcs_write_1param(0x00, 0x00);  // NOP
-    const uint8_t cmd2_enable1[] = {0x80, 0x09, 0x01};
-    dsi_generic_write(0xFF, cmd2_enable1, 3);
+    // NT35510 initialization sequence from official ST BSP driver
+    // Reference: lv_port_stm32f469_disco/Drivers/BSP/Components/nt35510/nt35510.c
 
-    dsi_dcs_write_1param(0x00, 0x80);  // Shift address
-    const uint8_t cmd2_enable2[] = {0x80, 0x09};
-    dsi_generic_write(0xFF, cmd2_enable2, 2);
+    // ========================================
+    // Proprietary Initialization (Page 1)
+    // ========================================
+    dprintf("  Enabling MCS Page 1...\n");
+    const uint8_t page1_enable[] = {0x55, 0xAA, 0x52, 0x08, 0x01};
+    dsi_generic_write(0xF0, page1_enable, 5);
 
-    // Essential power and timing settings
-    dsi_dcs_write_1param(0x00, 0x80);
-    dsi_dcs_write_1param(0xC4, 0x30);
-    chThdSleepMilliseconds(10);
+    // Power settings
+    dprintf("  Configuring power settings...\n");
+    const uint8_t avdd[] = {0x03, 0x03, 0x03};        // AVDD: 5.2V
+    dsi_generic_write(0xB0, avdd, 3);
+    const uint8_t avdd_ratio[] = {0x46, 0x46, 0x46};  // AVDD ratio
+    dsi_generic_write(0xB6, avdd_ratio, 3);
+    const uint8_t avee[] = {0x03, 0x03, 0x03};        // AVEE: -5.2V
+    dsi_generic_write(0xB1, avee, 3);
+    const uint8_t avee_ratio[] = {0x36, 0x36, 0x36};  // AVEE ratio
+    dsi_generic_write(0xB7, avee_ratio, 3);
+    const uint8_t vcl[] = {0x00, 0x00, 0x02};         // VCL: -2.5V
+    dsi_generic_write(0xB2, vcl, 3);
+    const uint8_t vcl_ratio[] = {0x26, 0x26, 0x26};   // VCL ratio
+    dsi_generic_write(0xB8, vcl_ratio, 3);
+    dsi_dcs_write_1param(0xBF, 0x01);                 // VGH: 15V (Free pump)
+    const uint8_t vgh[] = {0x09, 0x09, 0x09};         // VGH
+    dsi_generic_write(0xB3, vgh, 3);
+    const uint8_t vgh_ratio[] = {0x36, 0x36, 0x36};   // VGH ratio
+    dsi_generic_write(0xB9, vgh_ratio, 3);
+    const uint8_t vgl[] = {0x08, 0x08, 0x08};         // VGL_REG: -10V
+    dsi_generic_write(0xB5, vgl, 3);
+    const uint8_t vgl_ratio[] = {0x26, 0x26, 0x26};   // VGLX ratio
+    dsi_generic_write(0xBA, vgl_ratio, 3);
+    const uint8_t vgmp[] = {0x00, 0x80, 0x00};        // VGMP/VGSP: 4.5V/0V
+    dsi_generic_write(0xBC, vgmp, 3);
+    const uint8_t vgmn[] = {0x00, 0x80, 0x00};        // VGMN/VGSN: -4.5V/0V
+    dsi_generic_write(0xBD, vgmn, 3);
+    const uint8_t vcom[] = {0x00, 0x50};              // VCOM: -1.325V
+    dsi_generic_write(0xBE, vcom, 2);
 
-    dsi_dcs_write_1param(0x00, 0x8A);
-    dsi_dcs_write_1param(0xC4, 0x40);
-    chThdSleepMilliseconds(10);
+    // ========================================
+    // Proprietary DCS Initialization (Page 0)
+    // ========================================
+    dprintf("  Enabling MCS Page 0...\n");
+    const uint8_t page0_enable[] = {0x55, 0xAA, 0x52, 0x08, 0x00};
+    dsi_generic_write(0xF0, page0_enable, 5);
 
-    dsi_dcs_write_1param(0x00, 0xB1);
-    dsi_dcs_write_1param(0xC5, 0xA9);
+    const uint8_t dispctrl[] = {0xFC, 0x00};          // Display control
+    dsi_generic_write(0xB1, dispctrl, 2);
+    dsi_dcs_write_1param(0xB6, 0x03);                 // Src hold time
+    dsi_dcs_write_1param(0xB5, 0x51);
+    const uint8_t gate_eq[] = {0x00, 0x00};           // Gate EQ control
+    dsi_generic_write(0xB7, gate_eq, 2);
+    const uint8_t src_eq[] = {0x01, 0x02, 0x02, 0x02}; // Src EQ control (Mode2)
+    dsi_generic_write(0xB8, src_eq, 4);
+    const uint8_t inv_mode[] = {0x00, 0x00, 0x00};    // Inv. mode (2-dot)
+    dsi_generic_write(0xBC, inv_mode, 3);
+    const uint8_t disp_timing[] = {0x03, 0x00, 0x00}; // Display timing
+    dsi_generic_write(0xCC, disp_timing, 3);
+    dsi_dcs_write_1param(0xBA, 0x01);
 
-    dsi_dcs_write_1param(0x00, 0x91);
-    dsi_dcs_write_1param(0xC5, 0x34);
+    // Tear on
+    dsi_dcs_write_0param(0x35);
 
-    dsi_dcs_write_1param(0x00, 0xB4);
-    dsi_dcs_write_1param(0xC0, 0x50);
+    // Set pixel format to RGB888
+    dprintf("  Setting pixel format to RGB888...\n");
+    dsi_dcs_write_1param(0x3A, 0x77);  // COLMOD - RGB888
 
-    dsi_dcs_write_1param(0xD9, 0x4E);
+    // Add delay for MADCTL to take effect
+    chThdSleepMilliseconds(200);
 
-    // Exit CMD2
-    dprintf("  Exiting CMD2...\n");
-    dsi_dcs_write_1param(0x00, 0x00);
-    const uint8_t cmd2_exit[] = {0xFF, 0xFF, 0xFF};
-    dsi_generic_write(0xFF, cmd2_exit, 3);
+    // ========================================
+    // Standard DCS Initialization
+    // ========================================
+    // Configure landscape orientation (800x480)
+    dprintf("  Setting landscape orientation...\n");
+    dsi_dcs_write_1param(0x36, 0x60);  // MADCTL - Landscape
 
-    // Standard DCS commands
+    // Set column address for landscape (0-799)
+    const uint8_t caset[] = {0x00, 0x00, 0x03, 0x1F};
+    dsi_generic_write(0x2A, caset, 4);
+
+    // Set page address for landscape (0-479)
+    const uint8_t paset[] = {0x00, 0x00, 0x01, 0xDF};
+    dsi_generic_write(0x2B, paset, 4);
+
+    // Exit sleep mode
     dprintf("  Sending Sleep Out...\n");
     dsi_dcs_write_0param(0x11);  // Sleep Out
     chThdSleepMilliseconds(120);
 
-    dprintf("  Setting pixel format to RGB888...\n");
+    // Set pixel format again after sleep out
     dsi_dcs_write_1param(0x3A, 0x77);  // COLMOD - RGB888
 
-    dprintf("  Setting landscape orientation...\n");
-    dsi_dcs_write_1param(0x36, 0x60);  // MADCTR - Landscape mode
+    // ========================================
+    // CABC (Content Adaptive Backlight Control)
+    // ========================================
+    dsi_dcs_write_1param(0x51, 0x7F);  // Brightness: intermediate
+    dsi_dcs_write_1param(0x53, 0x2C);  // Brightness Control Block, Display Dimming & BackLight on
+    dsi_dcs_write_1param(0x55, 0x02);  // Image Content based Adaptive Brightness [Still Picture]
+    dsi_dcs_write_1param(0x5E, 0xFF);  // CABC minimum brightness
 
-    // Set column and page address for 800x480 landscape
-    const uint8_t caset[] = {0x00, 0x00, 0x03, 0x1F};  // 0-799
-    dsi_generic_write(0x2A, caset, 4);
-
-    const uint8_t paset[] = {0x00, 0x00, 0x01, 0xDF};  // 0-479
-    dsi_generic_write(0x2B, paset, 4);
-
+    // Display ON
     dprintf("  Enabling display...\n");
     dsi_dcs_write_0param(0x29);  // Display On
 
+    // Start GRAM write
     dprintf("  Starting GRAM write...\n");
     dsi_dcs_write_0param(0x2C);  // Write Memory Start
 
-    dprintf("OTM8009A initialization complete!\n");
+    dprintf("NT35510 initialization complete!\n");
+
+    // ========================================
+    // Step 10b: Configure LTDC Layer 1 with red framebuffer
+    // ========================================
+    dprintf("\nStep 10b: Configuring LTDC Layer 1 with red framebuffer...\n");
+
+    // Framebuffer in SDRAM (F469-Discovery SDRAM starts at 0xC0000000)
+    // Using RGB888 format (3 bytes per pixel)
+    // 800 x 480 x 3 = 1,152,000 bytes
+    uint8_t *framebuffer = (uint8_t *)0xC0000000;
+
+    // Fill framebuffer with RED (RGB888: R=0xFF, G=0x00, B=0x00)
+    dprintf("  Filling framebuffer with RED...\n");
+    for (uint32_t i = 0; i < 800 * 480; i++) {
+        framebuffer[i * 3 + 0] = 0x00;  // Blue
+        framebuffer[i * 3 + 1] = 0x00;  // Green
+        framebuffer[i * 3 + 2] = 0xFF;  // Red
+    }
+    dprintf("  Framebuffer filled at 0x%08lX\n", (unsigned long)framebuffer);
+
+    // Configure LTDC Layer 1
+    // Window horizontal position
+    uint32_t hstart = HSA + HBP;
+    uint32_t hstop = HSA + HBP + HACT - 1;
+    LTDC_Layer1->WHPCR = (hstop << 16) | hstart;
+
+    // Window vertical position
+    uint32_t vstart = VSA + VBP;
+    uint32_t vstop = VSA + VBP + VACT - 1;
+    LTDC_Layer1->WVPCR = (vstop << 16) | vstart;
+
+    // Pixel format: RGB888
+    LTDC_Layer1->PFCR = 1;  // 1 = RGB888
+
+    // Constant alpha: fully opaque
+    LTDC_Layer1->CACR = 0xFF;
+
+    // Default color (black, fully transparent)
+    LTDC_Layer1->DCCR = 0x00000000;
+
+    // Blending factors: use constant alpha
+    LTDC_Layer1->BFCR = (4 << 8) | 5;  // BF1=constant alpha, BF2=1-constant alpha
+
+    // Color frame buffer start address
+    LTDC_Layer1->CFBAR = (uint32_t)framebuffer;
+
+    // Color frame buffer line length and pitch
+    // Line length = active width * bytes per pixel + 3 (must be >= pitch)
+    // Pitch = active width * bytes per pixel
+    uint32_t pitch = HACT * 3;  // 800 * 3 = 2400 bytes
+    LTDC_Layer1->CFBLR = (pitch << 16) | (pitch + 3);
+
+    // Color frame buffer line number
+    LTDC_Layer1->CFBLNR = VACT;  // 480 lines
+
+    // Enable Layer 1
+    LTDC_Layer1->CR |= LTDC_LxCR_LEN;
+
+    // Reload LTDC configuration immediately
+    LTDC->SRCR = LTDC_SRCR_IMR;
+
+    dprintf("  LTDC Layer 1 configured:\n");
+    dprintf("    WHPCR: 0x%08lX (H: %lu-%lu)\n", (unsigned long)LTDC_Layer1->WHPCR, (unsigned long)hstart, (unsigned long)hstop);
+    dprintf("    WVPCR: 0x%08lX (V: %lu-%lu)\n", (unsigned long)LTDC_Layer1->WVPCR, (unsigned long)vstart, (unsigned long)vstop);
+    dprintf("    CFBAR: 0x%08lX\n", (unsigned long)LTDC_Layer1->CFBAR);
+    dprintf("    CFBLR: 0x%08lX (pitch=%lu)\n", (unsigned long)LTDC_Layer1->CFBLR, (unsigned long)pitch);
+    dprintf("    CR: 0x%08lX\n", (unsigned long)LTDC_Layer1->CR);
 
     // Step 11: Read panel IDs to verify communication
     dprintf("\nStep 11: Reading panel IDs to verify DSI communication...\n");
@@ -599,36 +745,48 @@ bool dsi_test_read_panel_id(void) {
     dprintf("  Dummy read complete.\n");
 
     // Now do the actual reads - responses should be aligned correctly
-    // Read ID1 (Manufacturer)
-    dprintf("  Reading ID1 (0xDA - Manufacturer ID)...\n");
+    // Panel ID values per ST BSP drivers:
+    //   OTM8009A: ID1 (0xDA) = 0x40  (older F469-Discovery boards)
+    //   NT35510:  ID2 (0xDB) = 0x80  (Rev B08+ F469-Discovery boards)
+
+    // Read ID1 - OTM8009A returns 0x40 here
+    dprintf("  Reading ID1 (0xDA)...\n");
     uint8_t id1 = dsi_dcs_read_1byte(0xDA);
-    dprintf("    ID1: 0x%02X (expected 0x40)\n", id1);
+    dprintf("    ID1: 0x%02X (OTM8009A = 0x40)\n", id1);
 
-    // Read ID2 (Module/Driver version)
-    dprintf("  Reading ID2 (0xDB - Module/Driver version)...\n");
+    // Read ID2 - NT35510 returns 0x80 here
+    dprintf("  Reading ID2 (0xDB)...\n");
     uint8_t id2 = dsi_dcs_read_1byte(0xDB);
-    dprintf("    ID2: 0x%02X (expected 0x00)\n", id2);
+    dprintf("    ID2: 0x%02X (NT35510 = 0x80)\n", id2);
 
-    // Read ID3 (Module/Driver ID)
-    dprintf("  Reading ID3 (0xDC - Module/Driver ID)...\n");
+    // Read ID3
+    dprintf("  Reading ID3 (0xDC)...\n");
     uint8_t id3 = dsi_dcs_read_1byte(0xDC);
-    dprintf("    ID3: 0x%02X (expected 0x80)\n", id3);
+    dprintf("    ID3: 0x%02X\n", id3);
 
     // Check ISR for errors
     dprintf("\n  DSI Status after reads:\n");
     dprintf("    ISR[0]: 0x%08lX\n", (unsigned long)DSI->ISR[0]);
     dprintf("    ISR[1]: 0x%08lX\n", (unsigned long)DSI->ISR[1]);
 
-    // Verify IDs
-    bool ids_correct = (id1 == 0x40 && id2 == 0x00 && id3 == 0x80);
-    dprintf("\n=== Panel ID Verification: %s ===\n",
-            ids_correct ? "PASSED" : "FAILED");
+    // Verify IDs per ST BSP drivers:
+    //   OTM8009A_ID = 0x40 in ID1 (0xDA)
+    //   NT35510_ID  = 0x80 in ID2 (0xDB)
+    bool is_nt35510 = (id2 == 0x80);
+    bool is_otm8009a = (id1 == 0x40);
+    bool any_response = (id1 != 0xFF || id2 != 0xFF || id3 != 0xFF);
 
-    if (!ids_correct) {
-        dprintf("  Expected: ID1=0x40, ID2=0x00, ID3=0x80\n");
-        dprintf("  Got:      ID1=0x%02X, ID2=0x%02X, ID3=0x%02X\n", id1, id2, id3);
+    dprintf("\n=== Panel ID Results ===\n");
+    dprintf("  ID1=0x%02X, ID2=0x%02X, ID3=0x%02X\n", id1, id2, id3);
+
+    if (is_nt35510) {
+        dprintf("  Detected: NT35510 (Rev B08+ board)\n");
+    } else if (is_otm8009a) {
+        dprintf("  Detected: OTM8009A (older board revision)\n");
+    } else if (any_response) {
+        dprintf("  Unknown panel - got responses but IDs don't match known controllers\n");
     } else {
-        dprintf("  DSI read communication is working!\n");
+        dprintf("  No valid response from panel (all 0xFF)\n");
     }
 
     // Verify LTDC and DSI status
@@ -652,7 +810,7 @@ bool dsi_test_read_panel_id(void) {
     return true;
 }
 
-bool dsi_test_read_panel_id_old(void) {
+__attribute__((used)) bool dsi_test_read_panel_id_old(void) {
     uint8_t  panel_id[3] = {0, 0, 0};
     uint32_t timeout;
 

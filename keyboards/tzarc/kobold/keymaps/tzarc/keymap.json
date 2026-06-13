@@ -1,3 +1,12 @@
 {
-    "modules": ["tzarc/experimental/rv32_rgb_runner"]
+    "modules": [
+        //"tzarc/experimental/rv32_rgb_runner"
+    ],
+    "config": {
+        "features": {
+            "game_modes": false,
+            "raw": false,
+            "xap": false
+        }
+    }
 }

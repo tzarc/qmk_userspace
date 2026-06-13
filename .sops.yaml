@@ -1,0 +1,4 @@
+creation_rules:
+  - age: >-
+      ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDPJ7M3DKTuP5K4jjkaDgIJ9S9oX+rXehA3XTio3aEyT,
+      ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILJmlhkrrrfBqxyWCECg/mhCy8S6Ye6001YfSwq3V+ru

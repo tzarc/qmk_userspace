@@ -1,3 +1,6 @@
+# Unencrypted secrets
+secrets
+
 # Junk files
 *.bak
 *.swp
@@ -29,6 +32,8 @@ compile_commands.json
 /qmk_base_container
 /qmk_compiler
 /qmk_api
+/qmk_udev
+/chibios-maintenance
 
 # Don't need source images
 users-tzarc/graphics/src/*.gif

@@ -2,3 +2,4 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #define MATRIX_INPUT_PRESSED_STATE 1
+#define TRANSIENT_EEPROM_SIZE 1024
