@@ -16,7 +16,7 @@ jobs:
         set -e
 
         # Ensure the environment is set up for the QMK CLI
-        eval "$(qmk env)"
+        eval "$(qmk env | sed -e 's/^/export /g')"
         # Install the updated compilers
         ./bin/install-tzarc-distrib.sh
 
