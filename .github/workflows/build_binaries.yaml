@@ -15,6 +15,9 @@ jobs:
       preparation_command: |
         set -e
 
+        # Install the updated compilers
+        ./bin/install-tzarc-distrib.sh
+
         # Set up any symlinks required for the makefile
         echo
         echo '##################################################################################################################################################'
