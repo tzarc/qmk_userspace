@@ -15,6 +15,8 @@ jobs:
       preparation_command: |
         set -e
 
+        # Ensure the environment is set up for the QMK CLI
+        eval "$(qmk env)"
         # Install the updated compilers
         ./bin/install-tzarc-distrib.sh
 
