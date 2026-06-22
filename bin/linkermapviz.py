@@ -150,9 +150,11 @@ def main() -> None:
         size = list(map(lambda x: x.size, objects))
         children = list(
             map(
-                lambda x: ",".join(map(lambda x: x[1], x.children))
-                if x.children
-                else x.section,
+                lambda x: (
+                    ",".join(map(lambda x: x[1], x.children))
+                    if x.children
+                    else x.section
+                ),
                 objects,
             )
         )

@@ -1,3 +1,3 @@
-// Copyright 2024-2025 Nick Brassel (@tzarc)
+// Copyright 2024-2026 Nick Brassel (@tzarc)
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "keyboards/steelseries/prime_plus/keymaps/tzarc/keymap.c"

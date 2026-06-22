@@ -35,24 +35,24 @@ repos:
     hooks:
       - id: yesqa
   - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-    rev: v2.15.0
+    rev: v2.16.0
     hooks:
       - id: pretty-format-yaml
         args: [--autofix, --offset, '2']
       - id: pretty-format-toml
         args: [--autofix]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.10
+    rev: v0.15.18
     hooks:
       - id: ruff-check
         args: [--fix]
       - id: ruff-format
   - repo: https://github.com/scop/pre-commit-shfmt
-    rev: v3.12.0-2
+    rev: v3.13.1-1
     hooks:
       - id: shfmt
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.5.5
+    rev: v1.5.6
     hooks:
       - id: remove-tabs
         exclude: \.svd$|[mM]akefile[^\/]*$|.*\.mk$
@@ -67,7 +67,7 @@ repos:
             \.q[gf]f\.[ch]|
             \.inl\.[ch]
             )$
-        args: [--allow-past-years, --license-filepath=.license-header, --comment-style=//]
+        args: [--allow-past-years, --use-current-year, --license-filepath=.license-header, --comment-style=//]
         types_or: [c, c++]
       - id: insert-license
         name: Insert License Header (Python files)
@@ -75,5 +75,5 @@ repos:
           (?x)(
               linkermapviz\.py
               )$
-        args: [--allow-past-years, --license-filepath=.license-header, --comment-style=#, --no-extra-eol]
+        args: [--allow-past-years, --use-current-year, --license-filepath=.license-header, --comment-style=#, --no-extra-eol]
         types_or: [python]
