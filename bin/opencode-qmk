@@ -1,0 +1,20 @@
+#!/usr/bin/env zsh
+# vim:ft=sh ts=4 sw=4 sts=4
+
+set -eEuo pipefail
+
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd -P)"
+
+exec bwrap-run \
+    --app-bin opencode \
+    --rw-app "$REPO_ROOT" \
+    --rw-app "$HOME/.opencode" \
+    --rw-app "$HOME/.config/opencode" \
+    --rw-app "$HOME/.local/share/opencode" \
+    --setenv "OPENCODE_TUI_CONFIG=$HOME/.config/opencode/tui-danger.json" \
+    --setenv 'OPENCODE_PERMISSION={"*":"allow"}' \
+    --setenv "VSCODE_PID=" \
+    --setenv "VSCODE_CWD=" \
+    --setenv "TERM_PROGRAM=" \
+    -- \
+    "$(command -v opencode)" "$@"

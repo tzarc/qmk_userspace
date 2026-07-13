@@ -8,7 +8,6 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd -P)"
 exec bwrap-run \
     --app-bin claude \
     --rw-app "$REPO_ROOT" \
-    --rw-app "$TZ_DOTFILES/extra/ai-shenanigans" \
     --rw-app "$HOME/.claude" \
     --rw-app "$HOME/.claude.json" \
     --rw-app "$HOME/.claude-mem" \
