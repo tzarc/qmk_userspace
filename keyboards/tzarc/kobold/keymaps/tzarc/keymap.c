@@ -21,7 +21,7 @@ void housekeeping_task_keymap(void) {
     }
     last_read = timer_read32();
 
-    #define NUM_SLOTS 20
+    #define NUM_SLOTS 200
     static int16_t voltage_readings[NUM_SLOTS] = {0};
     static int16_t current_readings[NUM_SLOTS] = {0};
     static int32_t voltage_sum           = 0;

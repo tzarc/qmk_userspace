@@ -1,12 +1,17 @@
 {
     "modules": [
-        //"tzarc/experimental/rv32_rgb_runner"
+        "tzarc/experimental/rv32_rgb_runner"
     ],
     "config": {
         "features": {
             "game_modes": false,
             "raw": false,
             "xap": false
+        },
+        "eeprom": {
+            "wear_leveling": {
+                "backing_size": 8192
+            }
         }
     }
 }
