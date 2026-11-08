@@ -45,7 +45,9 @@ if [[ -d $venv_dir ]] && [[ -d $firmware_dir ]]; then
         source "$venv_dir/bin/activate"
 
         # Upgrade QMK CLI and all other deps
-        uv pip install --upgrade pip -r "$script_dir/../python-requirements.txt"
+        uv pip install --upgrade \
+            -r "$script_dir/../pyproject.toml" --group "$script_dir/../pyproject.toml:dev" \
+            -r requirements.txt -r requirements-dev.txt -r util/ci/requirements.txt
 
         # Determine all the submodules we expect, as well as the ones we found on-disk
         actual_submodules=$(git -C "$firmware_dir" submodule --quiet foreach --recursive git rev-parse --show-toplevel | sed -e "s@${firmware_dir}/@@g")

@@ -7,10 +7,11 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd -P)"
 
 exec bwrap-run \
     --app-bin claude \
-    --rw-app "$REPO_ROOT" \
-    --rw-app "$HOME/.claude" \
-    --rw-app "$HOME/.claude.json" \
-    --rw-app "$HOME/.claude-mem" \
+    --rw-dir "$REPO_ROOT" \
+    --rw-dir "$HOME/.claude" \
+    --rw-file "$HOME/.claude.json" \
+    --rw-dir "$HOME/.claude-mem" \
+    --rw-dir "$HOME/.local/share/caveman-compress" \
     --setenv "VSCODE_PID=" \
     --setenv "VSCODE_CWD=" \
     --setenv "TERM_PROGRAM=" \

@@ -8,11 +8,13 @@ secrets
 .DS_Store
 ._*
 __pycache__
+.temp
 
 # Firmware files
 *.hex
 *.bin
 *.uf2
+*.elf
 
 # clangd
 compile_commands.json

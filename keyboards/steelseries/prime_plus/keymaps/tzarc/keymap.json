@@ -1,7 +1,7 @@
 {
     "config": {
         "features": {
-            "debug_matrix_scan_rate": false,
+            "debug_matrix_scan_rate": true,
             "encoder_map": true,
             "game_modes": false,
             "mousekey": true
