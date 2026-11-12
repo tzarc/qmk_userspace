@@ -21,13 +21,7 @@
         "python.analysis.typeCheckingMode": "standard",
         "python.analysis.languageServerMode": "full",
         "python.analysis.extraPaths": [
-            "${workspaceFolder:qmk_firmware}/lib/python",
-            "${workspaceFolder:qmk_userspace}/.direnv/uv/tools/qmk/lib/python3.13/site-packages",
-            "${workspaceFolder:qmk_userspace}/.direnv/uv/tools/qmk/lib/python3/site-packages",
-            "${workspaceFolder:qmk_userspace}/.direnv/uv/tools/qmk/lib/python",
-            "${workspaceFolder:qmk_userspace}/.venv/lib/python3.13/site-packages",
-            "${workspaceFolder:qmk_userspace}/.venv/lib/python3/site-packages",
-            "${workspaceFolder:qmk_userspace}/.venv/lib/python"
+            "${workspaceFolder:qmk_firmware}/lib/python"
         ],
         "python.analysis.aiCodeActions": {
             "convertFormatString": true,

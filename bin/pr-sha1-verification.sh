@@ -10,8 +10,8 @@ script_dir="$(realpath "$(dirname "$this_script")")"
 userspace_dir="$(realpath "$script_dir/..")"
 
 # Ensure we have access to the qmk venv if it exists
-venv_activate_path=$(find $userspace_dir -path '*/.venv/bin/*' -name activate | head -n1)
-if [[ -n ${venv_activate_path:-} ]]; then
+venv_activate_path="$userspace_dir/.venv/bin/activate"
+if [[ -f $venv_activate_path ]]; then
     echo "Activating environment: $venv_activate_path"
     source "$venv_activate_path"
 fi

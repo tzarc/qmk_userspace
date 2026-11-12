@@ -1,8 +1,31 @@
 [dependency-groups]
 dev = [
+  {include-group = "qmk-firmware"},
   "pip",
   "pre-commit",
   "ruff"
+]
+# Mirrors qmk_firmware's requirements.txt, requirements-dev.txt, util/ci/requirements.txt
+qmk-firmware = [
+  "ansi2html",
+  "argcomplete",
+  "colorama",
+  "discord-webhook",
+  "dotty-dict",
+  "flake8",
+  "hid",
+  "hjson",
+  "jinja2",
+  "jsonschema>=4",
+  "milc>=1.9.0",
+  "nose2",
+  "pep8-naming",
+  "pillow",
+  "pyflakes",
+  "pygments",
+  "pyserial",
+  "pyusb",
+  "yapf"
 ]
 
 [project]
@@ -55,3 +78,6 @@ ignore = []
 # Pyflakes (`F`), a subset of pycodestyle (`E`), pyupgrade (`UP`), unused-noqa (`RUF100`).
 select = ["E4", "E7", "E9", "F", "UP", "RUF100"]
 unfixable = []
+
+[tool.uv]
+package = false

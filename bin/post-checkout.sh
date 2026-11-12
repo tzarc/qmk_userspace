@@ -25,29 +25,17 @@ venv_dir=$(realpath "$script_dir/../.venv")
 # If we have a valid venv and valid qmk_firmware, do the actual processing
 if [[ -d $venv_dir ]] && [[ -d $firmware_dir ]]; then
     if [ "${1:-}" = "update" ]; then
-        # Figure out and enter the qmk venv
-        source "$venv_dir/bin/activate"
-
         pushd "$script_dir/../" >/dev/null 2>&1 &&
+            uv lock --upgrade &&
+            uv sync --frozen &&
             pre-commit autoupdate &&
             popd >/dev/null 2>&1
         pushd "$script_dir/../modules/tzarc" >/dev/null 2>&1 &&
             pre-commit autoupdate &&
             popd >/dev/null 2>&1
-
-        # Drop out of the qmk venv
-        deactivate
     elif [ "${1:-}" = "" -o "${1:-}" != "${2:-}" ]; then # Either no-arguments, or args 1&2 are different (i.e. git checkout decided to change the working tree)
         # Everything here happens within qmk_firmware
         cd "$firmware_dir"
-
-        # Figure out and enter the qmk venv
-        source "$venv_dir/bin/activate"
-
-        # Upgrade QMK CLI and all other deps
-        uv pip install --upgrade \
-            -r "$script_dir/../pyproject.toml" --group "$script_dir/../pyproject.toml:dev" \
-            -r requirements.txt -r requirements-dev.txt -r util/ci/requirements.txt
 
         # Determine all the submodules we expect, as well as the ones we found on-disk
         actual_submodules=$(git -C "$firmware_dir" submodule --quiet foreach --recursive git rev-parse --show-toplevel | sed -e "s@${firmware_dir}/@@g")
@@ -83,8 +71,5 @@ if [[ -d $venv_dir ]] && [[ -d $firmware_dir ]]; then
             popd >/dev/null 2>&1
         [[ -L "$firmware_dir/.git/hooks/post-checkout" ]] ||
             ln -sf "$script_dir/post-checkout.sh" "$firmware_dir/.git/hooks/post-checkout"
-
-        # Drop out of the qmk venv
-        deactivate
     fi
 fi
